@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:llm-prompt-purify": "node dist/llm-prompt-purify/server/server.mjs"
+    "serve:ssr:llm-prompt-purify": "node dist/llm-prompt-purify/server/server.mjs",
+    "postbuild": "cp apps/llm-prompt-purify/_redirects dist/llm-prompt-purify/"
   },
   "private": true,
   "dependencies": {
