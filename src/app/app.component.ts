@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import Swal from "sweetalert2";
 import { FormsModule } from "@angular/forms";
 import { OutputBuilder } from "../libs/builders/OutputBuilder";
-import { MAIN_DICT } from "../libs/vars/dictionaries";
+import { MAIN_DICT, PATTERNS } from "../libs/vars/dictionaries";
 import { MatIconModule } from "@angular/material/icon";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
@@ -34,12 +34,15 @@ export class AppComponent {
     let timerInterval: any;
     const txt = this.userInput.trim().split(/[\s\n\t\r=,_]/g),
       dictEntries = Object.entries(MAIN_DICT).filter(Boolean),
-      results = [];
+      results = [],
+      outpId = "resultOutput",
+      patternsTitle = "patternsTitle";
     let processing = true,
       failed = false,
       running = performance.now();
-    const outp = document.getElementById("resultOutput");
+    const outp = document.getElementById(outpId);
     if (outp) outp.innerText = "";
+    document.getElementById(patternsTitle)?.remove();
     const loading = setInterval(() => {
       if (!processing) return;
       Swal.fire({
@@ -111,13 +114,113 @@ export class AppComponent {
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, I will do it!",
       });
-      const outp = document.getElementById("resultOutput");
+      const h3 = document.createElement("h3");
+      h3.id = patternsTitle;
+      h3.textContent = "Identified patterns and suggested masks";
+      const outp = document.getElementById(outpId);
       if (outp) {
+        outp.insertAdjacentElement("beforebegin", h3);
         outp.innerText = `${results
-          .map(
-            ({ k, v }) =>
-              `${k}: ${v} — Suggested Mask: ${crypto.randomUUID()}\n\n`
-          )
+          .map(({ k, v }) => {
+            let newWord = v,
+              acc = 0;
+            do {
+              if (acc > v.length * 10) break;
+              const evals = [];
+              for (let l = 0; l < v.length; l++) {
+                const d = v[l];
+                if (
+                  PATTERNS.SYMBOLS().test(d) &&
+                  !/@\/\.\u20A0-\u20CF/.test(d)
+                ) {
+                  evals.push("s");
+                  continue;
+                } else if (PATTERNS.LATINIZED_CHARS().test(d)) {
+                  evals.push("l");
+                  continue;
+                } else if (PATTERNS.NUMBERS().test(d)) {
+                  evals.push("d");
+                  continue;
+                } else if (PATTERNS.JAPANESE().test(d)) {
+                  evals.push("j");
+                  continue;
+                } else if (PATTERNS.HANGUL().test(d)) {
+                  evals.push("hg");
+                  continue;
+                } else if (PATTERNS.HAN().test(d)) {
+                  evals.push("ha");
+                  continue;
+                } else if (PATTERNS.ARABIC().test(d)) {
+                  evals.push("a");
+                  continue;
+                } else if (PATTERNS.CYRILIC().test(d)) {
+                  evals.push("c");
+                  continue;
+                } else evals.push("?");
+              }
+              newWord = "";
+              const newLetters = [];
+              for (let e = 0; e < evals.length; e++) {
+                const c = evals[e];
+                switch (c) {
+                  case "s":
+                    newLetters.push(PATTERNS.getRandomSymbol(v));
+                    break;
+                  case "l":
+                    newLetters.push(
+                      PATTERNS.getRandomChar(0x0041, 0x005a)
+                        .concat(PATTERNS.getRandomChar(0x0061, 0x007a))
+                        .concat(PATTERNS.getRandomChar(0x00c0, 0x00ff))[
+                        Math.floor(Math.random() * 3)
+                      ]
+                    );
+                    break;
+                  case "d":
+                    newLetters.push(Math.floor(Math.random() * 10));
+                    break;
+                  case "j":
+                    newLetters.push(PATTERNS.getRandomChar(0x3040, 0x309f));
+                    break;
+                  case "hg":
+                    newLetters.push(PATTERNS.getRandomChar(0xac00, 0xd7af));
+                    break;
+                  case "ha":
+                    newLetters.push(
+                      Math.random() < 0.5
+                        ? PATTERNS.getRandomChar(0x4e00, 0x9fff)
+                        : PATTERNS.getRandomChar(0x3400, 0x4dbf)
+                    );
+                    break;
+                  case "a": {
+                    newLetters.push(
+                      Math.random() < 0.6
+                        ? PATTERNS.getRandomChar(0x0600, 0x06ff)
+                        : Math.random() < 0.8
+                        ? PATTERNS.getRandomChar(0x0750, 0x077f)
+                        : PATTERNS.getRandomChar(0x08a0, 0x08ff)
+                    );
+                    break;
+                  }
+                  case "c":
+                    newLetters.push(PATTERNS.getRandomChar(0x0400, 0x04ff));
+                    break;
+                  default:
+                    newLetters.push(v[e]);
+                }
+              }
+              newWord = newLetters.join("");
+              acc += 1;
+            } while (newWord === v);
+            if (newWord.length < v.length)
+              newWord = crypto
+                .randomUUID()
+                .slice(0, v.length - newWord.length)
+                .replace(/@\/\.\u20A0-\u20CF/g, "a");
+            return `${k
+              .replace(/^,_=/, "")
+              .replace(/,_=$/, "")
+              .toUpperCase()}: ${v} — Suggested Mask: ${newWord}\n\n`;
+          })
           .toString()
           .replace("[", "")
           .replace("]", "")}`;
