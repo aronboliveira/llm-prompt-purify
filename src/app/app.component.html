@@ -1,16 +1,45 @@
-<div class="container">
-  <h1>LLM Prompt Purify</h1>
-  <textarea
-    [(ngModel)]="userInput"
-    [attr.maxLength]="maxLength"
-    placeholder="Type your message here..."
-    rows="10"
-    cols="50"
-  ></textarea>
+<div class="container" id="mainContainer">
+  <h1 style="font-weight: boldest">LLM Prompt Purify</h1>
+  <mat-form-field appearance="outline">
+    <mat-label>Type or paste your prompt here</mat-label>
+    <textarea
+      matInput
+      [(ngModel)]="userInput"
+      [attr.maxLength]="maxLength"
+      placeholder="Type your message here..."
+      rows="10"
+      cols="100"
+    ></textarea>
+  </mat-form-field>
   <p>{{ userInput.length }}/{{ maxLength }} characters</p>
   <output id="resultOutput">{{ processedOutput }}</output>
   <div class="actions">
-    <button (click)="copyOutput()">Copy Output</button>
-    <button (click)="downloadZip()">Download .zip</button>
+    <button
+      mat-raised-button
+      color="primary"
+      aria-label="Scan Prompt"
+      title="Scan Prompt"
+      (click)="checkPrompt()"
+    >
+      Scan Prompt
+    </button>
+    <button
+      mat-icon-button
+      color="secondary"
+      aria-label="Copy Output"
+      title="Copy Output"
+      (click)="copyOutput()"
+    >
+      <mat-icon>content_copy</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      color="accent"
+      aria-label="Download Output"
+      title="Download Output"
+      (click)="downloadZip()"
+    >
+      <mat-icon>download</mat-icon>
+    </button>
   </div>
 </div>
