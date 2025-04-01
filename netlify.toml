@@ -1,10 +1,9 @@
 [build]
-  base = "apps/llm-prompt-purify"        
-  command = "npx ng build --configuration production"  
+  command = "ls -la && npx ng build --configuration production"  
   publish = "dist/llm-prompt-purify"     
 
 [build.environment]
-  NODE_VERSION = "18"                    
+  NODE_VERSION = "22"                    
   NPM_FLAGS = "--legacy-peer-deps"       
 
 [[redirects]]
