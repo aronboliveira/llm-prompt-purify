@@ -1,6 +1,6 @@
 [build]
   command = "ls -la && npx ng build --configuration production"  
-  publish = "dist/llm-prompt-purify"     
+  publish = "dist/"     
 
 [build.environment]
   NODE_VERSION = "22"                    
