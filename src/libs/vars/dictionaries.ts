@@ -1,0 +1,37 @@
+export const MAIN_DICT = Object.freeze({
+  common: Object.freeze({
+    email: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,
+    ssn: /\b\d{3}-\d{2}-\d{4}\b/,
+    url: /\b(https?:\/\/[^\s/$.?#].[^\s]*)\b/gi,
+    urn: /\burn:[a-z0-9][a-z0-9-]{1,31}:[^\s]+\b/gi,
+    phone: /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
+    creditCard: /\b(?:\d[ -]*?){13,16}\b/,
+    envVar: /\b[A-Z][A-Z0-9_]{2,}(?:_KEY|_SECRET|_TOKEN|_URL)?\b/,
+    apiKey: /\b[A-Za-z0-9]{20,}\b/,
+    token:
+      /\b(?:password|secret|token)\s*[:=]\s*['"]?[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}\b/gi,
+    business:
+      /\b(?:company\s*(?:ID|number)|registration\s*number)\s*[:=]\s*[A-Z0-9\-]{4,}\b/gi,
+    cpf: /\b\d{3}[.\-]?\d{3}[.\-]?\d{3}[\-]?\d{2}\b/g,
+  }),
+  pt: Object.freeze({
+    cpfLabel: /\b(?:[Cc][Pp][Ff])\s*[:=-]?/gi,
+    cpnjLabel: /\b(?:cnpj)\s*[:=-]?/gi,
+    emailLabel: /\b(?:email|e[-\s]?mail|correio eletr[oô]nico)\s*[:=-]?/gi,
+    phoneLabel: /\b(?:telefone|tel|celular)\s*[:=-]?/gi,
+    addressLabel: /\b(?:end[eê]re[çc]o)\s*[:=-]\s*.+/gi,
+    fullNameLabel: /\b(?:nome completo|nome)\s*[:=-]/gi,
+    secondNameLabel: /\b(?:sobrenome)\s*[:=-]\s*([A-ZÀ-Ÿ][a-zà-ÿ]+)\b/gi,
+    companyLabel: /\b(?:empresa|raz[ãa]o social)\s*[:=-]+\b/i,
+  }),
+  en: Object.freeze({}),
+  es: Object.freeze({}),
+  de: Object.freeze({}),
+  hb: Object.freeze({}),
+  ja: Object.freeze({}),
+  ko: Object.freeze({}),
+  zh: Object.freeze({}),
+  ru: Object.freeze({}),
+  fr: Object.freeze({}),
+  it: Object.freeze({}),
+});
