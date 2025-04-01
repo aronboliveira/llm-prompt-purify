@@ -1,5 +1,4 @@
----
-title: **LLM Prompt Purify**  
+title: **LLM Prompt Purify**
 subtitle: Client-Side Sensitive Data Filtering Suite  
 contact: [aron.programador@gmail.com](mailto:aron.programador@gmail.com)  
 ---
