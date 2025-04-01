@@ -1,0 +1,16 @@
+<div class="container">
+  <h1>LLM Prompt Purify</h1>
+  <textarea
+    [(ngModel)]="userInput"
+    [attr.maxLength]="maxLength"
+    placeholder="Type your message here..."
+    rows="10"
+    cols="50"
+  ></textarea>
+  <p>{{ userInput.length }}/{{ maxLength }} characters</p>
+  <output id="resultOutput">{{ processedOutput }}</output>
+  <div class="actions">
+    <button (click)="copyOutput()">Copy Output</button>
+    <button (click)="downloadZip()">Download .zip</button>
+  </div>
+</div>

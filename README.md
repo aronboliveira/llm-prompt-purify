@@ -159,24 +159,14 @@ Anonimización automática antes de enviar datos a APIs
 </details>
 (A seguir: 🇩🇪, 🇷🇺, 🇯🇵, 🇨🇳, 🇫🇷 — deseja que continue com os próximos agora?)
 
-
-
-
-
 You said:
 Sim. Faça todas as línguas de uma vez só, e inclua mais estilizações para controle de peso e estilo de fonte, anexação de hyperlinks (meu contato sendo aron.programador@gmail.com)
-
 
 ChatGPT said:
-Perfeito! Aqui estão **todas as versões traduzidas e estil
-
-
-
-
+Perfeito! Aqui estão \*\*todas as versões traduzidas e estil
 
 You said:
 Sim. Faça todas as línguas de uma vez só, e inclua mais estilizações para controle de peso e estilo de fonte, anexação de hyperlinks (meu contato sendo aron.programador@gmail.com)
-
 
 ChatGPT said:
 Reasoned for 58 seconds
@@ -479,11 +469,11 @@ Backend: Express.js
 
 📧 メールアドレスや個人アカウント
 
-🧾 身分証明書（SSN、CPFなど）
+🧾 身分証明書（SSN、CPF など）
 
 🗺️ 住所、所在地、座標
 
-🔗 URL、APIトークン、内部URI
+🔗 URL、API トークン、内部 URI
 
 🏢 企業や戦略的データ
 
@@ -533,11 +523,11 @@ AI API に送信する前のデータの 匿名化
 
 📧 电子邮件及个人账户
 
-🧾 身份证件（如SSN、CPF等）
+🧾 身份证件（如 SSN、CPF 等）
 
 🗺️ 地址、位置信息及坐标
 
-🔗 URL、API令牌、内部URI
+🔗 URL、API 令牌、内部 URI
 
 🏢 企业及战略数据
 
@@ -613,4 +603,3 @@ Anonymisation des données avant de les envoyer aux API d'IA
 
 </details>
 Contact: aron.programador@gmail.com
-
