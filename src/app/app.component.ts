@@ -211,14 +211,21 @@ export class AppComponent {
               newWord = newLetters.join("");
               acc += 1;
             } while (newWord === v);
+            if (/(?:cpf|cpnj|celular|telefone|rg)[\s\t\n=:]*/gi.test(newWord)) {
+              const chars = newWord.split("");
+              for (let a = 0; a < chars.length; a++) {
+                if (PATTERNS.NUMBERS().test(chars[a]))
+                  chars[a] = PATTERNS.getRandomSymbol(newWord);
+              }
+            }
             if (newWord.length < v.length)
               newWord = crypto
                 .randomUUID()
                 .slice(0, v.length - newWord.length)
                 .replace(/@\/\.\u20A0-\u20CF/g, "a");
             return `${k
-              .replace(/^,_=/, "")
-              .replace(/,_=$/, "")
+              .replace(/^[,_=]+/, "")
+              .replace(/[,_=]+$/, "")
               .toUpperCase()}: ${v} — Suggested Mask: ${newWord}\n\n`;
           })
           .toString()
