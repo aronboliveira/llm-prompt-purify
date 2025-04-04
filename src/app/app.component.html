@@ -13,7 +13,7 @@
   </mat-form-field>
   <p>{{ userInput.length }}/{{ maxLength }} characters</p>
   <output id="resultOutput">{{ processedOutput }}</output>
-  <div class="actions">
+  <fieldset class="actions">
     <button
       mat-raised-button
       color="primary"
@@ -41,5 +41,6 @@
     >
       <mat-icon>download</mat-icon>
     </button>
-  </div>
+    <app-compress-picker></app-compress-picker>
+  </fieldset>
 </div>

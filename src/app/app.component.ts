@@ -7,6 +7,8 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
+import { appState } from "../libs/state";
+import { CompressPickerComponent } from "./compress-picker/compress-picker.component";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -16,6 +18,7 @@ import { MatButtonModule } from "@angular/material/button";
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    CompressPickerComponent,
   ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
@@ -250,7 +253,7 @@ export class AppComponent {
   downloadZip(): void {
     new OutputBuilder({
       _input: this.userInput,
-      _compressionLevel: "6", //TODO INCLUIR OPÇÃO EM SELECT
+      _compressionLevel: appState.compressionLevel.toString(),
     });
   }
 }
