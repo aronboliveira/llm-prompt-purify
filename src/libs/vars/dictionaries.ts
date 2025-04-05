@@ -26,12 +26,15 @@ export const MAIN_DICT = Object.freeze({
     COMPANY_LABEL: /\b(?:empresa|raz[ãa]o social)\s*[:=-]\s*/gi,
   }),
   en: Object.freeze({
+    FIRST_NAME_LABEL: /\bfirst\s+name\s*[:=-]\s*([A-Z][a-z]+)\b/i,
+    FULL_NAME_LABEL: /\b(?:full name|name)\s*[:=-]\s*/gi,
+    LAST_NAME_LABEL: /\b(?:last name|surname)\s*[:=-]\s*/gi,
     EMAIL_LABEL: /\b(?:email)\s*[:=-]\s*/gi,
     PHONE_LABEL: /\b(?:phone|tel)\s*[:=-]\s*/gi,
     ADDRESS_LABEL: /\b(?:address)\s*[:=-]\s*/gi,
-    FULL_NAME_LABEL: /\b(?:full name|name)\s*[:=-]\s*/gi,
-    LAST_NAME_LABEL: /\b(?:last name|surname)\s*[:=-]\s*/gi,
-    COMPANY_LABEL: /\b(?:company|business)\s*[:=-]\s*/gi,
+    COMPANY_LABEL:
+      /\b(?:company(?:\s+name)?|organization|business)\s*[:=-]\s*([A-Z][A-Za-z0-9\s&.,-]+)\b/i,
+    AGE_LABEL: /\bage\s*[:=-]\s*(\d{1,3})\b/i,
   }),
   es: Object.freeze({
     EMAIL_LABEL: /\b(?:correo electr[oó]nico|email)\s*[:=-]\s*/gi,
