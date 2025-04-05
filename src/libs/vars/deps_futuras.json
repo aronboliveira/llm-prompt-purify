@@ -1,0 +1,34 @@
+{
+  "pt": [
+    {
+      "name": "IBGE Nomes",
+      "URI": "https://servicodados.ibge.gov.br/api/v2/censos/nomes/"
+    },
+    {
+      "name": "Turicas",
+      "URI": "https://github.com/turicas/genero-nomes/blob/master/genero.csv"
+    }
+  ],
+  "en": [
+    {
+      "name": "Anglosphere Baby Names",
+      "URI": "kkoopmans/anglosphere-baby-names"
+    },
+    {
+      "name": "Australian Name Database",
+      "URI": "https://census.name/australian-name-database/"
+    },
+    {
+      "name": "South Australia Popular Baby Names",
+      "URI": "https://www.data.gov.au/dataset/ds-sa-9849aa7f-e316-426e-8ab5-74658a62c7e6/details"
+    },
+    {
+      "name": "NameDB",
+      "URI": "https://incompetech.com/named/"
+    },
+    {
+      "name": "American Names",
+      "URI": "https://www.kaggle.com/datasets/louisteitelbaum/american-names-by-multi-ethnic-national-origin"
+    }
+  ]
+}

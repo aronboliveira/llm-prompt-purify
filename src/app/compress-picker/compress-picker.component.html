@@ -1,0 +1,11 @@
+<mat-form-field appearance="outline">
+  <mat-label>File Compression Level</mat-label>
+  <mat-select
+    [(ngModel)]="compressionLevel"
+    (ngModelChange)="updateCompressionLevel()"
+  >
+    <mat-option *ngFor="let level of compressionLevels" [value]="level">
+      {{ level }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
