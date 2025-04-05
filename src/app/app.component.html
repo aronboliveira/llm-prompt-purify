@@ -5,6 +5,7 @@
     <textarea
       matInput
       [(ngModel)]="userInput"
+      (ngModelChange)="setInput($event)"
       [attr.maxLength]="maxLength"
       placeholder="Type your message here..."
       rows="10"
@@ -14,15 +15,7 @@
   <p>{{ userInput.length }}/{{ maxLength }} characters</p>
   <output id="resultOutput">{{ processedOutput }}</output>
   <fieldset class="actions">
-    <button
-      mat-raised-button
-      color="primary"
-      aria-label="Scan Prompt"
-      title="Scan Prompt"
-      (click)="checkPrompt()"
-    >
-      Scan Prompt
-    </button>
+    <app-scan-submit></app-scan-submit>
     <button
       mat-icon-button
       color="secondary"

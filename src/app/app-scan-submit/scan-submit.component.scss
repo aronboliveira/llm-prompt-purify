@@ -1,0 +1,4 @@
+@use "../styles/abstracts/vars.scss" as *;
+:host {
+  margin-block: $cta-margin;
+}
