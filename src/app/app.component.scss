@@ -1,3 +1,4 @@
+@use "./styles/abstracts/vars.scss" as *;
 textarea {
   width: 100%;
   font-size: 1rem;
@@ -5,20 +6,27 @@ textarea {
 
 .actions {
   margin-top: 1rem;
-  display: flex;
   gap: 1rem;
+  display: flex;
+  justify-content: center;
+  vertical-align: middle;
+  flex-wrap: wrap;
+  border: none;
+  button {
+    margin-block: $cta-margin;
+  }
 }
 
 .container {
-  max-width: 600px;
+  max-width: 37.5rem;
   margin: auto;
   padding: 1rem;
 }
 
 #mainContainer {
-  padding-top: 5%;
+  padding-top: calc($cta-margin * 0.75);
 }
 
 #resultOutput {
-  color: red;
+  color: rgba(255, 0, 0, 0.819);
 }

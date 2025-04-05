@@ -1,4 +1,4 @@
-export const MAIN_DICT = Object.freeze({
+export const MAIN_DICT: Readonly<Record<any, any>> = Object.freeze({
   common: Object.freeze({
     EMAIL: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,
     SSN: /\b\d{3}-\d{2}-\d{4}\b/,
@@ -141,14 +141,13 @@ export const PATTERNS = Object.freeze({
     ),
   getRandomSymbol: (originalStr: string) => {
     const symbolRanges = [
+      ...Array.from({ length: 10 }).map(() => [0x20, 0x7e]),
       [0x2000, 0x206f],
       [0x2100, 0x214f],
       [0x2190, 0x21ff],
       [0x2200, 0x22ff],
       [0x2300, 0x23ff],
       [0x2500, 0x257f],
-      [0x2600, 0x26ff],
-      [0x2700, 0x27bf],
       [0x2900, 0x297f],
       [0x2b00, 0x2bff],
       [0x3000, 0x303f],
@@ -159,9 +158,8 @@ export const PATTERNS = Object.freeze({
     for (const [start, end] of symbolRanges) {
       for (let code = start; code <= end; code++) {
         const char = String.fromCharCode(code);
-        if (!/@\/\.[\u20A0-\u20CF]/.test(char) && !originalStr.includes(char)) {
+        if (!/@\/\.[\u20A0-\u20CF]/.test(char) && !originalStr.includes(char))
           validSymbols.push(char);
-        }
       }
     }
     return validSymbols.length > 0
