@@ -15,7 +15,7 @@ _Multi-Language Security Solution for LLM Interactions_
 
 ## 🌐 **Language Versions**
 
-### 🇧🇷 Português (Brasil)
+### Português (Brasil)
 
 **Finalidade:**  
 <em>Garantir proteção total de dados sensíveis durante o uso de LLMs através de filtragem local</em>
