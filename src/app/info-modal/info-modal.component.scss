@@ -21,9 +21,15 @@ a {
   text-decoration: none;
   border-bottom: 1px solid transparent;
 }
-mat-dialog-content {
+mat-dialog-content,
+[mat-dialog-content] {
   max-height: 50rem;
   overflow: auto;
+  padding: 1rem !important;
+  details,
+  article {
+    padding: 1rem !important;
+  }
 }
 mat-dialog-title,
 [mat-dialog-title] {
