@@ -1,5 +1,10 @@
-/* You can add global styles to this file, and also import other style files */
-
+:root {
+  --info-bg-primary: #3f51b5;
+  --info-bg-secondary: #303f9f;
+  --info-bg-invert-secondary: #8f00f57b;
+  --warn: #ffeb3b;
+  --info: #2196f3;
+}
 html,
 body {
   height: 100%;

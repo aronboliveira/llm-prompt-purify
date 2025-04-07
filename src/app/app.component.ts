@@ -8,32 +8,47 @@ import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import { appState } from "./libs/state";
 import { CompressPickerComponent } from "./compress-picker/compress-picker.component";
-import { ScanSubmitComponent } from "./app-scan-submit/scan-submit.component";
+import { ScanSubmitComponent } from "./scan-submit/scan-submit.component";
 import { UserInputSerivce } from "./libs/state/user-input.service";
+import { UnderDevelopmentComponent } from "./under-development/under-development.component";
+import { HelpToggleComponent } from "./help-toggle/help-toggle.component";
+import { InfoModalComponent } from "./info-modal/info-modal.component";
+import { MatDialog, MatDialogModule } from "@angular/material/dialog";
+import { CommonModule } from "@angular/common";
+import { presentation } from "./libs/bloc/html/info";
 @Component({
   selector: "app-root",
   standalone: true,
   imports: [
+    CommonModule,
     FormsModule,
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatDialogModule,
+    HelpToggleComponent,
+    InfoModalComponent,
     ScanSubmitComponent,
     CompressPickerComponent,
+    UnderDevelopmentComponent,
   ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent {
-  constructor(private _userInputService: UserInputSerivce) {}
+  constructor(
+    private _userInputService: UserInputSerivce,
+    public dialog: MatDialog
+  ) {}
   userInput = "";
-  maxLength = 4096;
   processedOutput = "";
+  maxLength = 4096;
+  isHelpOpen = false;
   ngOnInit(): void {
     this.processedOutput = this.userInput.trim();
   }
-  setInput(v: string) {
+  setInput(v: string): void {
     this.userInput = v;
     this._userInputService.setObsUserInput(v);
   }
@@ -53,5 +68,16 @@ export class AppComponent {
       _input: this.userInput,
       _compressionLevel: appState.compressionLevel.toString(),
     });
+  }
+  openInfoDialog(): void {
+    this.dialog
+      .open(InfoModalComponent, {
+        data: { text: presentation() },
+        panelClass: "project-info-modal",
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.isHelpOpen = false;
+      });
   }
 }

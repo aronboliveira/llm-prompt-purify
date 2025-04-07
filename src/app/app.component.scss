@@ -1,12 +1,12 @@
 @use "./styles/abstracts/vars.scss" as *;
 textarea {
   width: 100%;
-  font-size: 1rem;
+  font-size: $gap-md;
 }
 
 .actions {
-  margin-top: 1rem;
-  gap: 1rem;
+  margin-top: $gap-md;
+  gap: $gap-md;
   display: flex;
   justify-content: center;
   vertical-align: middle;
@@ -20,11 +20,16 @@ textarea {
 .container {
   max-width: 37.5rem;
   margin: auto;
-  padding: 1rem;
+  padding: $gap-md;
 }
 
 #mainContainer {
   padding-top: calc($cta-margin * 0.75);
+}
+
+#mainHeader {
+  display: flex;
+  justify-content: space-around;
 }
 
 #resultOutput {

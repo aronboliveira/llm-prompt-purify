@@ -1,0 +1,122 @@
+@use "../styles/abstracts/vars.scss" as *;
+@use "../styles/abstracts/mixins.scss" as *;
+details {
+  border: 1px solid lighten($primary-color, 40%);
+  border-radius: $border-radius;
+  padding: $gap-sm;
+  margin-bottom: $gap-md;
+  summary {
+    font-weight: bold;
+    display: list-item;
+    margin-bottom: $gap-sm;
+    @include interactive-states();
+    &::marker {
+      color: $secondary-color;
+    }
+  }
+}
+a {
+  @include interactive-states();
+  color: $primary-color;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+mat-dialog-content {
+  max-height: 50rem;
+  overflow: auto;
+}
+mat-dialog-title,
+[mat-dialog-title] {
+  display: inline;
+}
+p {
+  white-space: pre-line;
+  hyphens: auto;
+}
+.dialog-header {
+  padding: $gap-md;
+  display: flex;
+  justify-content: space-around;
+  mat-button,
+  [mat-button] {
+    vertical-align: super;
+  }
+}
+.highlight {
+  background-color: var(--warn);
+  padding: $txt-tn $txt-sm;
+  border-radius: 3px;
+  box-decoration-break: clone;
+}
+.modal {
+  @include interactive-states();
+  background-color: $background-color;
+  color: $text-color;
+  border: 1px solid lighten($primary-color, 40%);
+  border-radius: $border-radius;
+  padding: $gap-md;
+  transition: background-color $transition-speed;
+  .modal-header {
+    @include delined-pseudo-elements;
+    font-size: $txt-md;
+    margin-bottom: $gap-sm;
+  }
+  .modal-content {
+    font-size: 1em;
+    line-height: 1.5;
+    p {
+      margin-bottom: $gap-md;
+    }
+  }
+  .modal-footer {
+    text-align: right;
+    button {
+      @include interactive-states();
+      padding: $gap-sm $gap-md;
+      border: none;
+      border-radius: $border-radius;
+      background-color: $primary-color;
+      color: $background-color;
+      transition: background-color $transition-speed;
+    }
+  }
+}
+.project-info-modal {
+  max-width: 37.5rem;
+  .mat-dialog-container {
+    padding: $gap-lg;
+    border-radius: $gap-sm;
+  }
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: calc($gap-md + $gap-sm);
+  }
+}
+#projectInfoModal {
+  background-color: #fff;
+  color: #333;
+  ::details-content {
+    font-size: $gap-md;
+  }
+  #projectTitle {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  p {
+    line-height: 1.6;
+    margin-bottom: $gap-md;
+  }
+  a {
+    transition: border-color $transition-speed;
+    &:hover,
+    &:focus {
+      border-bottom: 1px solid currentColor;
+      outline: 2px solid $secondary-color;
+    }
+  }
+}
+.underline-emph {
+  text-decoration: underline wavy var(--info);
+  text-underline-offset: $txt-tn;
+}

@@ -1,0 +1,22 @@
+@use "./vars.scss" as *;
+@mixin interactive-states($bg-hover: $hover-bg, $bg-active: $active-bg) {
+  &:hover {
+    background-color: $bg-hover;
+    cursor: pointer;
+  }
+  &:active {
+    background-color: $bg-active;
+  }
+}
+@mixin delined-pseudo-elements {
+  &::first-letter {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+  &::first-line {
+    font-style: italic;
+  }
+  &::placeholder {
+    color: lighten($text-color, 30%);
+  }
+}
