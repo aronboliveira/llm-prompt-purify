@@ -16,6 +16,7 @@ import { InfoModalComponent } from "./info-modal/info-modal.component";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { CommonModule } from "@angular/common";
 import { presentation } from "./libs/bloc/html/info";
+import { FixedHeaderComponent } from "./fixed-header/fixed-header.component";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -27,6 +28,7 @@ import { presentation } from "./libs/bloc/html/info";
     MatInputModule,
     MatButtonModule,
     MatDialogModule,
+    FixedHeaderComponent,
     HelpToggleComponent,
     InfoModalComponent,
     ScanSubmitComponent,

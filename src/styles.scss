@@ -33,3 +33,10 @@ mat-dialog-container,
     }
   }
 }
+bng #scanResults {
+  width: 100%;
+  td,
+  th {
+    text-align: center;
+  }
+}

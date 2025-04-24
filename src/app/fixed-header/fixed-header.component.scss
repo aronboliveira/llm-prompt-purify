@@ -1,0 +1,35 @@
+.fixed-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #1976d2;
+  color: #fff;
+  transition: height 0.3s ease, transform 0.5s ease;
+  z-index: 1000;
+  overflow: hidden;
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    .header-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .fix-toggle {
+      font-size: 0.875rem;
+      padding: 0.25rem 0.5rem;
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      &:active {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+}

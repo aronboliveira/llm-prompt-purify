@@ -1,0 +1,43 @@
+<header #header class="fixed-header" role="banner">
+  <div class="header-content">
+    <div class="header-title-container">
+      <span class="header-title" tabindex="0">LLM Prompt Purify</span>
+    </div>
+    <nav class="header-nav" aria-label="Main Navigation">
+      <a
+        href="/feedback"
+        role="button"
+        class="nav-link"
+        tabindex="0"
+        aria-label="Feedback Form"
+        title="Feedback"
+        >Feedback</a
+      >
+      <a
+        href="/contact"
+        role="button"
+        class="nav-link"
+        tabindex="0"
+        aria-label="Contact Developer"
+        title="Contact"
+        >Contact</a
+      >
+      <button class="info-button" aria-label="Information" title="Information">
+        <mat-icon>help_outline</mat-icon>
+      </button>
+    </nav>
+    <button
+      mat-button
+      class="fix-toggle"
+      (click)="toggleFixHeader()"
+      aria-label="Fix header"
+      title="Fix Header"
+    >
+      <mat-checkbox
+        [checked]="fixHeader"
+        class="mat-small-checkbox"
+      ></mat-checkbox>
+      Fix Header
+    </button>
+  </div>
+</header>

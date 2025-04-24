@@ -1,49 +1,52 @@
 <div class="container" id="mainContainer" style="padding-top: 5rem">
-  <hgroup id="mainHeader">
-    <h1 style="font-weight: bold">LLM Prompt Purify</h1>
-    <app-help-toggle
-      [isHelpOpen]="isHelpOpen"
-      (toggleHelp)="openInfoDialog()"
-    ></app-help-toggle>
-  </hgroup>
-  <!-- <ng-container *ngIf="isHelpOpen">
-    <app-info-modal></app-info-modal>
-  </ng-container> -->
-  <mat-form-field appearance="outline">
-    <mat-label>Type or paste your prompt here</mat-label>
-    <textarea
-      matInput
-      [(ngModel)]="userInput"
-      (ngModelChange)="setInput($event)"
-      [attr.maxLength]="maxLength"
-      placeholder="Type your message here..."
-      rows="10"
-      cols="100"
-    ></textarea>
-  </mat-form-field>
-  <p>{{ userInput.length }}/{{ maxLength }} characters</p>
-  <output id="resultOutput">{{ processedOutput }}</output>
-  <fieldset class="actions">
-    <app-scan-submit></app-scan-submit>
-    <button
-      mat-icon-button
-      color="secondary"
-      aria-label="Copy Output"
-      title="Copy Output"
-      (click)="copyOutput()"
-    >
-      <mat-icon>content_copy</mat-icon>
-    </button>
-    <button
-      mat-icon-button
-      color="accent"
-      aria-label="Download Output"
-      title="Download Output"
-      (click)="downloadZip()"
-    >
-      <mat-icon>download</mat-icon>
-    </button>
-    <app-compress-picker></app-compress-picker>
-  </fieldset>
+  <app-fixed-header></app-fixed-header>
+  <main id="main" class="main">
+    <hgroup id="mainHeader">
+      <h1 style="font-weight: bold">LLM Prompt Purify</h1>
+      <app-help-toggle
+        [isHelpOpen]="isHelpOpen"
+        (toggleHelp)="openInfoDialog()"
+      ></app-help-toggle>
+    </hgroup>
+    <!-- <ng-container *ngIf="isHelpOpen">
+      <app-info-modal></app-info-modal>
+    </ng-container> -->
+    <mat-form-field appearance="outline">
+      <mat-label>Type or paste your prompt here</mat-label>
+      <textarea
+        matInput
+        [(ngModel)]="userInput"
+        (ngModelChange)="setInput($event)"
+        [attr.maxLength]="maxLength"
+        placeholder="Type your message here..."
+        rows="10"
+        cols="100"
+      ></textarea>
+    </mat-form-field>
+    <p>{{ userInput.length }}/{{ maxLength }} characters</p>
+    <output id="resultOutput">{{ processedOutput }}</output>
+    <fieldset class="actions">
+      <app-scan-submit></app-scan-submit>
+      <button
+        mat-icon-button
+        color="secondary"
+        aria-label="Copy Output"
+        title="Copy Output"
+        (click)="copyOutput()"
+      >
+        <mat-icon>content_copy</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        color="accent"
+        aria-label="Download Output"
+        title="Download Output"
+        (click)="downloadZip()"
+      >
+        <mat-icon>download</mat-icon>
+      </button>
+      <app-compress-picker></app-compress-picker>
+    </fieldset>
+  </main>
   <app-under-development></app-under-development>
 </div>
