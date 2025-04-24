@@ -13,14 +13,14 @@ import Swal from "sweetalert2";
 export class ScanSubmitComponent {
   #userInput: string = "";
   constructor(private _userInputService: UserInputSerivce) {
-    this._userInputService.userInput$.subscribe((v) => (this.#userInput = v));
+    this._userInputService.userInput$.subscribe(v => (this.#userInput = v));
   }
   checkPrompt(): void {
     let timerInterval: any;
     console.log(this.#userInput);
     const txt = this.#userInput?.trim().split(/[\s\n\t\r=,_]/g),
       dictEntries = Object.entries(MAIN_DICT).filter(Boolean),
-      results = [],
+      results: Array<{ k: string; e: RegExp | string; v: string }> = [],
       outpId = "resultOutput",
       patternsTitle = "patternsTitle";
     let processing = true,
@@ -49,6 +49,7 @@ export class ScanSubmitComponent {
       });
       running += performance.now();
     }, 2000);
+
     setTimeout(() => {
       clearInterval(loading);
       if (processing) {
@@ -81,14 +82,15 @@ export class ScanSubmitComponent {
         }
       }
     }
+
     if (processing) return;
-    if (!results.length)
+    if (!results.length) {
       Swal.fire({
         title: "Your prompt is safe!",
         icon: "success",
         draggable: true,
       });
-    else {
+    } else {
       Swal.fire({
         title: "Your prompt has dangerous data!",
         text: "You need to mask it!",
@@ -98,127 +100,171 @@ export class ScanSubmitComponent {
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, I will do it!",
       });
+
       const h3 = document.createElement("h3");
       h3.id = patternsTitle;
       h3.textContent = "Identified patterns and suggested masks";
       const outp = document.getElementById(outpId);
+
       if (outp) {
         outp.insertAdjacentElement("beforebegin", h3);
-        outp.innerText = `${results
-          .map(({ k, v }) => {
-            let newWord = v,
-              acc = 0;
-            do {
-              if (acc > v.length * 10) break;
-              const evals = [];
-              for (let l = 0; l < v.length; l++) {
-                const d = v[l];
-                if (
-                  PATTERNS.SYMBOLS().test(d) &&
-                  !/@\/\.\u20A0-\u20CF/.test(d)
-                ) {
-                  evals.push("s");
-                  continue;
-                } else if (PATTERNS.LATINIZED_CHARS().test(d)) {
-                  evals.push("l");
-                  continue;
-                } else if (PATTERNS.NUMBERS().test(d)) {
-                  evals.push("d");
-                  continue;
-                } else if (PATTERNS.JAPANESE().test(d)) {
-                  evals.push("j");
-                  continue;
-                } else if (PATTERNS.HANGUL().test(d)) {
-                  evals.push("hg");
-                  continue;
-                } else if (PATTERNS.HAN().test(d)) {
-                  evals.push("ha");
-                  continue;
-                } else if (PATTERNS.ARABIC().test(d)) {
-                  evals.push("a");
-                  continue;
-                } else if (PATTERNS.CYRILIC().test(d)) {
-                  evals.push("c");
-                  continue;
-                } else evals.push("?");
-              }
-              newWord = "";
-              const newLetters = [];
-              for (let e = 0; e < evals.length; e++) {
-                const c = evals[e];
-                switch (c) {
-                  case "s":
-                    newLetters.push(PATTERNS.getRandomSymbol(v));
-                    break;
-                  case "l":
-                    newLetters.push(
-                      PATTERNS.getRandomChar(0x0041, 0x005a)
-                        .concat(PATTERNS.getRandomChar(0x0061, 0x007a))
-                        .concat(PATTERNS.getRandomChar(0x00c0, 0x00ff))[
-                        Math.floor(Math.random() * 3)
-                      ]
-                    );
-                    break;
-                  case "d":
-                    newLetters.push(Math.floor(Math.random() * 10));
-                    break;
-                  case "j":
-                    newLetters.push(PATTERNS.getRandomChar(0x3040, 0x309f));
-                    break;
-                  case "hg":
-                    newLetters.push(PATTERNS.getRandomChar(0xac00, 0xd7af));
-                    break;
-                  case "ha":
-                    newLetters.push(
-                      Math.random() < 0.5
-                        ? PATTERNS.getRandomChar(0x4e00, 0x9fff)
-                        : PATTERNS.getRandomChar(0x3400, 0x4dbf)
-                    );
-                    break;
-                  case "a": {
-                    newLetters.push(
-                      Math.random() < 0.6
-                        ? PATTERNS.getRandomChar(0x0600, 0x06ff)
-                        : Math.random() < 0.8
-                        ? PATTERNS.getRandomChar(0x0750, 0x077f)
-                        : PATTERNS.getRandomChar(0x08a0, 0x08ff)
-                    );
-                    break;
-                  }
-                  case "c":
-                    newLetters.push(PATTERNS.getRandomChar(0x0400, 0x04ff));
-                    break;
-                  default:
-                    newLetters.push(v[e]);
-                }
-              }
-              newWord = newLetters.join("");
-              acc += 1;
-            } while (newWord === v);
-            if (
-              /(?:cpf|cpnj|celular|telefone|phone|ssn|rg)[\s\t\n=:]*/gi.test(k)
-            ) {
-              const chars = newWord.split("");
-              for (let a = 0; a < chars.length; a++)
-                if (PATTERNS.NUMBERS().test(chars[a]))
-                  chars[a] = PATTERNS.getRandomSymbol(newWord);
-              newWord = chars.join("");
+        const cta = document.querySelector(".actions"),
+          tb = document.createElement("table"),
+          th = document.createElement("thead"),
+          tbd = document.createElement("tbody"),
+          headers = [
+            { e: document.createElement("th"), txt: "Index" },
+            { e: document.createElement("th"), txt: "Pattern Recognized" },
+            { e: document.createElement("th"), txt: "Suggested Mask" },
+          ],
+          cap = document.createElement("caption");
+        tb.id = `scanResults`;
+        cap.id = `captionScanResults`;
+        cap.innerText = "Relation of patterns and suggested masks";
+        for (const { k, v } of [
+          { k: "fontSize", v: "0.8rem" },
+          { k: "opacity", v: "0.7" },
+          { k: "fontStyle", v: "italic" },
+          { k: "textAlign", v: "center" },
+          { k: "verticalAlign", v: "baseline" },
+          { k: "paddingBottom", v: "1rem" },
+        ]) {
+          try {
+            const dc = Object.getOwnPropertyDescriptor(cap.style, k);
+            if (dc?.writable && !["length", "parentRule"].includes(k)) {
+              cap.style.setProperty(
+                k
+                  .replace(
+                    /([a-záàâäãéèêëíìîïóòôöõúùûüçñ0-9])([A-ZÁÀÂÄÃÉÈÊËÍÌÎÏÓÒÔÖÕÚÙÛÜÇ])/g,
+                    "$1-$2"
+                  )
+                  .toLowerCase(),
+                v
+              );
             }
-            if (newWord.length < v.length)
-              newWord = crypto
-                .randomUUID()
-                .slice(0, v.length - newWord.length)
-                .replace(/@\/\.\u20A0-\u20CF/g, "a");
-            return `${k
-              .replace(/^[,_=]+/, "")
-              .replace(/[,_=]+$/, "")
-              .replaceAll(",", "")
-              .toUpperCase()}: ${v} — Suggested Mask: ${newWord}\n\n`;
-          })
-          .toString()
-          .replace("[", "")
-          .replace("]", "")
-          .replaceAll(",", "")}`;
+          } catch (se) {
+            console.log(se);
+            continue;
+          }
+        }
+        tb.appendChild(cap);
+        cta?.insertAdjacentElement("afterend", tb);
+        tb.appendChild(th);
+        th.insertRow();
+        headers.forEach(h => {
+          th.rows[0].appendChild(h.e);
+          h.e.style.fontWeight = "bold";
+          h.e.innerText = h.txt;
+        });
+        tb.appendChild(tbd);
+        results.forEach(({ k, v }, i) => {
+          let newWord = v;
+          let acc = 0;
+          do {
+            if (acc > v.length * 10) break;
+            const evals = [];
+            for (let l = 0; l < v.length; l++) {
+              const d = v[l];
+              if (
+                PATTERNS.SYMBOLS().test(d) &&
+                !/[@\/.\u20A0-\u20CF]/.test(d)
+              ) {
+                evals.push("s");
+              } else if (PATTERNS.LATINIZED_CHARS().test(d)) {
+                evals.push("l");
+              } else if (PATTERNS.NUMBERS().test(d)) {
+                evals.push("d");
+              } else if (PATTERNS.JAPANESE().test(d)) {
+                evals.push("j");
+              } else if (PATTERNS.HANGUL().test(d)) {
+                evals.push("hg");
+              } else if (PATTERNS.HAN().test(d)) {
+                evals.push("ha");
+              } else if (PATTERNS.ARABIC().test(d)) {
+                evals.push("a");
+              } else if (PATTERNS.CYRILIC().test(d)) {
+                evals.push("c");
+              } else {
+                evals.push("?");
+              }
+            }
+            const newLetters = [];
+            for (let e = 0; e < evals.length; e++) {
+              const c = evals[e];
+              switch (c) {
+                case "s":
+                  newLetters.push(PATTERNS.getRandomSymbol(v));
+                  break;
+                case "l":
+                  newLetters.push(
+                    [
+                      PATTERNS.getRandomChar(0x0041, 0x005a),
+                      PATTERNS.getRandomChar(0x0061, 0x007a),
+                      PATTERNS.getRandomChar(0x00c0, 0x00ff),
+                    ][Math.floor(Math.random() * 3)]
+                  );
+                  break;
+                case "d":
+                  newLetters.push(Math.floor(Math.random() * 10));
+                  break;
+                case "j":
+                  newLetters.push(PATTERNS.getRandomChar(0x3040, 0x309f));
+                  break;
+                case "hg":
+                  newLetters.push(PATTERNS.getRandomChar(0xac00, 0xd7af));
+                  break;
+                case "ha":
+                  newLetters.push(
+                    Math.random() < 0.5
+                      ? PATTERNS.getRandomChar(0x4e00, 0x9fff)
+                      : PATTERNS.getRandomChar(0x3400, 0x4dbf)
+                  );
+                  break;
+                case "a":
+                  newLetters.push(
+                    Math.random() < 0.6
+                      ? PATTERNS.getRandomChar(0x0600, 0x06ff)
+                      : Math.random() < 0.8
+                      ? PATTERNS.getRandomChar(0x0750, 0x077f)
+                      : PATTERNS.getRandomChar(0x08a0, 0x08ff)
+                  );
+                  break;
+                case "c":
+                  newLetters.push(PATTERNS.getRandomChar(0x0400, 0x04ff));
+                  break;
+                default:
+                  newLetters.push(v[e]);
+              }
+            }
+            newWord = newLetters.join("");
+            acc += 1;
+          } while (newWord === v);
+          if (
+            /(?:cpf|cpnj|celular|telefone|phone|ssn|rg)[\s\t\n=:]*/gi.test(k)
+          ) {
+            const chars = newWord.split("");
+            for (let a = 0; a < chars.length; a++) {
+              if (PATTERNS.NUMBERS().test(chars[a]))
+                chars[a] = PATTERNS.getRandomSymbol(newWord);
+            }
+            newWord = chars.join("");
+          }
+          if (newWord.length < v.length) {
+            const fallback =
+              crypto?.randomUUID() || Math.random().toString(36).slice(2);
+            newWord += fallback
+              .slice(0, v.length - newWord.length)
+              .replace(/[@\/.\u20A0-\u20CF]/g, "a");
+          }
+          const row = tbd.insertRow();
+          row.insertCell().textContent = (i + 1).toString();
+          row.insertCell().textContent = k
+            .replace(/^[,_=]+/, "")
+            .replace(/[,_=]+$/, "")
+            .replaceAll(",", "")
+            .toUpperCase();
+          row.insertCell().textContent = newWord;
+        });
       }
     }
   }

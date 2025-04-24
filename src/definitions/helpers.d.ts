@@ -8,3 +8,17 @@ export type LabelKey =
   | "downloadOutput"
   | "copied"
   | "downloaded";
+export interface MaskMatch {
+  patternUsed: string;
+  startIndex: number;
+  endingIndex: number;
+  lang: string;
+  replacement: string;
+  isLabel: boolean;
+  excluded: boolean;
+  tableRow: number;
+  repetitions?: {
+    starts: number[];
+    endings: number[];
+  };
+}
