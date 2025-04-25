@@ -7,4 +7,7 @@ export class UserInputSerivce {
   setObsUserInput(v: string): void {
     this.#userInput.next(v);
   }
+  get userInput(): string {
+    return this.#userInput.value;
+  }
 }

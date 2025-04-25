@@ -1,16 +1,7 @@
 <div class="container" id="mainContainer" style="padding-top: 5rem">
   <app-fixed-header></app-fixed-header>
   <main id="main" class="main">
-    <hgroup id="mainHeader">
-      <h1 style="font-weight: bold">LLM Prompt Purify</h1>
-      <app-help-toggle
-        [isHelpOpen]="isHelpOpen"
-        (toggleHelp)="openInfoDialog()"
-      ></app-help-toggle>
-    </hgroup>
-    <!-- <ng-container *ngIf="isHelpOpen">
-      <app-info-modal></app-info-modal>
-    </ng-container> -->
+    <hgroup id="mainHeader" style="padding-bottom: 2rem"></hgroup>
     <mat-form-field appearance="outline">
       <mat-label>Type or paste your prompt here</mat-label>
       <textarea

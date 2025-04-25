@@ -1,7 +1,13 @@
 <header #header class="fixed-header" role="banner">
   <div class="header-content">
     <div class="header-title-container">
-      <span class="header-title" tabindex="0">LLM Prompt Purify</span>
+      <h1
+        class="header-title"
+        tabindex="0"
+        style="font-weight: bold; font-size: 1rem; margin: 0"
+      >
+        LLM Prompt Purify
+      </h1>
     </div>
     <nav class="header-nav" aria-label="Main Navigation">
       <a
@@ -22,9 +28,7 @@
         title="Contact"
         >Contact</a
       >
-      <button class="info-button" aria-label="Information" title="Information">
-        <mat-icon>help_outline</mat-icon>
-      </button>
+      <app-help-toggle></app-help-toggle>
     </nav>
     <button
       mat-button
@@ -34,7 +38,7 @@
       title="Fix Header"
     >
       <mat-checkbox
-        [checked]="fixHeader"
+        [checked]="_permFixHeader"
         class="mat-small-checkbox"
       ></mat-checkbox>
       Fix Header
