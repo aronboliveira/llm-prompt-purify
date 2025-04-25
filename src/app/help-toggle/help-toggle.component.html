@@ -1,9 +1,7 @@
 <button
   mat-icon-button
-  id="helpToggleButton"
-  (click)="onToggle()"
-  [ngClass]="{ open: isHelpOpen, closed: !isHelpOpen }"
-  aria-label="Toggle project information dialog"
+  (click)="toggleHelp()"
+  [attr.aria-label]="isHelpOpen ? 'Close help' : 'Open help'"
 >
-  <mat-icon>help_outline</mat-icon>
+  <mat-icon>{{ isHelpOpen ? "help" : "help_outline" }}</mat-icon>
 </button>

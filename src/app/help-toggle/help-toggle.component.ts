@@ -1,7 +1,8 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input, Output, EventEmitter } from "@angular/core";
+import { Component } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
+import { InfoDialogService } from "../libs/state/info-dialog-service";
 @Component({
   selector: "app-help-toggle",
   standalone: true,
@@ -10,9 +11,15 @@ import { MatIconModule } from "@angular/material/icon";
   styleUrl: "./help-toggle.component.scss",
 })
 export class HelpToggleComponent {
-  @Input() isHelpOpen: boolean = false;
-  @Output() toggleHelp: EventEmitter<void> = new EventEmitter();
-  onToggle(): void {
-    this.toggleHelp.emit();
+  isHelpOpen = false;
+
+  constructor(private _infoDialogService: InfoDialogService) {
+    this._infoDialogService.isHelpOpen$.subscribe((isOpen: boolean) => {
+      this.isHelpOpen = isOpen;
+    });
+  }
+
+  toggleHelp(): void {
+    this._infoDialogService.toggleHelp();
   }
 }
