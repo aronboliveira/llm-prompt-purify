@@ -1,0 +1,30 @@
+<div class="feedback-form" role="form" aria-label="Feedback Form">
+  <h2 tabindex="0">Feedback</h2>
+  <app-custom-input
+    label="Name"
+    placeholder="Enter your name"
+    [(value)]="name"
+    [required]="true"
+  ></app-custom-input>
+  <app-custom-input
+    label="Email"
+    placeholder="Enter your email"
+    [(value)]="email"
+    [required]="true"
+  ></app-custom-input>
+  <app-custom-textarea
+    label="Feedback"
+    placeholder="Enter your feedback"
+    [(value)]="feedback"
+    [required]="true"
+  ></app-custom-textarea>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    aria-label="Submit Feedback"
+    title="Submit Feedback"
+  >
+    Submit
+  </button>
+</div>
