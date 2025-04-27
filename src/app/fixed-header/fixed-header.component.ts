@@ -1,6 +1,5 @@
 import {
   Component,
-  OnInit,
   AfterViewInit,
   OnDestroy,
   ElementRef,
@@ -12,15 +11,26 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatIcon } from "@angular/material/icon";
 import { fromEvent, Subscription } from "rxjs";
 import { HelpToggleComponent } from "../help-toggle/help-toggle.component";
+import { MatDialogModule } from "@angular/material/dialog";
+import { CommonModule } from "@angular/common";
 @Component({
   selector: "app-fixed-header",
   templateUrl: "./fixed-header.component.html",
   styleUrls: ["./fixed-header.component.scss"],
-  imports: [MatButton, MatCheckboxModule, MatIcon, HelpToggleComponent],
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButton,
+    MatCheckboxModule,
+    MatIcon,
+    HelpToggleComponent,
+  ],
   standalone: true,
 })
 export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
-  @ViewChild("header") header!: ElementRef<HTMLElement>;
+  @ViewChild("header", { static: true }) header!: ElementRef<HTMLElement>;
+  @ViewChild("toggleButton", { read: ElementRef })
+  toggleButton: ElementRef<HTMLButtonElement> | null = null;
   public fixHeader = true;
   _permFixHeader = false;
   #scrollSubscription!: Subscription;
@@ -30,23 +40,23 @@ export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
   isHelpOpen = false;
   constructor(private _renderer: Renderer2) {}
   ngAfterViewInit(): void {
+    if (typeof window === "undefined") return;
     if (!(this.header.nativeElement instanceof HTMLElement)) return;
     this.#scrollTimeoutId = setTimeout(() => {
       this.fixHeader = false;
     }, 3000);
-    if (window)
-      this.#scrollSubscription = fromEvent(window, "scroll").subscribe(() => {
-        this.#scrollTimeoutId && clearTimeout(this.#scrollTimeoutId);
-        this.fixHeader = true;
-        this._renderer.setStyle(
-          this.header.nativeElement,
-          "transform",
-          "translateY(0)"
-        );
-        this.#scrollTimeoutId = setTimeout(() => {
-          this.fixHeader = false;
-        }, 3000);
-      });
+    this.#scrollSubscription = fromEvent(window, "scroll").subscribe(() => {
+      this.#scrollTimeoutId && clearTimeout(this.#scrollTimeoutId);
+      this.fixHeader = true;
+      this._renderer.setStyle(
+        this.header.nativeElement,
+        "transform",
+        "translateY(0)"
+      );
+      this.#scrollTimeoutId = setTimeout(() => {
+        this.fixHeader = false;
+      }, 3000);
+    });
     const atl = "autotranslate";
     if (this.header.nativeElement.getAttribute(`data-${atl}`) === "true")
       return;
@@ -83,6 +93,13 @@ export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
   }
   toggleFixHeader(): void {
     this._permFixHeader = !this._permFixHeader;
+    if (typeof window === "undefined") return;
+    console.log(this.toggleButton?.nativeElement);
+    if (this.toggleButton?.nativeElement instanceof HTMLElement) {
+      if (this._permFixHeader)
+        this.toggleButton.nativeElement.dataset["active"] = "true";
+      else this.toggleButton.nativeElement.dataset["active"] = "false";
+    }
   }
   setDialogRef(): void {}
 }

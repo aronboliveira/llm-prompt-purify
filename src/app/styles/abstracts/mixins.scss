@@ -8,6 +8,38 @@
     background-color: $bg-active;
   }
 }
+@mixin moving-button(
+  $hover-move: -1px,
+  $active-move: 2px,
+  $transition: transform 0.25s ease-in-out
+) {
+  @if transition != null {
+    transition: $transition;
+  }
+  &:hover {
+    transform: translateY($hover-move);
+  }
+  &:active {
+    transform: translateY($active-move);
+  }
+}
+@mixin styled-link {
+  text-decoration: none;
+  transition: transform 0.25s ease-in-out, color 0.25s ease-in-out;
+  &:not(:visited) {
+    opacity: 1;
+    font-weight: bolder;
+  }
+  &:visited {
+    opacity: 0.8;
+  }
+  &::first-letter {
+    text-transform: capitalize;
+  }
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
 @mixin delined-pseudo-elements {
   &::first-letter {
     font-size: 1.5em;
