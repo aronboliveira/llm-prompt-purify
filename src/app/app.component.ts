@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from "@angular/core";
@@ -24,6 +25,7 @@ import { CommonModule } from "@angular/common";
 import { presentation } from "./libs/bloc/html/info";
 import { FixedHeaderComponent } from "./fixed-header/fixed-header.component";
 import { MAIN_DICT, PATTERNS } from "./libs/vars/dictionaries";
+import DOMValidator from "./libs/utils/dom/DOMValidator";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -45,16 +47,36 @@ import { MAIN_DICT, PATTERNS } from "./libs/vars/dictionaries";
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("promptInput", { static: true }) input: ElementRef | null = null;
   userInput = "";
   processedOutput = "";
   isHelpOpen = false;
   _maxLength = 4096;
+  promptValueKey = "llmPromptToPurifyValue";
   constructor(
     private _userInputService: UserInputSerivce,
     public dialog: MatDialog
   ) {}
+  handleEnter(ev: KeyboardEvent): void {
+    try {
+      if (
+        ev.key?.toLowerCase() !== "enter" ||
+        document.body?.classList.contains("swal2-shown")
+      )
+        return;
+      ev.preventDefault();
+      const promptInput =
+        this.input?.nativeElement ?? document.getElementById("promptInput");
+      if (DOMValidator.isTextbox(promptInput)) {
+        promptInput;
+      }
+      this.checkPrompt();
+    } catch (e) {
+      console.warn(`Failed to handle enter press`);
+      console.warn(e);
+    }
+  }
   ngOnInit(): void {
     this.processedOutput = this.userInput.trim();
   }
@@ -62,38 +84,75 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (typeof window === "undefined") return;
     const ppi =
       this.input?.nativeElement || document.getElementById("promptInput");
-    if (ppi instanceof HTMLElement && ppi?.dataset?.["focusenter"] !== "true") {
-      ppi?.addEventListener("focus", ev => {
-        if (
-          !(
-            ev.currentTarget instanceof HTMLElement &&
-            ev.currentTarget.isConnected
+    if (ppi instanceof HTMLElement) {
+      try {
+        (async (): Promise<void> => {
+          const ppjv = sessionStorage.getItem(this.promptValueKey);
+          if (!ppjv) return;
+          const ppv = JSON.parse(ppjv);
+          if (!("v" in ppv)) return;
+          await new Promise(resolve => setTimeout(resolve, 200));
+          if (DOMValidator.isDefaultTextbox(ppi)) ppi.value = ppv.v;
+          else if (DOMValidator.isCustomCheckbox(ppi)) ppi.innerText = ppv.v;
+          if (
+            ppi instanceof HTMLElement &&
+            ppi.getAttribute("data-focused") !== "true" &&
+            ((DOMValidator.isDefaultTextbox(ppi) && ppi.value === "") ||
+              (DOMValidator.isCustomCheckbox(ppi) && ppi.innerText === ""))
+          ) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (DOMValidator.isDefaultTextbox(ppi)) ppi.value = ppv.v;
+            else if (DOMValidator.isCustomCheckbox(ppi)) ppi.innerText = ppv.v;
+          }
+        })();
+      } catch (sse) {
+        console.error(`Failed to get prompt value from session storage`);
+      }
+      if (ppi?.dataset?.["focusenter"] !== "true") {
+        ppi.addEventListener("focus", ev => {
+          if (
+            !(
+              ev.currentTarget instanceof HTMLElement &&
+              ev.currentTarget.isConnected
+            )
           )
-        )
-          return;
-        ppi.setAttribute("data-focused", "true");
-      });
-      ppi?.addEventListener("blur", ev => {
-        if (
-          !(
-            ev.currentTarget instanceof HTMLElement &&
-            ev.currentTarget.isConnected
+            return;
+          ppi.setAttribute("data-focused", "true");
+        });
+        ppi.addEventListener("blur", ev => {
+          if (
+            !(
+              ev.currentTarget instanceof HTMLElement &&
+              ev.currentTarget.isConnected
+            )
           )
-        )
-          return;
-        ppi?.setAttribute("data-focused", "false");
-      });
-      ppi.dataset["focusenter"] = "true";
+            return;
+          ppi?.setAttribute("data-focused", "false");
+        });
+        window.addEventListener("keyup", this.handleEnter.bind(this));
+        ppi.dataset["focusenter"] = "true";
+      }
     }
+  }
+  ngOnDestroy(): void {
+    if (typeof window === "undefined") return;
+    window.removeEventListener("keyup", this.handleEnter);
   }
   setInput(v: string): void {
     this.userInput = v;
     this._userInputService.setObsUserInput(v);
-    window && sessionStorage.setItem("v", v.toString());
+    try {
+      window &&
+        sessionStorage.setItem(
+          this.promptValueKey,
+          JSON.stringify({ v: v.toString() })
+        );
+    } catch (e) {}
   }
   copyOutput(): void {
     navigator.clipboard.writeText(this.userInput.trim()).then(() => {
       Swal.fire({
+        toast: true,
         position: "top-end",
         icon: "success",
         title: "Your text has been copied to the clipboard",

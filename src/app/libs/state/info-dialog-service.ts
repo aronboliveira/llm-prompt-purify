@@ -11,23 +11,35 @@ export class InfoDialogService {
   isPromptTableOpen$ = this.#isPromptTableOpen.asObservable();
   constructor(private _matDialog: MatDialog) {}
   openHelp(): void {
-    if (!this.#isHelpOpen.value) {
-      this._matDialog
-        .open(InfoModalComponent, {
-          data: { text: presentation() },
-          panelClass: "project-info-modal",
-        })
-        .afterClosed()
-        .subscribe(() => {
-          this.#isHelpOpen.next(false);
-        });
-      this.#isHelpOpen.next(true);
-    }
+    if (this.#isHelpOpen.value) return;
+    this._matDialog
+      .open(InfoModalComponent, {
+        data: { text: presentation() },
+        panelClass: "project-info-modal",
+      })
+      .afterClosed()
+      .subscribe(() => this.#isHelpOpen.next(false));
+    this.#isHelpOpen.next(true);
+  }
+  openPromptTable(): void {
+    if (this.#isPromptTableOpen.value) return;
+    this._matDialog
+      .open(InfoModalComponent, {
+        data: { text: "Table modal works!" },
+        panelClass: "prompt-table-modal",
+      })
+      .afterClosed()
+      .subscribe(() => this.#isPromptTableOpen.next(false));
   }
   closeHelp(): void {
     if (!this.#isHelpOpen.value) return;
     this._matDialog.closeAll();
     this.#isHelpOpen.next(false);
+  }
+  closePromptTable(): void {
+    if (!this.#isPromptTableOpen.value) return;
+    this._matDialog.closeAll();
+    this.#isPromptTableOpen.next(false);
   }
   toggleHelp(): void {
     this.#isHelpOpen.value ? this.closeHelp() : this.openHelp();

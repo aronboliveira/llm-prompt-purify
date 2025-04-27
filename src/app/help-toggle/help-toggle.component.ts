@@ -12,13 +12,11 @@ import { InfoDialogService } from "../libs/state/info-dialog-service";
 })
 export class HelpToggleComponent {
   isHelpOpen = false;
-
   constructor(private _infoDialogService: InfoDialogService) {
     this._infoDialogService.isHelpOpen$.subscribe((isOpen: boolean) => {
       this.isHelpOpen = isOpen;
     });
   }
-
   toggleHelp(): void {
     this._infoDialogService.toggleHelp();
   }
