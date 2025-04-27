@@ -1,0 +1,36 @@
+<div class="contact-form" role="form" aria-label="Contact Form">
+  <h2 tabindex="0">Contact</h2>
+  <app-custom-input
+    label="Name"
+    placeholder="Enter your name"
+    [(value)]="name"
+    [required]="true"
+  ></app-custom-input>
+  <app-custom-input
+    label="Email"
+    placeholder="Enter your email"
+    [(value)]="email"
+    [required]="true"
+  ></app-custom-input>
+  <app-custom-input
+    label="Subject"
+    placeholder="Subject"
+    [(value)]="subject"
+    [required]="true"
+  ></app-custom-input>
+  <app-custom-textarea
+    label="Message"
+    placeholder="Your message"
+    [(value)]="message"
+    [required]="true"
+  ></app-custom-textarea>
+  <button
+    mat-raised-button
+    color="accent"
+    (click)="onSubmit()"
+    aria-label="Submit Contact"
+    title="Submit Contact"
+  >
+    Submit
+  </button>
+</div>

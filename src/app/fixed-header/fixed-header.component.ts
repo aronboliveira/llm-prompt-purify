@@ -101,5 +101,4 @@ export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
       else this.toggleButton.nativeElement.dataset["active"] = "false";
     }
   }
-  setDialogRef(): void {}
 }
