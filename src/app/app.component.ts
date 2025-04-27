@@ -26,6 +26,7 @@ import { presentation } from "./libs/bloc/html/info";
 import { FixedHeaderComponent } from "./fixed-header/fixed-header.component";
 import { MAIN_DICT, PATTERNS } from "./libs/vars/dictionaries";
 import DOMValidator from "./libs/utils/dom/DOMValidator";
+import { InfoDialogService } from "./libs/state/info-dialog-service";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -56,6 +57,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   promptValueKey = "llmPromptToPurifyValue";
   constructor(
     private _userInputService: UserInputSerivce,
+    private _dlgService: InfoDialogService,
     public dialog: MatDialog
   ) {}
   handleEnter(ev: KeyboardEvent): void {
@@ -68,9 +70,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       ev.preventDefault();
       const promptInput =
         this.input?.nativeElement ?? document.getElementById("promptInput");
-      if (DOMValidator.isTextbox(promptInput)) {
-        promptInput;
-      }
+      if (DOMValidator.isTextbox(promptInput))
+        promptInput.value = promptInput.value.trim();
+      if (DOMValidator.isCustomTextbox(promptInput))
+        promptInput.textContent = promptInput.textContent?.trim() || "";
       this.checkPrompt();
     } catch (e) {
       console.warn(`Failed to handle enter press`);
@@ -166,17 +169,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       _input: this.userInput,
       _compressionLevel: appState.compressionLevel.toString(),
     });
-  }
-  openInfoDialog(): void {
-    this.dialog
-      .open(InfoModalComponent, {
-        data: { text: presentation() },
-        panelClass: "project-info-modal",
-      })
-      .afterClosed()
-      .subscribe(() => {
-        this.isHelpOpen = false;
-      });
   }
   async checkPrompt(): Promise<void> {
     let timerInterval: any,
