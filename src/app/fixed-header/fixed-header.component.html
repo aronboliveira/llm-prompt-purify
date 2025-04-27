@@ -28,20 +28,22 @@
         title="Contact"
         >Contact</a
       >
-      <app-help-toggle></app-help-toggle>
     </nav>
+    <app-help-toggle></app-help-toggle>
     <button
+      #toggleButton
       mat-button
       class="fix-toggle"
       (click)="toggleFixHeader()"
       aria-label="Fix header"
+      aria-labelledby="fixHeaderLabel"
       title="Fix Header"
     >
       <mat-checkbox
         [checked]="_permFixHeader"
         class="mat-small-checkbox"
       ></mat-checkbox>
-      Fix Header
+      <label id="fixHeaderLabel"> Fix Header </label>
     </button>
   </div>
 </header>

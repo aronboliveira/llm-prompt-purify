@@ -5,19 +5,21 @@
     <mat-form-field appearance="outline">
       <mat-label>Type or paste your prompt here</mat-label>
       <textarea
+        #promptInput
+        id="promptInput"
         matInput
         [(ngModel)]="userInput"
         (ngModelChange)="setInput($event)"
-        [attr.maxLength]="maxLength"
+        [attr.maxLength]="_maxLength"
         placeholder="Type your message here..."
         rows="10"
         cols="100"
       ></textarea>
     </mat-form-field>
-    <p>{{ userInput.length }}/{{ maxLength }} characters</p>
+    <p>{{ userInput.length }}/{{ _maxLength }} characters</p>
     <output id="resultOutput">{{ processedOutput }}</output>
     <fieldset class="actions">
-      <app-scan-submit></app-scan-submit>
+      <app-scan-submit (scan)="checkPrompt()"></app-scan-submit>
       <button
         mat-icon-button
         color="secondary"

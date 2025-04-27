@@ -7,9 +7,9 @@ import { presentation } from "../bloc/html/info";
 export class InfoDialogService {
   #isHelpOpen = new BehaviorSubject<boolean>(false);
   isHelpOpen$ = this.#isHelpOpen.asObservable();
-
+  #isPromptTableOpen = new BehaviorSubject<boolean>(false);
+  isPromptTableOpen$ = this.#isPromptTableOpen.asObservable();
   constructor(private _matDialog: MatDialog) {}
-
   openHelp(): void {
     if (!this.#isHelpOpen.value) {
       this._matDialog
@@ -21,23 +21,21 @@ export class InfoDialogService {
         .subscribe(() => {
           this.#isHelpOpen.next(false);
         });
-
       this.#isHelpOpen.next(true);
     }
   }
-
   closeHelp(): void {
-    if (this.#isHelpOpen.value) {
-      this._matDialog.closeAll();
-      this.#isHelpOpen.next(false);
-    }
+    if (!this.#isHelpOpen.value) return;
+    this._matDialog.closeAll();
+    this.#isHelpOpen.next(false);
   }
-
   toggleHelp(): void {
     this.#isHelpOpen.value ? this.closeHelp() : this.openHelp();
   }
-
   get isHelpOpen(): boolean {
     return this.#isHelpOpen.value;
+  }
+  get isPromptTableOpen(): boolean {
+    return this.#isPromptTableOpen.value;
   }
 }
