@@ -5,7 +5,6 @@ import { importProvidersFrom } from "@angular/core";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { MatDialogModule } from "@angular/material/dialog";
 import { A11yModule } from "@angular/cdk/a11y";
-
 const bootstrap = () =>
   bootstrapApplication(AppComponent, {
     ...config,
@@ -18,5 +17,4 @@ const bootstrap = () =>
       ),
     ],
   });
-
 export default bootstrap;
