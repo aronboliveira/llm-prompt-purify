@@ -44,6 +44,11 @@ export class InfoDialogService {
   toggleHelp(): void {
     this.#isHelpOpen.value ? this.closeHelp() : this.openHelp();
   }
+  togglePromptTable(): void {
+    this.#isPromptTableOpen.value
+      ? this.closePromptTable()
+      : this.openPromptTable();
+  }
   get isHelpOpen(): boolean {
     return this.#isHelpOpen.value;
   }

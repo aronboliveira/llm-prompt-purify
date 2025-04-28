@@ -17,7 +17,7 @@ export class HelpToggleComponent {
       this.isHelpOpen = isOpen;
     });
   }
-  toggleHelp(): void {
+  onToggleHelp(): void {
     this._infoDialogService.toggleHelp();
   }
 }
