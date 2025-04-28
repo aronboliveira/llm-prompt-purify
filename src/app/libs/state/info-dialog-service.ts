@@ -3,6 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { BehaviorSubject } from "rxjs";
 import { InfoModalComponent } from "../../info-modal/info-modal.component";
 import { presentation } from "../bloc/html/info";
+import { PromptTableComponent } from "../../prompt-table/prompt-table.component";
 @Injectable({ providedIn: "root" })
 export class InfoDialogService {
   #isHelpOpen = new BehaviorSubject<boolean>(false);
@@ -24,8 +25,10 @@ export class InfoDialogService {
   openPromptTable(): void {
     if (this.#isPromptTableOpen.value) return;
     this._matDialog
-      .open(InfoModalComponent, {
-        data: { text: "Table modal works!" },
+      .open(PromptTableComponent, {
+        data: {
+          text: "Check the definitions and features for your customization of the text",
+        },
         panelClass: "prompt-table-modal",
       })
       .afterClosed()
