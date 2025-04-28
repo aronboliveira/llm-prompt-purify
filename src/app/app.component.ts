@@ -22,7 +22,6 @@ import { HelpToggleComponent } from "./help-toggle/help-toggle.component";
 import { InfoModalComponent } from "./info-modal/info-modal.component";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { CommonModule } from "@angular/common";
-import { presentation } from "./libs/bloc/html/info";
 import { FixedHeaderComponent } from "./fixed-header/fixed-header.component";
 import { MAIN_DICT, PATTERNS } from "./libs/vars/dictionaries";
 import DOMValidator from "./libs/utils/dom/DOMValidator";
@@ -491,17 +490,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           const h3 = document.createElement("h3");
           h3.id = patternsTitle;
           h3.textContent = "Identified patterns and suggested masks";
-          const outp = document.getElementById(outpId);
-          if (outp) {
-            outp.insertAdjacentElement("beforebegin", h3);
-            mountTable(document.querySelector(".actions"));
-          }
           this._dlgService.togglePromptTable();
-          const modal = document.querySelector(".prompt-table-modal");
-          if (modal) {
-            console.log("modal was found");
+          document.querySelector(".prompt-table-modal") &&
             mountTable(document.querySelector("#prompt-table-flag"));
-          }
         }
       } else {
         await Swal.fire({

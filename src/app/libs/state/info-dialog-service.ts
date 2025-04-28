@@ -27,7 +27,7 @@ export class InfoDialogService {
     this._matDialog
       .open(PromptTableComponent, {
         data: {
-          text: "Check the definitions and features for your customization of the text",
+          text: '<span>Check the definitions and features for your customization of the text</span><hr style="border: #7171712e 1px solid; opacity: 0.25; width: 95%; margin-right: 12%">',
         },
         panelClass: "prompt-table-modal",
       })

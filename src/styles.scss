@@ -16,6 +16,12 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+table {
+  td,
+  th {
+    text-align: center !important;
+  }
+}
 
 mat-dialog-container,
 [mat-dialog-container] {

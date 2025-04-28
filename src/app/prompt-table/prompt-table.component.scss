@@ -6,7 +6,11 @@
   #scanResults {
     width: 60%;
   }
-  mat-mdc-dialog-surface.mdc-dialog__surface {
-    scrollbar-width: none;
+  .mat-mdc-dialog-surface.mdc-dialog__surface {
+    scrollbar-width: none !important;
+  }
+  table {
+    width: 60%;
+    align-self: center;
   }
 }
