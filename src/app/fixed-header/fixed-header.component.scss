@@ -12,35 +12,48 @@
   border-bottom: ridge v.$gap-tn #c7cad1;
   .header-content {
     display: grid;
-    grid-auto-flow: column;
-    grid-template-columns: 0.5fr 0.8fr 3fr 0.3fr 0.75fr;
-    align-items: center;
-    padding: v.$gap-sm v.$gap-md;
+    grid-auto-flow: row;
+    #logoWrapper {
+      grid-column: logo;
+    }
+    .header-title-container {
+      grid-column: title;
+    }
+    .header-nav {
+      grid-column: links;
+    }
     .header-title {
       font-size: v.$txt-md;
       font-weight: 600;
+      white-space: pre;
+      padding-right: v.$gap-md;
     }
     .fix-toggle {
       @include moving-button(-2px, 2px);
+      grid-column: fix-toggle;
       font-size: 0.875rem;
-      padding: v.$gap-tn v.$gap-sm;
+      white-space: pre;
+      min-width: 7.5rem;
+      margin-left: v.$gap-sm;
+      padding: v.$gap-tn calc(v.$gap-sm + v.$gap-md);
       background: transparent;
       border: none;
       color: inherit;
       cursor: pointer;
+      max-width: max-content;
       transition: background-color 0.3s ease, transform 0.25s ease-in-out;
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-      }
-      &:active {
-        background-color: rgba(255, 255, 255, 0.2);
-      }
-      border-bottom: aliceblue 0.25rem ridge;
+      border-bottom: aliceblue v.$gap-tn ridge;
       border-inline: aliceblue 1px ridge;
       border-top: aliceblue 1px outset;
       border-radius: v.$gap-lg;
       * {
         border-radius: v.$gap-lg;
+      }
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      &:active {
+        background-color: rgba(255, 255, 255, 0.2);
       }
       &[data-active="true"] {
         filter: brightness(70%);
@@ -49,11 +62,33 @@
           transform: translateY(3px);
         }
       }
+      @media screen and (max-width: 600px) {
+        grid-column: 8;
+      }
+    }
+    grid-template-areas: "logo title links help fix-toggle";
+    grid-template-columns: 0.35fr 0.6fr 4.25fr 0.3fr 0.75fr;
+    align-items: center;
+    padding: v.$gap-sm v.$gap-md;
+    @media screen and (max-width: 800px) {
+      grid-template-columns: 0.35fr 0.6fr 4.5fr 0.5fr 2fr;
+    }
+    @media screen and (max-width: 600px) {
+      grid-template-areas:
+        "logo title title title help"
+        "links links links links fix-toggle";
+      grid-template-columns: 0.4fr 1fr 0.25fr 0.5rem;
+      grid-template-rows: 1fr 0.8fr;
+      .toggle-help {
+        grid-row: 1;
+      }
     }
   }
   .header-nav {
     display: flex;
     gap: v.$gap-md;
+    grid-column: span 3;
+    padding-left: 1.5rem;
     a {
       @include styled-link;
     }

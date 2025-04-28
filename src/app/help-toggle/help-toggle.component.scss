@@ -1,22 +1,19 @@
 @use "../styles/abstracts/vars.scss" as *;
+@use "../styles/abstracts/mixins.scss" as *;
 :host {
+  @include moving-button(-2px, 2px, transform ease-in-out 0.5s);
   width: $shape-sm;
   height: $shape-sm;
   color: #fff;
   transform: background-color 0.3s;
-  transition: transform ease-in-out 0.5s;
   &:hover,
   &:active {
-    // background-color: var(--info-bg-secondary);
     cursor: pointer;
   }
-  &:hover {
-    transform: translateY(-2px);
+  @media screen and (max-width: 600px) {
+    grid-column: 8;
+    grid-row: 1;
+    justify-self: end;
+    padding-right: $gap-sm;
   }
-  &:active {
-    transform: translateY(2px);
-  }
-  // &.open {
-  // background-color: var(--info-bg-invert-secondary);
-  // }
 }

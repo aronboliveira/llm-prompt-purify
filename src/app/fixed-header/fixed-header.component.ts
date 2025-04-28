@@ -32,7 +32,7 @@ export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
   @ViewChild("toggleButton", { read: ElementRef })
   toggleButton: ElementRef<HTMLButtonElement> | null = null;
   public fixHeader = true;
-  _permFixHeader = false;
+  _permFixHeader = true;
   #scrollSubscription!: Subscription;
   #scrollTimeoutId: NodeJS.Timeout | number | undefined;
   #positionInterval: NodeJS.Timeout | number | undefined;
@@ -94,7 +94,6 @@ export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
   toggleFixHeader(): void {
     this._permFixHeader = !this._permFixHeader;
     if (typeof window === "undefined") return;
-    console.log(this.toggleButton?.nativeElement);
     if (this.toggleButton?.nativeElement instanceof HTMLElement) {
       if (this._permFixHeader)
         this.toggleButton.nativeElement.dataset["active"] = "true";
