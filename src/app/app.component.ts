@@ -27,6 +27,7 @@ import { FixedHeaderComponent } from "./fixed-header/fixed-header.component";
 import { MAIN_DICT, PATTERNS } from "./libs/vars/dictionaries";
 import DOMValidator from "./libs/utils/dom/DOMValidator";
 import { InfoDialogService } from "./libs/state/info-dialog-service";
+import { PromptTableComponent } from "./prompt-table/prompt-table.component";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -41,6 +42,7 @@ import { InfoDialogService } from "./libs/state/info-dialog-service";
     FixedHeaderComponent,
     HelpToggleComponent,
     InfoModalComponent,
+    PromptTableComponent,
     ScanSubmitComponent,
     CompressPickerComponent,
     UnderDevelopmentComponent,
@@ -95,17 +97,41 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           const ppv = JSON.parse(ppjv);
           if (!("v" in ppv)) return;
           await new Promise(resolve => setTimeout(resolve, 200));
-          if (DOMValidator.isDefaultTextbox(ppi)) ppi.value = ppv.v;
-          else if (DOMValidator.isCustomCheckbox(ppi)) ppi.innerText = ppv.v;
+          if (
+            DOMValidator.isDefaultTextbox(ppi) ||
+            DOMValidator.isCustomTextbox(ppi)
+          ) {
+            if (DOMValidator.isDefaultTextbox(ppi)) {
+              ppi.value = ppv.v;
+              ppi.dispatchEvent(
+                new InputEvent("input", {
+                  bubbles: true,
+                  cancelable: true,
+                  inputType: "insertText",
+                  data: ppv.v,
+                })
+              );
+            } else if (DOMValidator.isCustomTextbox(ppi)) ppi.innerText = ppv.v;
+            this.userInput = ppv.v;
+          }
           if (
             ppi instanceof HTMLElement &&
             ppi.getAttribute("data-focused") !== "true" &&
             ((DOMValidator.isDefaultTextbox(ppi) && ppi.value === "") ||
-              (DOMValidator.isCustomCheckbox(ppi) && ppi.innerText === ""))
+              (DOMValidator.isCustomTextbox(ppi) && ppi.innerText === ""))
           ) {
             await new Promise(resolve => setTimeout(resolve, 1000));
             if (DOMValidator.isDefaultTextbox(ppi)) ppi.value = ppv.v;
-            else if (DOMValidator.isCustomCheckbox(ppi)) ppi.innerText = ppv.v;
+            else if (DOMValidator.isCustomTextbox(ppi)) ppi.innerText = ppv.v;
+            this.userInput = ppv.v;
+            ppi.dispatchEvent(
+              new InputEvent("input", {
+                bubbles: true,
+                cancelable: true,
+                inputType: "insertText",
+                data: ppv.v,
+              })
+            );
           }
         })();
       } catch (sse) {
@@ -232,8 +258,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             continue;
           }
         }
-        tb.appendChild(cap);
         targ.insertAdjacentElement("afterend", tb);
+        tb.appendChild(cap);
         tb.appendChild(th);
         th.insertRow();
         headers.forEach(h => {
@@ -350,6 +376,16 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             .toUpperCase();
           row.insertCell().textContent = newWord;
         });
+        if (targ.id === "prompt-table-flag") {
+          setTimeout(() => {
+            const matmdc = document
+              .querySelector(".prompt-table-modal")
+              ?.querySelector(".mat-mdc-dialog-content");
+            console.log(matmdc);
+            console.log(tb);
+            matmdc && matmdc.appendChild(tb);
+          }, 200);
+        }
       };
     if (outp) outp.innerText = "";
     document.getElementById(patternsTitle)?.remove();
@@ -459,6 +495,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           if (outp) {
             outp.insertAdjacentElement("beforebegin", h3);
             mountTable(document.querySelector(".actions"));
+          }
+          this._dlgService.togglePromptTable();
+          const modal = document.querySelector(".prompt-table-modal");
+          if (modal) {
+            console.log("modal was found");
+            mountTable(document.querySelector("#prompt-table-flag"));
           }
         }
       } else {

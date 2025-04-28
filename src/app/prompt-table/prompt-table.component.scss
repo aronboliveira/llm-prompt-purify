@@ -1,0 +1,12 @@
+.prompt-table-modal {
+  height: 50vw !important;
+  mat-dialog-content.mat-mdc-dialog-content {
+    width: 50vw;
+  }
+  #scanResults {
+    width: 60%;
+  }
+  mat-mdc-dialog-surface.mdc-dialog__surface {
+    scrollbar-width: none;
+  }
+}
