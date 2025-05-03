@@ -22,3 +22,10 @@ export interface MaskMatch {
     endings: number[];
   };
 }
+export interface resultDict {
+  k: string;
+  e: RegExp | string;
+  v: string;
+  foundIn: number;
+  endsIn: number;
+}

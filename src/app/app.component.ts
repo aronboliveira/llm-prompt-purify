@@ -27,6 +27,7 @@ import { MAIN_DICT, PATTERNS } from "./libs/vars/dictionaries";
 import DOMValidator from "./libs/utils/dom/DOMValidator";
 import { InfoDialogService } from "./libs/state/info-dialog-service";
 import { PromptTableComponent } from "./prompt-table/prompt-table.component";
+import { resultDict } from "../definitions/helpers";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -205,187 +206,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         .split(/[\s\n\t\r=,_]+/g)
         .filter(Boolean),
       dictEntries = Object.entries(MAIN_DICT).filter(Boolean),
-      results: Array<{ k: string; e: RegExp | string; v: string }> = [],
+      results: Array<resultDict> = [],
       outpId = "resultOutput",
       patternsTitle = "patternsTitle",
       outp = document.getElementById(outpId),
-      limit = 60_000,
-      mountTable = (targ: Element | null): void => {
-        if (!targ) {
-          console.warn(`The masking suggestions could not be mounted due to a falsish target for adjacent insertion:
-          Target: ${(targ as any)?.toString()}`);
-          return;
-        }
-        const tb = document.createElement("table"),
-          th = document.createElement("thead"),
-          tbd = document.createElement("tbody"),
-          headers = [
-            { e: document.createElement("th"), txt: "Index" },
-            {
-              e: document.createElement("th"),
-              txt: "Pattern Recognized",
-            },
-            { e: document.createElement("th"), txt: "Suggested Mask" },
-          ],
-          cap = document.createElement("caption");
-        tb.id = `scanResults`;
-        cap.id = `captionScanResults`;
-        cap.innerText = "Relation of patterns and suggested masks";
-        for (const { k, v } of [
-          { k: "fontSize", v: "0.8rem" },
-          { k: "opacity", v: "0.7" },
-          { k: "fontStyle", v: "italic" },
-          { k: "textAlign", v: "center" },
-          { k: "verticalAlign", v: "baseline" },
-          { k: "paddingBottom", v: "1rem" },
-        ]) {
-          try {
-            const dc = Object.getOwnPropertyDescriptor(cap.style, k);
-            if (dc?.writable && !["length", "parentRule"].includes(k)) {
-              cap.style.setProperty(
-                k
-                  .replace(
-                    /([a-záàâäãéèêëíìîïóòôöõúùûüçñ0-9])([A-ZÁÀÂÄÃÉÈÊËÍÌÎÏÓÒÔÖÕÚÙÛÜÇ])/g,
-                    "$1-$2"
-                  )
-                  .toLowerCase(),
-                v
-              );
-            }
-          } catch (se) {
-            console.log(se);
-            continue;
-          }
-        }
-        targ.insertAdjacentElement("afterend", tb);
-        tb.appendChild(cap);
-        tb.appendChild(th);
-        th.insertRow();
-        headers.forEach(h => {
-          th.rows[0].appendChild(h.e);
-          h.e.style.fontWeight = "bold";
-          h.e.innerText = h.txt;
-        });
-        tb.appendChild(tbd);
-        results.forEach(({ k, v }, i) => {
-          let newWord = v;
-          let acc = 0;
-          do {
-            if (acc > v.length * 10) break;
-            const evals = [];
-            for (let l = 0; l < v.length; l++) {
-              const d = v[l];
-              if (
-                PATTERNS.SYMBOLS().test(d) &&
-                !/[@\/.\u20A0-\u20CF]/.test(d)
-              ) {
-                evals.push("s");
-              } else if (PATTERNS.LATINIZED_CHARS().test(d)) {
-                evals.push("l");
-              } else if (PATTERNS.NUMBERS().test(d)) {
-                evals.push("d");
-              } else if (PATTERNS.JAPANESE().test(d)) {
-                evals.push("j");
-              } else if (PATTERNS.HANGUL().test(d)) {
-                evals.push("hg");
-              } else if (PATTERNS.HAN().test(d)) {
-                evals.push("ha");
-              } else if (PATTERNS.ARABIC().test(d)) {
-                evals.push("a");
-              } else if (PATTERNS.CYRILIC().test(d)) {
-                evals.push("c");
-              } else {
-                evals.push("?");
-              }
-            }
-            const newLetters = [];
-            for (let e = 0; e < evals.length; e++) {
-              const c = evals[e];
-              switch (c) {
-                case "s":
-                  newLetters.push(PATTERNS.getRandomSymbol(v));
-                  break;
-                case "l":
-                  newLetters.push(
-                    [
-                      PATTERNS.getRandomChar(0x0041, 0x005a),
-                      PATTERNS.getRandomChar(0x0061, 0x007a),
-                      PATTERNS.getRandomChar(0x00c0, 0x00ff),
-                    ][Math.floor(Math.random() * 3)]
-                  );
-                  break;
-                case "d":
-                  newLetters.push(Math.floor(Math.random() * 10));
-                  break;
-                case "j":
-                  newLetters.push(PATTERNS.getRandomChar(0x3040, 0x309f));
-                  break;
-                case "hg":
-                  newLetters.push(PATTERNS.getRandomChar(0xac00, 0xd7af));
-                  break;
-                case "ha":
-                  newLetters.push(
-                    Math.random() < 0.5
-                      ? PATTERNS.getRandomChar(0x4e00, 0x9fff)
-                      : PATTERNS.getRandomChar(0x3400, 0x4dbf)
-                  );
-                  break;
-                case "a":
-                  newLetters.push(
-                    Math.random() < 0.6
-                      ? PATTERNS.getRandomChar(0x0600, 0x06ff)
-                      : Math.random() < 0.8
-                      ? PATTERNS.getRandomChar(0x0750, 0x077f)
-                      : PATTERNS.getRandomChar(0x08a0, 0x08ff)
-                  );
-                  break;
-                case "c":
-                  newLetters.push(PATTERNS.getRandomChar(0x0400, 0x04ff));
-                  break;
-                default:
-                  newLetters.push(v[e]);
-              }
-            }
-            newWord = newLetters.join("");
-            acc += 1;
-          } while (newWord === v);
-          if (
-            /(?:cpf|cpnj|celular|telefone|phone|ssn|rg)[\s\t\n=:]*/gi.test(k)
-          ) {
-            const chars = newWord.split("");
-            for (let a = 0; a < chars.length; a++) {
-              if (PATTERNS.NUMBERS().test(chars[a]))
-                chars[a] = PATTERNS.getRandomSymbol(newWord);
-            }
-            newWord = chars.join("");
-          }
-          if (newWord.length < v.length) {
-            const fallback =
-              crypto?.randomUUID() || Math.random().toString(36).slice(2);
-            newWord += fallback
-              .slice(0, v.length - newWord.length)
-              .replace(/[@\/.\u20A0-\u20CF]/g, "a");
-          }
-          const row = tbd.insertRow();
-          row.insertCell().textContent = (i + 1).toString();
-          row.insertCell().textContent = k
-            .replace(/^[,_=]+/, "")
-            .replace(/[,_=]+$/, "")
-            .replaceAll(",", "")
-            .toUpperCase();
-          row.insertCell().textContent = newWord;
-        });
-        if (targ.id === "prompt-table-flag") {
-          setTimeout(() => {
-            const matmdc = document
-              .querySelector(".prompt-table-modal")
-              ?.querySelector(".mat-mdc-dialog-content");
-            console.log(matmdc);
-            console.log(tb);
-            matmdc && matmdc.appendChild(tb);
-          }, 200);
-        }
-      };
+      limit = 60_000;
     if (outp) outp.innerText = "";
     document.getElementById(patternsTitle)?.remove();
     try {
@@ -423,17 +248,34 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
               for (let i = 0; i < dictEntries.length; i++) {
                 const localDicts: [string, any] = dictEntries[i];
                 for (let j = 0; j < Object.values(localDicts).length; j++) {
-                  const exps = Object.entries(localDicts[1]);
+                  const exps: Array<[string, RegExp]> = Object.entries(
+                    localDicts[1]
+                  );
                   for (let k = 0; k < exps.length; k++) {
                     const exp = exps[k][1],
-                      key = exps[k][0];
-                    if (exp instanceof RegExp && exp.test(txt[w]))
-                      results.push({ k: key, e: exp, v: txt[w] });
+                      key = exps[k][0],
+                      res = exp.exec(txt[w]);
+                    if (exp instanceof RegExp && res)
+                      results.push({
+                        k: key,
+                        e: exp,
+                        v: txt[w],
+                        foundIn: res.index,
+                        endsIn: res.index + txt[w].length,
+                      });
                     else if (
                       typeof exp === "string" &&
                       txt[w].trim().toLowerCase() === exp
                     )
-                      results.push({ k: key, e: exp, v: txt[w] });
+                      results.push({
+                        k: key,
+                        e: exp,
+                        v: txt[w],
+                        foundIn: new RegExp(exp).exec(txt[w])?.index || 0,
+                        endsIn:
+                          (new RegExp(exp).exec(txt[w])?.index || 0) +
+                          txt[w].length,
+                      });
                   }
                 }
               }
@@ -492,7 +334,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           h3.textContent = "Identified patterns and suggested masks";
           this._dlgService.togglePromptTable();
           document.querySelector(".prompt-table-modal") &&
-            mountTable(document.querySelector("#prompt-table-flag"));
+            this.#mountTable(
+              document.querySelector("#prompt-table-flag"),
+              results
+            );
         }
       } else {
         await Swal.fire({
@@ -514,5 +359,296 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     } finally {
       clearInterval(timerInterval);
     }
+  }
+  #mountTable(targ: Element | null, results: Array<resultDict>): void {
+    if (!targ) {
+      console.warn(`The masking suggestions could not be mounted due to a falsish target for adjacent insertion:
+      Target: ${(targ as any)?.toString()}`);
+      return;
+    }
+    const tb = document.createElement("table"),
+      th = document.createElement("thead"),
+      tbd = document.createElement("tbody"),
+      headers = [
+        {
+          e: document.createElement("th"),
+          txt: "Pattern Recognized",
+        },
+        { e: document.createElement("th"), txt: "Suggested Mask" },
+        { e: document.createElement("th"), txt: "Use mask" },
+      ],
+      cap = document.createElement("caption");
+    tb.id = `scanResults`;
+    cap.id = `captionScanResults`;
+    cap.innerText = "Relation of patterns and suggested masks";
+    for (const { k, v } of [
+      { k: "fontSize", v: "0.8rem" },
+      { k: "opacity", v: "0.7" },
+      { k: "fontStyle", v: "italic" },
+      { k: "textAlign", v: "center" },
+      { k: "verticalAlign", v: "baseline" },
+      { k: "paddingBottom", v: "1rem" },
+    ]) {
+      try {
+        const dc = Object.getOwnPropertyDescriptor(cap.style, k);
+        if (dc?.writable) {
+          cap.style.setProperty(
+            k
+              .replace(
+                /([a-záàâäãéèêëíìîïóòôöõúùûüçñ0-9])([A-ZÁÀÂÄÃÉÈÊËÍÌÎÏÓÒÔÖÕÚÙÛÜÇ])/g,
+                "$1-$2"
+              )
+              .toLowerCase(),
+            v
+          );
+        }
+      } catch (se) {
+        console.log(se);
+        continue;
+      }
+    }
+    targ.insertAdjacentElement("afterend", tb);
+    tb.appendChild(cap);
+    tb.appendChild(th);
+    th.insertRow();
+    headers.forEach(h => {
+      th.rows[0].appendChild(h.e);
+      h.e.style.fontWeight = "bold";
+      h.e.innerText = h.txt;
+    });
+    tb.appendChild(tbd);
+    results.forEach(({ k, v, foundIn: f, endsIn: e }, i) => {
+      let newWord = v,
+        acc = 0;
+      do {
+        if (acc > v.length * 10) break;
+        newWord = this.#generateMask(v, () => Math.floor(Math.random() * 10));
+        acc += 1;
+      } while (newWord === v);
+      if (/(?:cpf|cpnj|celular|telefone|phone|ssn|rg)[\s\t\n=:]*/gi.test(k)) {
+        const chars = newWord.split("");
+        for (let a = 0; a < chars.length; a++) {
+          if (PATTERNS.NUMBERS().test(chars[a]))
+            chars[a] = PATTERNS.getRandomSymbol(newWord);
+        }
+        newWord = chars.join("");
+      }
+      if (newWord.length < v.length) {
+        const fallback =
+          crypto?.randomUUID() || Math.random().toString(36).slice(2);
+        newWord += fallback
+          .slice(0, v.length - newWord.length)
+          .replace(/[@\/.\u20A0-\u20CF]/g, "a");
+      }
+      const row = tbd.insertRow();
+      row.insertCell().textContent = k
+        .replace(/^[,_=]+/, "")
+        .replace(/[,_=]+$/, "")
+        .replaceAll(",", "")
+        .toUpperCase();
+      const maskCell = row.insertCell(),
+        maskN = `mask_${i}`;
+      for (const { k, v } of [
+        { k: "textContent", v: newWord },
+        { k: "title", v: "Click here to regenerate" },
+        { k: "data-willuse", v: "true" },
+        { k: "id", v: maskN },
+        { k: "data-idx", v: `mask_${i}` },
+      ])
+        maskCell.setAttribute(k, v);
+      const maskSpan = document.createElement("span"),
+        cycleSpan = document.createElement("kbd");
+      for (const act of [
+        (e: any) => {
+          e.textContent = newWord;
+        },
+        (e: any) => e.classList.add("regenerate"),
+        ...[
+          { k: "start", v: f },
+          { k: "end", v: e },
+        ].map(({ k, v }) => {
+          return (e: any) => e.setAttribute(`data-${k}`, v.toString());
+        }),
+        (e: any) =>
+          e.addEventListener("pointerup", (ev: PointerEvent) => {
+            if (
+              !(
+                ev.button === 0 &&
+                ev.currentTarget instanceof HTMLElement &&
+                ev.currentTarget.textContent
+              )
+            )
+              return;
+            ev.currentTarget.textContent = this.#generateMask(
+              ev.currentTarget.textContent
+            );
+          }),
+      ])
+        act(maskSpan);
+      for (const act of [
+        (e: any) => (e.textContent = "♻"),
+        (e: any) => e.classList.add("regenerate-btn"),
+        (e: any) =>
+          e.addEventListener("pointerup", (ev: PointerEvent) => {
+            if (!(ev.button === 0 && ev.currentTarget instanceof HTMLElement))
+              return;
+            const tg = ev.currentTarget;
+            tg.style.backgroundColor = "#2222";
+            setTimeout(() => {
+              if (!(tg instanceof HTMLElement)) return;
+              tg.style.backgroundColor = "#eeee";
+            }, 100);
+            const cell =
+              ev.currentTarget.closest("td") ||
+              ev.currentTarget.closest("th") ||
+              ev.currentTarget.closest(".MuiTableCell-root");
+            if (!cell) return;
+            const regenMask = cell.querySelector(".regenerate");
+            if (!(regenMask instanceof HTMLElement && regenMask.textContent))
+              return;
+            regenMask.textContent = this.#generateMask(regenMask.textContent);
+          }),
+      ])
+        act(cycleSpan);
+      for (const c of [maskSpan, cycleSpan]) maskCell.append(c);
+      const cbCell = row.insertCell(),
+        fsCb = document.createElement("fieldset"),
+        cb = document.createElement("input");
+      fsCb.style.border = "none";
+      for (const { k, v } of [
+        { k: "type", v: "checkbox" },
+        { k: "data-controls", v: maskN },
+        { k: "aria-controls", v: maskN },
+      ])
+        cb.setAttribute(k, v);
+      cb.checked = true;
+      cb.addEventListener("change", ev => {
+        try {
+          if (
+            !(
+              ev.currentTarget instanceof HTMLInputElement &&
+              ev.currentTarget.type === "checkbox"
+            )
+          )
+            return;
+          const acst =
+              ev.currentTarget.closest("table") ?? document.body ?? document,
+            mask = acst.querySelector(
+              `[data-idx="${ev.currentTarget.getAttribute("data-controls")}"]`
+            );
+          if (!mask) return;
+          mask.setAttribute(
+            "data-willuse",
+            ev.currentTarget.checked.toString()
+          );
+        } catch (e) {
+          Swal.fire({
+            toast: true,
+            icon: "warning",
+            title: `Some error occured!: ${(e as Error).name}`,
+          });
+        }
+      });
+      fsCb.appendChild(cb);
+      cbCell.append(fsCb);
+    });
+    if (targ.id === "prompt-table-flag") {
+      setTimeout(() => {
+        const matmdc = document
+          .querySelector(".prompt-table-modal")
+          ?.querySelector(".mat-mdc-dialog-content");
+        matmdc && matmdc.appendChild(tb);
+      }, 200);
+    }
+  }
+  #generateMask(
+    targ: string,
+    dCb: Function = (v: string) => PATTERNS.getRandomSymbol(v)
+  ) {
+    const iniLg = targ.length,
+      evals = [];
+    for (let l = 0; l < targ.length; l++) {
+      const d = targ[l];
+      if (PATTERNS.SYMBOLS().test(d) && !/[@\/.\u20A0-\u20CF]/.test(d))
+        evals.push("s");
+      else if (PATTERNS.LATINIZED_CHARS().test(d)) evals.push("l");
+      else if (PATTERNS.NUMBERS().test(d)) evals.push("d");
+      else if (PATTERNS.JAPANESE().test(d)) evals.push("j");
+      else if (PATTERNS.HANGUL().test(d)) evals.push("hg");
+      else if (PATTERNS.HAN().test(d)) evals.push("ha");
+      else if (PATTERNS.ARABIC().test(d)) evals.push("a");
+      else if (PATTERNS.CYRILIC().test(d)) evals.push("c");
+      else evals.push("?");
+    }
+    const newLetters = [];
+    for (let e = 0; e < evals.length; e++) {
+      const c = evals[e];
+      switch (c) {
+        case "s":
+          newLetters.push(PATTERNS.getRandomSymbol(targ));
+          break;
+        case "l":
+          newLetters.push(
+            [
+              PATTERNS.getRandomChar(0x0041, 0x005a),
+              PATTERNS.getRandomChar(0x0061, 0x007a),
+              PATTERNS.getRandomChar(0x00c0, 0x00ff),
+            ][Math.floor(Math.random() * 3)]
+          );
+          break;
+        case "d":
+          newLetters.push(dCb());
+          break;
+        case "j":
+          newLetters.push(PATTERNS.getRandomChar(0x3040, 0x309f));
+          break;
+        case "hg":
+          newLetters.push(PATTERNS.getRandomChar(0xac00, 0xd7af));
+          break;
+        case "ha":
+          newLetters.push(
+            Math.random() < 0.5
+              ? PATTERNS.getRandomChar(0x4e00, 0x9fff)
+              : PATTERNS.getRandomChar(0x3400, 0x4dbf)
+          );
+          break;
+        case "a":
+          newLetters.push(
+            Math.random() < 0.6
+              ? PATTERNS.getRandomChar(0x0600, 0x06ff)
+              : Math.random() < 0.8
+              ? PATTERNS.getRandomChar(0x0750, 0x077f)
+              : PATTERNS.getRandomChar(0x08a0, 0x08ff)
+          );
+          break;
+        case "c":
+          newLetters.push(PATTERNS.getRandomChar(0x0400, 0x04ff));
+          break;
+        default:
+          newLetters.push(targ[e]);
+      }
+    }
+    let newWord = newLetters.join("");
+    if (newWord.length < iniLg) {
+      const fallback =
+        crypto?.randomUUID() || Math.random().toString(36).slice(2);
+      newWord += fallback
+        .slice(0, targ.length - newWord.length)
+        .replace(/[@\/.\u20A0-\u20CF]/g, "a");
+    }
+    if (targ === newWord)
+      Swal.fire({
+        toast: true,
+        position: "top-right",
+        icon: "warning",
+        title: "Regenerating this mask didn't work!",
+        text: "Try recreating the table.",
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+          popup: "colored-toast",
+        },
+      });
+    return newWord;
   }
 }
