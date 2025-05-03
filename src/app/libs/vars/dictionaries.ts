@@ -158,7 +158,7 @@ export const PATTERNS = Object.freeze({
     for (const [start, end] of symbolRanges) {
       for (let code = start; code <= end; code++) {
         const char = String.fromCharCode(code);
-        if (!/@\/\.[\u20A0-\u20CF]/.test(char) && !originalStr.includes(char))
+        if (!/@\/\.[\u20A0-\u20CF]/.test(char) && !originalStr?.includes(char))
           validSymbols.push(char);
       }
     }

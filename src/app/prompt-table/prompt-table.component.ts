@@ -55,7 +55,11 @@ export class PromptTableComponent implements AfterViewInit {
     setTimeout(() => {
       const tb = content.querySelector("table");
       if (tb) {
-        tb.style.width = "100%";
+        for (const { k, v } of [
+          { k: "width", v: "100%" },
+          { k: "padding", v: "0 1.5rem 0 0" },
+        ])
+          (tb.style as any)[k] = v;
         [
           ...Array.from(tb.getElementsByTagName("th")),
           ...Array.from(tb.getElementsByTagName("td")),
