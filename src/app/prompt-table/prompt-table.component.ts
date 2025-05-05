@@ -24,7 +24,7 @@ export class PromptTableComponent implements AfterViewInit {
   @ViewChild("content") content: ElementRef<HTMLElement> | null = null;
   constructor(
     public dialogRef: MatDialogRef<PromptTableComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { text: string }
+    @Inject(MAT_DIALOG_DATA) public data: { text: string; prompt: string }
   ) {}
   ngAfterViewInit(): void {
     if (typeof window === "undefined") return;
@@ -47,7 +47,7 @@ export class PromptTableComponent implements AfterViewInit {
       if (i === arr.length - 1) {
         for (const { k, v } of [
           { k: "marginBlock", v: "1rem" },
-          { k: "transform", v: "translateX(-1rem)" },
+          { k: "transform", v: "translateX(-2.5%)" },
         ])
           hr.style[k as any] = v;
       }
