@@ -22,12 +22,13 @@ export class InfoDialogService {
       .subscribe(() => this.#isHelpOpen.next(false));
     this.#isHelpOpen.next(true);
   }
-  openPromptTable(): void {
+  openPromptTable(data?: any): void {
     if (this.#isPromptTableOpen.value) return;
     this._matDialog
       .open(PromptTableComponent, {
         data: {
           text: '<span>Check the definitions and features for your customization of the text</span><hr style="border: #7171712e 1px solid; opacity: 0.25; width: 95%; margin-right: 12%">',
+          prompt: data?.prompt ?? "",
         },
         panelClass: "prompt-table-modal",
       })
@@ -47,10 +48,10 @@ export class InfoDialogService {
   toggleHelp(): void {
     this.#isHelpOpen.value ? this.closeHelp() : this.openHelp();
   }
-  togglePromptTable(): void {
+  togglePromptTable(data?: any): void {
     this.#isPromptTableOpen.value
       ? this.closePromptTable()
-      : this.openPromptTable();
+      : this.openPromptTable(data);
   }
   get isHelpOpen(): boolean {
     return this.#isHelpOpen.value;

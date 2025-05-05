@@ -56,11 +56,13 @@ import Swal from "sweetalert2";
 })
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("promptInput", { static: true }) input: ElementRef | null = null;
+  isHelpOpen = false;
   userInput = "";
   processedOutput = "";
-  isHelpOpen = false;
-  _maxLength = 4096;
   promptValueKey = "llmPromptToPurifyValue";
+  safeHtml = "";
+  labelPattern = "data-labelpattern";
+  _maxLength = 4096;
   constructor(
     private _userInputService: UserInputSerivce,
     private _dlgService: InfoDialogService,
@@ -353,42 +355,73 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           const h3 = document.createElement("h3");
           h3.id = patternsTitle;
           h3.textContent = "Identified patterns and suggested masks";
-          this._dlgService.togglePromptTable();
+          this._dlgService.togglePromptTable({ prompt: this.userInput });
           if (document.querySelector(".prompt-table-modal")) {
-            const table = this.#mountTable(
+            const { table, output } = this.#mountTable(
               document.querySelector("#prompt-table-flag"),
               results
             );
+            const ensureTableRender = async () => {
+              await new Promise(resolve => setTimeout(resolve, 200));
+              if (
+                !(
+                  table &&
+                  (!document.getElementById(table.id) ||
+                    !table.isConnected ||
+                    !table.clientWidth)
+                )
+              )
+                return;
+              const matmdc = document
+                .querySelector(".prompt-table-modal")
+                ?.querySelector(".mat-mdc-dialog-content");
+              if (matmdc) {
+                if (table) this._renderer.appendChild(matmdc, table);
+                else
+                  this._renderer.setProperty(
+                    this._renderer.createElement("div") as HTMLDivElement,
+                    "innerText",
+                    "Failed to render table! ❌"
+                  );
+              }
+              if (
+                !(
+                  output &&
+                  (!document.getElementById(output.id) ||
+                    !output.isConnected ||
+                    !output.clientWidth)
+                ) ||
+                !matmdc
+              )
+                return;
+              if (output) this._renderer.appendChild(matmdc, output);
+              else
+                this._renderer.setProperty(
+                  this._renderer.createElement("div") as HTMLDivElement,
+                  "innerText",
+                  "Failed to render output! ❌"
+                );
+            };
+            ensureTableRender();
+            ensureTableRender();
             if (!table) throw TypeError("Table failed to mount");
-            await new Promise(resolve => setTimeout(resolve, 200));
-            const outp = document.createElement("output");
-            let safeHtml: SafeHtml = "";
-            const originalText = outp.textContent || "";
-            let sanitizedOutput = originalText;
             const masks = Array.from(table.querySelectorAll(".regenerate"));
-            for (const act of [
-              (e: any) => e.classList.add("maskedOutput"),
-              (e: any) => {
-                e.textContent =
-                  this.userInput ||
-                  (() => {
-                    const txt = document.getElementById("promptInput");
-                    if (!txt) return "";
-                    if (DOMValidator.isDefaultTextbox(txt)) return txt.value;
-                    if (DOMValidator.isCustomTextbox(txt))
-                      return txt.textContent || "";
-                    else return "";
-                  })();
-              },
-            ])
-              act(outp);
-            if (!outp.textContent)
-              throw new TypeError(`Failed to write Output Text Content`);
+            if (!output?.textContent)
+              throw new TypeError(`Failed to write output text`);
+            for (const act of [(e: any) => e.classList.add("maskedOutput")])
+              act(output);
             for (const mask of masks) {
               if (
                 !(mask instanceof HTMLElement) ||
                 !mask.textContent ||
-                !outp.textContent
+                !output?.textContent ||
+                (
+                  mask.closest("tr") ||
+                  mask.closest("mat-mdc-row") ||
+                  mask.closest(".tr")
+                )
+                  ?.querySelector(".label-cell")
+                  ?.getAttribute(this.labelPattern) === "true"
               )
                 continue;
               const st = mask.getAttribute("data-start"),
@@ -397,52 +430,46 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
               const nSt = parseInt(st, 10),
                 nEnd = parseInt(end, 10);
               if (!Number.isFinite(nSt) || !Number.isFinite(nEnd)) continue;
-              sanitizedOutput =
-                originalText.slice(0, nSt) +
-                this._sanitizer.sanitize(
-                  SecurityContext.HTML,
-                  mask.textContent
-                ) +
-                originalText.slice(nEnd);
-              outp.textContent = this._sanitizer.bypassSecurityTrustHtml(
-                sanitizedOutput
-              ) as any;
-              if (
-                !outp.textContent?.startsWith(this.userInput.slice(0, 3)) &&
-                !masks
-                  .filter(m => m.textContent)
-                  .some(m => outp.textContent?.startsWith(m.textContent!))
-              ) {
-                outp.textContent = "###FAILED TO RENDER MASKED OUTPUT";
-                const sm = document.createElement("small"),
-                  cnt = document.getElementById("promptTableContent");
-                sm.textContent = this.userInput;
-                sm.id = "inputReflex";
-                for (const { k, v } of [
-                  { k: "opacity", v: "0.75" },
-                  { k: "fontStyle", v: "italic" },
-                  { k: "font-size", v: "0.8rem" },
-                  { k: "display", v: "block" },
-                ])
-                  this._renderer.setStyle(sm, k, v);
-                await new Promise(resolve =>
-                  this._zone.runOutsideAngular(() =>
-                    setTimeout(() => this._zone.run(resolve), 300)
-                  )
-                );
-                if (
-                  !document.getElementById("inputReflex") &&
-                  (outp.parentNode?.parentNode || cnt)
-                )
-                  this._renderer.appendChild(
-                    outp.parentNode ||
-                      (outp.parentNode as any)?.parentNode ||
-                      cnt,
-                    sm
-                  );
-              }
+              output.textContent =
+                output.textContent.slice(0, nSt) +
+                mask.textContent +
+                output.textContent.slice(nEnd);
             }
-            table.insertAdjacentElement("afterend", outp);
+            if (
+              !output?.textContent?.startsWith(this.userInput.slice(0, 3)) &&
+              !masks
+                .filter(m => m.textContent)
+                .some(m => output?.textContent?.startsWith(m.textContent!))
+            ) {
+              if (output)
+                output.textContent = "###FAILED TO RENDER MASKED OUTPUT";
+              const sm = document.createElement("small"),
+                cnt = document.getElementById("promptTableContent");
+              sm.textContent = this.userInput;
+              sm.id = "inputReflex";
+              for (const { k, v } of [
+                { k: "opacity", v: "0.75" },
+                { k: "fontStyle", v: "italic" },
+                { k: "font-size", v: "0.8rem" },
+                { k: "display", v: "block" },
+              ])
+                this._renderer.setStyle(sm, k, v);
+              await new Promise(resolve =>
+                this._zone.runOutsideAngular(() =>
+                  setTimeout(() => this._zone.run(resolve), 300)
+                )
+              );
+              if (
+                !document.getElementById("inputReflex") &&
+                (output?.parentNode?.parentNode || cnt)
+              )
+                this._renderer.appendChild(
+                  output?.parentNode ||
+                    (output?.parentNode as any)?.parentNode ||
+                    cnt,
+                  sm
+                );
+            }
           }
         }
       } else {
@@ -460,10 +487,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       await new Promise(resolve => setTimeout(resolve, 250));
       Swal.fire({
         icon: "error",
-        text: `An unexpected error (${
-          (e as Error).name
-        }) occurred. Please try again later.`,
+        text: `An unexpected error occurred. Please try again later.
+        `,
       });
+      console.error(`[${(e as Error).name}]: ${(e as Error).message}`);
     } finally {
       clearInterval(timerInterval);
     }
@@ -471,12 +498,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   #mountTable(
     targ: Element | null,
     results: Array<resultDict>
-  ): HTMLTableElement | null {
+  ): { table: HTMLTableElement | null; output: HTMLOutputElement | null } {
     try {
       if (!targ) {
         console.warn(`The masking suggestions could not be mounted due to a falsish target for adjacent insertion:
         Target: ${(targ as any)?.toString()}`);
-        return null;
+        throw new TypeError(`Failed to validate target`);
       }
       const tb = document.createElement("table"),
         th = document.createElement("thead"),
@@ -551,11 +578,22 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             .replace(/[@\/.\u20A0-\u20CF]/g, "a");
         }
         const row = tbd.insertRow();
-        row.insertCell().textContent = k
-          .replace(/^[,_=]+/, "")
-          .replace(/[,_=]+$/, "")
-          .replaceAll(",", "")
-          .toUpperCase();
+        const labCell = row.insertCell();
+        for (const act of [
+          (e: any) => {
+            e.textContent = k
+              .replace(/^[,_=]+/, "")
+              .replace(/[,_=]+$/, "")
+              .replaceAll(",", "")
+              .toUpperCase();
+          },
+          (e: any) => e.classList.add("label-cell"),
+        ])
+          act(labCell);
+        const isLabPattern = ["_label", "-label"].some(p =>
+          labCell.textContent?.toLowerCase().endsWith(p)
+        );
+        isLabPattern && labCell.setAttribute(this.labelPattern, "true");
         const maskCell = row.insertCell(),
           maskN = `mask_${i}`;
         for (const { k, v } of [
@@ -566,6 +604,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           { k: "data-idx", v: `mask_${i}` },
         ])
           maskCell.setAttribute(k, v);
+        maskCell.classList.add("mask-cell");
         const maskSpan = document.createElement("span"),
           cycleSpan = document.createElement("kbd");
         for (const act of [
@@ -631,7 +670,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           { k: "aria-controls", v: maskN },
         ])
           cb.setAttribute(k, v);
-        cb.checked = true;
+        cbCell.classList.add("check-cell");
+        cb.checked = !isLabPattern ? true : false;
         cb.addEventListener("change", ev => {
           try {
             if (
@@ -662,18 +702,17 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         fsCb.appendChild(cb);
         cbCell.append(fsCb);
       });
-      if (targ.id === "prompt-table-flag") {
-        setTimeout(() => {
-          const matmdc = document
-            .querySelector(".prompt-table-modal")
-            ?.querySelector(".mat-mdc-dialog-content");
-          matmdc && matmdc.appendChild(tb);
-        }, 200);
+      const outp = this._renderer.createElement("output") as HTMLOutputElement,
+        res = tb.insertAdjacentElement("afterend", outp);
+      if (!res) {
+        console.error(`Failed to insert output element`);
+        return { table: tb, output: outp };
       }
-      return tb;
+      outp.innerText = this.userInput || "# FAILED TO CAPTURE USER INPUT ❌";
+      return { table: tb, output: outp };
     } catch (e) {
       console.error(`Table mounting failed due to ${(e as Error).name}`);
-      return null;
+      return { table: null, output: null };
     }
   }
   #generateMask(
