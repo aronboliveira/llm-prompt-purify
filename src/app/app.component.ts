@@ -4,9 +4,12 @@ import {
   ElementRef,
   OnDestroy,
   OnInit,
+  SecurityContext,
   ViewChild,
+  Renderer2,
+  NgZone,
 } from "@angular/core";
-import Swal from "sweetalert2";
+import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 import { FormsModule } from "@angular/forms";
 import { OutputBuilder } from "./libs/builders/OutputBuilder";
 import { MatIconModule } from "@angular/material/icon";
@@ -24,10 +27,11 @@ import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { CommonModule } from "@angular/common";
 import { FixedHeaderComponent } from "./fixed-header/fixed-header.component";
 import { MAIN_DICT, PATTERNS } from "./libs/vars/dictionaries";
-import DOMValidator from "./libs/utils/dom/DOMValidator";
 import { InfoDialogService } from "./libs/state/info-dialog-service";
 import { PromptTableComponent } from "./prompt-table/prompt-table.component";
 import { resultDict } from "../definitions/helpers";
+import DOMValidator from "./libs/utils/dom/DOMValidator";
+import Swal from "sweetalert2";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -60,6 +64,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private _userInputService: UserInputSerivce,
     private _dlgService: InfoDialogService,
+    private _sanitizer: DomSanitizer,
+    private _renderer: Renderer2,
+    private _zone: NgZone,
     public dialog: MatDialog
   ) {}
   handleEnter(ev: KeyboardEvent): void {
@@ -254,14 +261,27 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   for (let k = 0; k < exps.length; k++) {
                     const exp = exps[k][1],
                       key = exps[k][0],
-                      res = exp.exec(txt[w]);
+                      res = exp.exec(txt[w]),
+                      gRes = new RegExp(
+                        exp.source,
+                        exp.flags + (exp.global ? "" : "g")
+                      ).exec(this.userInput);
+                    console.log([
+                      this.userInput,
+                      exp,
+                      new RegExp(
+                        exp.source,
+                        exp.flags + (exp.global ? "" : "g")
+                      ),
+                      gRes,
+                    ]);
                     if (exp instanceof RegExp && res)
                       results.push({
                         k: key,
                         e: exp,
                         v: txt[w],
-                        foundIn: res.index,
-                        endsIn: res.index + txt[w].length,
+                        foundIn: gRes?.index || 0,
+                        endsIn: (gRes?.index || 0) + txt[w].length,
                       });
                     else if (
                       typeof exp === "string" &&
@@ -271,10 +291,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                         k: key,
                         e: exp,
                         v: txt[w],
-                        foundIn: new RegExp(exp).exec(txt[w])?.index || 0,
+                        foundIn:
+                          new RegExp(exp).exec(this.userInput)?.index || 0,
                         endsIn:
-                          (new RegExp(exp).exec(txt[w])?.index || 0) +
-                          txt[w].length,
+                          (new RegExp(exp, "g").exec(this.userInput)?.index ||
+                            0) + txt[w].length,
                       });
                   }
                 }
@@ -333,11 +354,96 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           h3.id = patternsTitle;
           h3.textContent = "Identified patterns and suggested masks";
           this._dlgService.togglePromptTable();
-          document.querySelector(".prompt-table-modal") &&
-            this.#mountTable(
+          if (document.querySelector(".prompt-table-modal")) {
+            const table = this.#mountTable(
               document.querySelector("#prompt-table-flag"),
               results
             );
+            if (!table) throw TypeError("Table failed to mount");
+            await new Promise(resolve => setTimeout(resolve, 200));
+            const outp = document.createElement("output");
+            let safeHtml: SafeHtml = "";
+            const originalText = outp.textContent || "";
+            let sanitizedOutput = originalText;
+            const masks = Array.from(table.querySelectorAll(".regenerate"));
+            for (const act of [
+              (e: any) => e.classList.add("maskedOutput"),
+              (e: any) => {
+                e.textContent =
+                  this.userInput ||
+                  (() => {
+                    const txt = document.getElementById("promptInput");
+                    if (!txt) return "";
+                    if (DOMValidator.isDefaultTextbox(txt)) return txt.value;
+                    if (DOMValidator.isCustomTextbox(txt))
+                      return txt.textContent || "";
+                    else return "";
+                  })();
+              },
+            ])
+              act(outp);
+            if (!outp.textContent)
+              throw new TypeError(`Failed to write Output Text Content`);
+            for (const mask of masks) {
+              if (
+                !(mask instanceof HTMLElement) ||
+                !mask.textContent ||
+                !outp.textContent
+              )
+                continue;
+              const st = mask.getAttribute("data-start"),
+                end = mask.getAttribute("data-end");
+              if (!(st && end)) continue;
+              const nSt = parseInt(st, 10),
+                nEnd = parseInt(end, 10);
+              if (!Number.isFinite(nSt) || !Number.isFinite(nEnd)) continue;
+              sanitizedOutput =
+                originalText.slice(0, nSt) +
+                this._sanitizer.sanitize(
+                  SecurityContext.HTML,
+                  mask.textContent
+                ) +
+                originalText.slice(nEnd);
+              outp.textContent = this._sanitizer.bypassSecurityTrustHtml(
+                sanitizedOutput
+              ) as any;
+              if (
+                !outp.textContent?.startsWith(this.userInput.slice(0, 3)) &&
+                !masks
+                  .filter(m => m.textContent)
+                  .some(m => outp.textContent?.startsWith(m.textContent!))
+              ) {
+                outp.textContent = "###FAILED TO RENDER MASKED OUTPUT";
+                const sm = document.createElement("small"),
+                  cnt = document.getElementById("promptTableContent");
+                sm.textContent = this.userInput;
+                sm.id = "inputReflex";
+                for (const { k, v } of [
+                  { k: "opacity", v: "0.75" },
+                  { k: "fontStyle", v: "italic" },
+                  { k: "font-size", v: "0.8rem" },
+                  { k: "display", v: "block" },
+                ])
+                  this._renderer.setStyle(sm, k, v);
+                await new Promise(resolve =>
+                  this._zone.runOutsideAngular(() =>
+                    setTimeout(() => this._zone.run(resolve), 300)
+                  )
+                );
+                if (
+                  !document.getElementById("inputReflex") &&
+                  (outp.parentNode?.parentNode || cnt)
+                )
+                  this._renderer.appendChild(
+                    outp.parentNode ||
+                      (outp.parentNode as any)?.parentNode ||
+                      cnt,
+                    sm
+                  );
+              }
+            }
+            table.insertAdjacentElement("afterend", outp);
+          }
         }
       } else {
         await Swal.fire({
@@ -349,216 +455,225 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         });
         return;
       }
-    } catch {
+    } catch (e) {
       Swal.close();
       await new Promise(resolve => setTimeout(resolve, 250));
       Swal.fire({
         icon: "error",
-        text: "An undefined error occurred. Please try again later.",
+        text: `An unexpected error (${
+          (e as Error).name
+        }) occurred. Please try again later.`,
       });
     } finally {
       clearInterval(timerInterval);
     }
   }
-  #mountTable(targ: Element | null, results: Array<resultDict>): void {
-    if (!targ) {
-      console.warn(`The masking suggestions could not be mounted due to a falsish target for adjacent insertion:
-      Target: ${(targ as any)?.toString()}`);
-      return;
-    }
-    const tb = document.createElement("table"),
-      th = document.createElement("thead"),
-      tbd = document.createElement("tbody"),
-      headers = [
-        {
-          e: document.createElement("th"),
-          txt: "Pattern Recognized",
-        },
-        { e: document.createElement("th"), txt: "Suggested Mask" },
-        { e: document.createElement("th"), txt: "Use mask" },
-      ],
-      cap = document.createElement("caption");
-    tb.id = `scanResults`;
-    cap.id = `captionScanResults`;
-    cap.innerText = "Relation of patterns and suggested masks";
-    for (const { k, v } of [
-      { k: "fontSize", v: "0.8rem" },
-      { k: "opacity", v: "0.7" },
-      { k: "fontStyle", v: "italic" },
-      { k: "textAlign", v: "center" },
-      { k: "verticalAlign", v: "baseline" },
-      { k: "paddingBottom", v: "1rem" },
-    ]) {
-      try {
-        const dc = Object.getOwnPropertyDescriptor(cap.style, k);
-        if (dc?.writable) {
-          cap.style.setProperty(
-            k
-              .replace(
-                /([a-záàâäãéèêëíìîïóòôöõúùûüçñ0-9])([A-ZÁÀÂÄÃÉÈÊËÍÌÎÏÓÒÔÖÕÚÙÛÜÇ])/g,
-                "$1-$2"
-              )
-              .toLowerCase(),
-            v
-          );
-        }
-      } catch (se) {
-        console.log(se);
-        continue;
+  #mountTable(
+    targ: Element | null,
+    results: Array<resultDict>
+  ): HTMLTableElement | null {
+    try {
+      if (!targ) {
+        console.warn(`The masking suggestions could not be mounted due to a falsish target for adjacent insertion:
+        Target: ${(targ as any)?.toString()}`);
+        return null;
       }
-    }
-    targ.insertAdjacentElement("afterend", tb);
-    tb.appendChild(cap);
-    tb.appendChild(th);
-    th.insertRow();
-    headers.forEach(h => {
-      th.rows[0].appendChild(h.e);
-      h.e.style.fontWeight = "bold";
-      h.e.innerText = h.txt;
-    });
-    tb.appendChild(tbd);
-    results.forEach(({ k, v, foundIn: f, endsIn: e }, i) => {
-      let newWord = v,
-        acc = 0;
-      do {
-        if (acc > v.length * 10) break;
-        newWord = this.#generateMask(v, () => Math.floor(Math.random() * 10));
-        acc += 1;
-      } while (newWord === v);
-      if (/(?:cpf|cpnj|celular|telefone|phone|ssn|rg)[\s\t\n=:]*/gi.test(k)) {
-        const chars = newWord.split("");
-        for (let a = 0; a < chars.length; a++) {
-          if (PATTERNS.NUMBERS().test(chars[a]))
-            chars[a] = PATTERNS.getRandomSymbol(newWord);
-        }
-        newWord = chars.join("");
-      }
-      if (newWord.length < v.length) {
-        const fallback =
-          crypto?.randomUUID() || Math.random().toString(36).slice(2);
-        newWord += fallback
-          .slice(0, v.length - newWord.length)
-          .replace(/[@\/.\u20A0-\u20CF]/g, "a");
-      }
-      const row = tbd.insertRow();
-      row.insertCell().textContent = k
-        .replace(/^[,_=]+/, "")
-        .replace(/[,_=]+$/, "")
-        .replaceAll(",", "")
-        .toUpperCase();
-      const maskCell = row.insertCell(),
-        maskN = `mask_${i}`;
+      const tb = document.createElement("table"),
+        th = document.createElement("thead"),
+        tbd = document.createElement("tbody"),
+        headers = [
+          {
+            e: document.createElement("th"),
+            txt: "Pattern Recognized",
+          },
+          { e: document.createElement("th"), txt: "Suggested Mask" },
+          { e: document.createElement("th"), txt: "Use mask" },
+        ],
+        cap = document.createElement("caption");
+      tb.id = `scanResults`;
+      cap.id = `captionScanResults`;
+      cap.innerText = "Relation of patterns and suggested masks";
       for (const { k, v } of [
-        { k: "textContent", v: newWord },
-        { k: "title", v: "Click here to regenerate" },
-        { k: "data-willuse", v: "true" },
-        { k: "id", v: maskN },
-        { k: "data-idx", v: `mask_${i}` },
-      ])
-        maskCell.setAttribute(k, v);
-      const maskSpan = document.createElement("span"),
-        cycleSpan = document.createElement("kbd");
-      for (const act of [
-        (e: any) => {
-          e.textContent = newWord;
-        },
-        (e: any) => e.classList.add("regenerate"),
-        ...[
-          { k: "start", v: f },
-          { k: "end", v: e },
-        ].map(({ k, v }) => {
-          return (e: any) => e.setAttribute(`data-${k}`, v.toString());
-        }),
-        (e: any) =>
-          e.addEventListener("pointerup", (ev: PointerEvent) => {
+        { k: "fontSize", v: "0.8rem" },
+        { k: "opacity", v: "0.7" },
+        { k: "fontStyle", v: "italic" },
+        { k: "textAlign", v: "center" },
+        { k: "verticalAlign", v: "baseline" },
+        { k: "paddingBottom", v: "1rem" },
+      ]) {
+        try {
+          const dc = Object.getOwnPropertyDescriptor(cap.style, k);
+          if (dc?.writable) {
+            cap.style.setProperty(
+              k
+                .replace(
+                  /([a-záàâäãéèêëíìîïóòôöõúùûüçñ0-9])([A-ZÁÀÂÄÃÉÈÊËÍÌÎÏÓÒÔÖÕÚÙÛÜÇ])/g,
+                  "$1-$2"
+                )
+                .toLowerCase(),
+              v
+            );
+          }
+        } catch (se) {
+          console.log(se);
+          continue;
+        }
+      }
+      targ.insertAdjacentElement("afterend", tb);
+      th.insertRow();
+      headers.forEach(h => {
+        th.rows[0].appendChild(h.e);
+        h.e.style.fontWeight = "bold";
+        h.e.innerText = h.txt;
+      });
+      for (const c of [cap, th, tbd]) tb.appendChild(c);
+      results.forEach(({ k, v, foundIn: f, endsIn: e }, i) => {
+        let newWord = v,
+          acc = 0;
+        do {
+          if (acc > v.length * 10) break;
+          newWord = this.#generateMask(v, () => Math.floor(Math.random() * 10));
+          acc += 1;
+        } while (newWord === v);
+        if (/(?:cpf|cpnj|celular|telefone|phone|ssn|rg)[\s\t\n=:]*/gi.test(k)) {
+          const chars = newWord.split("");
+          for (let a = 0; a < chars.length; a++) {
+            if (PATTERNS.NUMBERS().test(chars[a]))
+              chars[a] = PATTERNS.getRandomSymbol(newWord);
+          }
+          newWord = chars.join("");
+        }
+        if (newWord.length < v.length) {
+          const fallback =
+            crypto?.randomUUID() || Math.random().toString(36).slice(2);
+          newWord += fallback
+            .slice(0, v.length - newWord.length)
+            .replace(/[@\/.\u20A0-\u20CF]/g, "a");
+        }
+        const row = tbd.insertRow();
+        row.insertCell().textContent = k
+          .replace(/^[,_=]+/, "")
+          .replace(/[,_=]+$/, "")
+          .replaceAll(",", "")
+          .toUpperCase();
+        const maskCell = row.insertCell(),
+          maskN = `mask_${i}`;
+        for (const { k, v } of [
+          { k: "textContent", v: newWord },
+          { k: "title", v: "Click here to regenerate" },
+          { k: "data-willuse", v: "true" },
+          { k: "id", v: maskN },
+          { k: "data-idx", v: `mask_${i}` },
+        ])
+          maskCell.setAttribute(k, v);
+        const maskSpan = document.createElement("span"),
+          cycleSpan = document.createElement("kbd");
+        for (const act of [
+          (e: any) => {
+            e.textContent = newWord;
+          },
+          (e: any) => e.classList.add("regenerate"),
+          ...[
+            { k: "start", v: f },
+            { k: "end", v: e },
+          ].map(({ k, v }) => {
+            return (e: any) => e.setAttribute(`data-${k}`, v.toString());
+          }),
+          (e: any) =>
+            e.addEventListener("pointerup", (ev: PointerEvent) => {
+              if (
+                !(
+                  ev.button === 0 &&
+                  ev.currentTarget instanceof HTMLElement &&
+                  ev.currentTarget.textContent
+                )
+              )
+                return;
+              ev.currentTarget.textContent = this.#generateMask(
+                ev.currentTarget.textContent
+              );
+            }),
+        ])
+          act(maskSpan);
+        for (const act of [
+          (e: any) => (e.textContent = "♻"),
+          (e: any) => e.classList.add("regenerate-btn"),
+          (e: any) =>
+            e.addEventListener("pointerup", (ev: PointerEvent) => {
+              if (!(ev.button === 0 && ev.currentTarget instanceof HTMLElement))
+                return;
+              const tg = ev.currentTarget;
+              tg.style.backgroundColor = "#2222";
+              setTimeout(() => {
+                if (!(tg instanceof HTMLElement)) return;
+                tg.style.backgroundColor = "#eeee";
+              }, 100);
+              const cell =
+                ev.currentTarget.closest("td") ||
+                ev.currentTarget.closest("th") ||
+                ev.currentTarget.closest(".MuiTableCell-root");
+              if (!cell) return;
+              const regenMask = cell.querySelector(".regenerate");
+              if (!(regenMask instanceof HTMLElement && regenMask.textContent))
+                return;
+              regenMask.textContent = this.#generateMask(regenMask.textContent);
+            }),
+        ])
+          act(cycleSpan);
+        for (const c of [maskSpan, cycleSpan]) maskCell.append(c);
+        const cbCell = row.insertCell(),
+          fsCb = document.createElement("fieldset"),
+          cb = document.createElement("input");
+        fsCb.style.border = "none";
+        for (const { k, v } of [
+          { k: "type", v: "checkbox" },
+          { k: "data-controls", v: maskN },
+          { k: "aria-controls", v: maskN },
+        ])
+          cb.setAttribute(k, v);
+        cb.checked = true;
+        cb.addEventListener("change", ev => {
+          try {
             if (
               !(
-                ev.button === 0 &&
-                ev.currentTarget instanceof HTMLElement &&
-                ev.currentTarget.textContent
+                ev.currentTarget instanceof HTMLInputElement &&
+                ev.currentTarget.type === "checkbox"
               )
             )
               return;
-            ev.currentTarget.textContent = this.#generateMask(
-              ev.currentTarget.textContent
+            const acst =
+                ev.currentTarget.closest("table") ?? document.body ?? document,
+              mask = acst.querySelector(
+                `[data-idx="${ev.currentTarget.getAttribute("data-controls")}"]`
+              );
+            if (!mask) return;
+            mask.setAttribute(
+              "data-willuse",
+              ev.currentTarget.checked.toString()
             );
-          }),
-      ])
-        act(maskSpan);
-      for (const act of [
-        (e: any) => (e.textContent = "♻"),
-        (e: any) => e.classList.add("regenerate-btn"),
-        (e: any) =>
-          e.addEventListener("pointerup", (ev: PointerEvent) => {
-            if (!(ev.button === 0 && ev.currentTarget instanceof HTMLElement))
-              return;
-            const tg = ev.currentTarget;
-            tg.style.backgroundColor = "#2222";
-            setTimeout(() => {
-              if (!(tg instanceof HTMLElement)) return;
-              tg.style.backgroundColor = "#eeee";
-            }, 100);
-            const cell =
-              ev.currentTarget.closest("td") ||
-              ev.currentTarget.closest("th") ||
-              ev.currentTarget.closest(".MuiTableCell-root");
-            if (!cell) return;
-            const regenMask = cell.querySelector(".regenerate");
-            if (!(regenMask instanceof HTMLElement && regenMask.textContent))
-              return;
-            regenMask.textContent = this.#generateMask(regenMask.textContent);
-          }),
-      ])
-        act(cycleSpan);
-      for (const c of [maskSpan, cycleSpan]) maskCell.append(c);
-      const cbCell = row.insertCell(),
-        fsCb = document.createElement("fieldset"),
-        cb = document.createElement("input");
-      fsCb.style.border = "none";
-      for (const { k, v } of [
-        { k: "type", v: "checkbox" },
-        { k: "data-controls", v: maskN },
-        { k: "aria-controls", v: maskN },
-      ])
-        cb.setAttribute(k, v);
-      cb.checked = true;
-      cb.addEventListener("change", ev => {
-        try {
-          if (
-            !(
-              ev.currentTarget instanceof HTMLInputElement &&
-              ev.currentTarget.type === "checkbox"
-            )
-          )
-            return;
-          const acst =
-              ev.currentTarget.closest("table") ?? document.body ?? document,
-            mask = acst.querySelector(
-              `[data-idx="${ev.currentTarget.getAttribute("data-controls")}"]`
-            );
-          if (!mask) return;
-          mask.setAttribute(
-            "data-willuse",
-            ev.currentTarget.checked.toString()
-          );
-        } catch (e) {
-          Swal.fire({
-            toast: true,
-            icon: "warning",
-            title: `Some error occured!: ${(e as Error).name}`,
-          });
-        }
+          } catch (e) {
+            Swal.fire({
+              toast: true,
+              icon: "warning",
+              title: `Some error occured!: ${(e as Error).name}`,
+            });
+          }
+        });
+        fsCb.appendChild(cb);
+        cbCell.append(fsCb);
       });
-      fsCb.appendChild(cb);
-      cbCell.append(fsCb);
-    });
-    if (targ.id === "prompt-table-flag") {
-      setTimeout(() => {
-        const matmdc = document
-          .querySelector(".prompt-table-modal")
-          ?.querySelector(".mat-mdc-dialog-content");
-        matmdc && matmdc.appendChild(tb);
-      }, 200);
+      if (targ.id === "prompt-table-flag") {
+        setTimeout(() => {
+          const matmdc = document
+            .querySelector(".prompt-table-modal")
+            ?.querySelector(".mat-mdc-dialog-content");
+          matmdc && matmdc.appendChild(tb);
+        }, 200);
+      }
+      return tb;
+    } catch (e) {
+      console.error(`Table mounting failed due to ${(e as Error).name}`);
+      return null;
     }
   }
   #generateMask(

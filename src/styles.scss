@@ -43,12 +43,10 @@ mat-dialog-container,
   }
 }
 
-#scanResults {
-  width: 100%;
-  td,
-  th {
-    text-align: center;
-  }
+.maskedOutput {
+  display: block;
+  padding: 1.5rem 1rem;
+  font-weight: 500;
 }
 
 .regenerate {
@@ -76,5 +74,13 @@ mat-dialog-container,
   transition: background-color 0.25s ease-in-out;
   &:hover {
     background-color: #3333;
+  }
+}
+
+#scanResults {
+  width: 100%;
+  td,
+  th {
+    text-align: center;
   }
 }
