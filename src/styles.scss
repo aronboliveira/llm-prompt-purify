@@ -43,10 +43,21 @@ mat-dialog-container,
   }
 }
 
+.cdk-overlay-pane.mat-mdc-dialog-panel {
+  &.prompt-table-modal {
+    max-width: 100vw !important;
+  }
+}
+
 .maskedOutput {
   display: block;
   padding: 1.5rem 1rem;
   font-weight: 500;
+}
+
+.prompt-table-modal {
+  resize: both;
+  overflow: auto;
 }
 
 .regenerate {

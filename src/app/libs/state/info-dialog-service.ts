@@ -4,13 +4,17 @@ import { BehaviorSubject } from "rxjs";
 import { InfoModalComponent } from "../../info-modal/info-modal.component";
 import { presentation } from "../bloc/html/info";
 import { PromptTableComponent } from "../../prompt-table/prompt-table.component";
+import { DomSanitizer } from "@angular/platform-browser";
 @Injectable({ providedIn: "root" })
 export class InfoDialogService {
   #isHelpOpen = new BehaviorSubject<boolean>(false);
   isHelpOpen$ = this.#isHelpOpen.asObservable();
   #isPromptTableOpen = new BehaviorSubject<boolean>(false);
   isPromptTableOpen$ = this.#isPromptTableOpen.asObservable();
-  constructor(private _matDialog: MatDialog) {}
+  constructor(
+    private _matDialog: MatDialog,
+    private _sanitizer: DomSanitizer
+  ) {}
   openHelp(): void {
     if (this.#isHelpOpen.value) return;
     this._matDialog
@@ -27,7 +31,9 @@ export class InfoDialogService {
     this._matDialog
       .open(PromptTableComponent, {
         data: {
-          text: '<span>Check the definitions and features for your customization of the text</span><hr style="border: #7171712e 1px solid; opacity: 0.25; width: 95%; margin-right: 12%">',
+          text: this._sanitizer.bypassSecurityTrustHtml(
+            '<span class="subtitle">Check the definitions and features for your customization of the text</span><hr style="border: #7171712e 1px solid; opacity: 0.25; width: 95%; margin-right: 12%">'
+          ),
           prompt: data?.prompt ?? "",
         },
         panelClass: "prompt-table-modal",

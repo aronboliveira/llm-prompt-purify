@@ -4,12 +4,10 @@ import {
   ElementRef,
   OnDestroy,
   OnInit,
-  SecurityContext,
   ViewChild,
   Renderer2,
   NgZone,
 } from "@angular/core";
-import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 import { FormsModule } from "@angular/forms";
 import { OutputBuilder } from "./libs/builders/OutputBuilder";
 import { MatIconModule } from "@angular/material/icon";
@@ -66,7 +64,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private _userInputService: UserInputSerivce,
     private _dlgService: InfoDialogService,
-    private _sanitizer: DomSanitizer,
     private _renderer: Renderer2,
     private _zone: NgZone,
     public dialog: MatDialog
@@ -209,13 +206,13 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     let timerInterval: any,
       loadingId: any,
       failed = false,
-      empty = false;
+      empty = false,
+      results: Array<resultDict> = [];
     const txt = (this.userInput || "")
         ?.trim()
         .split(/[\s\n\t\r=,_]+/g)
         .filter(Boolean),
       dictEntries = Object.entries(MAIN_DICT).filter(Boolean),
-      results: Array<resultDict> = [],
       outpId = "resultOutput",
       patternsTitle = "patternsTitle",
       outp = document.getElementById(outpId),
@@ -237,6 +234,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                 timerInterval = setInterval(() => {
                   if (timer) timer.textContent = `${Swal.getTimerLeft()}`;
                 }, 1000);
+                const spinnerContainer =
+                  Swal.getPopup()?.querySelector(".swal2-actions");
+                if (spinnerContainer instanceof HTMLElement)
+                  spinnerContainer.style.paddingBottom = "2rem";
               },
               willClose: () => {
                 clearInterval(timerInterval);
@@ -261,44 +262,39 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                     localDicts[1]
                   );
                   for (let k = 0; k < exps.length; k++) {
+                    let matched = false;
                     const exp = exps[k][1],
                       key = exps[k][0],
-                      res = exp.exec(txt[w]),
-                      gRes = new RegExp(
-                        exp.source,
-                        exp.flags + (exp.global ? "" : "g")
-                      ).exec(this.userInput);
-                    console.log([
-                      this.userInput,
-                      exp,
-                      new RegExp(
-                        exp.source,
-                        exp.flags + (exp.global ? "" : "g")
-                      ),
-                      gRes,
-                    ]);
-                    if (exp instanceof RegExp && res)
+                      res = exp.exec(this.userInput);
+                    if (
+                      exp instanceof RegExp &&
+                      res &&
+                      !results.some(r => res.index === r.foundIn)
+                    ) {
                       results.push({
                         k: key,
                         e: exp,
-                        v: txt[w],
-                        foundIn: gRes?.index || 0,
-                        endsIn: (gRes?.index || 0) + txt[w].length,
+                        v: res[0],
+                        foundIn: res.index,
+                        endsIn: res.index + res[0].length,
                       });
-                    else if (
+                      matched = true;
+                    } else if (
                       typeof exp === "string" &&
-                      txt[w].trim().toLowerCase() === exp
-                    )
+                      res &&
+                      txt[w].trim().toLowerCase() === exp &&
+                      !results.some(r => res.index === r.foundIn)
+                    ) {
                       results.push({
                         k: key,
                         e: exp,
-                        v: txt[w],
-                        foundIn:
-                          new RegExp(exp).exec(this.userInput)?.index || 0,
-                        endsIn:
-                          (new RegExp(exp, "g").exec(this.userInput)?.index ||
-                            0) + txt[w].length,
+                        v: res[0],
+                        foundIn: res.index,
+                        endsIn: res.index + res[0].length,
                       });
+                      matched = true;
+                    }
+                    if (!matched) continue;
                   }
                 }
               }
@@ -358,50 +354,50 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           this._dlgService.togglePromptTable({ prompt: this.userInput });
           if (document.querySelector(".prompt-table-modal")) {
             const { table, output } = this.#mountTable(
-              document.querySelector("#prompt-table-flag"),
-              results
-            );
-            const ensureTableRender = async () => {
-              await new Promise(resolve => setTimeout(resolve, 200));
-              if (
-                !(
-                  table &&
-                  (!document.getElementById(table.id) ||
-                    !table.isConnected ||
-                    !table.clientWidth)
+                document.querySelector("#prompt-table-flag"),
+                results
+              ),
+              ensureTableRender = async () => {
+                await new Promise(resolve => setTimeout(resolve, 200));
+                if (
+                  !(
+                    table &&
+                    (!document.getElementById(table.id) ||
+                      !table.isConnected ||
+                      !table.clientWidth)
+                  )
                 )
-              )
-                return;
-              const matmdc = document
-                .querySelector(".prompt-table-modal")
-                ?.querySelector(".mat-mdc-dialog-content");
-              if (matmdc) {
-                if (table) this._renderer.appendChild(matmdc, table);
+                  return;
+                const matmdc = document
+                  .querySelector(".prompt-table-modal")
+                  ?.querySelector(".mat-mdc-dialog-content");
+                if (matmdc) {
+                  if (table) this._renderer.appendChild(matmdc, table);
+                  else
+                    this._renderer.setProperty(
+                      this._renderer.createElement("div") as HTMLDivElement,
+                      "innerText",
+                      "Failed to render table! ❌"
+                    );
+                }
+                if (
+                  !(
+                    output &&
+                    (!document.getElementById(output.id) ||
+                      !output.isConnected ||
+                      !output.clientWidth)
+                  ) ||
+                  !matmdc
+                )
+                  return;
+                if (output) this._renderer.appendChild(matmdc, output);
                 else
                   this._renderer.setProperty(
                     this._renderer.createElement("div") as HTMLDivElement,
                     "innerText",
-                    "Failed to render table! ❌"
+                    "Failed to render output! ❌"
                   );
-              }
-              if (
-                !(
-                  output &&
-                  (!document.getElementById(output.id) ||
-                    !output.isConnected ||
-                    !output.clientWidth)
-                ) ||
-                !matmdc
-              )
-                return;
-              if (output) this._renderer.appendChild(matmdc, output);
-              else
-                this._renderer.setProperty(
-                  this._renderer.createElement("div") as HTMLDivElement,
-                  "innerText",
-                  "Failed to render output! ❌"
-                );
-            };
+              };
             ensureTableRender();
             ensureTableRender();
             if (!table) throw TypeError("Table failed to mount");
@@ -410,6 +406,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
               throw new TypeError(`Failed to write output text`);
             for (const act of [(e: any) => e.classList.add("maskedOutput")])
               act(output);
+            let newOutput = output.textContent,
+              lastEnd = 0;
             for (const mask of masks) {
               if (
                 !(mask instanceof HTMLElement) ||
@@ -424,17 +422,24 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   ?.getAttribute(this.labelPattern) === "true"
               )
                 continue;
+              // console.log([mask.textContent]);
               const st = mask.getAttribute("data-start"),
                 end = mask.getAttribute("data-end");
+              // console.log([st, end]);
               if (!(st && end)) continue;
               const nSt = parseInt(st, 10),
                 nEnd = parseInt(end, 10);
+              // console.log(nSt, nEnd);
               if (!Number.isFinite(nSt) || !Number.isFinite(nEnd)) continue;
-              output.textContent =
-                output.textContent.slice(0, nSt) +
+              await new Promise(resolve => setTimeout(resolve, 10));
+              console.log([nSt, nEnd]);
+              newOutput =
+                newOutput.slice(0, nSt + lastEnd) +
                 mask.textContent +
-                output.textContent.slice(nEnd);
+                newOutput.slice(lastEnd + nEnd);
             }
+            console.log(newOutput);
+            output.textContent = newOutput;
             if (
               !output?.textContent?.startsWith(this.userInput.slice(0, 3)) &&
               !masks
@@ -554,154 +559,170 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         h.e.innerText = h.txt;
       });
       for (const c of [cap, th, tbd]) tb.appendChild(c);
-      results.forEach(({ k, v, foundIn: f, endsIn: e }, i) => {
-        let newWord = v,
-          acc = 0;
-        do {
-          if (acc > v.length * 10) break;
-          newWord = this.#generateMask(v, () => Math.floor(Math.random() * 10));
-          acc += 1;
-        } while (newWord === v);
-        if (/(?:cpf|cpnj|celular|telefone|phone|ssn|rg)[\s\t\n=:]*/gi.test(k)) {
-          const chars = newWord.split("");
-          for (let a = 0; a < chars.length; a++) {
-            if (PATTERNS.NUMBERS().test(chars[a]))
-              chars[a] = PATTERNS.getRandomSymbol(newWord);
+      results
+        .sort((a, b) => a.foundIn - b.foundIn)
+        .forEach(({ k, v, foundIn: f, endsIn: e }, i) => {
+          let newWord = v,
+            acc = 0;
+          do {
+            if (acc > v.length * 10) break;
+            newWord = this.#generateMask(v, () =>
+              Math.floor(Math.random() * 10)
+            );
+            acc += 1;
+          } while (newWord === v);
+          if (
+            /(?:cpf|cpnj|celular|telefone|phone|ssn|rg)[\s\t\n=:]*/gi.test(k)
+          ) {
+            const chars = newWord.split("");
+            for (let a = 0; a < chars.length; a++) {
+              if (PATTERNS.NUMBERS().test(chars[a]))
+                chars[a] = PATTERNS.getRandomSymbol(newWord);
+            }
+            newWord = chars.join("").replace(/\s/g, "-");
           }
-          newWord = chars.join("");
-        }
-        if (newWord.length < v.length) {
-          const fallback =
-            crypto?.randomUUID() || Math.random().toString(36).slice(2);
-          newWord += fallback
-            .slice(0, v.length - newWord.length)
-            .replace(/[@\/.\u20A0-\u20CF]/g, "a");
-        }
-        const row = tbd.insertRow();
-        const labCell = row.insertCell();
-        for (const act of [
-          (e: any) => {
-            e.textContent = k
-              .replace(/^[,_=]+/, "")
-              .replace(/[,_=]+$/, "")
-              .replaceAll(",", "")
-              .toUpperCase();
-          },
-          (e: any) => e.classList.add("label-cell"),
-        ])
-          act(labCell);
-        const isLabPattern = ["_label", "-label"].some(p =>
-          labCell.textContent?.toLowerCase().endsWith(p)
-        );
-        isLabPattern && labCell.setAttribute(this.labelPattern, "true");
-        const maskCell = row.insertCell(),
-          maskN = `mask_${i}`;
-        for (const { k, v } of [
-          { k: "textContent", v: newWord },
-          { k: "title", v: "Click here to regenerate" },
-          { k: "data-willuse", v: "true" },
-          { k: "id", v: maskN },
-          { k: "data-idx", v: `mask_${i}` },
-        ])
-          maskCell.setAttribute(k, v);
-        maskCell.classList.add("mask-cell");
-        const maskSpan = document.createElement("span"),
-          cycleSpan = document.createElement("kbd");
-        for (const act of [
-          (e: any) => {
-            e.textContent = newWord;
-          },
-          (e: any) => e.classList.add("regenerate"),
-          ...[
-            { k: "start", v: f },
-            { k: "end", v: e },
-          ].map(({ k, v }) => {
-            return (e: any) => e.setAttribute(`data-${k}`, v.toString());
-          }),
-          (e: any) =>
-            e.addEventListener("pointerup", (ev: PointerEvent) => {
+          if (newWord.length < v.length)
+            newWord +=
+              crypto?.randomUUID() ||
+              Math.random()
+                .toString(36)
+                .slice(0, v.length - newWord.length)
+                .replace(/[@\/.\u20A0-\u20CF]/g, "a");
+          const row = tbd.insertRow(),
+            labCell = row.insertCell();
+          for (const act of [
+            (e: any) => {
+              e.textContent = k
+                .replace(/^[,_=]+/, "")
+                .replace(/[,_=]+$/, "")
+                .replaceAll(",", "")
+                .toUpperCase();
+            },
+            (e: any) => e.classList.add("label-cell"),
+          ])
+            act(labCell);
+          const isLabPattern = ["_label", "-label"].some(p =>
+            labCell.textContent?.toLowerCase().endsWith(p)
+          );
+          isLabPattern && labCell.setAttribute(this.labelPattern, "true");
+          const maskCell = row.insertCell(),
+            maskN = `mask_${i}`;
+          for (const { k, v } of [
+            { k: "textContent", v: newWord },
+            { k: "title", v: "Click here to regenerate" },
+            { k: "data-willuse", v: !isLabPattern ? "true" : "false" },
+            { k: "id", v: maskN },
+            { k: "data-idx", v: `mask_${i}` },
+          ])
+            maskCell.setAttribute(k, v);
+          maskCell.classList.add("mask-cell");
+          const maskSpan = document.createElement("span"),
+            cycleSpan = document.createElement("kbd");
+          for (const act of [
+            (e: any) => {
+              e.textContent = newWord;
+            },
+            (e: any) => e.classList.add("regenerate"),
+            ...[
+              { k: "start", v: f },
+              { k: "end", v: e },
+            ].map(({ k, v }) => {
+              return (e: any) => e.setAttribute(`data-${k}`, v.toString());
+            }),
+            (e: any) =>
+              e.addEventListener("pointerup", (ev: PointerEvent) => {
+                if (
+                  !(
+                    ev.button === 0 &&
+                    ev.currentTarget instanceof HTMLElement &&
+                    ev.currentTarget.textContent
+                  )
+                )
+                  return;
+                ev.currentTarget.textContent = this.#generateMask(
+                  ev.currentTarget.textContent
+                );
+              }),
+          ])
+            act(maskSpan);
+          for (const act of [
+            (e: any) => (e.textContent = "♻"),
+            (e: any) => e.classList.add("regenerate-btn"),
+            (e: any) =>
+              e.addEventListener("pointerup", (ev: PointerEvent) => {
+                if (
+                  !(ev.button === 0 && ev.currentTarget instanceof HTMLElement)
+                )
+                  return;
+                const tg = ev.currentTarget;
+                tg.style.backgroundColor = "#2222";
+                setTimeout(() => {
+                  if (!(tg instanceof HTMLElement)) return;
+                  tg.style.backgroundColor = "#eeee";
+                }, 100);
+                const cell =
+                  ev.currentTarget.closest("td") ||
+                  ev.currentTarget.closest("th") ||
+                  ev.currentTarget.closest(".MuiTableCell-root");
+                if (!cell) return;
+                const regenMask = cell.querySelector(".regenerate");
+                if (
+                  !(regenMask instanceof HTMLElement && regenMask.textContent)
+                )
+                  return;
+                regenMask.textContent = this.#generateMask(
+                  regenMask.textContent
+                );
+              }),
+          ])
+            act(cycleSpan);
+          for (const c of [maskSpan, cycleSpan]) maskCell.append(c);
+          const cbCell = row.insertCell(),
+            fsCb = document.createElement("fieldset"),
+            cb = document.createElement("input");
+          fsCb.style.border = "none";
+          for (const { k, v } of [
+            { k: "type", v: "checkbox" },
+            { k: "data-controls", v: maskN },
+            { k: "aria-controls", v: maskN },
+          ])
+            cb.setAttribute(k, v);
+          cbCell.classList.add("check-cell");
+          cb.checked = !isLabPattern ? true : false;
+          cb.addEventListener("change", ev => {
+            try {
               if (
                 !(
-                  ev.button === 0 &&
-                  ev.currentTarget instanceof HTMLElement &&
-                  ev.currentTarget.textContent
+                  ev.currentTarget instanceof HTMLInputElement &&
+                  ev.currentTarget.type === "checkbox"
                 )
               )
                 return;
-              ev.currentTarget.textContent = this.#generateMask(
-                ev.currentTarget.textContent
+              const acst =
+                  ev.currentTarget.closest("table") ??
+                  document.body ??
+                  document,
+                mask = acst.querySelector(
+                  `[data-idx="${ev.currentTarget.getAttribute(
+                    "data-controls"
+                  )}"]`
+                );
+              if (!mask) return;
+              mask.setAttribute(
+                "data-willuse",
+                ev.currentTarget.checked.toString()
               );
-            }),
-        ])
-          act(maskSpan);
-        for (const act of [
-          (e: any) => (e.textContent = "♻"),
-          (e: any) => e.classList.add("regenerate-btn"),
-          (e: any) =>
-            e.addEventListener("pointerup", (ev: PointerEvent) => {
-              if (!(ev.button === 0 && ev.currentTarget instanceof HTMLElement))
-                return;
-              const tg = ev.currentTarget;
-              tg.style.backgroundColor = "#2222";
-              setTimeout(() => {
-                if (!(tg instanceof HTMLElement)) return;
-                tg.style.backgroundColor = "#eeee";
-              }, 100);
-              const cell =
-                ev.currentTarget.closest("td") ||
-                ev.currentTarget.closest("th") ||
-                ev.currentTarget.closest(".MuiTableCell-root");
-              if (!cell) return;
-              const regenMask = cell.querySelector(".regenerate");
-              if (!(regenMask instanceof HTMLElement && regenMask.textContent))
-                return;
-              regenMask.textContent = this.#generateMask(regenMask.textContent);
-            }),
-        ])
-          act(cycleSpan);
-        for (const c of [maskSpan, cycleSpan]) maskCell.append(c);
-        const cbCell = row.insertCell(),
-          fsCb = document.createElement("fieldset"),
-          cb = document.createElement("input");
-        fsCb.style.border = "none";
-        for (const { k, v } of [
-          { k: "type", v: "checkbox" },
-          { k: "data-controls", v: maskN },
-          { k: "aria-controls", v: maskN },
-        ])
-          cb.setAttribute(k, v);
-        cbCell.classList.add("check-cell");
-        cb.checked = !isLabPattern ? true : false;
-        cb.addEventListener("change", ev => {
-          try {
-            if (
-              !(
-                ev.currentTarget instanceof HTMLInputElement &&
-                ev.currentTarget.type === "checkbox"
-              )
-            )
-              return;
-            const acst =
-                ev.currentTarget.closest("table") ?? document.body ?? document,
-              mask = acst.querySelector(
-                `[data-idx="${ev.currentTarget.getAttribute("data-controls")}"]`
-              );
-            if (!mask) return;
-            mask.setAttribute(
-              "data-willuse",
-              ev.currentTarget.checked.toString()
-            );
-          } catch (e) {
-            Swal.fire({
-              toast: true,
-              icon: "warning",
-              title: `Some error occured!: ${(e as Error).name}`,
-            });
-          }
+            } catch (e) {
+              Swal.fire({
+                toast: true,
+                icon: "warning",
+                title: `Some error occured!: ${(e as Error).name}`,
+              });
+            }
+          });
+          fsCb.appendChild(cb);
+          cbCell.append(fsCb);
         });
-        fsCb.appendChild(cb);
-        cbCell.append(fsCb);
-      });
       const outp = this._renderer.createElement("output") as HTMLOutputElement,
         res = tb.insertAdjacentElement("afterend", outp);
       if (!res) {
@@ -782,14 +803,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           newLetters.push(targ[e]);
       }
     }
-    let newWord = newLetters.join("");
-    if (newWord.length < iniLg) {
-      const fallback =
-        crypto?.randomUUID() || Math.random().toString(36).slice(2);
-      newWord += fallback
-        .slice(0, targ.length - newWord.length)
-        .replace(/[@\/.\u20A0-\u20CF]/g, "a");
-    }
+    let newWord = newLetters.join("").replace(/\s/g, "-");
+    if (newWord.length < iniLg)
+      newWord +=
+        crypto?.randomUUID() ||
+        Math.random()
+          .toString(36)
+          .slice(0, targ.length - newWord.length)
+          .replace(/[@\/.\u20A0-\u20CF]/g, "a");
     if (targ === newWord)
       Swal.fire({
         toast: true,
