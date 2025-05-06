@@ -24,6 +24,10 @@
     align-self: center;
   }
 }
+.mdc-dialog--open .mat-mdc-dialog-surface {
+  scroll-behavior: smooth;
+  scrollbar-width: none !important;
+}
 :host ::ng-deep table td fieldset {
   display: flex;
   align-items: center;
@@ -37,7 +41,6 @@
     outline: transparent;
   }
 }
-
 ::ng-deep .prompt-table-modal {
   .subtitle {
     display: flex;

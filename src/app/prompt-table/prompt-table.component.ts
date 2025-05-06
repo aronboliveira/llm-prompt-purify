@@ -6,7 +6,6 @@ import {
   Inject,
   Renderer2,
   ViewChild,
-  afterNextRender,
 } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import {
@@ -15,6 +14,7 @@ import {
   MatDialogRef,
 } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
+import Swal from "sweetalert2";
 @Component({
   selector: "app-prompt-table",
   standalone: true,
@@ -26,8 +26,7 @@ export class PromptTableComponent implements AfterViewInit {
   @ViewChild("content") content: ElementRef<HTMLElement> | null = null;
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { text: string; prompt: string },
-    public dialogRef: MatDialogRef<PromptTableComponent>,
-    private _renderer: Renderer2
+    public dialogRef: MatDialogRef<PromptTableComponent>
   ) {}
   ngAfterViewInit(): void {
     if (typeof window === "undefined") return;
@@ -80,5 +79,21 @@ export class PromptTableComponent implements AfterViewInit {
       if (!mod) return;
       // this._renderer.setProperty(mod, "draggable", "true");
     })();
+  }
+  copyOutput(toCopy?: string): void {
+    navigator.clipboard
+      .writeText(
+        (document.querySelector(".masked-output")?.textContent ?? "").trim()
+      )
+      .then(() => {
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Your text has been copied to the clipboard",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      });
   }
 }

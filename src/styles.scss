@@ -49,10 +49,15 @@ mat-dialog-container,
   }
 }
 
-.maskedOutput {
+.masked-output {
   display: block;
   padding: 1.5rem 1rem;
   font-weight: 500;
+}
+
+.mdc-dialog--open .mat-mdc-dialog-surface {
+  scroll-behavior: smooth;
+  scrollbar-width: none !important;
 }
 
 .prompt-table-modal {

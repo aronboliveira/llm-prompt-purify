@@ -184,8 +184,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         );
     } catch (e) {}
   }
-  copyOutput(): void {
-    navigator.clipboard.writeText(this.userInput.trim()).then(() => {
+  copyOutput(toCopy: string = this.userInput): void {
+    navigator.clipboard.writeText(toCopy.trim()).then(() => {
       Swal.fire({
         toast: true,
         position: "top-end",
@@ -404,7 +404,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             const masks = Array.from(table.querySelectorAll(".regenerate"));
             if (!output?.textContent)
               throw new TypeError(`Failed to write output text`);
-            for (const act of [(e: any) => e.classList.add("maskedOutput")])
+            for (const act of [(e: any) => e.classList.add("masked-output")])
               act(output);
             let newOutput = output.textContent,
               lastEnd = 0;
@@ -630,17 +630,33 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
               return (e: any) => e.setAttribute(`data-${k}`, v.toString());
             }),
             (e: any) =>
-              e.addEventListener("pointerup", (ev: PointerEvent) => {
+              e.addEventListener("pointerup", async (ev: PointerEvent) => {
+                const tg = ev.currentTarget;
                 if (
                   !(
                     ev.button === 0 &&
-                    ev.currentTarget instanceof HTMLElement &&
-                    ev.currentTarget.textContent
+                    tg instanceof HTMLElement &&
+                    tg.textContent
                   )
                 )
                   return;
-                ev.currentTarget.textContent = this.#generateMask(
-                  ev.currentTarget.textContent
+                const prevMask = tg.textContent;
+                tg.textContent = this.#generateMask(prevMask);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                const mskd = document.querySelector(".masked-output"),
+                  willUse =
+                    tg
+                      .closest("tr")
+                      ?.querySelector(".mask-cell")
+                      ?.getAttribute("data-willuse") === "true";
+                if (
+                  !(mskd instanceof HTMLElement && mskd.isConnected) ||
+                  !willUse
+                )
+                  return;
+                mskd.innerText = mskd.innerText.replace(
+                  prevMask,
+                  tg.textContent
                 );
               }),
           ])
@@ -649,7 +665,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             (e: any) => (e.textContent = "♻"),
             (e: any) => e.classList.add("regenerate-btn"),
             (e: any) =>
-              e.addEventListener("pointerup", (ev: PointerEvent) => {
+              e.addEventListener("pointerup", async (ev: PointerEvent) => {
                 if (
                   !(ev.button === 0 && ev.currentTarget instanceof HTMLElement)
                 )
@@ -661,16 +677,27 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   tg.style.backgroundColor = "#eeee";
                 }, 100);
                 const cell =
-                  ev.currentTarget.closest("td") ||
-                  ev.currentTarget.closest("th") ||
-                  ev.currentTarget.closest(".MuiTableCell-root");
+                  tg.closest("td") ||
+                  tg.closest("th") ||
+                  tg.closest(".MuiTableCell-root");
                 if (!cell) return;
                 const regenMask = cell.querySelector(".regenerate");
                 if (
                   !(regenMask instanceof HTMLElement && regenMask.textContent)
                 )
                   return;
-                regenMask.textContent = this.#generateMask(
+                const prevMask = regenMask.textContent;
+                regenMask.textContent = this.#generateMask(prevMask);
+                await new Promise(resolve => setTimeout(resolve, 100));
+                const mskd = document.querySelector(".masked-output"),
+                  willUse = cell.getAttribute("data-willuse") === "true";
+                if (
+                  !(mskd instanceof HTMLElement && mskd.isConnected) ||
+                  !willUse
+                )
+                  return;
+                mskd.innerText = mskd.innerText.replace(
+                  prevMask,
                   regenMask.textContent
                 );
               }),
