@@ -408,37 +408,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
               act(output);
             let newOutput = output.textContent,
               lastEnd = 0;
-            for (const mask of masks) {
-              if (
-                !(mask instanceof HTMLElement) ||
-                !mask.textContent ||
-                !output?.textContent ||
-                (
-                  mask.closest("tr") ||
-                  mask.closest("mat-mdc-row") ||
-                  mask.closest(".tr")
-                )
-                  ?.querySelector(".label-cell")
-                  ?.getAttribute(this.labelPattern) === "true"
-              )
-                continue;
-              // console.log([mask.textContent]);
-              const st = mask.getAttribute("data-start"),
-                end = mask.getAttribute("data-end");
-              // console.log([st, end]);
-              if (!(st && end)) continue;
-              const nSt = parseInt(st, 10),
-                nEnd = parseInt(end, 10);
-              // console.log(nSt, nEnd);
-              if (!Number.isFinite(nSt) || !Number.isFinite(nEnd)) continue;
-              await new Promise(resolve => setTimeout(resolve, 10));
-              console.log([nSt, nEnd]);
+            for (const mask of masks)
               newOutput =
-                newOutput.slice(0, nSt + lastEnd) +
-                mask.textContent +
-                newOutput.slice(lastEnd + nEnd);
-            }
-            console.log(newOutput);
+                this.#spliceMask({
+                  mask,
+                  output,
+                  newOutput,
+                  lastEnd,
+                }) || newOutput;
             output.textContent = newOutput;
             if (
               !output?.textContent?.startsWith(this.userInput.slice(0, 3)) &&
@@ -717,28 +694,36 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           cbCell.classList.add("check-cell");
           cb.checked = !isLabPattern ? true : false;
           cb.addEventListener("change", ev => {
+            const tg = ev.currentTarget;
             try {
-              if (
-                !(
-                  ev.currentTarget instanceof HTMLInputElement &&
-                  ev.currentTarget.type === "checkbox"
-                )
-              )
+              if (!(tg instanceof HTMLInputElement && tg.type === "checkbox"))
                 return;
-              const acst =
-                  ev.currentTarget.closest("table") ??
-                  document.body ??
-                  document,
-                mask = acst.querySelector(
-                  `[data-idx="${ev.currentTarget.getAttribute(
-                    "data-controls"
-                  )}"]`
+              const acst = tg.closest("table") ?? document.body ?? document,
+                maskCell = acst.querySelector(
+                  `[data-idx="${tg.getAttribute("data-controls")}"]`
                 );
-              if (!mask) return;
-              mask.setAttribute(
-                "data-willuse",
-                ev.currentTarget.checked.toString()
-              );
+              if (!maskCell) return;
+              maskCell.setAttribute("data-willuse", tg.checked.toString());
+              if (!tg.checked) return;
+              const mask = maskCell.querySelector(".regenerate"),
+                output = tg
+                  .closest(".mat-mdc-dialog-panel")
+                  ?.querySelector(".masked-output"),
+                st = mask?.getAttribute("data-start");
+              console.log([output, mask, st]);
+              if (!(output instanceof HTMLElement && output.textContent) || !st)
+                return;
+              console.log([output.textContent, tg.checked]);
+              const lastEnd = parseInt(st, 10);
+              if (!Number.isFinite(lastEnd)) return;
+              console.log([lastEnd, output.textContent, tg.checked]);
+              const newOutput = this.#spliceMask({
+                mask,
+                output,
+                newOutput: output.textContent,
+                lastEnd,
+              });
+              output.textContent = newOutput || output.textContent;
             } catch (e) {
               Swal.fire({
                 toast: true,
@@ -852,5 +837,37 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         },
       });
     return newWord;
+  }
+  #spliceMask({
+    mask,
+    output,
+    newOutput,
+    lastEnd,
+  }: {
+    mask: Element | null;
+    output: HTMLElement | null;
+    newOutput: string;
+    lastEnd: number;
+  }): string | void {
+    if (
+      !(mask instanceof HTMLElement) ||
+      !mask.textContent ||
+      !output?.textContent ||
+      (mask.closest("tr") || mask.closest("mat-mdc-row") || mask.closest(".tr"))
+        ?.querySelector(".label-cell")
+        ?.getAttribute(this.labelPattern) === "true"
+    )
+      return;
+    const st = mask.getAttribute("data-start"),
+      end = mask.getAttribute("data-end");
+    if (!(st && end)) return;
+    const nSt = parseInt(st, 10),
+      nEnd = parseInt(end, 10);
+    if (!Number.isFinite(nSt) || !Number.isFinite(nEnd)) return;
+    return (
+      newOutput.slice(0, nSt + lastEnd) +
+      mask.textContent +
+      newOutput.slice(lastEnd + nEnd)
+    );
   }
 }

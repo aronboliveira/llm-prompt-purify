@@ -80,7 +80,7 @@ export class PromptTableComponent implements AfterViewInit {
       // this._renderer.setProperty(mod, "draggable", "true");
     })();
   }
-  copyOutput(toCopy?: string): void {
+  copyOutput(): void {
     navigator.clipboard
       .writeText(
         (document.querySelector(".masked-output")?.textContent ?? "").trim()
