@@ -726,8 +726,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                 newOutput: output.textContent,
                 lastEnd,
                 acceptLabel: true,
+                recycling: true,
               });
+              console.log(newOutput);
               output.textContent = newOutput || output.textContent;
+              console.log(output.textContent);
             } catch (e) {
               Swal.fire({
                 toast: true,
@@ -843,27 +846,15 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     newOutput,
     lastEnd,
     acceptLabel = false,
+    recycling = false,
   }: {
     mask: Element | null;
     output: HTMLElement | null;
     newOutput: string;
     lastEnd: number;
     acceptLabel?: boolean;
+    recycling?: boolean;
   }): string | void {
-    console.log([
-      mask instanceof HTMLElement,
-      mask?.textContent,
-      output?.textContent,
-      !(
-        (
-          mask?.closest("tr") ||
-          mask?.closest("mat-mdc-row") ||
-          mask?.closest(".tr")
-        )
-          ?.querySelector(".label-cell")
-          ?.getAttribute(this.labelPattern) === "true"
-      ),
-    ]);
     if (
       !(mask instanceof HTMLElement) ||
       !mask.textContent ||
@@ -884,12 +875,19 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     const nSt = parseInt(st, 10),
       nEnd = parseInt(end, 10);
     if (!Number.isFinite(nSt) || !Number.isFinite(nEnd)) return;
+    console.log([
+      newOutput.slice(0, nSt),
+      mask.textContent,
+      newOutput.slice(nSt + mask.textContent.length),
+    ]);
     console.log([nSt, nEnd]);
-    return (
-      newOutput.slice(0, nSt + lastEnd) +
-      mask.textContent +
-      newOutput.slice(lastEnd + nEnd)
-    );
+    return !recycling
+      ? newOutput.slice(0, nSt + lastEnd) +
+          mask.textContent +
+          newOutput.slice(lastEnd + nEnd)
+      : newOutput.slice(0, nSt) +
+          mask.textContent +
+          newOutput.slice(nSt + mask.textContent.length);
   }
   #padMask({ word, v }: { word: string; v: string }): string {
     word += crypto?.randomUUID() || Math.random().toString(36);
