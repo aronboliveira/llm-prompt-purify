@@ -100,3 +100,21 @@ mat-dialog-container,
     text-align: center;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  #mainContainer {
+    background-color: #3b3b3b;
+    input,
+    textarea,
+    p,
+    mat-select,
+    mat-label,
+    .mat-mdc-form-field-infix {
+      color: #eeee;
+    }
+    .mdc-button--raised,
+    mat-icon {
+      filter: invert(0.8);
+    }
+  }
+}
