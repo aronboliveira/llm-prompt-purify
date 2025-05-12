@@ -30,6 +30,7 @@ import { PromptTableComponent } from "./prompt-table/prompt-table.component";
 import { resultDict } from "../definitions/helpers";
 import DOMValidator from "./libs/utils/dom/DOMValidator";
 import Swal from "sweetalert2";
+import { MaskStorageService } from "./libs/services/mask-storage.service";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -64,6 +65,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private _userInputService: UserInputSerivce,
     private _dlgService: InfoDialogService,
+    private _maskStorage: MaskStorageService,
     private _renderer: Renderer2,
     private _zone: NgZone,
     public dialog: MatDialog
@@ -182,7 +184,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           this.promptValueKey,
           JSON.stringify({ v: v.toString() })
         );
-    } catch (e) {}
+    } catch (e) {
+      // Fail silently
+    }
   }
   copyOutput(toCopy: string = this.userInput): void {
     navigator.clipboard.writeText(toCopy.trim()).then(() => {
@@ -512,7 +516,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       ]) {
         try {
           const dc = Object.getOwnPropertyDescriptor(cap.style, k);
-          if (dc?.writable) {
+          if (dc?.writable)
             cap.style.setProperty(
               k
                 .replace(
@@ -522,7 +526,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                 .toLowerCase(),
               v
             );
-          }
         } catch (se) {
           console.log(se);
           continue;
@@ -559,12 +562,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             newWord = chars.join("").replace(/\s/g, "-");
           }
           if (newWord.length < v.length)
-            newWord +=
-              crypto?.randomUUID() ||
-              Math.random()
-                .toString(36)
-                .slice(0, v.length - newWord.length)
-                .replace(/[@\/.\u20A0-\u20CF]/g, "a");
+            newWord = this.#padMask({ word: newWord, v });
+          this._maskStorage.setMask(v, newWord);
           const row = tbd.insertRow(),
             labCell = row.insertCell();
           for (const act of [
@@ -596,17 +595,17 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           const maskSpan = document.createElement("span"),
             cycleSpan = document.createElement("kbd");
           for (const act of [
-            (e: any) => {
+            (e: any): void => {
               e.textContent = newWord;
             },
-            (e: any) => e.classList.add("regenerate"),
+            (e: any): void => e.classList.add("regenerate"),
             ...[
               { k: "start", v: f },
               { k: "end", v: e },
             ].map(({ k, v }) => {
               return (e: any) => e.setAttribute(`data-${k}`, v.toString());
             }),
-            (e: any) =>
+            (e: any): void =>
               e.addEventListener("pointerup", async (ev: PointerEvent) => {
                 const tg = ev.currentTarget;
                 if (
@@ -635,13 +634,18 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   prevMask,
                   tg.textContent
                 );
+                const ot = mskd.getAttribute("data-original-token");
+                ot && this._maskStorage.setMask(ot, tg.textContent);
               }),
+            (e: any): void => e.setAttribute("data-original-token", v),
           ])
             act(maskSpan);
           for (const act of [
-            (e: any) => (e.textContent = "♻"),
-            (e: any) => e.classList.add("regenerate-btn"),
-            (e: any) =>
+            (e: any): void => {
+              e.textContent = "♻";
+            },
+            (e: any): void => e.classList.add("regenerate-btn"),
+            (e: any): void =>
               e.addEventListener("pointerup", async (ev: PointerEvent) => {
                 if (
                   !(ev.button === 0 && ev.currentTarget instanceof HTMLElement)
@@ -663,8 +667,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   !(regenMask instanceof HTMLElement && regenMask.textContent)
                 )
                   return;
-                const prevMask = regenMask.textContent;
+                const prevMask = regenMask.textContent,
+                  ot = regenMask.getAttribute("data-original-token");
                 regenMask.textContent = this.#generateMask(prevMask);
+                ot && this._maskStorage.setMask(ot, regenMask.textContent);
                 await new Promise(resolve => setTimeout(resolve, 100));
                 const mskd = document.querySelector(".masked-output"),
                   willUse = cell.getAttribute("data-willuse") === "true";
@@ -710,18 +716,16 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   .closest(".mat-mdc-dialog-panel")
                   ?.querySelector(".masked-output"),
                 st = mask?.getAttribute("data-start");
-              console.log([output, mask, st]);
               if (!(output instanceof HTMLElement && output.textContent) || !st)
                 return;
-              console.log([output.textContent, tg.checked]);
               const lastEnd = parseInt(st, 10);
               if (!Number.isFinite(lastEnd)) return;
-              console.log([lastEnd, output.textContent, tg.checked]);
               const newOutput = this.#spliceMask({
                 mask,
                 output,
                 newOutput: output.textContent,
                 lastEnd,
+                acceptLabel: true,
               });
               output.textContent = newOutput || output.textContent;
             } catch (e) {
@@ -817,12 +821,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     let newWord = newLetters.join("").replace(/\s/g, "-");
     if (newWord.length < iniLg)
-      newWord +=
-        crypto?.randomUUID() ||
-        Math.random()
-          .toString(36)
-          .slice(0, targ.length - newWord.length)
-          .replace(/[@\/.\u20A0-\u20CF]/g, "a");
+      newWord = this.#padMask({ word: newWord, v: targ });
     if (targ === newWord)
       Swal.fire({
         toast: true,
@@ -843,19 +842,40 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     output,
     newOutput,
     lastEnd,
+    acceptLabel = false,
   }: {
     mask: Element | null;
     output: HTMLElement | null;
     newOutput: string;
     lastEnd: number;
+    acceptLabel?: boolean;
   }): string | void {
+    console.log([
+      mask instanceof HTMLElement,
+      mask?.textContent,
+      output?.textContent,
+      !(
+        (
+          mask?.closest("tr") ||
+          mask?.closest("mat-mdc-row") ||
+          mask?.closest(".tr")
+        )
+          ?.querySelector(".label-cell")
+          ?.getAttribute(this.labelPattern) === "true"
+      ),
+    ]);
     if (
       !(mask instanceof HTMLElement) ||
       !mask.textContent ||
       !output?.textContent ||
-      (mask.closest("tr") || mask.closest("mat-mdc-row") || mask.closest(".tr"))
-        ?.querySelector(".label-cell")
-        ?.getAttribute(this.labelPattern) === "true"
+      (!acceptLabel &&
+        (
+          mask.closest("tr") ||
+          mask.closest("mat-mdc-row") ||
+          mask.closest(".tr")
+        )
+          ?.querySelector(".label-cell")
+          ?.getAttribute(this.labelPattern) === "true")
     )
       return;
     const st = mask.getAttribute("data-start"),
@@ -864,10 +884,18 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     const nSt = parseInt(st, 10),
       nEnd = parseInt(end, 10);
     if (!Number.isFinite(nSt) || !Number.isFinite(nEnd)) return;
+    console.log([nSt, nEnd]);
     return (
       newOutput.slice(0, nSt + lastEnd) +
       mask.textContent +
       newOutput.slice(lastEnd + nEnd)
     );
+  }
+  #padMask({ word, v }: { word: string; v: string }): string {
+    word += crypto?.randomUUID() || Math.random().toString(36);
+    word = word
+      .slice(0, v.length - word.length)
+      .replace(/[@\/.\u20A0-\u20CF]/g, "*");
+    return word;
   }
 }
