@@ -57,6 +57,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("promptInput", { static: true }) input: ElementRef | null = null;
   isHelpOpen = false;
   userInput = "";
+  title = "Masked Input";
   processedOutput = "";
   promptValueKey = "llmPromptToPurifyValue";
   safeHtml = "";
@@ -710,7 +711,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                 );
               if (!maskCell) return;
               maskCell.setAttribute("data-willuse", tg.checked.toString());
-              if (!tg.checked) return;
               const mask = maskCell.querySelector(".regenerate"),
                 output = tg
                   .closest(".mat-mdc-dialog-panel")
@@ -727,10 +727,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                 lastEnd,
                 acceptLabel: true,
                 recycling: true,
+                useMask: tg.checked,
               });
-              console.log(newOutput);
               output.textContent = newOutput || output.textContent;
-              console.log(output.textContent);
             } catch (e) {
               Swal.fire({
                 toast: true,
@@ -743,12 +742,37 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           cbCell.append(fsCb);
         });
       const outp = this._renderer.createElement("output") as HTMLOutputElement,
+        outpTitle = this._renderer.createElement("h3") as HTMLHeadingElement,
         res = tb.insertAdjacentElement("afterend", outp);
       if (!res) {
         console.error(`Failed to insert output element`);
-        return { table: tb, output: outp };
+        alert(
+          `There has been a critical error creating your output! Contact us through our feedback page!`
+        );
       }
       outp.innerText = this.userInput || "# FAILED TO CAPTURE USER INPUT ❌";
+      outpTitle.innerText = this.title;
+      for (const { k, v } of [
+        { k: "margin", v: "1.5rem 1rem 0 1rem" },
+        { k: "font-size", v: "1.25rem" },
+        { k: "font-weight", v: "800" },
+      ])
+        this._renderer.setStyle(outpTitle, k, v);
+      if (tb.parentElement?.isConnected && outp.isConnected)
+        this._renderer.insertBefore(tb.parentElement, outpTitle, outp);
+      setTimeout(() => {
+        if (!(tb.parentElement?.isConnected && outp.isConnected)) return;
+        this._renderer.insertBefore(tb.parentElement, outpTitle, outp);
+        const hr = this._renderer.createElement("hr");
+        for (const { k, v } of [
+          { k: "width", v: "90%" },
+          { k: "margin", v: "2rem 1rem" },
+          { k: "border", v: "1px solid rgba(113, 113, 113, 0.18)" },
+          { k: "opacity", v: "0.8" },
+        ])
+          this._renderer.setStyle(hr, k, v);
+        this._renderer.insertBefore(tb.parentElement, hr, outpTitle);
+      }, 250);
       return { table: tb, output: outp };
     } catch (e) {
       console.error(`Table mounting failed due to ${(e as Error).name}`);
@@ -847,6 +871,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     lastEnd,
     acceptLabel = false,
     recycling = false,
+    useMask = true,
   }: {
     mask: Element | null;
     output: HTMLElement | null;
@@ -854,6 +879,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     lastEnd: number;
     acceptLabel?: boolean;
     recycling?: boolean;
+    useMask?: boolean;
   }): string | void {
     if (
       !(mask instanceof HTMLElement) ||
@@ -875,18 +901,15 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     const nSt = parseInt(st, 10),
       nEnd = parseInt(end, 10);
     if (!Number.isFinite(nSt) || !Number.isFinite(nEnd)) return;
-    console.log([
-      newOutput.slice(0, nSt),
-      mask.textContent,
-      newOutput.slice(nSt + mask.textContent.length),
-    ]);
-    console.log([nSt, nEnd]);
+    const intron = useMask
+      ? mask.textContent
+      : mask.getAttribute("data-original-token") || mask.textContent;
     return !recycling
       ? newOutput.slice(0, nSt + lastEnd) +
-          mask.textContent +
+          intron +
           newOutput.slice(lastEnd + nEnd)
       : newOutput.slice(0, nSt) +
-          mask.textContent +
+          intron +
           newOutput.slice(nSt + mask.textContent.length);
   }
   #padMask({ word, v }: { word: string; v: string }): string {

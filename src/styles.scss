@@ -102,8 +102,12 @@ mat-dialog-container,
 }
 
 @media (prefers-color-scheme: dark) {
+  $dark-theme-bg--prim: #3b3b3b;
+  html {
+    background-color: $dark-theme-bg--prim;
+  }
   #mainContainer {
-    background-color: #3b3b3b;
+    background-color: $dark-theme-bg--prim;
     input,
     textarea,
     p,
@@ -114,7 +118,7 @@ mat-dialog-container,
     }
     .mdc-button--raised,
     mat-icon {
-      filter: invert(0.8);
+      filter: invert(0.85);
     }
   }
 }
