@@ -24,21 +24,37 @@
     align-self: center;
   }
 }
-.mdc-dialog--open .mat-mdc-dialog-surface {
-  scroll-behavior: smooth;
-  scrollbar-width: none !important;
+.mdc-dialog--open {
+  &.mat-mdc-dialog-surface {
+    scroll-behavior: smooth;
+    scrollbar-width: none !important;
+  }
 }
-:host ::ng-deep table td fieldset {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-top: 0.625em;
-  [type="checkbox"] {
-    cursor: pointer;
-    width: 1rem;
-    height: 1rem;
-    clip-path: circle(65%);
-    outline: transparent;
+:host ::ng-deep {
+  table {
+    td {
+      fieldset {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: 0.625em;
+        [type="checkbox"] {
+          cursor: pointer;
+          width: 1rem;
+          height: 1rem;
+          clip-path: circle(65%);
+          outline: transparent;
+        }
+      }
+    }
+  }
+  .fs-copy {
+    display: flex;
+    align-items: center;
+    padding: 1rem 0 1rem 1rem;
+    color: #2229;
+    font-size: 0.8rem;
+    font-weight: 600;
   }
 }
 ::ng-deep .prompt-table-modal {
@@ -46,9 +62,9 @@
     display: flex;
     justify-content: center;
     font-weight: bold;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     opacity: 0.7;
-    margin: 0.25rem 0 0 0;
+    margin: 0.5rem 0 0 0;
     padding-bottom: 0.5rem;
   }
 
