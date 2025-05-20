@@ -1,38 +1,11 @@
 <hgroup class="dialog-header">
-  <h2
-    mat-dialog-title
-    style="
-      font-weight: bold;
-      font-size: 1.5rem;
-      transform: translate(-7.5%);
-      margin-bottom: 0;
-      padding-bottom: 0;
-    "
-  >
-    About the Project
-  </h2>
+  <h2 mat-dialog-title id="infoHeading">About the Project</h2>
   <mat-dialog-actions align="end">
-    <button
-      mat-button
-      mat-dialog-close
-      aria-label="close"
-      style="transform: translate(3vw, -2.5vw)"
-    >
-      <mat-icon style="margin: 0">close</mat-icon>
+    <button mat-button mat-dialog-close aria-label="close">
+      <mat-icon>close</mat-icon>
     </button>
   </mat-dialog-actions>
 </hgroup>
-<small
-  style="
-    opacity: 0.25;
-    padding-left: 3rem;
-    font-size: 0.7rem;
-    font-style: italic;
-  "
-  >Click on the headings to read the related text</small
->
-<hr style="border: #7171712e 1px solid; width: 80%; margin-right: 12%" />
-<mat-dialog-content
-  style="padding: 1rem"
-  [innerHTML]="data.text"
-></mat-dialog-content>
+<small id="infoNote">Click on the headings to read the related text</small>
+<hr class="info-break" />
+<mat-dialog-content [innerHTML]="data.text"></mat-dialog-content>

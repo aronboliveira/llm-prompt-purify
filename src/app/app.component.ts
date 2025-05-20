@@ -81,8 +81,24 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       ev.preventDefault();
       const promptInput =
         this.input?.nativeElement ?? document.getElementById("promptInput");
-      if (DOMValidator.isTextbox(promptInput))
+      if (DOMValidator.isTextbox(promptInput)) {
         promptInput.value = promptInput.value.trim();
+        if (
+          promptInput.value.length > 1 &&
+          promptInput.selectionStart &&
+          promptInput.value.slice(
+            promptInput.selectionStart - 1,
+            promptInput.selectionStart
+          ) === "\n"
+        ) {
+          const caret = promptInput.selectionStart;
+          promptInput.value = `${promptInput.value.slice(
+            0,
+            promptInput.selectionStart - 1
+          )}${promptInput.value.slice(promptInput.selectionStart)}`;
+          promptInput.setSelectionRange(caret - 1, caret - 1);
+        }
+      }
       if (DOMValidator.isCustomTextbox(promptInput))
         promptInput.textContent = promptInput.textContent?.trim() || "";
       this.checkPrompt();
@@ -513,7 +529,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         { k: "fontStyle", v: "italic" },
         { k: "textAlign", v: "center" },
         { k: "verticalAlign", v: "baseline" },
-        { k: "paddingBottom", v: "1rem" },
+        { k: "paddingBottom", v: "2rem" },
       ]) {
         try {
           const dc = Object.getOwnPropertyDescriptor(cap.style, k);
@@ -767,7 +783,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         for (const { k, v } of [
           { k: "width", v: "90%" },
           { k: "margin", v: "2rem 1rem" },
-          { k: "border", v: "1px solid rgba(113, 113, 113, 0.18)" },
+          { k: "border", v: "1px solid transparent" },
           { k: "opacity", v: "0.8" },
         ])
           this._renderer.setStyle(hr, k, v);

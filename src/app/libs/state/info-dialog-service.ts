@@ -32,7 +32,7 @@ export class InfoDialogService {
       .open(PromptTableComponent, {
         data: {
           text: this._sanitizer.bypassSecurityTrustHtml(
-            '<span class="subtitle">Check the definitions and features for your customization of the text</span><hr style="border: #7171712e 1px solid; opacity: 0.25; width: 95%; margin-right: 12%">'
+            '<span class="subtitle">Check the definitions and features for your customization of the text</span><hr class="info-break info-break-secondary">'
           ),
           prompt: data?.prompt ?? "",
         },

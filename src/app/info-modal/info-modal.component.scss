@@ -1,10 +1,38 @@
 @use "../styles/abstracts/vars.scss" as *;
 @use "../styles/abstracts/mixins.scss" as *;
+:host ::ng-deep {
+  .info-break {
+    border: #7171712e 1px solid;
+    width: 80%;
+    margin-right: 12%;
+    &.info-break-secondary {
+      width: 95%;
+      opacity: 0.25;
+    }
+  }
+  .mdc-dialog__content {
+    padding: 1rem !important;
+  }
+  #infoHeading {
+    font-weight: bold;
+    font-size: 1.5rem;
+    transform: translate(-7.5%);
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #infoNote {
+    opacity: 0.25;
+    padding-left: 3rem;
+    font-size: 0.7rem;
+    font-style: italic;
+  }
+}
 details {
   border: 1px solid lighten($primary-color, 40%);
   border-radius: $border-radius;
   padding: $gap-sm;
   margin-bottom: $gap-md;
+  font-size: 1rem !important;
   summary {
     font-weight: bold;
     display: list-item;
@@ -46,6 +74,10 @@ p {
   mat-button,
   [mat-button] {
     vertical-align: super;
+    transform: translate(3vw, -2.5vw) !important;
+    .mat-icon {
+      margin: 0 !important;
+    }
   }
 }
 .highlight {

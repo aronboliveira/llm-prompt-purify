@@ -173,11 +173,11 @@ export const presentation = (lang: string = "all") => {
 			<article id="projectInfo" class="project-info p-4" role="article">
 				<header class="mb-4">
 				</header>
-				<details style="font-size: 1rem;">
+				<details>
 					<summary><h3>English</h3></summary>
 					${en}
 				</details>
-				<details style="font-size: 1rem;">
+				<details>
 					<summary><h3>Português</h3></summary>
 					${pt}
 			</article>

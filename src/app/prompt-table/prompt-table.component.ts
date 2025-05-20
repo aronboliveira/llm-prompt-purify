@@ -39,7 +39,7 @@ export class PromptTableComponent implements AfterViewInit {
       if (!container) return;
       container.querySelectorAll("hr").forEach((hr, i, arr) => {
         for (const { k, v } of [
-          { k: "border", v: "#7171712e 1px solid" },
+          { k: "border", v: "transparent 1px solid" },
           { k: "width", v: "90%" },
           { k: "margin-right", v: "12%" },
           { k: "text-align", v: "center" },
@@ -48,10 +48,7 @@ export class PromptTableComponent implements AfterViewInit {
         ])
           hr.style[k as any] = v;
         if (i === arr.length - 1) {
-          for (const { k, v } of [
-            { k: "marginBlock", v: "1rem" },
-            { k: "transform", v: "translateX(-2.5%)" },
-          ])
+          for (const { k, v } of [{ k: "transform", v: "translateX(-2.5%)" }])
             hr.style[k as any] = v;
         }
       });
@@ -59,8 +56,8 @@ export class PromptTableComponent implements AfterViewInit {
         const tb = content.querySelector("table");
         if (tb) {
           for (const { k, v } of [
-            { k: "width", v: "100%" },
-            { k: "padding", v: "0 1.5rem 0 0" },
+            { k: "width", v: "95%" },
+            { k: "padding", v: "1rem" },
           ])
             (tb.style as any)[k] = v;
           [
