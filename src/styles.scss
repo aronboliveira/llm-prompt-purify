@@ -20,6 +20,10 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 table {
+  th {
+    padding-block: 0.5rem;
+    vertical-align: middle;
+  }
   td,
   th {
     text-align: center !important;
@@ -49,6 +53,19 @@ mat-dialog-container,
   }
 }
 
+.cdk-overlay-pane.mat-mdc-dialog-panel,
+.mat-mdc-dialog-container.mdc-dialog,
+.mat-mdc-dialog-inner-container.mdc-dialog__container,
+.mat-mdc-dialog-surface.mdc-dialog__surface,
+.mat-mdc-dialog-component-host.ng-star-inserted {
+  min-width: 50vw;
+  max-width: 90vw;
+  scrollbar-width: thin;
+  * {
+    scrollbar-width: thin;
+  }
+}
+
 .masked-output {
   display: block;
   padding: 1.5rem 1rem;
@@ -63,6 +80,9 @@ mat-dialog-container,
 .prompt-table-modal {
   resize: both;
   overflow: auto;
+  &.cdk-overlay-pane {
+    width: 80%;
+  }
 }
 
 .regenerate {
