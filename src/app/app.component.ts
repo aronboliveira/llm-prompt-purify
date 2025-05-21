@@ -7,6 +7,7 @@ import {
   ViewChild,
   Renderer2,
   NgZone,
+  ChangeDetectionStrategy,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { OutputBuilder } from "./libs/builders/OutputBuilder";
@@ -31,6 +32,7 @@ import { resultDict } from "../definitions/helpers";
 import DOMValidator from "./libs/utils/dom/DOMValidator";
 import Swal from "sweetalert2";
 import { MaskStorageService } from "./libs/services/mask-storage.service";
+import { MatTooltipModule } from "@angular/material/tooltip";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -49,9 +51,11 @@ import { MaskStorageService } from "./libs/services/mask-storage.service";
     ScanSubmitComponent,
     CompressPickerComponent,
     UnderDevelopmentComponent,
+    MatTooltipModule,
   ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("promptInput", { static: true }) input: ElementRef | null = null;
@@ -420,22 +424,24 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   );
               };
             ensureTableRender();
+            // hack to deal with Angular SSR strict sanitization
             ensureTableRender();
             if (!table) throw TypeError("Table failed to mount");
             const masks = Array.from(table.querySelectorAll(".regenerate"));
             if (!output?.textContent)
               throw new TypeError(`Failed to write output text`);
-            for (const act of [(e: any) => e.classList.add("masked-output")])
+            for (const act of [
+              (e: any): void => e.classList.add("masked-output"),
+            ])
               act(output);
-            let newOutput = output.textContent,
-              lastEnd = 0;
+            let newOutput = output.textContent;
             for (const mask of masks)
               newOutput =
                 this.#spliceMask({
                   mask,
                   output,
                   newOutput,
-                  lastEnd,
+                  lastEnd: 0,
                 }) || newOutput;
             output.textContent = newOutput;
             if (
@@ -511,14 +517,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       const tb = document.createElement("table"),
         th = document.createElement("thead"),
         tbd = document.createElement("tbody"),
-        headers = [
-          {
-            e: document.createElement("th"),
-            txt: "Pattern Recognized",
-          },
-          { e: document.createElement("th"), txt: "Suggested Mask" },
-          { e: document.createElement("th"), txt: "Use mask" },
-        ],
+        headers = ["Pattern Recognized", "Suggested Mask", "Use mask"],
         cap = document.createElement("caption");
       tb.id = `scanResults`;
       cap.id = `captionScanResults`;
@@ -533,27 +532,27 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       ]) {
         try {
           const dc = Object.getOwnPropertyDescriptor(cap.style, k);
-          if (dc?.writable)
-            cap.style.setProperty(
-              k
-                .replace(
-                  /([a-záàâäãéèêëíìîïóòôöõúùûüçñ0-9])([A-ZÁÀÂÄÃÉÈÊËÍÌÎÏÓÒÔÖÕÚÙÛÜÇ])/g,
-                  "$1-$2"
-                )
-                .toLowerCase(),
-              v
-            );
+          if (!dc?.writable) continue;
+          cap.style.setProperty(
+            k
+              .replace(
+                /([a-záàâäãéèêëíìîïóòôöõúùûüçñ0-9])([A-ZÁÀÂÄÃÉÈÊËÍÌÎÏÓÒÔÖÕÚÙÛÜÇ])/g,
+                "$1-$2"
+              )
+              .toLowerCase(),
+            v
+          );
         } catch (se) {
-          console.log(se);
           continue;
         }
       }
       targ.insertAdjacentElement("afterend", tb);
       th.insertRow();
       headers.forEach(h => {
-        th.rows[0].appendChild(h.e);
-        h.e.style.fontWeight = "bold";
-        h.e.innerText = h.txt;
+        const e = document.createElement("th");
+        th.rows[0].appendChild(e);
+        e.style.fontWeight = "bold";
+        e.innerText = h;
       });
       for (const c of [cap, th, tbd]) tb.appendChild(c);
       results
@@ -789,10 +788,48 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           this._renderer.setStyle(hr, k, v);
         this._renderer.insertBefore(tb.parentElement, hr, outpTitle);
       }, 250);
+      setTimeout(() => {
+        if (!tb?.isConnected) return;
+        this.#setMatTableStyles(tb);
+        // TODO SORTING LOGIC
+        this._renderer;
+      }, 300);
       return { table: tb, output: outp };
     } catch (e) {
       console.error(`Table mounting failed due to ${(e as Error).name}`);
       return { table: null, output: null };
+    }
+  }
+  #setMatTableStyles(tb: HTMLTableElement): boolean {
+    try {
+      if (!(tb?.isConnected && tb instanceof HTMLTableElement))
+        throw new Error(`Table could not be validated`);
+      const t = "mat-mdc-table",
+        hrc = "mat-mad-header-row",
+        rc = "mat-mdc-table-row-alt",
+        hc = ["mat-mdc-header-cell", "columnheader"],
+        bc = ["mat-mdc-cell", "cell"],
+        rs = Array.from(tb.rows);
+      if (!tb.classList.contains(t)) this._renderer.addClass(tb, t);
+      for (let i = 0; i < rs.length; i++) {
+        const r = rs[i];
+        if (!i) !r.classList.contains(hrc) && this._renderer.addClass(r, hrc);
+        else if (i % 2 === 1 && !r.classList.contains(rc))
+          this._renderer.addClass(r, rc);
+        for (const c of Array.from(r.cells)) {
+          if (c.tagName.toLowerCase() === "th") {
+            if (!c.classList.contains(hc[0])) this._renderer.addClass(c, hc[0]);
+            if (c.role !== hc[1]) this._renderer.setAttribute(c, "role", hc[1]);
+          } else if (c.tagName.toLowerCase() === "td") {
+            if (!c.classList.contains(bc[0])) this._renderer.addClass(c, bc[0]);
+            if (c.role !== bc[1]) this._renderer.setAttribute(c, "role", bc[1]);
+          }
+        }
+      }
+      return true;
+    } catch (e) {
+      console.error(`Error : ${(e as Error).name} — ${(e as Error).message}`);
+      return false;
     }
   }
   #generateMask(

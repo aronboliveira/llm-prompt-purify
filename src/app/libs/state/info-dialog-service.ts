@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, takeUntil } from "rxjs";
 import { InfoModalComponent } from "../../info-modal/info-modal.component";
 import { presentation } from "../bloc/html/info";
 import { PromptTableComponent } from "../../prompt-table/prompt-table.component";

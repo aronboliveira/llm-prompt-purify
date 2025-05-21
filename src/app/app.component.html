@@ -13,7 +13,6 @@
         [attr.maxLength]="_maxLength"
         placeholder="Type your message here..."
         rows="10"
-        cols="100"
       ></textarea>
     </mat-form-field>
     <p>{{ userInput.length }}/{{ _maxLength }} characters</p>
@@ -24,7 +23,7 @@
         mat-icon-button
         color="secondary"
         aria-label="Copy Output"
-        title="Copy Output"
+        matTooltip="Copy Output"
         (click)="copyOutput()"
       >
         <mat-icon>content_copy</mat-icon>
@@ -33,7 +32,7 @@
         mat-icon-button
         color="accent"
         aria-label="Download Output"
-        title="Download Output"
+        matTooltip="Download Output"
         (click)="downloadZip()"
       >
         <mat-icon>download</mat-icon>
