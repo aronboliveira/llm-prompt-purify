@@ -180,6 +180,9 @@ mat-dialog-container,
   @include interactive-states(#d1d1d144, $dark-header-hover-bg);
   border: solid 0.1rem rgba(0, 0, 0, 0.27);
   border-radius: $gap-tn;
+  @media (prefers-color-scheme: dark) {
+    border: solid 0.1rem rgba(0, 0, 0, 0);
+  }
 }
 
 .regenerate-btn {
@@ -191,6 +194,9 @@ mat-dialog-container,
   text-align: center;
   vertical-align: middle;
   @include interactive-states(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3));
+  @media (prefers-color-scheme: dark) {
+    background-color: rgb(238 238 238 / 36%);
+  }
 }
 
 #scanResults {

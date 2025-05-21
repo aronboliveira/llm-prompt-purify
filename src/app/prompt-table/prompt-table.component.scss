@@ -46,10 +46,11 @@
         padding-top: 0.625em;
         [type="checkbox"] {
           cursor: pointer;
-          width: 1rem;
-          height: 1rem;
-          clip-path: circle(65%);
+          width: 2rem;
+          height: 1.2rem;
+          clip-path: circle(45%);
           outline: transparent;
+          accent-color: gold;
         }
       }
     }
