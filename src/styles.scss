@@ -8,6 +8,9 @@
   --info-bg-invert-secondary: #8f00f57b;
   --warn: #ffeb3b;
   --info: #2196f3;
+  --header-row-bg: #ececec;
+  --dialog-surface-bg: #fff;
+  --dialog-surface-color: #000;
 }
 
 html,
@@ -18,12 +21,56 @@ body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+
+  &.dark-theme {
+    .cdk-overlay-container {
+      .mat-mdc-table {
+        @include zebra-stripes($dark-alt-row-bg);
+
+        th.mat-mdc-header-cell {
+          background-color: $dark-header-bg;
+          color: $dark-text;
+          border-bottom: 1px solid #757575;
+
+          &:hover {
+            background-color: $dark-header-hover-bg;
+          }
+        }
+
+        td.mat-mdc-cell {
+          background-color: $dark-cell-bg;
+          color: $dark-text;
+          border-bottom: 1px solid #555;
+
+          &:hover {
+            background-color: $dark-header-hover-bg;
+          }
+        }
+      }
+
+      .mat-mdc-dialog-title {
+        color: $dark-text;
+      }
+
+      .mat-mdc-dialog-container,
+      .mdc-dialog__surface {
+        background-color: $dark-cell-bg;
+        color: $dark-text;
+      }
+
+      .mat-mdc-dialog-content {
+        @include dialog-scrollbar-dark;
+      }
+    }
+  }
 }
+
 table {
   th {
-    padding-block: 0.5rem;
+    padding-block: $gap-md;
     vertical-align: middle;
   }
+
   td,
   th {
     text-align: center !important;
@@ -33,11 +80,14 @@ table {
 mat-dialog-container,
 [mat-dialog-container] {
   max-height: 80vh !important;
+
   summary {
     display: block;
   }
+
   details {
     padding: $gap-sm $gap-md;
+
     h3 {
       font-size: 1.75rem !important;
     }
@@ -61,25 +111,62 @@ mat-dialog-container,
   min-width: 50vw;
   max-width: 90vw;
   scrollbar-width: thin;
+
   * {
     scrollbar-width: thin;
   }
 }
 
+.mat-mdc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Roboto, sans-serif;
+  font-size: 0.875rem;
+  @include zebra-stripes(#f2f2f2);
+
+  .mat-mdc-header-row {
+    @include mat-header-row();
+  }
+
+  th.mat-mdc-header-cell {
+    @include mat-header-cell;
+  }
+
+  td.mat-mdc-cell {
+    @include mat-cell;
+  }
+}
+
+.mat-mdc-dialog-container,
+.mdc-dialog__surface {
+  @include dialog-surface();
+}
+
+.mat-mdc-dialog-content {
+  table {
+    &.mat-mdc-table {
+      @include zebra-stripes(#f2f2f2);
+    }
+  }
+}
+
 .masked-output {
   display: block;
-  padding: 1.5rem 1rem;
+  padding: calc($gap-md + $gap-sm) $gap-md;
   font-weight: 500;
 }
 
-.mdc-dialog--open .mat-mdc-dialog-surface {
-  scroll-behavior: smooth;
-  scrollbar-width: none !important;
+.mdc-dialog--open {
+  .mat-mdc-dialog-surface {
+    scroll-behavior: smooth;
+    scrollbar-width: none !important;
+  }
 }
 
 .prompt-table-modal {
   resize: both;
   overflow: auto;
+
   &.cdk-overlay-pane {
     width: 80%;
   }
@@ -90,31 +177,25 @@ mat-dialog-container,
   min-width: max-content;
   justify-content: center;
   width: 60%;
-  &:hover {
-    background-color: #d1d1d144;
-    border: solid 0.1rem #4444;
-    border-radius: 0.25rem;
-    cursor: pointer;
-  }
+  @include interactive-states(#d1d1d144, $dark-header-hover-bg);
+  border: solid 0.1rem rgba(0, 0, 0, 0.27);
+  border-radius: $gap-tn;
 }
 
 .regenerate-btn {
   background-color: #eeee;
-  margin-left: 0.5rem;
-  border-radius: 0.25rem;
-  border: solid 1px #4444;
+  margin-left: $gap-sm;
+  border-radius: $gap-tn;
+  border: solid 1px rgba(0, 0, 0, 0.27);
   padding: 0.1rem 0.15rem;
   text-align: center;
   vertical-align: middle;
-  cursor: pointer;
-  transition: background-color 0.25s ease-in-out;
-  &:hover {
-    background-color: #3333;
-  }
+  @include interactive-states(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3));
 }
 
 #scanResults {
   width: 100%;
+
   td,
   th {
     text-align: center;
@@ -122,12 +203,15 @@ mat-dialog-container,
 }
 
 @media (prefers-color-scheme: dark) {
-  $dark-theme-bg--prim: #3b3b3b;
+  $dark-base: #3b3b3b;
+
   html {
-    background-color: $dark-theme-bg--prim;
+    background-color: $dark-base;
   }
+
   #mainContainer {
-    background-color: $dark-theme-bg--prim;
+    background-color: $dark-base;
+
     input,
     textarea,
     p,
@@ -136,9 +220,45 @@ mat-dialog-container,
     .mat-mdc-form-field-infix {
       color: #eeee;
     }
+
     .mdc-button--raised,
     mat-icon {
       filter: invert(0.85);
+    }
+  }
+
+  .cdk-overlay-container {
+    .mat-mdc-dialog-container,
+    .mdc-dialog__surface {
+      @include dialog-surface($dark-cell-bg, $dark-text);
+    }
+
+    .mat-mdc-dialog-content {
+      table.mat-mdc-table {
+        @include zebra-stripes($dark-alt-row-bg);
+
+        th.mat-mdc-header-cell {
+          @include mat-header-cell;
+          background-color: $dark-header-bg;
+          color: $dark-text;
+
+          &:hover {
+            background-color: $dark-header-hover-bg;
+          }
+        }
+
+        td.mat-mdc-cell {
+          @include mat-cell;
+          background-color: $dark-cell-bg;
+          color: $dark-text;
+        }
+      }
+
+      @include dialog-scrollbar-dark;
+    }
+
+    .mat-mdc-dialog-title {
+      color: $dark-text;
     }
   }
 }

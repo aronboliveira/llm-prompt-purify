@@ -16,9 +16,9 @@
   #infoHeading {
     font-weight: bold;
     font-size: 1.5rem;
-    transform: translate(-7.5%);
     margin-bottom: 0;
     padding-bottom: 0;
+    padding-left: 0 !important;
   }
   #infoNote {
     opacity: 0.25;
@@ -74,7 +74,6 @@ p {
   mat-button,
   [mat-button] {
     vertical-align: super;
-    transform: translate(3vw, -2.5vw) !important;
     .mat-icon {
       margin: 0 !important;
     }

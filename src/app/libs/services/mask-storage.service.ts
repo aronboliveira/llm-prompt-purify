@@ -4,7 +4,25 @@ import { BehaviorSubject } from "rxjs";
 export class MaskStorageService {
   #storageKey = "maskDictionary";
   #masksSubject = new BehaviorSubject<Record<string, string>>({});
-  public mask$ = this.#masksSubject.asObservable();
+  mask$ = this.#masksSubject.asObservable();
+  constructor() {
+    this.#loadFromSessionStorage();
+  }
+  getMask(token: string): string | null {
+    return this.#masksSubject.value[token] ?? null;
+  }
+  setMask(token: string, mask: string): boolean {
+    if (token === mask) return false;
+    const updated = { ...this.#masksSubject.value, [token]: mask };
+    this.#masksSubject.next(updated);
+    this.#saveToSessionStorage(updated);
+    return true;
+  }
+  clearMask(token: string): void {
+    const { [token]: _, ...remaining } = this.#masksSubject.value;
+    this.#masksSubject.next(remaining);
+    this.#saveToSessionStorage(remaining);
+  }
   #loadFromSessionStorage(): void {
     try {
       if (!sessionStorage) return;
@@ -30,23 +48,5 @@ export class MaskStorageService {
         }`
       );
     }
-  }
-  constructor() {
-    this.#loadFromSessionStorage();
-  }
-  public getMask(token: string): string | null {
-    return this.#masksSubject.value[token] ?? null;
-  }
-  public setMask(token: string, mask: string): boolean {
-    if (token === mask) return false;
-    const updated = { ...this.#masksSubject.value, [token]: mask };
-    this.#masksSubject.next(updated);
-    this.#saveToSessionStorage(updated);
-    return true;
-  }
-  public clearMask(token: string): void {
-    const { [token]: _, ...remaining } = this.#masksSubject.value;
-    this.#masksSubject.next(remaining);
-    this.#saveToSessionStorage(remaining);
   }
 }

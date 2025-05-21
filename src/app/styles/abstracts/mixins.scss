@@ -52,3 +52,58 @@
     color: lighten($text-color, 30%);
   }
 }
+
+@mixin mat-header-row($bg: var(--header-row-bg, #ececec)) {
+  background-color: $bg;
+}
+
+@mixin mat-header-cell {
+  padding: $gap-md $gap-sm;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  background-color: rgba(0, 0, 0, 0.04);
+  @include interactive-states();
+}
+
+/** Body cells */
+@mixin mat-cell {
+  padding: $gap-md $gap-sm;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  @include interactive-states();
+}
+
+@mixin zebra-stripes($alt-bg) {
+  tbody tr:nth-child(odd) td.mat-mdc-cell {
+    background-color: $alt-bg;
+  }
+}
+
+@mixin dialog-surface(
+  $bg: var(--dialog-surface-bg, #fff),
+  $fg: var(--dialog-surface-color, #000)
+) {
+  background-color: $bg;
+  color: $fg;
+  border-radius: 0.75rem;
+  *,
+  .mat-mdc-dialog-title {
+    color: rgba(255, 255, 255, 0.87);
+  }
+  summary {
+    h2,
+    h3,
+    h4 {
+      font-weight: 550;
+      font-size: 1.2rem !important;
+      margin-left: 0.75rem;
+    }
+  }
+}
+
+@mixin dialog-scrollbar-dark {
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: $gap-tn;
+  }
+}

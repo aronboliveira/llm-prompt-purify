@@ -1,0 +1,27 @@
+@use "./vars.scss" as *;
+
+%mat-table-base {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+}
+
+%mat-header-cell {
+  padding: $gap-md $gap-sm;
+  font-weight: 500;
+  background-color: rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  user-select: none;
+  @include interactive-states();
+}
+
+%mat-cell {
+  padding: $gap-md $gap-sm;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  @include interactive-states();
+}
+
+%mat-header-row {
+  background-color: var(--header-row-bg, #e0e0e0);
+}
