@@ -1,4 +1,5 @@
 @use "../styles/abstracts/vars.scss" as *;
+@use "../styles/abstracts/mixins.scss" as *;
 @keyframes ripple {
   to {
     transform: translate(-50%, -50%) scale(10);
@@ -100,27 +101,20 @@
           transform: translateY(-1px);
         }
         &::after {
-          content: "";
-          display: inline-block;
-          height: 100%;
-          width: 100%;
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          top: 0;
-          z-index: -99;
+          @include btn-after-expander;
           opacity: 0.5;
           background-color: #ffffff00;
           border-radius: 1rem;
-          transition: all linear 0.25s;
         }
         &:active {
           &::after {
-            transform: scale(3, 3);
-            opacity: 0;
-            background-color: #ffffff77;
+            @include btn-after-active-expander;
+            background-color: #eae7e78b;
           }
         }
+      }
+      @media screen and (max-width: 750px) {
+        grid-template: repeat(3, max-content) / 1fr;
       }
     }
     .prompt-table-break {
@@ -156,23 +150,13 @@
         cursor: pointer;
       }
       &::after {
-        content: "";
-        display: inline-block;
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        top: 0;
-        z-index: -99;
+        @include btn-after-expander;
         background-color: #ffffff00;
         border-radius: 1rem;
-        transition: all 0.2s;
       }
       &:active {
         &::after {
-          transform: scale(2, 2);
-          opacity: 0;
+          @include btn-after-active-expander;
           background-color: #ffffff77;
         }
       }

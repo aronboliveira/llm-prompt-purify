@@ -1,4 +1,20 @@
 @use "./vars.scss" as *;
+@mixin btn-after-expander {
+  content: "";
+  display: inline-block;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  z-index: -99;
+  transition: transform linear 0.25s, opacity ease-out 0.1s;
+}
+@mixin btn-after-active-expander {
+  transform: scale(5);
+  opacity: 0;
+}
 @mixin clear-btn {
   width: max-content;
   background: none;

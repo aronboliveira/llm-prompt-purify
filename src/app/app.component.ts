@@ -29,10 +29,11 @@ import { MAIN_DICT, PATTERNS } from "./libs/vars/dictionaries";
 import { InfoDialogService } from "./libs/state/info-dialog-service";
 import { PromptTableComponent } from "./prompt-table/prompt-table.component";
 import { resultDict } from "../definitions/helpers";
-import DOMValidator from "./libs/utils/dom/DOMValidator";
+import DOMValidator from "./libs/utils/dom/facades/DOMValidator";
 import Swal from "sweetalert2";
 import { MaskStorageService } from "./libs/services/mask-storage.service";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import TableExecutive from "./libs/utils/dom/executives/TableExecutive";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -621,37 +622,40 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
               return (e: any) => e.setAttribute(`data-${k}`, v.toString());
             }),
             (e: any): void =>
-              e.addEventListener("pointerup", async (ev: PointerEvent) => {
-                const tg = ev.currentTarget;
-                if (
-                  !(
-                    ev.button === 0 &&
-                    tg instanceof HTMLElement &&
-                    tg.textContent
+              e.addEventListener(
+                appState.regenerateEvent,
+                async (ev: PointerEvent) => {
+                  const tg = ev.currentTarget;
+                  if (
+                    !(
+                      ev.button === 0 &&
+                      tg instanceof HTMLElement &&
+                      tg.textContent
+                    )
                   )
-                )
-                  return;
-                const prevMask = tg.textContent;
-                tg.textContent = this.#generateMask(prevMask);
-                await new Promise(resolve => setTimeout(resolve, 100));
-                const mskd = document.querySelector(".masked-output"),
-                  willUse =
-                    tg
-                      .closest("tr")
-                      ?.querySelector(".mask-cell")
-                      ?.getAttribute("data-willuse") === "true";
-                if (
-                  !(mskd instanceof HTMLElement && mskd.isConnected) ||
-                  !willUse
-                )
-                  return;
-                mskd.innerText = mskd.innerText.replace(
-                  prevMask,
-                  tg.textContent
-                );
-                const ot = mskd.getAttribute("data-original-token");
-                ot && this._maskStorage.setMask(ot, tg.textContent);
-              }),
+                    return;
+                  const prevMask = tg.textContent;
+                  tg.textContent = this.#generateMask(prevMask);
+                  await new Promise(resolve => setTimeout(resolve, 100));
+                  const mskd = document.querySelector(".masked-output"),
+                    willUse =
+                      tg
+                        .closest("tr")
+                        ?.querySelector(".mask-cell")
+                        ?.getAttribute("data-willuse") === "true";
+                  if (
+                    !(mskd instanceof HTMLElement && mskd.isConnected) ||
+                    !willUse
+                  )
+                    return;
+                  mskd.innerText = mskd.innerText.replace(
+                    prevMask,
+                    tg.textContent
+                  );
+                  const ot = mskd.getAttribute("data-original-token");
+                  ot && this._maskStorage.setMask(ot, tg.textContent);
+                }
+              ),
             (e: any): void => e.setAttribute("data-original-token", v),
           ])
             act(maskSpan);
@@ -661,44 +665,49 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             },
             (e: any): void => e.classList.add("regenerate-btn"),
             (e: any): void =>
-              e.addEventListener("pointerup", async (ev: PointerEvent) => {
-                if (
-                  !(ev.button === 0 && ev.currentTarget instanceof HTMLElement)
-                )
-                  return;
-                const tg = ev.currentTarget;
-                tg.style.backgroundColor = "#2222";
-                setTimeout(() => {
-                  if (!(tg instanceof HTMLElement)) return;
-                  tg.style.backgroundColor = "#eeee";
-                }, 100);
-                const cell =
-                  tg.closest("td") ||
-                  tg.closest("th") ||
-                  tg.closest(".MuiTableCell-root");
-                if (!cell) return;
-                const regenMask = cell.querySelector(".regenerate");
-                if (
-                  !(regenMask instanceof HTMLElement && regenMask.textContent)
-                )
-                  return;
-                const prevMask = regenMask.textContent,
-                  ot = regenMask.getAttribute("data-original-token");
-                regenMask.textContent = this.#generateMask(prevMask);
-                ot && this._maskStorage.setMask(ot, regenMask.textContent);
-                await new Promise(resolve => setTimeout(resolve, 100));
-                const mskd = document.querySelector(".masked-output"),
-                  willUse = cell.getAttribute("data-willuse") === "true";
-                if (
-                  !(mskd instanceof HTMLElement && mskd.isConnected) ||
-                  !willUse
-                )
-                  return;
-                mskd.innerText = mskd.innerText.replace(
-                  prevMask,
-                  regenMask.textContent
-                );
-              }),
+              e.addEventListener(
+                appState.regenerateEvent,
+                async (ev: PointerEvent) => {
+                  if (
+                    !(
+                      ev.button === 0 && ev.currentTarget instanceof HTMLElement
+                    )
+                  )
+                    return;
+                  const tg = ev.currentTarget;
+                  tg.style.backgroundColor = "#2222";
+                  setTimeout(() => {
+                    if (!(tg instanceof HTMLElement)) return;
+                    tg.style.backgroundColor = "#eeee";
+                  }, 100);
+                  const cell =
+                    tg.closest("td") ||
+                    tg.closest("th") ||
+                    tg.closest(".MuiTableCell-root");
+                  if (!cell) return;
+                  const regenMask = cell.querySelector(".regenerate");
+                  if (
+                    !(regenMask instanceof HTMLElement && regenMask.textContent)
+                  )
+                    return;
+                  const prevMask = regenMask.textContent,
+                    ot = regenMask.getAttribute("data-original-token");
+                  regenMask.textContent = this.#generateMask(prevMask);
+                  ot && this._maskStorage.setMask(ot, regenMask.textContent);
+                  await new Promise(resolve => setTimeout(resolve, 100));
+                  const mskd = document.querySelector(".masked-output"),
+                    willUse = cell.getAttribute("data-willuse") === "true";
+                  if (
+                    !(mskd instanceof HTMLElement && mskd.isConnected) ||
+                    !willUse
+                  )
+                    return;
+                  mskd.innerText = mskd.innerText.replace(
+                    prevMask,
+                    regenMask.textContent
+                  );
+                }
+              ),
           ])
             act(cycleSpan);
           for (const c of [maskSpan, cycleSpan]) maskCell.append(c);
@@ -714,7 +723,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             cb.setAttribute(k, v);
           cbCell.classList.add("check-cell");
           cb.checked = !isLabPattern ? true : false;
-          cb.addEventListener("change", ev => {
+          cb.addEventListener(appState.uncheckMaskEvent, ev => {
             const tg = ev.currentTarget;
             try {
               if (!(tg instanceof HTMLInputElement && tg.type === "checkbox"))
@@ -836,41 +845,41 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       if (!tb?.isConnected || !tb.parentElement)
         throw new TypeError(`Failed to validate prompt table in DOM`);
-      console.log("mounting cta...");
       const r = this._renderer,
         tbRelCta = r.createElement("fieldset") as HTMLFieldSetElement,
         btns = Array.from({ length: 3 }).map(
           () => r.createElement("button") as HTMLButtonElement
         ),
         cls = "fs-prompt-cta",
+        exc = new TableExecutive(tb),
         propsList = [
           {
             idf: "unchkMasksBtn",
             tp: "mat-button",
             lb: "Uncheck All Masks",
             ic: "clear_all",
-            lt: (ev: any) => {},
+            lt: () => exc.toggleAllChecks(false),
           },
           {
             idf: "chkMasksBtn",
             tp: "mat-button",
             lb: "Check All Masks",
             ic: "done_all",
-            lt: (ev: any) => {},
+            lt: () => exc.toggleAllChecks(true),
           },
           {
             idf: "regenMasksBtn",
             tp: "mat-button",
             lb: "Regenerate All Masks",
             ic: "autorenew",
-            lt: (ev: any) => {},
+            lt: () => exc.dispatchAllRegenerates(),
           },
         ] as Array<{
           idf: `${string}MasksBtn`;
           tp: `mat-${string}`;
           lb: string;
           ic: string;
-          lt: (ev: any) => any;
+          lt: (args: any) => any;
           drt?: `mat-${string}`;
           sz?: string;
         }>;
@@ -895,12 +904,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           r.setProperty(icon, "innerText", props.ic);
           for (const _cls of [
             "mat-icon",
-            "notranslate",
-            "material-icons",
             "mat-ligature-font",
             "mat-icon-no-color",
             "mat-mdc-icon",
             "mat-button__icon",
+            "material-icons",
+            "notranslate",
           ])
             r.addClass(icon, _cls);
           for (const [k, v] of [
