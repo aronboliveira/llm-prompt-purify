@@ -1,4 +1,13 @@
 @use "./vars.scss" as *;
+@mixin clear-btn {
+  width: max-content;
+  background: none;
+  border: none;
+  padding: $gap-tn $gap-sm;
+  display: inline-flex;
+  align-items: center;
+  gap: $gap-sm;
+}
 @mixin interactive-states($bg-hover: $hover-bg, $bg-active: $active-bg) {
   &:hover {
     background-color: $bg-hover;

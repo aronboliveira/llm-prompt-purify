@@ -23,6 +23,7 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 
   &.dark-theme {
+    scrollbar-color: #fff4 #1115;
     .cdk-overlay-container {
       .mat-mdc-table {
         @include zebra-stripes($dark-alt-row-bg);
@@ -114,6 +115,13 @@ mat-dialog-container,
 
   * {
     scrollbar-width: thin;
+  }
+}
+
+.clear-button {
+  @include clear-btn;
+  &.mat-icon {
+    @include clear-btn;
   }
 }
 
@@ -213,6 +221,7 @@ mat-dialog-container,
 
   html {
     background-color: $dark-base;
+    scrollbar-color: #fff4 #1115;
   }
 
   #mainContainer {
@@ -266,5 +275,9 @@ mat-dialog-container,
     .mat-mdc-dialog-title {
       color: $dark-text;
     }
+  }
+
+  .mat-icon {
+    color: grey;
   }
 }

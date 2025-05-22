@@ -444,6 +444,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   lastEnd: 0,
                 }) || newOutput;
             output.textContent = newOutput;
+            // FAIL DISPLAY PROCEDURE
             if (
               !output?.textContent?.startsWith(this.userInput.slice(0, 3)) &&
               !masks
@@ -518,7 +519,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         th = document.createElement("thead"),
         tbd = document.createElement("tbody"),
         headers = ["Pattern Recognized", "Suggested Mask", "Use mask"],
-        cap = document.createElement("caption");
+        cap = document.createElement("caption"),
+        r = this._renderer;
       tb.id = `scanResults`;
       cap.id = `captionScanResults`;
       cap.innerText = "Relation of patterns and suggested masks";
@@ -528,7 +530,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         { k: "fontStyle", v: "italic" },
         { k: "textAlign", v: "center" },
         { k: "verticalAlign", v: "baseline" },
-        { k: "paddingBottom", v: "2rem" },
+        { k: "paddingBlock", v: "1rem" },
       ]) {
         try {
           const dc = Object.getOwnPropertyDescriptor(cap.style, k);
@@ -567,14 +569,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             );
             acc += 1;
           } while (newWord === v);
-          if (
-            /(?:cpf|cpnj|celular|telefone|phone|ssn|rg)[\s\t\n=:]*/gi.test(k)
-          ) {
+          if (/(?:_*label_*)/gi.test(k)) {
             const chars = newWord.split("");
-            for (let a = 0; a < chars.length; a++) {
+            for (let a = 0; a < chars.length; a++)
               if (PATTERNS.NUMBERS().test(chars[a]))
                 chars[a] = PATTERNS.getRandomSymbol(newWord);
-            }
             newWord = chars.join("").replace(/\s/g, "-");
           }
           if (newWord.length < v.length)
@@ -756,8 +755,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           fsCb.appendChild(cb);
           cbCell.append(fsCb);
         });
-      const outp = this._renderer.createElement("output") as HTMLOutputElement,
-        outpTitle = this._renderer.createElement("h3") as HTMLHeadingElement,
+      const outp = r.createElement("output") as HTMLOutputElement,
+        outpTitle = r.createElement("h3") as HTMLHeadingElement,
         res = tb.insertAdjacentElement("afterend", outp);
       if (!res) {
         console.error(`Failed to insert output element`);
@@ -772,27 +771,28 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         { k: "font-size", v: "1.25rem" },
         { k: "font-weight", v: "800" },
       ])
-        this._renderer.setStyle(outpTitle, k, v);
+        r.setStyle(outpTitle, k, v);
       if (tb.parentElement?.isConnected && outp.isConnected)
-        this._renderer.insertBefore(tb.parentElement, outpTitle, outp);
+        r.insertBefore(tb.parentElement, outpTitle, outp);
       setTimeout(() => {
         if (!(tb.parentElement?.isConnected && outp.isConnected)) return;
-        this._renderer.insertBefore(tb.parentElement, outpTitle, outp);
-        const hr = this._renderer.createElement("hr");
+        r.insertBefore(tb.parentElement, outpTitle, outp);
+        const hr = r.createElement("hr");
         for (const { k, v } of [
           { k: "width", v: "90%" },
           { k: "margin", v: "2rem 1rem" },
-          { k: "border", v: "1px solid transparent" },
+          { k: "border", v: "1px solid #00025" },
           { k: "opacity", v: "0.8" },
         ])
-          this._renderer.setStyle(hr, k, v);
-        this._renderer.insertBefore(tb.parentElement, hr, outpTitle);
+          r.setStyle(hr, k, v);
+        r.insertBefore(tb.parentElement, hr, outpTitle);
+        this.#mountCtaForTable(tb);
       }, 250);
       setTimeout(() => {
         if (!tb?.isConnected) return;
-        this.#setMatTableStyles(tb);
+        if (!this.#setMatTableStyles(tb))
+          console.warn(`Failed to set Material Styles for Table`);
         // TODO SORTING LOGIC
-        this._renderer;
       }, 300);
       return { table: tb, output: outp };
     } catch (e) {
@@ -829,6 +829,104 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       return true;
     } catch (e) {
       console.error(`Error : ${(e as Error).name} — ${(e as Error).message}`);
+      return false;
+    }
+  }
+  async #mountCtaForTable(tb: HTMLElement): Promise<boolean> {
+    try {
+      if (!tb?.isConnected || !tb.parentElement)
+        throw new TypeError(`Failed to validate prompt table in DOM`);
+      console.log("mounting cta...");
+      const r = this._renderer,
+        tbRelCta = r.createElement("fieldset") as HTMLFieldSetElement,
+        btns = Array.from({ length: 3 }).map(
+          () => r.createElement("button") as HTMLButtonElement
+        ),
+        cls = "fs-prompt-cta",
+        propsList = [
+          {
+            idf: "unchkMasksBtn",
+            tp: "mat-button",
+            lb: "Uncheck All Masks",
+            ic: "clear_all",
+            lt: (ev: any) => {},
+          },
+          {
+            idf: "chkMasksBtn",
+            tp: "mat-button",
+            lb: "Check All Masks",
+            ic: "done_all",
+            lt: (ev: any) => {},
+          },
+          {
+            idf: "regenMasksBtn",
+            tp: "mat-button",
+            lb: "Regenerate All Masks",
+            ic: "autorenew",
+            lt: (ev: any) => {},
+          },
+        ] as Array<{
+          idf: `${string}MasksBtn`;
+          tp: `mat-${string}`;
+          lb: string;
+          ic: string;
+          lt: (ev: any) => any;
+          drt?: `mat-${string}`;
+          sz?: string;
+        }>;
+      r.addClass(tbRelCta, cls);
+      r.insertBefore(tb.parentElement, tbRelCta, tb);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      const appendBtns = () => {
+        for (let i = 0; i < propsList.length; i++) {
+          const props = propsList[i],
+            b = btns[i];
+          if (!props.sz) props.sz = "small";
+          if (!props.drt) props.drt = "mat-button";
+          for (const args of [
+            ["id", props.idf],
+            [props.tp, ""],
+            ["aria-label", props.lb],
+          ])
+            r.setAttribute(b, ...(args as [string, string]));
+          r.listen(b, "pointerup", props.lt);
+          const icon = r.createElement("mat-icon") as HTMLElement;
+          for (const _cls of ["clear-button"]) r.addClass(b, _cls);
+          r.setProperty(icon, "innerText", props.ic);
+          for (const _cls of [
+            "mat-icon",
+            "notranslate",
+            "material-icons",
+            "mat-ligature-font",
+            "mat-icon-no-color",
+            "mat-mdc-icon",
+            "mat-button__icon",
+          ])
+            r.addClass(icon, _cls);
+          for (const [k, v] of [
+            ["aria-hidden", "true"],
+            ["role", "img"],
+          ])
+            r.setAttribute(icon, k, v);
+          const lbEl = r.createElement("label") as HTMLLabelElement;
+          r.setAttribute(lbEl, "for", props.idf);
+          r.setProperty(lbEl, "innerText", props.lb);
+          for (const args of [
+            [b, icon],
+            [b, lbEl],
+            [tbRelCta, b],
+          ])
+            r.appendChild(...(args as [HTMLElement, Node]));
+        }
+      };
+      if (!tbRelCta?.isConnected) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        r.insertBefore(tb.parentElement, tb, tbRelCta);
+        appendBtns();
+      } else appendBtns();
+      return true;
+    } catch (e) {
+      console.error(e);
       return false;
     }
   }
