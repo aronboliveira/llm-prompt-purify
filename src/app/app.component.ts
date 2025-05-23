@@ -117,6 +117,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   ngAfterViewInit(): void {
     if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches)
+      appState.colorScheme = "dark";
     const ppi =
       this.input?.nativeElement || document.getElementById("promptInput");
     if (ppi instanceof HTMLElement) {
@@ -678,7 +680,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   tg.style.backgroundColor = "#2222";
                   setTimeout(() => {
                     if (!(tg instanceof HTMLElement)) return;
-                    tg.style.backgroundColor = "#eeee";
+                    tg.style.backgroundColor =
+                      appState.colorScheme === "light"
+                        ? "#eeee"
+                        : "rgb(238 238 238 / 36%)";
                   }, 100);
                   const cell =
                     tg.closest("td") ||
