@@ -21,6 +21,7 @@
     }
     .header-nav {
       grid-column: links;
+      justify-self: start;
     }
     .header-title {
       font-size: v.$txt-md;
@@ -66,9 +67,10 @@
         grid-column: 8;
       }
     }
-    grid-template-areas: "logo title links help fix-toggle";
-    grid-template-columns: 0.35fr 0.6fr 4.25fr 0.3fr 0.75fr;
+    grid-template-areas: "logo title links scheme-toggle help fix-toggle";
+    grid-template-columns: 0.35fr 0.6fr 3fr 0.2fr 0.25fr 0.55fr;
     align-items: center;
+    justify-items: center;
     padding: v.$gap-sm v.$gap-md;
     @media screen and (max-width: 800px) {
       grid-template-columns: 0.35fr 0.6fr 4.5fr 0.5fr 2fr;

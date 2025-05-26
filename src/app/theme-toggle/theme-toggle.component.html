@@ -1,1 +1,11 @@
-<p>theme-toggle works!</p>
+<button
+  mat-icon-button
+  role="switch"
+  aria-label="Toggle dark/light theme"
+  (click)="svc.toggle()"
+>
+  <span
+    class="color-scheme-icon-wrapper"
+    [innerHTML]="(dark$ | async) ? moon : sun"
+  ></span>
+</button>

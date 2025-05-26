@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, OnDestroy } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
-import { InfoDialogService } from "../libs/state/info-dialog-service";
+import { InfoDialogService } from "../libs/state/info-dialog.service";
 import { Subject, takeUntil } from "rxjs";
 @Component({
   selector: "app-help-toggle",

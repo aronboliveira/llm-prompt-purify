@@ -2,5 +2,6 @@ export const appState = {
   compressionLevel: 6,
   regenerateEvent: "pointerup",
   uncheckMaskEvent: "change",
-  colorScheme: "light",
+  storageKey: "llmPurifyAppState",
+  colorSchemeKey: "colorScheme",
 };

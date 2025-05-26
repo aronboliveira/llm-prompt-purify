@@ -37,11 +37,12 @@ export default class TableExecutive {
       );
     });
   }
-  dispatchAllRegenerates(): void {
+  dispatchAllRegenerates(ev: MouseEvent | PointerEvent): void {
     if (
       !(
         this.#table?.isConnected && this.#table.querySelector(".regenerate-btn")
-      )
+      ) ||
+      ev.button !== 0
     )
       return;
     this.#table.querySelectorAll(".regenerate-btn").forEach(b => {

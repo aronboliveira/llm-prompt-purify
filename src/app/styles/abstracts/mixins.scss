@@ -49,23 +49,6 @@
     transform: translateY($active-move);
   }
 }
-@mixin styled-link {
-  text-decoration: none;
-  transition: transform 0.25s ease-in-out, color 0.25s ease-in-out;
-  &:not(:visited) {
-    opacity: 1;
-    font-weight: bolder;
-  }
-  &:visited {
-    opacity: 0.8;
-  }
-  &::first-letter {
-    text-transform: capitalize;
-  }
-  &:hover {
-    transform: translateY(-2px);
-  }
-}
 @mixin delined-pseudo-elements {
   &::first-letter {
     font-size: 1.5em;
@@ -78,33 +61,6 @@
     color: lighten($text-color, 30%);
   }
 }
-
-@mixin mat-header-row($bg: var(--header-row-bg, #ececec)) {
-  background-color: $bg;
-}
-
-@mixin mat-header-cell {
-  padding: $gap-md $gap-sm;
-  font-weight: 500;
-  cursor: pointer;
-  user-select: none;
-  background-color: rgba(0, 0, 0, 0.04);
-  @include interactive-states();
-}
-
-/** Body cells */
-@mixin mat-cell {
-  padding: $gap-md $gap-sm;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  @include interactive-states();
-}
-
-@mixin zebra-stripes($alt-bg) {
-  tbody tr:nth-child(odd) td.mat-mdc-cell {
-    background-color: $alt-bg;
-  }
-}
-
 @mixin dialog-surface(
   $bg: var(--dialog-surface-bg, #fff),
   $fg: var(--dialog-surface-color, #000)
@@ -126,10 +82,110 @@
     }
   }
 }
-
 @mixin dialog-scrollbar-dark {
   ::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: $gap-tn;
+  }
+}
+@mixin light-theme-overrides {
+  scrollbar-color: #1115 #fff4;
+
+  #mainContainer {
+    background-color: $background-color;
+    .mdc-button--raised,
+    mat-icon {
+      filter: invert(0);
+    }
+    input,
+    textarea,
+    p,
+    mat-select,
+    mat-label,
+    .mat-mdc-form-field-infix {
+      color: $text-color !important;
+    }
+  }
+
+  .cdk-overlay-container {
+    .mat-mdc-table {
+      @include zebra-stripes(#f2f2f2);
+
+      th.mat-mdc-header-cell {
+        @include mat-header-cell;
+        background-color: var(--header-row-bg);
+        color: $text-color;
+        &:hover {
+          background-color: $hover-bg;
+        }
+      }
+
+      td.mat-mdc-cell {
+        @include mat-cell;
+        background-color: $background-color;
+        color: $text-color;
+        &:hover {
+          background-color: lighten($background-color, 5%);
+        }
+      }
+    }
+
+    .mat-mdc-dialog-title {
+      color: $text-color;
+    }
+
+    .mat-mdc-dialog-container,
+    .mdc-dialog__surface {
+      @include dialog-surface($background-color, $text-color);
+    }
+
+    .mat-mdc-dialog-content {
+      ::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+
+  .regenerate-btn,
+  .regenerate {
+    border: solid 0.1rem rgba(0, 0, 0, 0.27) !important;
+  }
+}
+@mixin mat-header-row($bg: var(--header-row-bg, #ececec)) {
+  background-color: $bg;
+}
+@mixin mat-header-cell {
+  padding: $gap-md $gap-sm;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  background-color: rgba(0, 0, 0, 0.04);
+  @include interactive-states();
+}
+@mixin mat-cell {
+  padding: $gap-md $gap-sm;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  @include interactive-states();
+}
+@mixin styled-link {
+  text-decoration: none;
+  transition: transform 0.25s ease-in-out, color 0.25s ease-in-out;
+  &:not(:visited) {
+    opacity: 1;
+    font-weight: bolder;
+  }
+  &:visited {
+    opacity: 0.8;
+  }
+  &::first-letter {
+    text-transform: capitalize;
+  }
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+@mixin zebra-stripes($alt-bg) {
+  tbody tr:nth-child(odd) td.mat-mdc-cell {
+    background-color: $alt-bg;
   }
 }

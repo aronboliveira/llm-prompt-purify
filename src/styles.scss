@@ -21,7 +21,6 @@ body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-
   &.dark-theme {
     scrollbar-color: #fff4 #1115;
     .cdk-overlay-container {
@@ -63,6 +62,9 @@ body {
         @include dialog-scrollbar-dark;
       }
     }
+  }
+  &.light-theme {
+    @include light-theme-overrides;
   }
 }
 
@@ -222,6 +224,9 @@ mat-dialog-container,
   html {
     background-color: $dark-base;
     scrollbar-color: #fff4 #1115;
+    &:has(body.light-theme) {
+      background-color: #ffff;
+    }
   }
 
   #mainContainer {
@@ -239,6 +244,10 @@ mat-dialog-container,
     .mdc-button--raised,
     mat-icon {
       filter: invert(0.85);
+    }
+
+    .mat-icon {
+      color: rgb(10, 10, 10);
     }
   }
 
@@ -276,8 +285,10 @@ mat-dialog-container,
       color: $dark-text;
     }
   }
+}
 
-  .mat-icon {
-    color: grey;
+@media (prefers-color-scheme: light) {
+  body:not(.dark-theme):not(.light-theme) {
+    @include light-theme-overrides;
   }
 }
