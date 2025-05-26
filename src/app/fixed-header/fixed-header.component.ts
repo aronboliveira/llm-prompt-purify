@@ -13,6 +13,7 @@ import { fromEvent, Subscription } from "rxjs";
 import { HelpToggleComponent } from "../help-toggle/help-toggle.component";
 import { MatDialogModule } from "@angular/material/dialog";
 import { CommonModule } from "@angular/common";
+import { ThemeToggleComponent } from "../theme-toggle/theme-toggle.component";
 @Component({
   selector: "app-fixed-header",
   templateUrl: "./fixed-header.component.html",
@@ -24,6 +25,7 @@ import { CommonModule } from "@angular/common";
     MatCheckboxModule,
     MatIcon,
     HelpToggleComponent,
+    ThemeToggleComponent,
   ],
   standalone: true,
 })
@@ -34,6 +36,7 @@ export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
   public fixHeader = true;
   _permFixHeader = false;
   #scrollSubscription!: Subscription;
+  #buttonSubscriptions: any[] = [];
   #scrollTimeoutId: NodeJS.Timeout | number | undefined;
   #positionInterval: NodeJS.Timeout | number | undefined;
   #subscriptions = new Subscription();
@@ -45,17 +48,19 @@ export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
     this.#scrollTimeoutId = setTimeout(() => {
       this.fixHeader = false;
     }, 3000);
-    this.#scrollSubscription = fromEvent(window, "scroll").subscribe(() => {
-      this.#scrollTimeoutId && clearTimeout(this.#scrollTimeoutId);
-      this.fixHeader = true;
-      this._renderer.setStyle(
-        this.header.nativeElement,
-        "transform",
-        "translateY(0)"
-      );
-      this.#scrollTimeoutId = setTimeout(() => {
-        this.fixHeader = false;
-      }, 3000);
+    this.#scrollSubscription = fromEvent(window, "scroll").subscribe(() =>
+      this.#resetSlideCounter()
+    );
+    [
+      ...Array.from(this.header.nativeElement.getElementsByTagName("button")),
+      ...Array.from(this.header.nativeElement.getElementsByTagName("a")),
+      ...Array.from(
+        this.header.nativeElement.querySelectorAll('[role="button"]')
+      ),
+    ].forEach(bt => {
+      const handler = this.#resetSlideCounter.bind(this),
+        unlisten = this._renderer.listen(bt, "pointerup", handler);
+      this.#buttonSubscriptions.push(unlisten);
     });
     const atl = "autotranslate";
     if (this.header.nativeElement.getAttribute(`data-${atl}`) === "true")
@@ -90,6 +95,8 @@ export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
     this.#subscriptions?.unsubscribe();
     this.#positionInterval = undefined;
     this.#scrollTimeoutId = undefined;
+    for (const u of this.#buttonSubscriptions) u();
+    this.#buttonSubscriptions = [];
   }
   toggleFixHeader(): void {
     this._permFixHeader = !this._permFixHeader;
@@ -99,5 +106,17 @@ export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
         this.toggleButton.nativeElement.dataset["active"] = "true";
       else this.toggleButton.nativeElement.dataset["active"] = "false";
     }
+  }
+  #resetSlideCounter(): void {
+    this.#scrollTimeoutId && clearTimeout(this.#scrollTimeoutId);
+    this.fixHeader = true;
+    this._renderer.setStyle(
+      this.header.nativeElement,
+      "transform",
+      "translateY(0)"
+    );
+    this.#scrollTimeoutId = setTimeout(() => {
+      this.fixHeader = false;
+    }, 3000);
   }
 }

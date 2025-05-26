@@ -26,7 +26,7 @@ import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 import { CommonModule } from "@angular/common";
 import { FixedHeaderComponent } from "./fixed-header/fixed-header.component";
 import { MAIN_DICT, PATTERNS } from "./libs/vars/dictionaries";
-import { InfoDialogService } from "./libs/state/info-dialog-service";
+import { InfoDialogService } from "./libs/state/info-dialog.service";
 import { PromptTableComponent } from "./prompt-table/prompt-table.component";
 import { resultDict } from "../definitions/helpers";
 import DOMValidator from "./libs/utils/dom/facades/DOMValidator";
@@ -34,6 +34,7 @@ import Swal from "sweetalert2";
 import { MaskStorageService } from "./libs/services/mask-storage.service";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import TableExecutive from "./libs/utils/dom/executives/TableExecutive";
+import IconsMapper from "./libs/utils/dom/facades/IconsMapper";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -79,6 +80,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   handleEnter(ev: KeyboardEvent): void {
     try {
       if (
+        ev.altKey ||
+        ev.ctrlKey ||
         ev.key?.toLowerCase() !== "enter" ||
         document.body?.classList.contains("swal2-shown")
       )
@@ -117,8 +120,23 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   ngAfterViewInit(): void {
     if (typeof window === "undefined") return;
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches)
-      appState.colorScheme = "dark";
+    try {
+      const tm = window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light",
+        stg = localStorage.getItem(appState.storageKey);
+      localStorage.setItem(
+        appState.storageKey,
+        stg
+          ? JSON.stringify({
+              ...JSON.parse(stg),
+              [appState.colorSchemeKey]: tm,
+            })
+          : JSON.stringify({ [appState.colorSchemeKey]: tm })
+      );
+    } catch (e) {
+      console.warn(`Could not proceed with color scheme storage`);
+    }
     const ppi =
       this.input?.nativeElement || document.getElementById("promptInput");
     if (ppi instanceof HTMLElement) {
@@ -521,7 +539,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       const tb = document.createElement("table"),
         th = document.createElement("thead"),
         tbd = document.createElement("tbody"),
-        headers = ["Pattern Recognized", "Suggested Mask", "Use mask"],
+        headers = ["Index", "Pattern Recognized", "Suggested Mask", "Use mask"],
         cap = document.createElement("caption"),
         r = this._renderer;
       tb.id = `scanResults`;
@@ -554,10 +572,22 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       targ.insertAdjacentElement("afterend", tb);
       th.insertRow();
       headers.forEach(h => {
-        const e = document.createElement("th");
-        th.rows[0].appendChild(e);
-        e.style.fontWeight = "bold";
-        e.innerText = h;
+        try {
+          const e = document.createElement("th");
+          th.rows[0].appendChild(e);
+          e.style.fontWeight = "bold";
+          r.setStyle(e, "verticalAlign", "bottom");
+          const headerSpan = r.createElement("span") as HTMLSpanElement;
+          r.setProperty(headerSpan, "innerText", h);
+          r.appendChild(e, headerSpan);
+          const icon = IconsMapper.generateBaseMuiIcon(r, "swap_vert");
+          if (!icon) return;
+          r.addClass(icon, "header-icon");
+          r.setAttribute(icon, "title", "Click to sort the related column");
+          r.appendChild(e, icon);
+        } catch (e) {
+          // Fail silently
+        }
       });
       for (const c of [cap, th, tbd]) tb.appendChild(c);
       results
@@ -572,7 +602,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             );
             acc += 1;
           } while (newWord === v);
-          if (/(?:_*label_*)/gi.test(k)) {
+          if (!/_*(?:label)_*/gi.test(k)) {
             const chars = newWord.split("");
             for (let a = 0; a < chars.length; a++)
               if (PATTERNS.NUMBERS().test(chars[a]))
@@ -583,7 +613,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             newWord = this.#padMask({ word: newWord, v });
           this._maskStorage.setMask(v, newWord);
           const row = tbd.insertRow(),
+            idxCell = row.insertCell(),
             labCell = row.insertCell();
+          r.setProperty(idxCell, "innerText", (i + 1).toString());
           for (const act of [
             (e: any) => {
               e.textContent = k
@@ -680,10 +712,22 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   tg.style.backgroundColor = "#2222";
                   setTimeout(() => {
                     if (!(tg instanceof HTMLElement)) return;
-                    tg.style.backgroundColor =
-                      appState.colorScheme === "light"
-                        ? "#eeee"
-                        : "rgb(238 238 238 / 36%)";
+                    const def = "rgb(238 238 238 / 36%)";
+                    try {
+                      const stg = localStorage.getItem(appState.storageKey);
+                      if (!stg)
+                        throw new TypeError(`Could not get storage dictionary`);
+                      const psd = JSON.parse(stg),
+                        scheme = psd?.[appState.colorSchemeKey];
+                      if (!scheme)
+                        throw new TypeError(
+                          `Could not use Color Scheme key:value`
+                        );
+                      tg.style.backgroundColor =
+                        scheme === "light" ? "#eeee" : def;
+                    } catch (e) {
+                      tg.style.backgroundColor = def;
+                    }
                   }, 100);
                   const cell =
                     tg.closest("td") ||
@@ -819,7 +863,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!(tb?.isConnected && tb instanceof HTMLTableElement))
         throw new Error(`Table could not be validated`);
       const t = "mat-mdc-table",
-        hrc = "mat-mad-header-row",
+        hrc = "mat-mdc-header-row",
         rc = "mat-mdc-table-row-alt",
         hc = ["mat-mdc-header-cell", "columnheader"],
         bc = ["mat-mdc-cell", "cell"],
@@ -877,7 +921,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             tp: "mat-button",
             lb: "Regenerate All Masks",
             ic: "autorenew",
-            lt: () => exc.dispatchAllRegenerates(),
+            lt: (ev: MouseEvent | PointerEvent) =>
+              exc.dispatchAllRegenerates(ev),
           },
         ] as Array<{
           idf: `${string}MasksBtn`;
@@ -903,26 +948,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             ["aria-label", props.lb],
           ])
             r.setAttribute(b, ...(args as [string, string]));
-          r.listen(b, "pointerup", props.lt);
-          const icon = r.createElement("mat-icon") as HTMLElement;
+          props.idf === "regenMasksBtn"
+            ? r.listen(b, "pointerup", ev => props.lt(ev))
+            : r.listen(b, "pointerup", props.lt);
           for (const _cls of ["clear-button"]) r.addClass(b, _cls);
-          r.setProperty(icon, "innerText", props.ic);
-          for (const _cls of [
-            "mat-icon",
-            "mat-ligature-font",
-            "mat-icon-no-color",
-            "mat-mdc-icon",
-            "mat-button__icon",
-            "material-icons",
-            "notranslate",
-          ])
-            r.addClass(icon, _cls);
-          for (const [k, v] of [
-            ["aria-hidden", "true"],
-            ["role", "img"],
-          ])
-            r.setAttribute(icon, k, v);
-          const lbEl = r.createElement("label") as HTMLLabelElement;
+          const icon = IconsMapper.generateBaseMuiIcon(r, props.ic),
+            lbEl = r.createElement("label") as HTMLLabelElement;
           r.setAttribute(lbEl, "for", props.idf);
           r.setProperty(lbEl, "innerText", props.lb);
           for (const args of [
@@ -930,7 +961,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             [b, lbEl],
             [tbRelCta, b],
           ])
-            r.appendChild(...(args as [HTMLElement, Node]));
+            args.every(Boolean) &&
+              r.appendChild(...(args as [HTMLElement, Node]));
         }
       };
       if (!tbRelCta?.isConnected) {

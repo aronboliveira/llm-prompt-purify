@@ -165,6 +165,17 @@
 }
 ::ng-deep {
   .prompt-table-modal {
+    th {
+      span {
+        vertical-align: text-top;
+      }
+    }
+    .header-icon {
+      font-size: 0.9rem;
+      transform: translateY(0.25rem);
+      vertical-align: text-top;
+      padding-left: 0.1rem;
+    }
     .subtitle {
       display: flex;
       justify-content: center;
