@@ -11,10 +11,12 @@
   &:active {
     cursor: pointer;
   }
-  @media screen and (max-width: 600px) {
-    grid-column: 8;
-    grid-row: 1;
-    justify-self: end;
-    padding-right: $gap-sm;
+  &:not(app-help-toggle) {
+    @media screen and (max-width: 600px) {
+      grid-column: 8;
+      grid-row: 1;
+      justify-self: end;
+      padding-right: $gap-sm;
+    }
   }
 }

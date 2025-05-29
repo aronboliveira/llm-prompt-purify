@@ -93,6 +93,14 @@
     #unchkMasksBtn {
       @include cta-buttons-icons(rgba(200, 15, 15, 0.6), "");
     }
+    .fs-wrapper-copy {
+      display: flex;
+      justify-content: space-between;
+      width: 87.5%;
+      @media (prefers-color-scheme: dark) {
+        border-color: transparent;
+      }
+    }
     .fs-copy {
       display: flex;
       align-items: center;
@@ -167,32 +175,15 @@
       border-block: rgba(200, 200, 200, 0.2) 1px solid;
     }
     #btnCopyOutputFromModal {
-      position: relative;
-      font-size: 0.8rem;
-      font-weight: 500;
-      display: grid;
-      grid-template: 1fr / repeat(2, max-content);
-      align-items: center;
-      gap: $gap-sm;
-      transition: border 0.25s ease-in-out, gap 0.25s ease-in-out;
+      @include modal-footer-btn;
+    }
+    #btnScrollDown {
+      @include modal-footer-btn;
       &:hover {
-        animation: border-spinning ease-in-out infinite 1s;
-        font-weight: 600;
-        gap: 1.2rem;
-      }
-      cursor: pointer;
-      label {
-        cursor: pointer;
-      }
-      &::after {
-        @include btn-after-expander;
-        background-color: #ffffff00;
-        border-radius: 1rem;
-      }
-      &:active {
-        &::after {
-          @include btn-after-active-expander;
-          background-color: #ffffff77;
+        animation: none;
+        gap: 0.75rem;
+        mat-icon {
+          @include mix-move-up-down;
         }
       }
     }

@@ -93,4 +93,12 @@ export class PromptTableComponent implements AfterViewInit {
         });
       });
   }
+  scrollBottom(): void {
+    const cnt = document.getElementById("promptTableContent");
+    if (!cnt) return;
+    cnt.scroll({
+      top: cnt.scrollHeight,
+      behavior: "smooth",
+    });
+  }
 }

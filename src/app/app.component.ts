@@ -125,151 +125,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   ngAfterViewInit(): void {
     if (typeof window === "undefined") return;
-    try {
-      const tm = window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light",
-        stg = localStorage.getItem(appState.storageKey);
-      localStorage.setItem(
-        appState.storageKey,
-        stg
-          ? JSON.stringify({
-              ...JSON.parse(stg),
-              [appState.colorSchemeKey]: tm,
-            })
-          : JSON.stringify({ [appState.colorSchemeKey]: tm })
-      );
-    } catch (e) {
-      console.warn(`Could not proceed with color scheme storage`);
-    }
-    const ppi =
-      this.input?.nativeElement || document.getElementById("promptInput");
-    if (ppi instanceof HTMLElement) {
-      try {
-        (async (): Promise<void> => {
-          const ppjv = sessionStorage.getItem(this.promptValueKey);
-          if (!ppjv) return;
-          const ppv = JSON.parse(ppjv);
-          if (!("v" in ppv)) return;
-          await new Promise(resolve => setTimeout(resolve, 200));
-          if (
-            DOMValidator.isDefaultTextbox(ppi) ||
-            DOMValidator.isCustomTextbox(ppi)
-          ) {
-            if (DOMValidator.isDefaultTextbox(ppi)) {
-              ppi.value = ppv.v;
-              ppi.dispatchEvent(
-                new InputEvent("input", {
-                  bubbles: true,
-                  cancelable: true,
-                  inputType: "insertText",
-                  data: ppv.v,
-                })
-              );
-            } else if (DOMValidator.isCustomTextbox(ppi)) ppi.innerText = ppv.v;
-            this.userInput = ppv.v;
-          }
-          if (
-            ppi instanceof HTMLElement &&
-            ppi.getAttribute("data-focused") !== "true" &&
-            ((DOMValidator.isDefaultTextbox(ppi) && ppi.value === "") ||
-              (DOMValidator.isCustomTextbox(ppi) && ppi.innerText === ""))
-          ) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            if (DOMValidator.isDefaultTextbox(ppi)) ppi.value = ppv.v;
-            else if (DOMValidator.isCustomTextbox(ppi)) ppi.innerText = ppv.v;
-            this.userInput = ppv.v;
-            ppi.dispatchEvent(
-              new InputEvent("input", {
-                bubbles: true,
-                cancelable: true,
-                inputType: "insertText",
-                data: ppv.v,
-              })
-            );
-          }
-        })();
-      } catch (sse) {
-        console.error(`Failed to get prompt value from session storage`);
-      }
-      if (ppi?.dataset?.["focusenter"] !== "true") {
-        ppi.addEventListener("focus", ev => {
-          if (
-            !(
-              ev.currentTarget instanceof HTMLElement &&
-              ev.currentTarget.isConnected
-            )
-          )
-            return;
-          ppi.setAttribute("data-focused", "true");
-        });
-        ppi.addEventListener("blur", ev => {
-          if (
-            !(
-              ev.currentTarget instanceof HTMLElement &&
-              ev.currentTarget.isConnected
-            )
-          )
-            return;
-          ppi?.setAttribute("data-focused", "false");
-        });
-        window.addEventListener("keyup", this.handleEnter.bind(this));
-        ppi.dataset["focusenter"] = "true";
-      }
-    }
-    const inpHandler = ((ev: InputEvent) => {
-        if (
-          !(ev.currentTarget && DOMValidator.isDefaultTextbox(ev.currentTarget))
-        )
-          return;
-        const el = ev.currentTarget as HTMLTextAreaElement;
-        if (el.getAttribute(appState.patterns.fixedTextbox) === "true") return;
-        const fontSize = parseFloat(
-          getComputedStyle(el).fontSize.replace(/[^0-9px]/g, "")
-        );
-        (el as HTMLTextAreaElement).style.height = `${
-          Math.max(
-            1,
-            (() => {
-              let v = Math.ceil(
-                (el as HTMLTextAreaElement).value.length /
-                  Math.floor(el.clientWidth / fontSize)
-              );
-              if (!Number.isFinite(v)) v = 0;
-              return v;
-            })()
-          ) *
-          fontSize *
-          0.9
-        }px`;
-      }).bind(this),
-      resizeObserver = new ResizeObserver(() => {
-        if (!this.input?.nativeElement) return;
-        this._renderer.setAttribute(
-          this.input.nativeElement,
-          appState.patterns.fixedTextbox,
-          "true"
-        );
-        setTimeout(() => {
-          if (!this.input?.nativeElement) return;
-          this._renderer.setAttribute(
-            this.input.nativeElement,
-            appState.patterns.fixedTextbox,
-            "false"
-          );
-        }, 2000);
-      }),
-      rszHandler = () =>
-        this.input?.nativeElement &&
-        resizeObserver.observe(this.input.nativeElement),
-      addHandlers = () => {
-        if (!this.input?.nativeElement) return;
-        this._renderer.listen(this.input.nativeElement, "input", inpHandler);
-        rszHandler();
-      };
-    !this.input?.nativeElement
-      ? nextTick(() => setTimeout(addHandlers, 200))
-      : addHandlers();
+    this.#checkForDarkMode();
+    this.#checkInputStorageData();
+    this.#addInputResizeListeners();
   }
   ngOnDestroy(): void {
     if (typeof window === "undefined") return;
@@ -626,6 +484,164 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       clearInterval(timerInterval);
     }
   }
+  #checkForDarkMode(): void {
+    try {
+      const tm = window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light",
+        stg = localStorage.getItem(appState.storageKey);
+      localStorage.setItem(
+        appState.storageKey,
+        stg
+          ? JSON.stringify({
+              ...JSON.parse(stg),
+              [appState.colorSchemeKey]: tm,
+            })
+          : JSON.stringify({ [appState.colorSchemeKey]: tm })
+      );
+    } catch (e) {
+      console.warn(`Could not proceed with color scheme storage`);
+    }
+  }
+  #checkInputStorageData(): void {
+    const ppi =
+      this.input?.nativeElement || document.getElementById("promptInput");
+    if (ppi instanceof HTMLElement) {
+      try {
+        (async (): Promise<void> => {
+          const ppjv = sessionStorage.getItem(this.promptValueKey);
+          if (!ppjv) return;
+          const ppv = JSON.parse(ppjv);
+          if (!("v" in ppv)) return;
+          await new Promise(resolve => setTimeout(resolve, 200));
+          if (
+            DOMValidator.isDefaultTextbox(ppi) ||
+            DOMValidator.isCustomTextbox(ppi)
+          ) {
+            if (DOMValidator.isDefaultTextbox(ppi)) {
+              ppi.value = ppv.v;
+              ppi.dispatchEvent(
+                new InputEvent("input", {
+                  bubbles: true,
+                  cancelable: true,
+                  inputType: "insertText",
+                  data: ppv.v,
+                })
+              );
+            } else if (DOMValidator.isCustomTextbox(ppi)) ppi.innerText = ppv.v;
+            this.userInput = ppv.v;
+          }
+          if (
+            ppi instanceof HTMLElement &&
+            ppi.getAttribute("data-focused") !== "true" &&
+            ((DOMValidator.isDefaultTextbox(ppi) && ppi.value === "") ||
+              (DOMValidator.isCustomTextbox(ppi) && ppi.innerText === ""))
+          ) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (DOMValidator.isDefaultTextbox(ppi)) ppi.value = ppv.v;
+            else if (DOMValidator.isCustomTextbox(ppi)) ppi.innerText = ppv.v;
+            this.userInput = ppv.v;
+            ppi.dispatchEvent(
+              new InputEvent("input", {
+                bubbles: true,
+                cancelable: true,
+                inputType: "insertText",
+                data: ppv.v,
+              })
+            );
+          }
+        })();
+      } catch (sse) {
+        console.error(`Failed to get prompt value from session storage`);
+      }
+      if (ppi?.dataset?.["focusenter"] !== "true") {
+        ppi.addEventListener("focus", ev => {
+          if (
+            !(
+              ev.currentTarget instanceof HTMLElement &&
+              ev.currentTarget.isConnected
+            )
+          )
+            return;
+          ppi.setAttribute("data-focused", "true");
+        });
+        ppi.addEventListener("blur", ev => {
+          if (
+            !(
+              ev.currentTarget instanceof HTMLElement &&
+              ev.currentTarget.isConnected
+            )
+          )
+            return;
+          ppi?.setAttribute("data-focused", "false");
+        });
+        window.addEventListener("keyup", this.handleEnter.bind(this));
+        ppi.dataset["focusenter"] = "true";
+      }
+    }
+  }
+  #addInputResizeListeners(): void {
+    const resize = (el: HTMLElement) => {
+        const fontSize = parseFloat(
+          getComputedStyle(el).fontSize.replace(/[^0-9px]/g, "")
+        );
+        (el as HTMLTextAreaElement).style.height = `${
+          Math.max(
+            1,
+            (() => {
+              let v = Math.ceil(
+                (el as HTMLTextAreaElement).value.length /
+                  Math.floor(el.clientWidth / fontSize)
+              );
+              if (!Number.isFinite(v)) v = 0;
+              return v;
+            })()
+          ) *
+          fontSize *
+          0.9
+        }px`;
+      },
+      inpHandler = ((ev: InputEvent) => {
+        if (
+          !(ev.currentTarget && DOMValidator.isDefaultTextbox(ev.currentTarget))
+        )
+          return;
+        const el = ev.currentTarget as HTMLTextAreaElement;
+        if (el.getAttribute(appState.patterns.fixedTextbox) === "true") return;
+        resize(el);
+      }).bind(this),
+      resizeObserver = new ResizeObserver(() => {
+        if (!this.input?.nativeElement) return;
+        this._renderer.setAttribute(
+          this.input.nativeElement,
+          appState.patterns.fixedTextbox,
+          "true"
+        );
+        setTimeout(() => {
+          if (!this.input?.nativeElement) return;
+          this._renderer.setAttribute(
+            this.input.nativeElement,
+            appState.patterns.fixedTextbox,
+            "false"
+          );
+        }, 2000);
+      }),
+      rszHandler = () =>
+        this.input?.nativeElement &&
+        resizeObserver.observe(this.input.nativeElement),
+      addHandlers = () => {
+        if (!this.input?.nativeElement) return;
+        this._renderer.listen(this.input.nativeElement, "input", inpHandler);
+        rszHandler();
+      };
+    setTimeout(
+      () => this.input?.nativeElement && resize(this.input.nativeElement),
+      1000
+    );
+    !this.input?.nativeElement
+      ? nextTick(() => setTimeout(addHandlers, 200))
+      : addHandlers();
+  }
   #mountTable(
     targ: Element | null,
     results: Array<resultDict>
@@ -688,10 +704,15 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           const headerSpan = r.createElement("span") as HTMLSpanElement;
           r.setProperty(headerSpan, "innerText", h);
           r.appendChild(e, headerSpan);
-          if (!i) {
-            r.setAttribute(e, appState.patterns.activeSorting, "true");
-            r.setAttribute(e, appState.patterns.order, appState.orderValues[0]);
-          }
+          !i
+            ? r.setAttribute(e, appState.patterns.activeSorting, "true")
+            : r.setAttribute(e, appState.patterns.activeSorting, "false");
+          r.setAttribute(e, appState.patterns.order, appState.orderValues[0]);
+          r.setAttribute(
+            e,
+            appState.patterns.sort,
+            h.replace(/\s+/g, "_").toLowerCase()
+          );
           const icon = MuiSupport.generateBaseMuiIcon(r, "swap_vert");
           if (!icon) return;
           r.addClass(icon, "header-icon");
@@ -967,9 +988,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       }, 250);
       setTimeout(() => {
         if (!tb?.isConnected) return;
-        if (!this.#setMatTableStyles(tb))
+        !this.#setMatTableStyles(tb) &&
           console.warn(`Failed to set Material Styles for Table`);
-        // TODO SORTING LOGIC
       }, 300);
       return { table: tb, output: outp };
     } catch (e) {

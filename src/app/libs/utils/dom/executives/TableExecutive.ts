@@ -27,7 +27,7 @@ export default class TableExecutive {
       )
     )
       return;
-    this.#table.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+    this.#table.querySelectorAll(".mask-check-field").forEach(chk => {
       if (!(chk instanceof HTMLInputElement && chk.type === "checkbox")) return;
       chk.checked = state;
       chk.dispatchEvent(
@@ -92,5 +92,43 @@ export default class TableExecutive {
       appState.patterns.order,
       !orderBy ? "asc" : orderBy === "asc" ? "desc" : "asc"
     );
+    this.#recollectAndSort();
+  }
+  #recollectAndSort() {
+    console.log("recollecting...");
+    const pt = appState.patterns,
+      rows =
+        this.#table instanceof HTMLTableElement
+          ? Array.from(this.#table.rows)
+          : Array.from(
+              new Set([
+                ...Array.from(this.#table.getElementsByTagName("tr")),
+                ...Array.from(
+                  this.#table.querySelectorAll("[class*=mat-mdc-table-row]")
+                ),
+              ])
+            ),
+      sortingHeader = Array.from(
+        new Set([
+          ...Array.from(rows[0].querySelectorAll("th")),
+          ...Array.from(rows[0].querySelectorAll(".mat-mdc-header-cell")),
+        ])
+      )
+        .map<[number, Element]>((h, i) => [i, h])
+        .find(
+          ([_, h]) =>
+            h instanceof HTMLElement &&
+            h.getAttribute(pt.sort) &&
+            h.getAttribute(pt.order) &&
+            h.getAttribute(pt.activeSorting) === "true"
+        );
+    sortingHeader instanceof HTMLElement &&
+      console.log(
+        "Table should be sorted by " +
+          sortingHeader.getAttribute(pt.sort) +
+          " in a " +
+          sortingHeader.getAttribute(pt.order) +
+          " order"
+      );
   }
 }
