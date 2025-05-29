@@ -8,6 +8,8 @@ import {
   Renderer2,
   NgZone,
   ChangeDetectionStrategy,
+  ViewContainerRef,
+  Injector,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { OutputBuilder } from "./libs/builders/OutputBuilder";
@@ -34,7 +36,8 @@ import Swal from "sweetalert2";
 import { MaskStorageService } from "./libs/services/mask-storage.service";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import TableExecutive from "./libs/utils/dom/executives/TableExecutive";
-import IconsMapper from "./libs/utils/dom/facades/IconsMapper";
+import MuiSupport from "./libs/utils/dom/facades/MuiSupport";
+import { nextTick } from "process";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -61,13 +64,13 @@ import IconsMapper from "./libs/utils/dom/facades/IconsMapper";
 })
 export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("promptInput", { static: true }) input: ElementRef | null = null;
+  #executive: TableExecutive | null = null;
   isHelpOpen = false;
   userInput = "";
-  title = "Masked Input";
   processedOutput = "";
+  title = "Masked Input";
+  unchksId = "unchkMasksBtn";
   promptValueKey = "llmPromptToPurifyValue";
-  safeHtml = "";
-  labelPattern = "data-labelpattern";
   _maxLength = 4096;
   constructor(
     private _userInputService: UserInputSerivce,
@@ -75,6 +78,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private _maskStorage: MaskStorageService,
     private _renderer: Renderer2,
     private _zone: NgZone,
+    private _view: ViewContainerRef,
+    private _injector: Injector,
     public dialog: MatDialog
   ) {}
   handleEnter(ev: KeyboardEvent): void {
@@ -212,6 +217,59 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         ppi.dataset["focusenter"] = "true";
       }
     }
+    const inpHandler = ((ev: InputEvent) => {
+        if (
+          !(ev.currentTarget && DOMValidator.isDefaultTextbox(ev.currentTarget))
+        )
+          return;
+        const el = ev.currentTarget as HTMLTextAreaElement;
+        if (el.getAttribute(appState.patterns.fixedTextbox) === "true") return;
+        const fontSize = parseFloat(
+          getComputedStyle(el).fontSize.replace(/[^0-9px]/g, "")
+        );
+        (el as HTMLTextAreaElement).style.height = `${
+          Math.max(
+            1,
+            (() => {
+              let v = Math.ceil(
+                (el as HTMLTextAreaElement).value.length /
+                  Math.floor(el.clientWidth / fontSize)
+              );
+              if (!Number.isFinite(v)) v = 0;
+              return v;
+            })()
+          ) *
+          fontSize *
+          0.9
+        }px`;
+      }).bind(this),
+      resizeObserver = new ResizeObserver(() => {
+        if (!this.input?.nativeElement) return;
+        this._renderer.setAttribute(
+          this.input.nativeElement,
+          appState.patterns.fixedTextbox,
+          "true"
+        );
+        setTimeout(() => {
+          if (!this.input?.nativeElement) return;
+          this._renderer.setAttribute(
+            this.input.nativeElement,
+            appState.patterns.fixedTextbox,
+            "false"
+          );
+        }, 2000);
+      }),
+      rszHandler = () =>
+        this.input?.nativeElement &&
+        resizeObserver.observe(this.input.nativeElement),
+      addHandlers = () => {
+        if (!this.input?.nativeElement) return;
+        this._renderer.listen(this.input.nativeElement, "input", inpHandler);
+        rszHandler();
+      };
+    !this.input?.nativeElement
+      ? nextTick(() => setTimeout(addHandlers, 200))
+      : addHandlers();
   }
   ngOnDestroy(): void {
     if (typeof window === "undefined") return;
@@ -394,6 +452,48 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             cancelButtonColor: "#d33",
             confirmButtonText: "Yes, I will do it!",
           });
+          const swalConfirm = document.querySelector(".swal2-confirm"),
+            swalCancel = document.querySelector(".swal2-cancel");
+          if (swalCancel instanceof HTMLElement && swalCancel.isConnected) {
+            const tip = "Removes all applied masks from the output for copying";
+            if (
+              !MuiSupport.addTooltipToElement({
+                view: this._view,
+                injector: this._injector,
+                el: swalCancel,
+                txt: tip,
+              })
+            )
+              this._renderer.setProperty(swalCancel, "title", tip);
+            const handler = () => {
+              console.log(appState.maskChkCls);
+              Array.from(
+                document.getElementsByClassName(appState.maskChkCls)
+              ).forEach(e => {
+                if (
+                  !(
+                    e instanceof HTMLInputElement &&
+                    typeof e.checked === "boolean"
+                  )
+                )
+                  return;
+                e.checked = false;
+              });
+            };
+            this._renderer.listen(swalCancel, "click", handler);
+          }
+          if (swalConfirm instanceof HTMLElement && swalConfirm.isConnected) {
+            const tip = "Keeps all applied masks in the output for copying";
+            if (
+              !MuiSupport.addTooltipToElement({
+                view: this._view,
+                injector: this._injector,
+                el: swalConfirm,
+                txt: tip,
+              })
+            )
+              this._renderer.setProperty(swalConfirm, "title", tip);
+          }
           const h3 = document.createElement("h3");
           h3.id = patternsTitle;
           h3.textContent = "Identified patterns and suggested masks";
@@ -542,7 +642,15 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         headers = ["Index", "Pattern Recognized", "Suggested Mask", "Use mask"],
         cap = document.createElement("caption"),
         r = this._renderer;
-      tb.id = `scanResults`;
+      for (const { k, v } of [
+        { k: "id", v: appState.ids.scanTab },
+        { k: appState.patterns.sort, v: headers[0] },
+      ])
+        r.setAttribute(
+          tb,
+          k,
+          k === "id" ? v : v.toLowerCase().replace(/\s+/g, "-")
+        );
       cap.id = `captionScanResults`;
       cap.innerText = "Relation of patterns and suggested masks";
       for (const { k, v } of [
@@ -571,7 +679,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       targ.insertAdjacentElement("afterend", tb);
       th.insertRow();
-      headers.forEach(h => {
+      headers.forEach((h, i) => {
         try {
           const e = document.createElement("th");
           th.rows[0].appendChild(e);
@@ -580,10 +688,20 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           const headerSpan = r.createElement("span") as HTMLSpanElement;
           r.setProperty(headerSpan, "innerText", h);
           r.appendChild(e, headerSpan);
-          const icon = IconsMapper.generateBaseMuiIcon(r, "swap_vert");
+          if (!i) {
+            r.setAttribute(e, appState.patterns.activeSorting, "true");
+            r.setAttribute(e, appState.patterns.order, appState.orderValues[0]);
+          }
+          const icon = MuiSupport.generateBaseMuiIcon(r, "swap_vert");
           if (!icon) return;
           r.addClass(icon, "header-icon");
           r.setAttribute(icon, "title", "Click to sort the related column");
+          this.#executive ??= new TableExecutive(tb);
+          r.listen(
+            icon,
+            "pointerup",
+            this.#executive.sortColumn.bind(this.#executive)
+          );
           r.appendChild(e, icon);
         } catch (e) {
           // Fail silently
@@ -630,7 +748,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           const isLabPattern = ["_label", "-label"].some(p =>
             labCell.textContent?.toLowerCase().endsWith(p)
           );
-          isLabPattern && labCell.setAttribute(this.labelPattern, "true");
+          isLabPattern && labCell.setAttribute(appState.patterns.label, "true");
           const maskCell = row.insertCell(),
             maskN = `mask_${i}`;
           for (const { k, v } of [
@@ -770,6 +888,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             { k: "aria-controls", v: maskN },
           ])
             cb.setAttribute(k, v);
+          r.addClass(cb, appState.maskChkCls);
           cbCell.classList.add("check-cell");
           cb.checked = !isLabPattern ? true : false;
           cb.addEventListener(appState.uncheckMaskEvent, ev => {
@@ -894,27 +1013,27 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       if (!tb?.isConnected || !tb.parentElement)
         throw new TypeError(`Failed to validate prompt table in DOM`);
+      this.#executive ??= new TableExecutive(tb);
       const r = this._renderer,
         tbRelCta = r.createElement("fieldset") as HTMLFieldSetElement,
         btns = Array.from({ length: 3 }).map(
           () => r.createElement("button") as HTMLButtonElement
         ),
         cls = "fs-prompt-cta",
-        exc = new TableExecutive(tb),
         propsList = [
           {
-            idf: "unchkMasksBtn",
+            idf: this.unchksId,
             tp: "mat-button",
             lb: "Uncheck All Masks",
             ic: "clear_all",
-            lt: () => exc.toggleAllChecks(false),
+            lt: () => this.#executive?.toggleAllChecks(false),
           },
           {
             idf: "chkMasksBtn",
             tp: "mat-button",
             lb: "Check All Masks",
             ic: "done_all",
-            lt: () => exc.toggleAllChecks(true),
+            lt: () => this.#executive?.toggleAllChecks(true),
           },
           {
             idf: "regenMasksBtn",
@@ -922,7 +1041,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             lb: "Regenerate All Masks",
             ic: "autorenew",
             lt: (ev: MouseEvent | PointerEvent) =>
-              exc.dispatchAllRegenerates(ev),
+              this.#executive?.dispatchAllRegenerates(ev),
           },
         ] as Array<{
           idf: `${string}MasksBtn`;
@@ -949,10 +1068,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           ])
             r.setAttribute(b, ...(args as [string, string]));
           props.idf === "regenMasksBtn"
-            ? r.listen(b, "pointerup", ev => props.lt(ev))
-            : r.listen(b, "pointerup", props.lt);
+            ? r.listen(b, appState.checkAllEvent, ev => props.lt(ev))
+            : r.listen(b, appState.checkAllEvent, props.lt);
           for (const _cls of ["clear-button"]) r.addClass(b, _cls);
-          const icon = IconsMapper.generateBaseMuiIcon(r, props.ic),
+          const icon = MuiSupport.generateBaseMuiIcon(r, props.ic),
             lbEl = r.createElement("label") as HTMLLabelElement;
           r.setAttribute(lbEl, "for", props.idf);
           r.setProperty(lbEl, "innerText", props.lb);
@@ -1089,7 +1208,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           mask.closest(".tr")
         )
           ?.querySelector(".label-cell")
-          ?.getAttribute(this.labelPattern) === "true")
+          ?.getAttribute(appState.patterns.label) === "true")
     )
       return;
     const st = mask.getAttribute("data-start"),

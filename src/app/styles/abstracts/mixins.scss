@@ -1,4 +1,67 @@
 @use "./vars.scss" as *;
+@keyframes spinning {
+  0% {
+    transform: rotateZ(0deg);
+    animation-timing-function: ease-in;
+  }
+  50% {
+    transform: rotateZ(180deg);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+@keyframes subtle-glow-spin {
+  0% {
+    background-color: #7a7a7a;
+    box-shadow: 0 0 0 1px #d2cece1a, 0 0 5px 1px rgba(245, 245, 245, 0.093),
+      inset 0 0 3px rgba(0, 0, 0, 0.05);
+    border-color: #5e5e5e;
+  }
+  50% {
+    background-color: #4c4c4c;
+    box-shadow: 0 0 0 2px #eeeeee18, 0 0 8px 2px rgba(250, 250, 250, 0.142),
+      inset 0 0 5px rgba(0, 0, 0, 0.03);
+    border-color: #272727;
+  }
+  100% {
+    background-color: #aeabab;
+    box-shadow: 0 0 0 1px #86858531, 0 0 5px 1px rgba(245, 245, 245, 0.208),
+      inset 0 0 3px rgba(0, 0, 0, 0.05);
+    border-color: #6b6868;
+  }
+}
+@keyframes border-spinning {
+  0% {
+    background-color: #7a7a7a;
+    box-shadow: 0 0 0 1px #d2cece, 0 0 5px 1px rgba(245, 245, 245, 0.5),
+      inset 0 0 3px rgba(0, 0, 0, 0.05);
+    border-color: #3c3b3b;
+  }
+  50% {
+    background-color: #4c4c4c;
+    box-shadow: 0 0 0 2px #eee, 0 0 8px 2px rgba(250, 250, 250, 0.6),
+      inset 0 0 5px rgba(0, 0, 0, 0.03);
+    border-color: #656565;
+  }
+  100% {
+    background-color: #aeabab;
+    box-shadow: 0 0 0 1px #e5e5e5, 0 0 5px 1px rgba(245, 245, 245, 0.5),
+      inset 0 0 3px rgba(0, 0, 0, 0.05);
+    border-color: #222222;
+  }
+}
+@mixin cta-buttons-icons($color, $animation) {
+  .mat-icon.mat-mdc-icon {
+    transition: transform ease-in-out 0.5s, color ease-in-out 1s;
+    &:hover {
+      transform: rotateZ(-5deg) scale(1.2) !important;
+      color: $color;
+      z-index: 99;
+      animation: $animation;
+    }
+  }
+}
 @mixin btn-after-expander {
   content: "";
   display: inline-block;
@@ -25,28 +88,58 @@
   align-items: center;
   gap: $gap-sm;
 }
-@mixin interactive-states($bg-hover: $hover-bg, $bg-active: $active-bg) {
-  &:hover {
-    background-color: $bg-hover;
-    cursor: pointer;
+@mixin dark-swal {
+  .swal2-container {
+    background-color: rgba(0, 0, 0, 0.75);
   }
-  &:active {
-    background-color: $bg-active;
+
+  .swal2-popup {
+    @include dialog-surface(#1e1e1e, $dark-text);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
   }
-}
-@mixin moving-button(
-  $hover-move: -1px,
-  $active-move: 2px,
-  $transition: transform 0.25s ease-in-out
-) {
-  @if transition != null {
-    transition: $transition;
+
+  // SweetAlert “modal” variant
+  .swal2-popup.swal2-modal {
+    max-width: 90vw;
   }
-  &:hover {
-    transform: translateY($hover-move);
+
+  .swal2-icon-warning {
+    background-color: #1e1e1e;
+    color: $dark-text;
+    svg {
+      fill: $dark-text;
+    }
   }
-  &:active {
-    transform: translateY($active-move);
+
+  .swal2-show {
+    animation: swal2-show 0.3s;
+  }
+
+  .swal2-toast {
+    @include dialog-surface($dark-cell-bg, $dark-text);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  }
+  .swal2-toast .swal2-title,
+  .swal2-toast .swal2-content {
+    color: $dark-text;
+  }
+
+  .swal2-title,
+  .swal2-content {
+    color: $dark-text !important;
+  }
+
+  button.swal2-actions {
+    background-color: $dark-header-bg !important;
+    &.swal-confirm {
+      background-color: rgb(15 124 32) !important;
+    }
+    &.swal-cancel,
+    &.swal-deny {
+      background-color: rgb(221 151 51 / 71%) !important;
+    }
+    color: $dark-text !important;
+    @include interactive-states($dark-header-hover-bg, $dark-header-bg);
   }
 }
 @mixin delined-pseudo-elements {
@@ -86,6 +179,15 @@
   ::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: $gap-tn;
+  }
+}
+@mixin interactive-states($bg-hover: $hover-bg, $bg-active: $active-bg) {
+  &:hover {
+    background-color: $bg-hover;
+    cursor: pointer;
+  }
+  &:active {
+    background-color: $bg-active;
   }
 }
 @mixin light-theme-overrides {
@@ -166,6 +268,21 @@
   padding: $gap-md $gap-sm;
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   @include interactive-states();
+}
+@mixin moving-button(
+  $hover-move: -1px,
+  $active-move: 2px,
+  $transition: transform 0.25s ease-in-out
+) {
+  @if transition != null {
+    transition: $transition;
+  }
+  &:hover {
+    transform: translateY($hover-move);
+  }
+  &:active {
+    transform: translateY($active-move);
+  }
 }
 @mixin styled-link {
   text-decoration: none;
