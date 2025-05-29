@@ -7,19 +7,35 @@
 <mat-dialog-content #content id="promptTableContent" [innerHTML]="data.text">
   <span id="prompt-table-flag">Flag for table</span>
 </mat-dialog-content>
-<fieldset class="fs-copy">
-  <button
-    mat-icon-button
-    color="secondary"
-    aria-label="Click to copy the output"
-    aria-labelledby="labelCopyOutputFromModal"
-    title="Click to copy the output"
-    id="btnCopyOutputFromModal"
-    (click)="copyOutput()"
-  >
-    <mat-icon>content_copy</mat-icon>
-    <label id="labelCopyOutputFromModal" for="btnCopyOutputFromModal"
-      >Copy the Output</label
+<footer class="fs-wrapper-copy">
+  <fieldset class="fs-copy">
+    <button
+      mat-icon-button
+      color="secondary"
+      aria-label="Click to copy the output"
+      aria-labelledby="labelCopyOutputFromModal"
+      title="Click to copy the output"
+      id="btnCopyOutputFromModal"
+      (click)="copyOutput()"
     >
-  </button>
-</fieldset>
+      <mat-icon>content_copy</mat-icon>
+      <label id="labelCopyOutputFromModal" for="btnCopyOutputFromModal"
+        >Copy the Output</label
+      >
+    </button>
+  </fieldset>
+  <fieldset class="fs-copy">
+    <button
+      mat-icon-button
+      color="secondary"
+      aria-label="Click to scroll the main component to the bottom"
+      aria-labelledby="labelScrolldown"
+      title="Click to scroll the main component to the bottom"
+      id="btnScrollDown"
+      (click)="scrollBottom()"
+    >
+      <label id="labelScrolldown" for="btnScrollDown">Scroll Down</label>
+      <mat-icon>arrow_downward</mat-icon>
+    </button>
+  </fieldset>
+</footer>
