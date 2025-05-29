@@ -63,7 +63,7 @@
           transform: translateY(3px);
         }
       }
-      @media screen and (max-width: 600px) {
+      @media screen and (max-width: 720px) {
         grid-column: 8;
       }
     }
@@ -75,7 +75,7 @@
     @media screen and (max-width: 800px) {
       grid-template-columns: 0.35fr 0.6fr 4.5fr 0.5fr 2fr;
     }
-    @media screen and (max-width: 600px) {
+    @media screen and (max-width: 720px) {
       grid-template-areas:
         "logo title title title help"
         "links links links links fix-toggle";

@@ -62,13 +62,36 @@
           [type="checkbox"] {
             cursor: pointer;
             width: calc($gap-md * 2);
-            height: 1calc ($gap-md * 2);
+            height: calc($gap-md * 1.25);
             clip-path: circle(45%);
             outline: transparent;
-            accent-color: aquamarine;
+            accent-color: #7bdf91b8;
+            transition: transform 0.5s ease-in-out;
+            &:hover {
+              transform: translateY(-1px);
+              &:active {
+                transform: translateY(1px);
+              }
+            }
           }
         }
       }
+    }
+    #chkMasksBtn {
+      @include cta-buttons-icons(rgb(45, 207, 45), "");
+    }
+    #regenMasksBtn {
+      .mat-icon.mat-mdc-icon {
+        transition: transform ease-in-out 1s, color ease-in-out 3s;
+        &:hover {
+          color: rgb(108, 149, 239);
+          z-index: 99;
+          animation: spinning 2s infinite;
+        }
+      }
+    }
+    #unchkMasksBtn {
+      @include cta-buttons-icons(rgba(200, 15, 15, 0.6), "");
     }
     .fs-copy {
       display: flex;
@@ -99,6 +122,12 @@
         justify-self: center;
         &:hover {
           transform: translateY(-1px);
+          .mat-icon.mat-mdc-icon {
+            transform: rotateX(10px);
+          }
+          .mat-icon.mat-mdc-icon + * {
+            transform: rotateX(10px);
+          }
         }
         &::after {
           @include btn-after-expander;
@@ -145,6 +174,12 @@
       grid-template: 1fr / repeat(2, max-content);
       align-items: center;
       gap: $gap-sm;
+      transition: border 0.25s ease-in-out, gap 0.25s ease-in-out;
+      &:hover {
+        animation: border-spinning ease-in-out infinite 1s;
+        font-weight: 600;
+        gap: 1.2rem;
+      }
       cursor: pointer;
       label {
         cursor: pointer;
@@ -165,7 +200,35 @@
 }
 ::ng-deep {
   .prompt-table-modal {
+    hr {
+      border: #7171712e 1px solid;
+      margin-right: 12%;
+    }
     th {
+      .mat-button__icon {
+        transition: transform ease-in-out 0.5s;
+        ::after {
+          @include btn-after-expander;
+          background-color: #ffffff00;
+          border-radius: 1rem;
+        }
+        height: max-content;
+        width: max-content;
+        padding-inline: $gap-tn;
+        margin-left: calc($gap-tn + 0.1rem);
+        text-align: center;
+        &:hover {
+          border-radius: 0.25rem;
+          animation: subtle-glow-spin 1s ease-in-out infinite;
+        }
+        &:active,
+        &:focus {
+          ::after {
+            @include btn-after-active-expander;
+            background-color: #ffffff77;
+          }
+        }
+      }
       span {
         vertical-align: text-top;
       }
@@ -185,9 +248,10 @@
       margin: $gap-md--2 0 0 0;
       padding-bottom: $gap-sm;
     }
-    hr {
-      border: #7171712e 1px solid;
-      margin-right: 12%;
+    @media screen and (max-width: 600px) {
+      .regenerate {
+        padding-bottom: 0.5rem;
+      }
     }
   }
 }

@@ -62,6 +62,7 @@ body {
         @include dialog-scrollbar-dark;
       }
     }
+    @include dark-swal;
   }
   &.light-theme {
     @include light-theme-overrides;
@@ -209,6 +210,11 @@ mat-dialog-container,
   }
 }
 
+#promptInput {
+  height: 5rem;
+  min-height: 5rem !important;
+}
+
 #scanResults {
   width: 100%;
 
@@ -229,26 +235,8 @@ mat-dialog-container,
     }
   }
 
-  #mainContainer {
-    background-color: $dark-base;
-
-    input,
-    textarea,
-    p,
-    mat-select,
-    mat-label,
-    .mat-mdc-form-field-infix {
-      color: #eeee;
-    }
-
-    .mdc-button--raised,
-    mat-icon {
-      filter: invert(0.85);
-    }
-
-    .mat-icon {
-      color: rgb(10, 10, 10);
-    }
+  body {
+    @include dark-swal;
   }
 
   .cdk-overlay-container {
@@ -283,6 +271,28 @@ mat-dialog-container,
 
     .mat-mdc-dialog-title {
       color: $dark-text;
+    }
+  }
+
+  #mainContainer {
+    background-color: $dark-base;
+
+    input,
+    textarea,
+    p,
+    mat-select,
+    mat-label,
+    .mat-mdc-form-field-infix {
+      color: #eeee;
+    }
+
+    .mdc-button--raised,
+    mat-icon {
+      filter: invert(0.85);
+    }
+
+    .mat-icon {
+      color: rgb(10, 10, 10);
     }
   }
 }
