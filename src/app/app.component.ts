@@ -373,7 +373,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   return;
                 const matmdc = document
                   .querySelector(".prompt-table-modal")
-                  ?.querySelector(".mat-mdc-dialog-content");
+                  ?.querySelector(`.${appState.classes.matDlgCt}`);
                 if (matmdc) {
                   if (table) this._renderer.appendChild(matmdc, table);
                   else
@@ -674,7 +674,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           !i
             ? r.setAttribute(e, appState.patterns.activeSorting, "true")
             : r.setAttribute(e, appState.patterns.activeSorting, "false");
-          r.setAttribute(e, appState.patterns.order, appState.orderValues[0]);
+          r.setAttribute(e, appState.patterns.order, "asc");
           r.setAttribute(
             e,
             appState.patterns.sort,
@@ -900,7 +900,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
               maskCell.setAttribute("data-willuse", tg.checked.toString());
               const mask = maskCell.querySelector(".regenerate"),
                 output = tg
-                  .closest(".mat-mdc-dialog-panel")
+                  .closest(`.${appState.classes.matDlgPn}`)
                   ?.querySelector(".masked-output"),
                 st = mask?.getAttribute("data-start");
               if (!(output instanceof HTMLElement && output.textContent) || !st)
@@ -993,11 +993,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       if (!(tb?.isConnected && tb instanceof HTMLTableElement))
         throw new Error(`Table could not be validated`);
-      const t = "mat-mdc-table",
-        hrc = "mat-mdc-header-row",
-        rc = "mat-mdc-table-row-alt",
-        hc = ["mat-mdc-header-cell", "columnheader"],
-        bc = ["mat-mdc-cell", "cell"],
+      const t = appState.classes.matTb,
+        hrc = appState.classes.matTrh,
+        rc = appState.classes.matTrAlt,
+        hc = [appState.classes.matTh, "columnheader"],
+        bc = [appState.classes.matTd, "cell"],
         rs = Array.from(tb.rows);
       if (!tb.classList.contains(t)) this._renderer.addClass(tb, t);
       for (let i = 0; i < rs.length; i++) {
@@ -1005,6 +1005,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         if (!i) !r.classList.contains(hrc) && this._renderer.addClass(r, hrc);
         else if (i % 2 === 1 && !r.classList.contains(rc))
           this._renderer.addClass(r, rc);
+        else this._renderer.addClass(r, appState.classes.matTr);
         for (const c of Array.from(r.cells)) {
           if (c.tagName.toLowerCase() === "th") {
             if (!c.classList.contains(hc[0])) this._renderer.addClass(c, hc[0]);
@@ -1035,21 +1036,21 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         propsList = [
           {
             idf: this.unchksId,
-            tp: "mat-button",
+            tp: appState.classes.matBtn,
             lb: "Uncheck All Masks",
             ic: "clear_all",
             lt: () => this.#executive?.toggleAllChecks(false),
           },
           {
             idf: "chkMasksBtn",
-            tp: "mat-button",
+            tp: appState.classes.matBtn,
             lb: "Check All Masks",
             ic: "done_all",
             lt: () => this.#executive?.toggleAllChecks(true),
           },
           {
             idf: "regenMasksBtn",
-            tp: "mat-button",
+            tp: appState.classes.matBtn,
             lb: "Regenerate All Masks",
             ic: "autorenew",
             lt: (ev: MouseEvent | PointerEvent) =>
@@ -1072,7 +1073,8 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           const props = propsList[i],
             b = btns[i];
           if (!props.sz) props.sz = "small";
-          if (!props.drt) props.drt = "mat-button";
+          if (!props.drt)
+            props.drt = appState.classes.matBtn as `mat-${string}`;
           for (const args of [
             ["id", props.idf],
             [props.tp, ""],

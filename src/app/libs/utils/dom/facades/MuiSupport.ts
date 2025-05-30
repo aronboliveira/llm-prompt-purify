@@ -5,6 +5,7 @@ import {
   ViewContainerRef,
 } from "@angular/core";
 import { MatTooltip } from "@angular/material/tooltip";
+import { appState } from "../../../state";
 
 export default class MuiSupport {
   public static generateBaseMuiIcon(
@@ -12,15 +13,15 @@ export default class MuiSupport {
     type: string
   ): HTMLElement | null {
     try {
-      const icon = r.createElement("mat-icon") as HTMLElement;
+      const icon = r.createElement(appState.classes.matIc) as HTMLElement;
       r.setProperty(icon, "innerText", type);
       for (const _cls of [
-        "material-icons",
-        "mat-icon",
-        "mat-mdc-icon",
-        "mat-icon-no-color",
-        "mat-button__icon",
-        "mat-ligature-font",
+        appState.classes.matIcs,
+        appState.classes.matIc,
+        appState.classes.matMdIcn,
+        appState.classes.matIcTp,
+        appState.classes.matIcBtn,
+        appState.classes.matLig,
         "notranslate",
       ])
         r.addClass(icon, _cls);

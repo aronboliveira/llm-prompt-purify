@@ -15,6 +15,7 @@ import {
 } from "@angular/material/dialog";
 import { MatIconModule } from "@angular/material/icon";
 import Swal from "sweetalert2";
+import { appState } from "../libs/state";
 @Component({
   selector: "app-prompt-table",
   standalone: true,
@@ -35,7 +36,9 @@ export class PromptTableComponent implements AfterViewInit {
         this.content?.nativeElement ||
         document.getElementById("promptTableContent");
       if (!content) return;
-      const container = content.closest(".mat-mdc-dialog-container.mdc-dialog");
+      const container = content.closest(
+        `.${appState.classes.matDlgCn}.${appState.classes.mdDlg}`
+      );
       if (!container) return;
       container.querySelectorAll("hr").forEach((hr, i, arr) => {
         for (const { k, v } of [
