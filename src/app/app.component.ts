@@ -324,7 +324,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             )
               this._renderer.setProperty(swalCancel, "title", tip);
             const handler = () => {
-              console.log(appState.maskChkCls);
               Array.from(
                 document.getElementsByClassName(appState.maskChkCls)
               ).forEach(e => {
@@ -435,14 +434,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
               const sm = document.createElement("small"),
                 cnt = document.getElementById("promptTableContent");
               sm.textContent = this.userInput;
-              sm.id = "inputReflex";
-              for (const { k, v } of [
-                { k: "opacity", v: "0.75" },
-                { k: "fontStyle", v: "italic" },
-                { k: "font-size", v: "0.8rem" },
-                { k: "display", v: "block" },
-              ])
-                this._renderer.setStyle(sm, k, v);
+              this._renderer.setAttribute(sm, "id", "inputReflex");
               await new Promise(resolve =>
                 this._zone.runOutsideAngular(() =>
                   setTimeout(() => this._zone.run(resolve), 300)
@@ -669,30 +661,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       cap.id = `captionScanResults`;
       cap.innerText = "Relation of patterns and suggested masks";
-      for (const { k, v } of [
-        { k: "fontSize", v: "0.8rem" },
-        { k: "opacity", v: "0.7" },
-        { k: "fontStyle", v: "italic" },
-        { k: "textAlign", v: "center" },
-        { k: "verticalAlign", v: "baseline" },
-        { k: "paddingBlock", v: "1rem" },
-      ]) {
-        try {
-          const dc = Object.getOwnPropertyDescriptor(cap.style, k);
-          if (!dc?.writable) continue;
-          cap.style.setProperty(
-            k
-              .replace(
-                /([a-záàâäãéèêëíìîïóòôöõúùûüçñ0-9])([A-ZÁÀÂÄÃÉÈÊËÍÌÎÏÓÒÔÖÕÚÙÛÜÇ])/g,
-                "$1-$2"
-              )
-              .toLowerCase(),
-            v
-          );
-        } catch (se) {
-          continue;
-        }
-      }
       targ.insertAdjacentElement("afterend", tb);
       th.insertRow();
       headers.forEach((h, i) => {
@@ -700,7 +668,6 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           const e = document.createElement("th");
           th.rows[0].appendChild(e);
           e.style.fontWeight = "bold";
-          r.setStyle(e, "verticalAlign", "bottom");
           const headerSpan = r.createElement("span") as HTMLSpanElement;
           r.setProperty(headerSpan, "innerText", h);
           r.appendChild(e, headerSpan);
@@ -713,6 +680,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             appState.patterns.sort,
             h.replace(/\s+/g, "_").toLowerCase()
           );
+          r.setAttribute(e, appState.patterns.col, (i + 1).toString());
           const icon = MuiSupport.generateBaseMuiIcon(r, "swap_vert");
           if (!icon) return;
           r.addClass(icon, "header-icon");
@@ -753,8 +721,10 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
           this._maskStorage.setMask(v, newWord);
           const row = tbd.insertRow(),
             idxCell = row.insertCell(),
-            labCell = row.insertCell();
-          r.setProperty(idxCell, "innerText", (i + 1).toString());
+            labCell = row.insertCell(),
+            idx = (i + 1).toString();
+          r.setProperty(idxCell, "innerText", idx);
+          r.setProperty(idxCell, appState.patterns.col, idx);
           for (const act of [
             (e: any) => {
               e.textContent = k
@@ -780,7 +750,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             { k: "data-idx", v: `mask_${i}` },
           ])
             maskCell.setAttribute(k, v);
-          maskCell.classList.add("mask-cell");
+          for (const { k, v } of [
+            { k: maskCell, v: appState.classes.maskCell },
+            { k: idxCell, v: appState.classes.idxCell },
+            { k: labCell, v: appState.classes.labCell },
+          ] as Array<{ k: HTMLElement; v: string }>)
+            r.addClass(k, v);
           const maskSpan = document.createElement("span"),
             cycleSpan = document.createElement("kbd");
           for (const act of [
@@ -964,25 +939,14 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       outp.innerText = this.userInput || "# FAILED TO CAPTURE USER INPUT ❌";
       outpTitle.innerText = this.title;
-      for (const { k, v } of [
-        { k: "margin", v: "1.5rem 1rem 0 1rem" },
-        { k: "font-size", v: "1.25rem" },
-        { k: "font-weight", v: "800" },
-      ])
-        r.setStyle(outpTitle, k, v);
+      r.setAttribute(outpTitle, "id", "outpTitle");
       if (tb.parentElement?.isConnected && outp.isConnected)
         r.insertBefore(tb.parentElement, outpTitle, outp);
       setTimeout(() => {
         if (!(tb.parentElement?.isConnected && outp.isConnected)) return;
         r.insertBefore(tb.parentElement, outpTitle, outp);
         const hr = r.createElement("hr");
-        for (const { k, v } of [
-          { k: "width", v: "90%" },
-          { k: "margin", v: "2rem 1rem" },
-          { k: "border", v: "1px solid #00025" },
-          { k: "opacity", v: "0.8" },
-        ])
-          r.setStyle(hr, k, v);
+        r.setAttribute(hr, "id", "outpHr");
         r.insertBefore(tb.parentElement, hr, outpTitle);
         this.#mountCtaForTable(tb);
       }, 250);
@@ -991,6 +955,34 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
         !this.#setMatTableStyles(tb) &&
           console.warn(`Failed to set Material Styles for Table`);
       }, 300);
+      setTimeout(() => {
+        const tb = document.getElementById(appState.ids.scanTab);
+        if (!tb) {
+          Swal.fire({
+            icon: "warning",
+            titleText: "Failed to index table cells",
+            text: "You will not be able to sort the columns!",
+          });
+          return;
+        }
+        const rows =
+          tb instanceof HTMLTableElement
+            ? Array.from(tb.rows)
+            : Array.from(tb.querySelectorAll('[class^="mat"][class*="-row"]'));
+        for (const r of rows) {
+          const cells =
+            r instanceof HTMLTableRowElement
+              ? Array.from(r.cells)
+              : Array.from(
+                  r.querySelectorAll('[class^="mat"][class*="-cell"]')
+                );
+          for (let j = 0; j <= cells.length; j++) {
+            const c = cells[j];
+            if (!(c instanceof HTMLElement)) continue;
+            c.setAttribute(appState.patterns.col, (j + 1).toString());
+          }
+        }
+      }, 500);
       return { table: tb, output: outp };
     } catch (e) {
       console.error(`Table mounting failed due to ${(e as Error).name}`);

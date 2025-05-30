@@ -95,7 +95,6 @@ export default class TableExecutive {
     this.#recollectAndSort();
   }
   #recollectAndSort() {
-    console.log("recollecting...");
     const pt = appState.patterns,
       rows =
         this.#table instanceof HTMLTableElement
@@ -122,13 +121,39 @@ export default class TableExecutive {
             h.getAttribute(pt.order) &&
             h.getAttribute(pt.activeSorting) === "true"
         );
-    sortingHeader instanceof HTMLElement &&
-      console.log(
-        "Table should be sorted by " +
-          sortingHeader.getAttribute(pt.sort) +
-          " in a " +
-          sortingHeader.getAttribute(pt.order) +
-          " order"
+    const cells = Array.from(
+        new Set(
+          [
+            ...Array.from(this.#table.getElementsByTagName("td")),
+            ...Array.from(this.#table.getElementsByClassName("mat-mdc-cell")),
+          ].filter(
+            c =>
+              c instanceof HTMLElement &&
+              !c.classList.contains("mat-mdc-header-cell")
+          )
+        )
+      ),
+      headerCells = Array.from(
+        new Set(
+          [
+            ...Array.from(this.#table.getElementsByTagName("th")),
+            ...Array.from(
+              this.#table.getElementsByClassName("mat-mdc-header-cell")
+            ),
+          ].filter(c => c instanceof HTMLElement)
+        )
       );
+    const cols = [];
+    for (const h of headerCells) {
+      const col = h.getAttribute(appState.patterns.col);
+      if (!col) continue;
+      const colCells = cells.filter(
+        c =>
+          c instanceof HTMLElement &&
+          c.getAttribute(appState.patterns.col) === col
+      );
+      cols.push([h, ...colCells]);
+    }
+    console.log(cols);
   }
 }
