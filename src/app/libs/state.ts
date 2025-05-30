@@ -13,8 +13,14 @@ export const appState = {
     order: "data-orderby",
     activeSorting: "data-activesorting",
     fixedTextbox: "data-fixedheight",
+    col: "data-col",
   },
   ids: {
     scanTab: "scanResults",
+  },
+  classes: {
+    idxCell: "idx-cell",
+    maskCell: "mask-cell",
+    labCell: "lab-cell",
   },
 };

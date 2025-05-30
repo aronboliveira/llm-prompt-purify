@@ -91,16 +91,13 @@
     }
     @media screen and (max-width: 570px) {
       display: grid;
-      grid-template-columns: 0.25fr 1fr 1fr 0.25fr; /* Title expands, button fits content */
-      grid-template-rows: repeat(
-        3,
-        1fr
-      ); /* Two rows: first for title/button, second for links */
+      grid-template-columns: 0.25fr 1fr 1fr 0.25fr;
+      grid-template-rows: repeat(3, 1fr);
       grid-template-areas:
         "logo title title title"
         "links links links links"
-        "scheme-toggle help fix-toggle fix-toggle"; /* Second row: links span both columns */
-      gap: 0.3rem; /* Space between grid items */
+        "scheme-toggle help fix-toggle fix-toggle";
+      gap: 0.3rem;
       vertical-align: middle;
       white-space: pre;
       align-items: center;
