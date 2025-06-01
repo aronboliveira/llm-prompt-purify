@@ -256,8 +256,9 @@
           }
         }
       }
-      span {
+      .header-label {
         vertical-align: text-top;
+        white-space: pre;
       }
     }
     .header-icon {
