@@ -38,6 +38,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import TableExecutive from "./libs/utils/dom/executives/TableExecutive";
 import MuiSupport from "./libs/utils/dom/facades/MuiSupport";
 import { nextTick } from "process";
+import { DomSanitizer } from "@angular/platform-browser";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -80,6 +81,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     private _zone: NgZone,
     private _view: ViewContainerRef,
     private _injector: Injector,
+    private _sanitizer: DomSanitizer,
     public dialog: MatDialog
   ) {}
   handleEnter(ev: KeyboardEvent): void {
@@ -665,32 +667,190 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       th.insertRow();
       headers.forEach((h, i) => {
         try {
-          const e = document.createElement("th");
+          const e = document.createElement("th"),
+            pt = appState.patterns;
           th.rows[0].appendChild(e);
           e.style.fontWeight = "bold";
-          const headerSpan = r.createElement("span") as HTMLSpanElement;
+          const headerSpan = r.createElement("span") as HTMLSpanElement,
+            headSorting = h.replace(/\s+/g, "_").toLowerCase();
+          r.addClass(headerSpan, "header-label");
           r.setProperty(headerSpan, "innerText", h);
           r.appendChild(e, headerSpan);
-          !i
-            ? r.setAttribute(e, appState.patterns.activeSorting, "true")
-            : r.setAttribute(e, appState.patterns.activeSorting, "false");
-          r.setAttribute(e, appState.patterns.order, "asc");
-          r.setAttribute(
-            e,
-            appState.patterns.sort,
-            h.replace(/\s+/g, "_").toLowerCase()
-          );
-          r.setAttribute(e, appState.patterns.col, (i + 1).toString());
+          for (const { k, v } of [
+            { k: pt.order, v: "asc" },
+            { k: pt.sort, v: headSorting },
+            { k: pt.col, v: (i + 1).toString() },
+            { k: "id", v: `header_${(i + 1).toString()}` },
+          ])
+            r.setAttribute(e, k, v);
+          r.setAttribute(e, pt.activeSorting, !i ? "true" : "false");
           const icon = MuiSupport.generateBaseMuiIcon(r, "swap_vert");
           if (!icon) return;
           r.addClass(icon, "header-icon");
-          r.setAttribute(icon, "title", "Click to sort the related column");
           this.#executive ??= new TableExecutive(tb);
-          r.listen(
-            icon,
-            "pointerup",
-            this.#executive.sortColumn.bind(this.#executive)
-          );
+          const txt = "Click to sort the related column";
+          if (
+            !MuiSupport.addTooltipToElement({
+              view: this._view,
+              injector: this._injector,
+              el: icon,
+              txt,
+            })
+          )
+            r.setAttribute(icon, "title", txt);
+          r.listen(icon, "pointerup", (ev: PointerEvent) => {
+            try {
+              if (!this.#executive) return;
+              const sorted = this.#executive.sortColumn.bind(this.#executive)(
+                ev
+              );
+              if (!sorted) return;
+              const res = sorted,
+                cellTargets = res.targets,
+                tbd = tb?.querySelector("tbody");
+              if (!cellTargets.length || !tbd) return;
+              const targCell =
+                ev.currentTarget instanceof HTMLElement
+                  ? ev.currentTarget.closest("th") ??
+                    ev.currentTarget.closest(`.${appState.classes.matTh}`)
+                  : null;
+              if (!targCell) return;
+              const colIdx = targCell.getAttribute(pt.col) || "",
+                uniqueRows = Array.from(
+                  new Set(
+                    cellTargets
+                      .map(cellEl =>
+                        cellEl instanceof Element ? cellEl.closest("tr") : null
+                      )
+                      .filter(
+                        (r): r is HTMLTableRowElement =>
+                          r instanceof HTMLTableRowElement
+                      )
+                  )
+                );
+              const execSortRows = (
+                rows: HTMLTableRowElement[],
+                direction: "asc" | "desc"
+              ): HTMLTableRowElement[] => {
+                const getCellInRow = (
+                  row: HTMLTableRowElement
+                ): HTMLElement | null => {
+                  return row.querySelector(
+                    `td[${pt.col}="${colIdx}"]`
+                  ) as HTMLElement | null;
+                };
+                return [...rows].sort((rowA, rowB) => {
+                  const cellA = getCellInRow(rowA),
+                    cellB = getCellInRow(rowB);
+                  console.warn([cellA, cellB]);
+                  if (!cellA && !cellB) return 0;
+                  if (!cellA) return direction === "desc" ? 1 : -1;
+                  if (!cellB) return direction === "desc" ? -1 : 1;
+                  const criteria = (
+                    targCell.getAttribute(pt.sort) || "index"
+                  ).toLowerCase();
+                  let result = 0;
+                  if (criteria.includes("pattern")) {
+                    console.log("pattern case");
+                    const textA = (
+                        cellA.textContent ||
+                        cellA.innerText ||
+                        ""
+                      ).trim(),
+                      textB = (
+                        cellB.textContent ||
+                        cellB.innerText ||
+                        ""
+                      ).trim();
+                    result = textA.localeCompare(
+                      textB,
+                      [
+                        "pt",
+                        "de",
+                        "es",
+                        "hb",
+                        "in",
+                        "ja",
+                        "ko",
+                        "zh",
+                        "ru",
+                        "fr",
+                        "it",
+                      ],
+                      {
+                        sensitivity: "base",
+                        numeric: false,
+                        caseFirst: "false",
+                        ignorePunctuation: false,
+                      }
+                    );
+                  } else if (criteria.includes("suggested")) {
+                    console.log("suggest case");
+                    const toCodePoints = (str: string) =>
+                        Array.from(str).map(ch => ch.codePointAt(0) || 0),
+                      uA = toCodePoints(
+                        (cellA.textContent || cellA.innerText || "").trim()
+                      ),
+                      uB = toCodePoints(
+                        (cellB.textContent || cellB.innerText || "").trim()
+                      );
+                    for (let i = 0; i < Math.min(uA.length, uB.length); i++) {
+                      if (uA[i] !== uB[i]) {
+                        result = uA[i] - uB[i];
+                        break;
+                      }
+                    }
+                    if (result === 0) result = uA.length - uB.length;
+                  } else if (criteria.includes("use_mask")) {
+                    console.log("mask case");
+                    const cboxA = cellA.querySelector(
+                        'input[type="checkbox"]'
+                      ) as HTMLInputElement | null,
+                      cboxB = cellB.querySelector(
+                        'input[type="checkbox"]'
+                      ) as HTMLInputElement | null,
+                      checkedA = cboxA?.checked || false,
+                      checkedB = cboxB?.checked || false;
+                    if (checkedA === checkedB) {
+                      const textA = (
+                          cellA.textContent ||
+                          cellA.innerText ||
+                          ""
+                        ).trim(),
+                        textB = (
+                          cellB.textContent ||
+                          cellB.innerText ||
+                          ""
+                        ).trim();
+                      result = textA.localeCompare(textB);
+                    } else result = Number(checkedB) - Number(checkedA);
+                  } else {
+                    console.warn("numeric case");
+                    const parseNumeric = (el: HTMLElement): number => {
+                      const match = (el.textContent || el.innerText || "")
+                          .trim()
+                          .match(/-?\d+(\.\d+)?/),
+                        num = match ? parseFloat(match[0]) : NaN;
+                      return Number.isFinite(num) ? num : 0;
+                    };
+                    result = parseNumeric(cellA) - parseNumeric(cellB);
+                  }
+                  return direction === "desc" ? -result : result;
+                });
+              };
+              const direction =
+                  (
+                    targCell.getAttribute(appState.patterns.order) || "asc"
+                  ).toLowerCase() === "desc"
+                    ? "desc"
+                    : "asc",
+                sortedRows = execSortRows(uniqueRows, direction);
+              tbd.innerHTML = "";
+              for (const row of sortedRows) r.appendChild(tbd, row);
+            } catch (e) {
+              console.error(`Failed to sort:\n\n${e}`);
+            }
+          });
           r.appendChild(e, icon);
         } catch (e) {
           // Fail silently
@@ -980,6 +1140,16 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
             const c = cells[j];
             if (!(c instanceof HTMLElement)) continue;
             c.setAttribute(appState.patterns.col, (j + 1).toString());
+            c.setAttribute(
+              appState.patterns.refHead,
+              Array.from(
+                tb.getElementsByClassName(appState.classes.matTh)
+              ).find(
+                h =>
+                  h.getAttribute(appState.patterns.col) ===
+                  c.getAttribute(appState.patterns.col)
+              )?.id ?? `header_1`
+            );
           }
         }
       }, 500);

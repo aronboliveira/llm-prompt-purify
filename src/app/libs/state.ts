@@ -14,6 +14,7 @@ export const appState = {
     activeSorting: "data-activesorting",
     fixedTextbox: "data-fixedheight",
     col: "data-col",
+    refHead: "data-headref",
   },
   ids: {
     scanTab: "scanResults",
