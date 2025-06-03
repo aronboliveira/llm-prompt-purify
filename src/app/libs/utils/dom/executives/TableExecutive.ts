@@ -116,7 +116,6 @@ export default class TableExecutive {
       return null;
     }
   }
-
   #getTargets(
     targCell: HTMLElement
   ): { all: Element[]; targets: Element[] } | null {
