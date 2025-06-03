@@ -37,7 +37,6 @@ import { MaskStorageService } from "./libs/services/mask-storage.service";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import TableExecutive from "./libs/utils/dom/executives/TableExecutive";
 import MuiSupport from "./libs/utils/dom/facades/MuiSupport";
-import { nextTick } from "process";
 import { DomSanitizer } from "@angular/platform-browser";
 @Component({
   selector: "app-root",
@@ -633,7 +632,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       1000
     );
     !this.input?.nativeElement
-      ? nextTick(() => setTimeout(addHandlers, 200))
+      ? queueMicrotask(() => setTimeout(addHandlers, 200))
       : addHandlers();
   }
   #mountTable(
