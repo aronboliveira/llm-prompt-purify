@@ -100,57 +100,125 @@
   gap: $gap-sm;
 }
 @mixin dark-swal {
-  .swal2-container {
-    background-color: rgba(0, 0, 0, 0.75);
+  .swal2- {
+    &actions {
+      color: $dark-text !important;
+      @include interactive-states($dark-header-hover-bg, $dark-header-bg);
+      .swal2- {
+        &cancel,
+        &deny {
+          background-color: rgb(221 151 51 / 71%) !important;
+        }
+        &confirm.swal2-styled {
+          background-color: rgb(15 124 32) !important;
+        }
+      }
+    }
+    &container {
+      background-color: rgba(0, 0, 0, 0.75);
+    }
+    &icon-warning {
+      background-color: #1e1e1e;
+      color: $dark-text;
+      svg {
+        fill: $dark-text;
+      }
+    }
+    &popup {
+      @include dialog-surface(#1e1e1e, $dark-text);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      &.swal2-modal {
+        max-width: 90vw;
+      }
+    }
+    &show {
+      animation: swal2-show 0.3s;
+    }
+    &toast {
+      @include dialog-surface($dark-cell-bg, $dark-text);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      .swal2- {
+        &title,
+        &content {
+          color: $dark-text;
+        }
+      }
+    }
+    &title,
+    &content {
+      color: $dark-text !important;
+    }
   }
-
-  .swal2-popup {
-    @include dialog-surface(#1e1e1e, $dark-text);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-  }
-
-  // SweetAlert “modal” variant
-  .swal2-popup.swal2-modal {
-    max-width: 90vw;
-  }
-
-  .swal2-icon-warning {
-    background-color: #1e1e1e;
-    color: $dark-text;
-    svg {
-      fill: $dark-text;
+}
+@mixin dark-theme-overrides {
+  html {
+    scrollbar-color: #fff4 #1115;
+    &:has(body.dark-theme) {
+      background-color: $dark-base;
+    }
+    &:has(body.dark-theme.toggled-theme) {
+      background-color: $dark-base !important;
     }
   }
 
-  .swal2-show {
-    animation: swal2-show 0.3s;
+  body {
+    @include dark-swal;
   }
 
-  .swal2-toast {
-    @include dialog-surface($dark-cell-bg, $dark-text);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  }
-  .swal2-toast .swal2-title,
-  .swal2-toast .swal2-content {
-    color: $dark-text;
-  }
-
-  .swal2-title,
-  .swal2-content {
-    color: $dark-text !important;
-  }
-
-  button.swal2-actions {
-    background-color: $dark-header-bg !important;
-    &.swal-confirm {
-      background-color: rgb(15 124 32) !important;
+  .cdk-overlay-container {
+    .mat-mdc-dialog-container,
+    .mdc-dialog__surface {
+      @include dialog-surface($dark-cell-bg, $dark-text);
+      * {
+        border-color: $dark-background-color !important;
+      }
     }
-    &.swal-cancel,
-    &.swal-deny {
-      background-color: rgb(221 151 51 / 71%) !important;
+    .mat-mdc-dialog {
+      &-content {
+        @include dialog-scrollbar-dark;
+        table.mat-mdc-table {
+          @include zebra-stripes($dark-alt-row-bg);
+          th.mat-mdc-header-cell {
+            @include text-theme;
+            @include mat-header-cell;
+            background-color: $dark-header-bg;
+            &:hover {
+              background-color: $dark-header-hover-bg;
+            }
+          }
+          td.mat-mdc-cell {
+            @include text-theme;
+            @include mat-cell;
+            background-color: $dark-cell-bg;
+          }
+        }
+      }
+      &-title {
+        @include text-theme;
+      }
     }
-    color: $dark-text !important;
-    @include interactive-states($dark-header-hover-bg, $dark-header-bg);
+  }
+
+  #mainContainer {
+    background-color: $dark-base;
+
+    input,
+    textarea,
+    p,
+    mat-select,
+    mat-label,
+    .mat-mdc-form-field-infix {
+      color: #eeee;
+    }
+
+    .mdc-button--raised,
+    mat-icon {
+      filter: invert(0.85);
+    }
+
+    .mat-icon {
+      color: rgb(10, 10, 10);
+    }
   }
 }
 @mixin delined-pseudo-elements {
@@ -174,7 +242,7 @@
   border-radius: 0.75rem;
   *,
   .mat-mdc-dialog-title {
-    color: rgba(255, 255, 255, 0.87);
+    @include text-theme;
   }
   summary {
     h2,
@@ -183,6 +251,28 @@
       font-weight: 550;
       font-size: 1.2rem !important;
       margin-left: 0.75rem;
+      @include text-theme;
+    }
+  }
+}
+@mixin dialog-surface-dark($bg: $dark-background-color, $fg: $dark-text-color) {
+  background-color: $bg !important;
+  color: $fg !important;
+  border-radius: 0.75rem !important;
+
+  *,
+  .mat-mdc-dialog-title {
+    color: $fg !important;
+  }
+
+  summary {
+    h2,
+    h3,
+    h4 {
+      font-weight: 550 !important;
+      font-size: 1.2rem !important;
+      margin-left: 0.75rem !important;
+      color: $fg !important;
     }
   }
 }
@@ -190,6 +280,193 @@
   ::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: $gap-tn;
+  }
+}
+@mixin light-theme-overrides {
+  scrollbar-color: #1115 #fff4;
+
+  #mainContainer {
+    background-color: $background-color;
+
+    .mdc-button--raised,
+    mat-icon {
+      filter: invert(0);
+    }
+
+    input,
+    textarea,
+    p,
+    mat-select,
+    mat-label,
+    .mat-mdc-form-field-infix {
+      color: $text-color !important;
+    }
+  }
+
+  .cdk-overlay-container {
+    .mat-mdc- {
+      &content {
+        ::-webkit-scrollbar-thumb {
+          background-color: $scrollbar-thumb;
+        }
+      }
+
+      &dialog-title {
+        color: $text-color;
+      }
+
+      &table {
+        @include zebra-stripes($zebra-stripe);
+
+        th.mat-mdc-header-cell {
+          @include mat-header-cell;
+          background-color: var(--header-row-bg);
+          color: $text-color;
+
+          &:hover {
+            background-color: $hover-bg;
+          }
+        }
+
+        td.mat-mdc-cell {
+          @include mat-cell;
+          background-color: $background-color;
+          color: $text-color;
+
+          &:hover {
+            background-color: lighten($background-color, 5%);
+          }
+        }
+      }
+    }
+
+    .mat-mdc-dialog-container,
+    .mdc-dialog__surface {
+      @include dialog-surface($background-color, $text-color);
+    }
+  }
+
+  .regenerate-btn,
+  .regenerate {
+    border: solid 0.1rem $regenerate-border !important;
+  }
+
+  .swal2 {
+    &-actions {
+      &:hover {
+        background-color: rgba(232, 232, 232, 0.85);
+      }
+    }
+
+    &-icon {
+      &-warning {
+        background-color: #ffffff;
+        color: $text-color;
+
+        svg {
+          fill: $text-color;
+        }
+      }
+    }
+
+    &-popup {
+      background-color: $swal2-popup-bg;
+      opacity: 0.95;
+
+      * {
+        color: $text-color !important;
+      }
+
+      button {
+        font-weight: 550;
+      }
+
+      .swal2-html-container {
+        opacity: 0.8;
+      }
+    }
+
+    &-container {
+      background-color: $swal2-popup-bg;
+    }
+
+    &-toast {
+      @include dialog-surface($swal2-toast-bg, $text-color);
+      box-shadow: 0 2px 6px $swal2-toast-shadow;
+
+      .swal2 {
+        &-title,
+        &-content {
+          color: $text-color;
+        }
+      }
+    }
+  }
+
+  &.toggled-theme {
+    .cdk-overlay-container {
+      .mat-mdc-dialog-container,
+      .mdc-dialog__surface {
+        @include dialog-surface($background-color, $text-color);
+        @include text-tag-theme();
+      }
+      .mat-mdc {
+        &-dialog {
+          &-content {
+            ::-webkit-scrollbar-thumb {
+              background-color: $scrollbar-thumb !important;
+            }
+            table.mat-mdc-table {
+              @include zebra-stripes($dark-alt-row-bg);
+              th.mat-mdc-header-cell {
+                color: $text-color !important;
+                @include mat-header-cell;
+                background-color: darken($zebra-stripe, 5%);
+                &:hover {
+                  background-color: $dark-header-hover-bg;
+                }
+              }
+              td.mat-mdc-cell {
+                color: $text-color !important;
+                @include mat-cell;
+                background-color: darken($zebra-stripe, 2%);
+              }
+            }
+          }
+
+          &-title {
+            color: $text-color !important;
+          }
+        }
+
+        &-table {
+          @include zebra-stripes($zebra-stripe);
+
+          tbody tr:nth-child(odd) {
+            th#{&}-header-cell {
+              @include mat-header-cell;
+              background-color: $dark-header-bg !important;
+              color: $text-color !important;
+
+              &:hover {
+                background-color: $hover-bg !important;
+              }
+            }
+
+            td#{&}-cell,
+            td.mat-mdc-cell {
+              padding: $gap-md $gap-sm !important;
+              background-color: $background-color !important;
+              color: $text-color !important;
+
+              &:hover {
+                background-color: lighten($background-color, 5%) !important;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 @mixin modal-footer-btn {
@@ -235,67 +512,16 @@
     background-color: $bg-active;
   }
 }
-@mixin light-theme-overrides {
-  scrollbar-color: #1115 #fff4;
-
-  #mainContainer {
-    background-color: $background-color;
-    .mdc-button--raised,
-    mat-icon {
-      filter: invert(0);
-    }
-    input,
-    textarea,
-    p,
-    mat-select,
-    mat-label,
-    .mat-mdc-form-field-infix {
-      color: $text-color !important;
-    }
+@mixin interactive-states-dark(
+  $bg-hover: $dark-hover-bg,
+  $bg-active: $dark-active-bg
+) {
+  &:hover {
+    background-color: $bg-hover !important;
+    cursor: pointer !important;
   }
-
-  .cdk-overlay-container {
-    .mat-mdc-table {
-      @include zebra-stripes(#f2f2f2);
-
-      th.mat-mdc-header-cell {
-        @include mat-header-cell;
-        background-color: var(--header-row-bg);
-        color: $text-color;
-        &:hover {
-          background-color: $hover-bg;
-        }
-      }
-
-      td.mat-mdc-cell {
-        @include mat-cell;
-        background-color: $background-color;
-        color: $text-color;
-        &:hover {
-          background-color: lighten($background-color, 5%);
-        }
-      }
-    }
-
-    .mat-mdc-dialog-title {
-      color: $text-color;
-    }
-
-    .mat-mdc-dialog-container,
-    .mdc-dialog__surface {
-      @include dialog-surface($background-color, $text-color);
-    }
-
-    .mat-mdc-dialog-content {
-      ::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.2);
-      }
-    }
-  }
-
-  .regenerate-btn,
-  .regenerate {
-    border: solid 0.1rem rgba(0, 0, 0, 0.27) !important;
+  &:active {
+    background-color: $bg-active !important;
   }
 }
 @mixin mat-header-row($bg: var(--header-row-bg, #ececec)) {
@@ -309,6 +535,15 @@
   background-color: rgba(0, 0, 0, 0.04);
   @include interactive-states();
 }
+@mixin mat-header-cell-dark {
+  padding: $gap-md $gap-sm !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  @include interactive-states-dark;
+}
+
 @mixin mat-cell {
   padding: $gap-md $gap-sm;
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
@@ -346,8 +581,70 @@
     transform: translateY(-2px);
   }
 }
+@mixin text-theme {
+  @media (prefers-color-scheme: light) {
+    color: $text-color;
+  }
+  @media (prefers-color-scheme: dark) {
+    color: $dark-text;
+  }
+  &.dark-theme {
+    color: $dark-text;
+    &.toggled-theme {
+      color: $dark-text !important;
+    }
+  }
+  &.light-theme {
+    color: $text-color;
+    &.toggled-theme {
+      color: $text-color !important;
+    }
+  }
+}
+@mixin text-tag-theme($color: $text-color) {
+  span,
+  div,
+  small,
+  strong,
+  b,
+  em,
+  h1,
+  h2 h3,
+  h4,
+  h5,
+  h6 {
+    color: $color !important;
+    * {
+      color: $color;
+    }
+  }
+}
 @mixin zebra-stripes($alt-bg) {
-  tbody tr:nth-child(odd) td.mat-mdc-cell {
-    background-color: $alt-bg;
+  tbody {
+    tr {
+      &:nth-child(odd) {
+        td {
+          &.mat-mdc-cell {
+            background-color: $alt-bg;
+            &.toggled-theme {
+              background-color: $alt-bg !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@mixin zebra-stripes-dark($alt-bg) {
+  tbody {
+    tr {
+      &:nth-child(odd) {
+        td {
+          &.mat-mdc-cell {
+            background-color: $alt-bg;
+          }
+        }
+      }
+    }
   }
 }

@@ -271,8 +271,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       if (txt?.length) await new Promise(resolve => setTimeout(resolve, 1000));
       else await new Promise(resolve => setTimeout(resolve, 200));
       Swal.hideLoading();
-      if (loadingId && typeof loadingId.close === "function") loadingId.close();
-      else Swal.close();
+      loadingId && typeof loadingId.close === "function"
+        ? loadingId.close()
+        : Swal.close();
       if (txt?.length) await new Promise(resolve => setTimeout(resolve, 250));
       else await new Promise(resolve => setTimeout(resolve, 200));
       if (!winner || !txt) return;

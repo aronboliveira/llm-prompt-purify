@@ -26,43 +26,154 @@ body {
     .cdk-overlay-container {
       .mat-mdc-table {
         @include zebra-stripes($dark-alt-row-bg);
-
         th.mat-mdc-header-cell {
+          @include text-theme;
           background-color: $dark-header-bg;
-          color: $dark-text;
           border-bottom: 1px solid #757575;
-
+          &.toggled-theme {
+            background-color: $dark-header-bg !important;
+            border-bottom-color: 1px solid #757575 !important;
+          }
           &:hover {
             background-color: $dark-header-hover-bg;
+            &.toggled-theme {
+              background-color: $dark-header-hover-bg !important;
+            }
           }
         }
-
         td.mat-mdc-cell {
+          @include text-theme;
           background-color: $dark-cell-bg;
-          color: $dark-text;
           border-bottom: 1px solid #555;
-
+          &.toggled-theme {
+            background-color: $dark-cell-bg !important;
+            border-bottom: 1px solid #555 !important;
+          }
           &:hover {
             background-color: $dark-header-hover-bg;
+            &.toggled-theme {
+              background-color: $dark-header-hover-bg !important;
+            }
           }
         }
       }
-
       .mat-mdc-dialog-title {
-        color: $dark-text;
+        color: $dark-text !important;
+        * {
+          color: $dark-text !important;
+        }
       }
-
       .mat-mdc-dialog-container,
       .mdc-dialog__surface {
+        color: $dark-text !important;
         background-color: $dark-cell-bg;
-        color: $dark-text;
+        &.toggled-theme {
+          background-color: $dark-cell-bg !important;
+          @include text-tag-theme($dark-text);
+        }
+        * {
+          color: $dark-text !important;
+        }
       }
 
       .mat-mdc-dialog-content {
         @include dialog-scrollbar-dark;
       }
     }
+    &.toggled-theme {
+      @include text-tag-theme($dark-text);
+      .cdk-overlay-container {
+        .mat-mdc-table {
+          @include zebra-stripes($dark-alt-row-bg);
+          th.mat-mdc-header-cell {
+            color: $dark-text !important;
+            background-color: $dark-header-bg !important;
+            border-bottom: 1px solid #757575 !important;
+            &:hover {
+              background-color: $dark-header-hover-bg !important;
+            }
+          }
+          td.mat-mdc-cell {
+            color: $dark-text !important;
+            background-color: $dark-cell-bg !important;
+            border-bottom: 1px solid #555 !important;
+            &:hover {
+              background-color: $dark-header-hover-bg !important;
+            }
+          }
+        }
+        .mat-mdc-dialog-container,
+        .mdc-dialog__surface {
+          color: $dark-text !important;
+          background-color: $dark-cell-bg !important;
+        }
+        .mat-mdc {
+          &-dialog {
+            &-content {
+              @include dialog-scrollbar-dark;
+            }
+            &-title {
+              color: $dark-text !important;
+            }
+          }
+        }
+      }
+      .swal2 {
+        &-actions {
+          &:hover {
+            background-color: darken($dark-background-color, 3%) !important;
+          }
+        }
+
+        &-icon {
+          &-warning {
+            color: $dark-text !important;
+
+            svg {
+              fill: $dark-text !important;
+            }
+          }
+        }
+
+        &-popup {
+          background-color: $dark-background-color;
+          opacity: 0.95;
+
+          * {
+            color: $dark-text !important;
+          }
+
+          button {
+            font-weight: 550;
+          }
+
+          .swal2-html-container {
+            opacity: 0.8;
+          }
+        }
+
+        &-toast {
+          @include dialog-surface($dark-base, $dark-text);
+          box-shadow: 0 2px 6px $swal2-toast-shadow;
+
+          .swal2 {
+            &-title,
+            &-content {
+              color: $dark-text !important;
+            }
+          }
+        }
+      }
+      .mdc-button {
+        color: #005cbb !important;
+        *,
+        &__label {
+          color: #005cbb !important;
+        }
+      }
+    }
     @include dark-swal;
+    @include dark-theme-overrides;
   }
   &.light-theme {
     @include light-theme-overrides;
@@ -216,6 +327,15 @@ mat-dialog-container,
   }
 }
 
+.swal2- {
+  &actions,
+  &confirm,
+  &cancel,
+  &deny {
+    @include moving-button(-2px, 2px);
+  }
+}
+
 #promptInput {
   height: 5rem;
   min-height: 5rem !important;
@@ -231,80 +351,27 @@ mat-dialog-container,
 }
 
 @media (prefers-color-scheme: dark) {
-  $dark-base: #3b3b3b;
-
+  @include dark-theme-overrides;
   html {
-    background-color: $dark-base;
-    scrollbar-color: #fff4 #1115;
     &:has(body.light-theme) {
       background-color: #ffff;
     }
-  }
-
-  body {
-    @include dark-swal;
-  }
-
-  .cdk-overlay-container {
-    .mat-mdc-dialog-container,
-    .mdc-dialog__surface {
-      @include dialog-surface($dark-cell-bg, $dark-text);
-    }
-
-    .mat-mdc-dialog-content {
-      table.mat-mdc-table {
-        @include zebra-stripes($dark-alt-row-bg);
-
-        th.mat-mdc-header-cell {
-          @include mat-header-cell;
-          background-color: $dark-header-bg;
-          color: $dark-text;
-
-          &:hover {
-            background-color: $dark-header-hover-bg;
-          }
-        }
-
-        td.mat-mdc-cell {
-          @include mat-cell;
-          background-color: $dark-cell-bg;
-          color: $dark-text;
-        }
-      }
-
-      @include dialog-scrollbar-dark;
-    }
-
-    .mat-mdc-dialog-title {
-      color: $dark-text;
-    }
-  }
-
-  #mainContainer {
-    background-color: $dark-base;
-
-    input,
-    textarea,
-    p,
-    mat-select,
-    mat-label,
-    .mat-mdc-form-field-infix {
-      color: #eeee;
-    }
-
-    .mdc-button--raised,
-    mat-icon {
-      filter: invert(0.85);
-    }
-
-    .mat-icon {
-      color: rgb(10, 10, 10);
+    &:has(body.light-theme.toggled-theme) {
+      background-color: #ffff !important;
     }
   }
 }
 
 @media (prefers-color-scheme: light) {
-  body:not(.dark-theme):not(.light-theme) {
+  body:not(.dark-theme) {
     @include light-theme-overrides;
+  }
+  html {
+    &:has(body.dark-theme) {
+      background-color: $dark-background-color;
+    }
+    &:has(body.dark-theme.toggled-theme) {
+      background-color: $dark-background-color !important;
+    }
   }
 }

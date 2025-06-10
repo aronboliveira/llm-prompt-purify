@@ -17,6 +17,7 @@ $text-color: #333;
 $background-color: #fff;
 $warn: #ffeb3b;
 
+$header-bg: lighten(rgba(255, 255, 255), 90%);
 $hover-bg: lighten($primary-color, 20%);
 $active-bg: darken($primary-color, 10%);
 
@@ -24,8 +25,24 @@ $border-radius: 4px;
 
 $transition-speed: 0.3s;
 
+$scrollbar-thumb: rgba(0, 0, 0, 0.2);
+$regenerate-border: rgba(0, 0, 0, 0.27);
+$zebra-stripe: #f2f2f2;
+$swal2-popup-bg: rgba(239, 239, 239, 0.8);
+$swal2-container-bg: rgb(228, 228, 228);
+$swal2-toast-bg: #fffe;
+$swal2-toast-shadow: rgba(226, 226, 226, 0.5);
+$zebra-stripe: #f2f2f2;
+
+$dark-base: #3b3b3b;
 $dark-header-bg: #616161;
 $dark-header-hover-bg: #4a4a4a;
 $dark-cell-bg: #424242;
 $dark-alt-row-bg: #373737;
 $dark-text: rgba(255, 255, 255, 0.87);
+$dark-zebra-stripe: #373737;
+$dark-hover-bg: #4a4a4a;
+$dark-active-bg: darken($dark-hover-bg, 10%);
+$dark-background-color: #424242;
+$dark-text-color: rgba(255, 255, 255, 0.87);
+$dark-scrollbar-thumb: rgba(255, 255, 255, 0.2);
