@@ -29,7 +29,7 @@ export class ThemeService {
     return this.#dark.value;
   }
   toggle(): void {
-    this.#toggleBodyClass(!this.#dark.value);
+    this.#toggleBodyClass(!this.#dark.value, true);
   }
   #applyOsPref(): void {
     try {
@@ -41,17 +41,55 @@ export class ThemeService {
       this.#dark.next(false);
     }
   }
-  #toggleBodyClass(scheme: boolean = false): void {
+  #toggleBodyClass(scheme: boolean = false, event: boolean = false): void {
     try {
       const dt = "dark-theme",
         lt = "light-theme";
       this.#dark.next(scheme);
       if (typeof window === "undefined") return;
       const toggle = (schemeOn: string, schemeOff: string) => {
-        this._renderer?.removeClass(this._document.body, schemeOff) ??
-          this._document.body.classList.remove(schemeOff);
-        this._renderer?.addClass(this._document.body, schemeOn) ??
-          this._document.body.classList.add(schemeOn);
+        if (event) {
+          new Set([
+            this._document.body,
+            ...[
+              "matTh",
+              "matTd",
+              "matIc",
+              "matBtn",
+              "matMdIcn",
+              "matIcBtn",
+              "matTt",
+              "matDlgCn",
+              "matDlgSr",
+            ].flatMap(cls =>
+              Array.from(
+                this._document.getElementsByClassName(
+                  (appState.classes as any)[cls]
+                )
+              )
+            ),
+          ]).forEach(e => {
+            try {
+              if (e.classList.contains(schemeOff))
+                this._renderer?.removeClass(e, schemeOff) ??
+                  this._document.body.classList.remove(schemeOff);
+              if (!e.classList.contains(schemeOn))
+                this._renderer?.addClass(e, schemeOn) ??
+                  this._document.body.classList.add(schemeOn);
+              const toggled = "toggled-theme";
+              if (!e.classList.contains(toggled))
+                this._renderer?.addClass(e, toggled) ??
+                  this._document.body.classList.add("toggled-theme");
+            } catch (e) {
+              // fail silently
+            }
+          });
+        } else {
+          this._renderer?.removeClass(this._document.body, schemeOff) ??
+            this._document.body.classList.remove(schemeOff);
+          this._renderer?.addClass(this._document.body, schemeOn) ??
+            this._document.body.classList.add(schemeOn);
+        }
         try {
           const res = ThemeService.getStoredScheme();
           if (!res?.dict) throw TypeError(`Scheme key was not found`);

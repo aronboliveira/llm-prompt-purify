@@ -32,6 +32,7 @@ export const appState = {
     matDlgCn: "mat-mdc-dialog-container",
     matDlgCt: "mat-mdc-dialog-content",
     matDlgPn: "mat-mdc-dialog-panel",
+    matDlgSr: "mdc-dialog__surface",
     mdDlg: "mdc-dialog",
     matBtn: "mat-button",
     matIcs: "material-icons",
@@ -40,5 +41,6 @@ export const appState = {
     matIcTp: "mat-icon-no-color",
     matIcBtn: "mat-button__icon",
     matLig: "mat-ligature-font",
+    matTt: "mat-mdc-dialog-title",
   },
 };
