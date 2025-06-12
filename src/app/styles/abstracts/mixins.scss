@@ -343,6 +343,15 @@
     .mat-mdc-dialog-container,
     .mdc-dialog__surface {
       @include dialog-surface($background-color, $text-color);
+      .fs {
+        &-copy,
+        &-scroll-down {
+          border: none !important;
+        }
+      }
+      *:not(.skip-white-border) {
+        border-color: #eee !important;
+      }
     }
   }
 
