@@ -5,6 +5,7 @@ import {
   ElementRef,
   ViewChild,
   Renderer2,
+  NgZone,
 } from "@angular/core";
 import { MatButton } from "@angular/material/button";
 import { MatCheckboxModule } from "@angular/material/checkbox";
@@ -14,8 +15,9 @@ import { HelpToggleComponent } from "../help-toggle/help-toggle.component";
 import { MatDialogModule } from "@angular/material/dialog";
 import { CommonModule } from "@angular/common";
 import { ThemeToggleComponent } from "../theme-toggle/theme-toggle.component";
+const selector = "app-fixed-header";
 @Component({
-  selector: "app-fixed-header",
+  selector,
   templateUrl: "./fixed-header.component.html",
   styleUrls: ["./fixed-header.component.scss"],
   imports: [
@@ -41,7 +43,7 @@ export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
   #positionInterval: NodeJS.Timeout | number | undefined;
   #subscriptions = new Subscription();
   isHelpOpen = false;
-  constructor(private _renderer: Renderer2) {}
+  constructor(private _renderer: Renderer2, private _zone: NgZone) {}
   ngAfterViewInit(): void {
     if (typeof window === "undefined") return;
     if (!(this.header.nativeElement instanceof HTMLElement)) return;
@@ -89,6 +91,36 @@ export class FixedHeaderComponent implements AfterViewInit, OnDestroy {
         }
       }, 250);
     this.header.nativeElement.setAttribute(`data-${atl}`, "true");
+    const adjustMainPdg = (): void => {
+      const flag = "data-padding-main";
+      if (window == undefined || document.body.getAttribute(flag) === "true")
+        return;
+      if (window == undefined) return;
+      const mainEl =
+        document.getElementById("main") ||
+        document.querySelector(".main") ||
+        document.querySelector(selector)?.nextElementSibling;
+      if (!(mainEl instanceof HTMLElement && mainEl.isConnected)) return;
+      const hd = document.querySelector("header");
+      if (!(hd instanceof HTMLElement && hd.isConnected)) return;
+      mainEl.style.marginTop = `${hd.clientHeight * 0.6}px`;
+      setInterval(() => {
+        if (window == undefined) return;
+        const mainEl =
+          document.getElementById("main") ||
+          document.querySelector(".main") ||
+          document.querySelector(selector)?.nextElementSibling;
+        if (!(mainEl instanceof HTMLElement && mainEl.isConnected)) return;
+        const hd = document.querySelector("header");
+        if (!(hd instanceof HTMLElement && hd.isConnected)) return;
+        mainEl.style.marginTop = `${hd.clientHeight * 0.6}px`;
+      }, 250);
+      document.body.setAttribute(flag, "true");
+    };
+    this._zone.runOutsideAngular(() => {
+      if (window === undefined) setTimeout(adjustMainPdg, 1000);
+      else adjustMainPdg();
+    });
   }
   ngOnDestroy(): void {
     this.#scrollSubscription?.unsubscribe();

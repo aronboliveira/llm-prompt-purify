@@ -18,6 +18,10 @@ body {
   height: 100%;
 }
 
+main {
+  transition: margin-top 0.3s ease;
+}
+
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
