@@ -779,9 +779,9 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                       ],
                       {
                         sensitivity: "base",
-                        numeric: false,
                         caseFirst: "false",
                         ignorePunctuation: false,
+                        numeric: false,
                       }
                     );
                   } else if (criteria.includes("suggested")) {
