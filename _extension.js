@@ -338,6 +338,8 @@ javascript: (() => {
     styleCls = "show",
     alertCls = "simple-floating-alert",
     marginFlag = "data-adjusting-margin",
+    positionFlag = "data-positioning-alert",
+    updateFlag = "data-listening-update",
     gpsPrompt = "prompt-textarea",
     dsPrompt = "chat-input",
     claudeFb = ".ProseMirror",
@@ -360,6 +362,10 @@ javascript: (() => {
       this.injectCSS();
       this.createAlert();
       this.setupPositionTracking();
+      if (document.body.getAttribute(positionFlag) !== "true") {
+        setInterval(this._updatePosition, 1000);
+        document.body.setAttribute(positionFlag, "true");
+      }
     }
     injectCSS() {
       if (document.getElementById(styleIdf)) return;
@@ -412,22 +418,34 @@ javascript: (() => {
       document.body.appendChild(this.alert);
     }
     setupPositionTracking() {
-      this.updatePosition = () => {
-        if (!this.isCurrentlyShowing || !this.input) return;
-        const rect = this.input.getBoundingClientRect();
-        this.alert.style.left = rect.left + "px";
-        this.alert.style.top = rect.top - 50 + "px";
-        this.alert.style.width = rect.width + "px";
-      };
-      window.addEventListener("scroll", this.updatePosition, { passive: true });
-      window.addEventListener("resize", this.updatePosition, { passive: true });
-      let parent = this.input.parentElement;
-      while (parent && parent !== document.body) {
-        parent.addEventListener("scroll", this.updatePosition, {
+      if (document.body.getAttribute(updateFlag) !== "true") {
+        window.addEventListener("scroll", this._updatePosition, {
           passive: true,
         });
+        window.addEventListener("resize", this._updatePosition, {
+          passive: true,
+        });
+        document.body.setAttribute(updateFlag, "true");
+      }
+      let parent = this.input.parentElement;
+      while (
+        parent &&
+        parent !== document.body &&
+        parent.getAttribute(updateFlag) !== "true"
+      ) {
+        parent.addEventListener("scroll", this._updatePosition, {
+          passive: true,
+        });
+        parent.setAttribute(updateFlag, "true");
         parent = parent.parentElement;
       }
+    }
+    _updatePosition() {
+      if (!this.isCurrentlyShowing || !this.input) return;
+      const rect = this.input.getBoundingClientRect();
+      this.alert.style.left = rect.left + "px";
+      this.alert.style.top = rect.top - 50 + "px";
+      this.alert.style.width = rect.width + "px";
     }
     updateMargin() {
       if (!this.alert || !this.input) return;
@@ -456,7 +474,66 @@ javascript: (() => {
       if (!(this.alert instanceof HTMLElement || this.alert?.isConnected))
         this.alert = document.getElementById(this.idf);
       if (this.alert?.isConnected) {
-        this.alert.textContent = message;
+        try {
+          const msgContainer = document.createElement("span"),
+            msgCtCls = "prompt-alert-label-message";
+          msgContainer.classList.add(msgCtCls);
+          this.alert.appendChild(msgContainer);
+          const msgEl = document.createElement("em");
+          msgEl.textContent = message;
+          msgContainer.appendChild(msgEl);
+          const msgApplyBtn = document.createElement("span"),
+            applyBtnCls = "prompt-alert-apply-btn";
+          msgApplyBtn.title = window.navigator.language.startsWith("pt-")
+            ? "Clique aqui para aplicar as máscaras"
+            : "Click here to apply masks";
+          msgApplyBtn.classList.add(applyBtnCls);
+          msgApplyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-repeat" viewBox="0 0 16 16">
+            <path d="M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z"/>
+          </svg>`;
+          msgContainer.appendChild(msgApplyBtn);
+          try {
+            const firstRule = `.${msgCtCls} {
+              display: flex;
+              align-items: center;
+              gap: 0.2rem;
+              transform: translateY(-2px);
+            }`,
+              secondRule = `.${msgCtCls} .${applyBtnCls} {
+              display: flex;
+              align-items: center;
+              transform: scale(0.6) translateY(2px);
+              transition: all 0.2s ease-in-out;
+            }`,
+              thirdRule = `.${msgCtCls} .${applyBtnCls}:hover {
+              padding: 0.33rem;
+              filter: brightness(2);
+              font-weight: bold;
+              border: outset #737373b0 1px;
+              border-bottom-width: 2px;
+              transform: scale(0.8) translateY(0);
+              border-radius: 0.15rem;
+              margin-left: 0.1rem;
+            }`,
+              rules = [firstRule, secondRule, thirdRule];
+            const btnStlId = "buttonApplyStylesheet";
+            let sheet = document.getElementById(btnStlId);
+            if (!sheet) {
+              const btnStl = document.createElement("style");
+              btnStl.innerHTML = rules.join("\n");
+              btnStl.id = btnStlId;
+              document.body?.prepend(btnStl);
+            }
+          } catch (e) {
+            // fail silently
+          }
+        } catch (e) {
+          const appendedEls = Array.from(
+            alerterWindow.querySelectorAll("*")
+          ).filter(e => e && e.classList.contains(dmCls));
+          for (const e of appendedEls) e?.remove();
+          this.alert.innerText = message;
+        }
         this.alert.classList.add(this.showCls);
         if (this.alert.getAttribute(marginFlag) !== "true") {
           marginItv = setInterval(() => {
@@ -484,7 +561,7 @@ javascript: (() => {
         this.input.style.borderColor = "#dc3545";
         this.input.style.color = "red";
       } else this._fadeInput();
-      this.updatePosition();
+      this._updatePosition();
       if (!this.alert?.isConnected) return;
       if (!shouldShowMinimalAlert) {
         this.alert.style.transform = "scale(1)";
@@ -598,14 +675,40 @@ javascript: (() => {
         isDestroyed = false;
         hidingAcc = 0;
         alerter.show(
-          `${results.length} security leaks detected in your input!`
+          window.navigator.language.startsWith === "pt"
+            ? `${results.length} vazamento${
+                results.length > 1 ? "s" : ""
+              } de segurança na sua entrada!`
+            : `${results.length} security leak${
+                results.length > 1 ? "s" : ""
+              } detected in your input!`
         );
-        // TODO HOW TO SUGGEST POP UP FOR REPLACEMENT?
-        // for (let r = 0; r < results.length; r++) {
-        // console.log([results[r].foundIn, results[r].endsIn]);
-        // console.log(e.innerHTML.slice(0, results[r].foundIn));
-        // console.log(e.innerHTML.slice(results[r].foundIn, results[r].endsIn));
-        // }
+        for (let r = 0; r < results.length; r++) {
+          const childs = e.querySelectorAll("*");
+          let collectedHTML = "";
+          for (const c of childs) {
+            const html = c.outerHTML,
+              index = html.indexOf(results[r].foundIn);
+            if (index !== -1) {
+              collectedHTML += html.slice(0, index);
+              break;
+            }
+          }
+          const total =
+            (collectedHTML.match(/</g) || []).length +
+            (collectedHTML.match(/<\/?([a-zA-Z0-9\-]+)>?/g) || []).reduce(
+              (sum, tag) => sum + tag.replace(/<\/?|\/?>/g, "").length,
+              0
+            ) +
+            (collectedHTML.match(/\//g) || []).length +
+            (collectedHTML.match(/>/g) || []).length;
+          console.log("foundIn:", results[r].foundIn);
+          console.log("endsIn:", results[r].endsIn + total);
+          bearer = childs.find(c => c.innerText.includes(results[r].foundIn));
+          if (bearer) {
+            // Optional: handle logic for found bearer
+          }
+        }
         const dmCls = "dismiss",
           dmFlag = "data-listening-click",
           alrtFlag = "data-listening-click",
