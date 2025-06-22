@@ -438,7 +438,20 @@ javascript: (() => {
         this.alert.style.marginLeft = `${target}px`;
     }
     show(message) {
-      if (this.isCurrentlyShowing) return;
+      if (this.isCurrentlyShowing) {
+        if (!shouldShowMinimalAlert) {
+          const scl = "scale(1)",
+            cmpStl = getComputedStyle(this.alert);
+          if (!cmpStl.transform.includes(scl))
+            this.alert.style.transform = "scale(1)";
+          if (
+            cmpStl.opacity !== "1" &&
+            !ev.currentTarget.getAttribute(timingFlag) === "true"
+          )
+            this.alert.style.opacity = "1";
+        }
+        return;
+      }
       this.isCurrentlyShowing = true;
       if (!(this.alert instanceof HTMLElement || this.alert?.isConnected))
         this.alert = document.getElementById(this.idf);
@@ -633,10 +646,27 @@ javascript: (() => {
                       k: "marginLeft",
                       v: `${input?.clientWidth * 0.25 || 0}px`,
                     },
-                  ])
-                    alerterWindow.style[k] = v;
-                  if (alerterWindow.style.transform === "scale(0.1)")
-                    shouldShowMinimalAlert = true;
+                  ]) {
+                    if (
+                      !Object.getOwnPropertyDescriptor(
+                        alerterWindow.style[k]
+                      ) ||
+                      Object.getOwnPropertyDescriptor(alerterWindow.style[k])
+                        .configurable
+                    )
+                      alerterWindow.style[k] = v;
+                  }
+                  setTimeout(() => {
+                    if (!alerterWindow) return;
+                    const cmpTfm = getComputedStyle(alerterWindow).transform;
+                    if (
+                      cmpTfm.slice(
+                        cmpTfm.indexOf("(") + 1 ?? 0,
+                        cmpTfm.indexOf(",")
+                      ) !== "1"
+                    )
+                      shouldShowMinimalAlert = true;
+                  }, 50);
                 }
               });
               dm.setAttribute(dmFlag, "true");
@@ -655,15 +685,28 @@ javascript: (() => {
                 { k: "marginLeft", v: "0" },
               ])
                 ev.currentTarget.style[k] = v;
-              if (ev.currentTarget.style.transform === scl)
-                shouldShowMinimalAlert = false;
+              const targ = ev.currentTarget;
+              setTimeout(() => {
+                if (!alerterWindow) return;
+                const cmpTfm = getComputedStyle(alerterWindow).transform;
+                if (
+                  cmpTfm.slice(
+                    cmpTfm.indexOf("(") + 1 ?? 0,
+                    cmpTfm.indexOf(",")
+                  ) === "1"
+                ) {
+                  shouldShowMinimalAlert = false;
+                  if (!targ) return;
+                  targ.style.marginLeft = "0";
+                }
+              }, 500);
               if (ev.currentTarget.getAttribute(timingFlag) === "true") return;
               setTimeout(() => {
                 const alerterWindow = document.getElementById(promptAltIdf);
                 if (alerterWindow instanceof HTMLElement) return;
                 alerterWindow.style.opacity = "0.5";
                 alerterWindow.setAttribute(timingFlag, "false");
-              }, 1000);
+              }, 2000);
               ev.currentTarget.setAttribute(timingFlag, "true");
             });
             alerterWindow.setAttribute(alrtFlag, "true");
