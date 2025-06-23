@@ -356,15 +356,34 @@ javascript: (() => {
       this.showCls = styleCls;
       this.idf = idSuffix;
       this.isCurrentlyShowing = false;
-      this.init();
-    }
-    init() {
+      this._updatePosition = this._updatePosition.bind(this);
+      this.updateMargin = this.updateMargin.bind(this);
       this.injectCSS();
       this.createAlert();
-      this.setupPositionTracking();
-      if (document.body.getAttribute(positionFlag) !== "true") {
+      if (this.input.getAttribute(updateFlag) !== "true") {
+        window.addEventListener("scroll", this._updatePosition, {
+          passive: true,
+        });
+        window.addEventListener("resize", this._updatePosition, {
+          passive: true,
+        });
+        this.input.setAttribute(updateFlag, "true");
+      }
+      let parent = this.input.parentElement;
+      while (
+        parent &&
+        parent !== document.body &&
+        parent.getAttribute(updateFlag) !== "true"
+      ) {
+        parent.addEventListener("scroll", this._updatePosition, {
+          passive: true,
+        });
+        parent.setAttribute(updateFlag, "true");
+        parent = parent.parentElement;
+      }
+      if (this.input.getAttribute(positionFlag) !== "true") {
         setInterval(this._updatePosition, 1000);
-        document.body.setAttribute(positionFlag, "true");
+        this.input.setAttribute(positionFlag, "true");
       }
     }
     injectCSS() {
@@ -417,36 +436,6 @@ javascript: (() => {
       this.alert.className = alertCls;
       document.body.appendChild(this.alert);
     }
-    setupPositionTracking() {
-      if (document.body.getAttribute(updateFlag) !== "true") {
-        window.addEventListener("scroll", this._updatePosition, {
-          passive: true,
-        });
-        window.addEventListener("resize", this._updatePosition, {
-          passive: true,
-        });
-        document.body.setAttribute(updateFlag, "true");
-      }
-      let parent = this.input.parentElement;
-      while (
-        parent &&
-        parent !== document.body &&
-        parent.getAttribute(updateFlag) !== "true"
-      ) {
-        parent.addEventListener("scroll", this._updatePosition, {
-          passive: true,
-        });
-        parent.setAttribute(updateFlag, "true");
-        parent = parent.parentElement;
-      }
-    }
-    _updatePosition() {
-      if (!this.isCurrentlyShowing || !this.input) return;
-      const rect = this.input.getBoundingClientRect();
-      this.alert.style.left = rect.left + "px";
-      this.alert.style.top = rect.top - 50 + "px";
-      this.alert.style.width = rect.width + "px";
-    }
     updateMargin() {
       if (!this.alert || !this.input) return;
       const style = window.getComputedStyle(this.alert),
@@ -471,8 +460,8 @@ javascript: (() => {
         return;
       }
       this.isCurrentlyShowing = true;
-      if (!(this.alert instanceof HTMLElement || this.alert?.isConnected))
-        this.alert = document.getElementById(this.idf);
+      if (!(this.alert instanceof HTMLElement && this.alert.isConnected))
+        this.alert = document.getElementById(promptAltIdf);
       if (this.alert?.isConnected) {
         try {
           const msgContainer = document.createElement("span"),
@@ -502,7 +491,7 @@ javascript: (() => {
               secondRule = `.${msgCtCls} .${applyBtnCls} {
               display: flex;
               align-items: center;
-              transform: scale(0.6) translateY(2px);
+              transform: scale(0.6) translateY(2px);f
               transition: all 0.2s ease-in-out;
             }`,
               thirdRule = `.${msgCtCls} .${applyBtnCls}:hover {
@@ -537,11 +526,14 @@ javascript: (() => {
         this.alert.classList.add(this.showCls);
         if (this.alert.getAttribute(marginFlag) !== "true") {
           marginItv = setInterval(() => {
-            if (!(this.alert instanceof HTMLElement || this.alert?.isConnected))
-              this.alert = document.getElementById(this.idf);
+            if (!(this.alert instanceof HTMLElement && this.alert.isConnected))
+              this.alert = document.getElementById(promptAltIdf);
             if (!this.alert?.isConnected) return;
             if (!(this.input instanceof HTMLElement || this.input?.isConnected))
-              this.input = document.getElementById(promptAltIdf);
+              this.input =
+                document.getElementById(gpsPrompt) ||
+                document.getElementById(dsPrompt) ||
+                document.querySelector(claudeFb);
             if (
               !(
                 this.input instanceof HTMLElement &&
@@ -555,8 +547,11 @@ javascript: (() => {
           this.alert.setAttribute(marginFlag, "true");
         }
       }
-      if (!(this.input instanceof HTMLElement || this.input?.isConnected))
-        this.input = document.getElementById(promptAltIdf);
+      if (!(this.input instanceof HTMLElement && this.input.isConnected))
+        this.input =
+          document.getElementById(gpsPrompt) ||
+          document.getElementById(dsPrompt) ||
+          document.querySelector(claudeFb);
       if (this.input?.isConnected && !shouldShowMinimalAlert) {
         this.input.style.borderColor = "#dc3545";
         this.input.style.color = "red";
@@ -579,8 +574,8 @@ javascript: (() => {
     destroy() {
       if (!this.alert?.isConnected) return;
       this.alert.classList.remove(this.showCls);
-      if (!(this.alert instanceof HTMLElement || this.alert?.isConnected))
-        this.alert = document.getElementById(this.idf);
+      if (!(this.alert instanceof HTMLElement && this.alert.isConnected))
+        this.alert = document.getElementById(promptAltIdf);
       if (this.alert?.isConnected) {
         this.alert.style.transform = "scale(0)";
         this.alert.style.opacity = "0";
@@ -589,8 +584,8 @@ javascript: (() => {
       this.isCurrentlyShowing = false;
     }
     _fadeAlert(soft = false) {
-      if (!(this.alert instanceof HTMLElement || this.alert?.isConnected))
-        this.alert = document.getElementById(this.idf);
+      if (!(this.alert instanceof HTMLElement && this.alert.isConnected))
+        this.alert = document.getElementById(promptAltIdf);
       if (this.alert?.isConnected) {
         if (!soft) this.alert.style.transform = "scale(0.1)";
         if (!soft) this.alert.style.opacity = "0.33";
@@ -598,13 +593,39 @@ javascript: (() => {
       }
     }
     _fadeInput(soft = false) {
-      if (!(this.input instanceof HTMLElement || this.input?.isConnected))
-        this.input = document.getElementById(promptAltIdf);
+      if (!(this.input instanceof HTMLElement && this.input.isConnected))
+        this.input =
+          document.getElementById(gpsPrompt) ||
+          document.getElementById(dsPrompt) ||
+          document.querySelector(claudeFb);
       if (this.input?.isConnected) {
         this.input.style.borderColor = "";
         this.input.style.color = "#fff";
         if (!soft && this.alert) this.updateMargin();
       }
+    }
+    _updatePosition() {
+      console.log("updating...");
+      if (!(this.alert instanceof HTMLElement && this.alert.isConnected))
+        this.alert = document.getElementById(promptAltIdf);
+      if (!this.alert?.isConnected) return;
+      if (getComputedStyle(this.alert).opacity === "0")
+        this.isCurrentlyShowing = false;
+      console.log(this.isCurrentlyShowing);
+      if (!this.isCurrentlyShowing) return;
+      if (!(this.input instanceof HTMLElement && this.input.isConnected))
+        this.input =
+          document.getElementById(gpsPrompt) ||
+          document.getElementById(dsPrompt) ||
+          document.querySelector(claudeFb);
+      if (!this.input?.isConnected) return;
+      console.log(this.input);
+      console.log(this.alert);
+      console.log("procceding with update...");
+      const rect = this.input.getBoundingClientRect();
+      this.alert.style.left = rect.left + "px";
+      this.alert.style.top = rect.top - 50 + "px";
+      this.alert.style.width = rect.width + "px";
     }
   }
   const alerter = new SimpleFloatingAlert(inputElement);
