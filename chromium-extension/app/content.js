@@ -361,16 +361,16 @@ javascript: (() => {
       this.updateMargin = this.updateMargin.bind(this);
       this.injectCSS();
       this.createAlert();
-      if (this.input.getAttribute(updateFlag) !== "true") {
+      if (this.input?.getAttribute(updateFlag) !== "true") {
         window.addEventListener("scroll", this._updatePosition, {
           passive: true,
         });
         window.addEventListener("resize", this._updatePosition, {
           passive: true,
         });
-        this.input.setAttribute(updateFlag, "true");
+        this.input?.setAttribute(updateFlag, "true");
       }
-      let parent = this.input.parentElement;
+      let parent = this.input?.parentElement;
       while (
         parent &&
         parent !== document.body &&
@@ -382,9 +382,9 @@ javascript: (() => {
         parent.setAttribute(updateFlag, "true");
         parent = parent.parentElement;
       }
-      if (this.input.getAttribute(positionFlag) !== "true") {
+      if (this.input?.getAttribute(positionFlag) !== "true") {
         setInterval(this._updatePosition, 1000);
-        this.input.setAttribute(positionFlag, "true");
+        this.input?.setAttribute(positionFlag, "true");
       }
     }
     injectCSS() {
@@ -411,37 +411,6 @@ javascript: (() => {
           opacity: 1 !important;
         }
       `;
-      // style.textContent = `
-      // 	.${alertCls} {
-      // 		position: fixed;
-      // 		background-color: #dc3545;
-      // 		color: white;
-      // 		padding: 8px 12px;
-      // 		border-radius: 6px;
-      // 		font-size: 14px;
-      // 		z-index: 10000;
-      // 		display: none;
-      // 		box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      //     transition: transform 0.33s ease-in-out, opacity 0.5s ease-in-out, margin-left 0.33s ease-in-out;
-      // 	}
-      // 	.${alertCls}.${styleCls} {
-      // 		display: block;
-      // 	}
-      // 	.${alertCls}::after {
-      // 		content: '';
-      // 		position: absolute;
-      // 		bottom: -6px;
-      // 		left: 20px;
-      // 		width: 0;
-      // 		height: 0;
-      // 		border-left: 6px solid transparent;
-      // 		border-right: 6px solid transparent;
-      // 		border-top: 6px solid #dc3545;
-      // 	}
-      //   .${alertCls}:hover {
-      // 		opacity: 1 !important;
-      // 	}
-      // `;
       document.head.appendChild(style);
     }
     createAlert() {
@@ -451,23 +420,30 @@ javascript: (() => {
         // fail silently
       }
       const el = document.getElementById(this.idf);
-      if (el?.isConnected) return;
-      this.alert = document.createElement("div");
-      this.alert.id = this.idf;
-      this.alert.className = alertCls;
-      document.body.appendChild(this.alert);
+      if (!el?.isConnected) {
+        this.alert = document.createElement("div");
+        this.alert.id = this.idf;
+        this.alert.className = alertCls;
+        document.body.appendChild(this.alert);
+      }
     }
     updateMargin() {
       if (!this.alert || !this.input) return;
       const style = window.getComputedStyle(this.alert),
         current = parseFloat(style.marginLeft) || 0,
-        // target = shouldShowMinimalAlert ? this.input.clientWidth * 0.25 : 0;
+        // target = shouldShowMinimalAlert ? this.input?.clientWidth * 0.25 : 0;
         target = shouldShowMinimalAlert ? "25rem" : 0;
       if (Math.abs(current - target) > 0.5)
         this.alert.style.marginLeft = `${target}px`;
     }
     show(message) {
-      if (this.isCurrentlyShowing) {
+      if (!(this.alert instanceof HTMLElement && this.alert.isConnected)) {
+        this.alert = document.createElement("div");
+        this.alert.id = this.idf;
+        this.alert.className = alertCls;
+        document.body.appendChild(this.alert);
+      }
+      if (this.isCurrentlyShowing && this.alert) {
         if (!shouldShowMinimalAlert) {
           const scl = "scale(1)",
             cmpStl = getComputedStyle(this.alert);
@@ -482,8 +458,6 @@ javascript: (() => {
         return;
       }
       this.isCurrentlyShowing = true;
-      if (!(this.alert instanceof HTMLElement && this.alert.isConnected))
-        this.alert = document.getElementById(promptAltIdf);
       if (this.alert?.isConnected) {
         try {
           const msgCtCls = "prompt-alert-container-message",
@@ -497,17 +471,6 @@ javascript: (() => {
             msgEl.classList.add(labelCls);
             msgEl.textContent = message;
             msgContainer.appendChild(msgEl);
-            // if (!document.querySelector(`.${applyBtnCls}`)) {
-            //   const msgApplyBtn = document.createElement("span");
-            //   msgApplyBtn.classList.add(applyBtnCls);
-            //   msgApplyBtn.title = window.navigator.language.startsWith("pt-")
-            //     ? "Clique aqui para aplicar as máscaras"
-            //     : "Click here to apply masks";
-            //   msgApplyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-repeat" viewBox="0 0 16 16">
-            //   <path d="M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z"/>
-            // </svg>`;
-            //   msgContainer.appendChild(msgApplyBtn);
-            // }
             try {
               const firstRule = `.${msgCtCls} {
               display: flex;
@@ -546,7 +509,7 @@ javascript: (() => {
         } catch (e) {
           const appendedEls = Array.from(
             alerterWindow.querySelectorAll("*")
-          ).filter((e) => e && e.classList.contains(dmCls));
+          ).filter(e => e && e.classList.contains(dmCls));
           for (const e of appendedEls) e?.remove();
           this.alert.innerText = message;
         }
@@ -564,8 +527,8 @@ javascript: (() => {
             if (
               !(
                 this.input instanceof HTMLElement &&
-                this.input.isConnected &&
-                this.input.clientWidth
+                this.input?.isConnected &&
+                this.input?.clientWidth
               )
             )
               return;
@@ -574,15 +537,13 @@ javascript: (() => {
           this.alert.setAttribute(marginFlag, "true");
         }
       }
-      if (!(this.input instanceof HTMLElement && this.input.isConnected))
+      if (!(this.input instanceof HTMLElement && this.input?.isConnected))
         this.input =
           document.getElementById(gpsPrompt) ||
           document.getElementById(dsPrompt) ||
           document.querySelector(claudeFb);
-      if (this.input?.isConnected && !shouldShowMinimalAlert) {
-        this.input.style.borderColor = "#dc3545";
-        this.input.style.color = "red";
-      } else this._fadeInput();
+      if (!(this.input?.isConnected && !shouldShowMinimalAlert))
+        this._fadeInput();
       this._updatePosition();
       if (!this.alert?.isConnected) return;
       if (!shouldShowMinimalAlert) {
@@ -620,7 +581,7 @@ javascript: (() => {
       }
     }
     _fadeInput(soft = false) {
-      if (!(this.input instanceof HTMLElement && this.input.isConnected))
+      if (!(this.input instanceof HTMLElement && this.input?.isConnected))
         this.input =
           document.getElementById(gpsPrompt) ||
           document.getElementById(dsPrompt) ||
@@ -638,13 +599,13 @@ javascript: (() => {
       if (getComputedStyle(this.alert).opacity === "0")
         this.isCurrentlyShowing = false;
       if (!this.isCurrentlyShowing) return;
-      if (!(this.input instanceof HTMLElement && this.input.isConnected))
+      if (!(this.input instanceof HTMLElement && this.input?.isConnected))
         this.input =
           document.getElementById(gpsPrompt) ||
           document.getElementById(dsPrompt) ||
           document.querySelector(claudeFb);
       if (!this.input?.isConnected) return;
-      const rect = this.input.getBoundingClientRect();
+      const rect = this.input?.getBoundingClientRect();
       this.alert.style.left = rect.left + "px";
       this.alert.style.top = rect.top - 50 + "px";
       // this.alert.style.width = rect.width + "px";
@@ -656,7 +617,8 @@ javascript: (() => {
     alerterWindow.setAttribute("role", "alert");
     alerterWindow.setAttribute("aria-live", "assertive");
   }
-  setInterval(() => {
+  let prevText = "";
+  setInterval(async () => {
     try {
       const e =
         document.getElementById(gpsPrompt) ||
@@ -671,25 +633,46 @@ javascript: (() => {
       )
         return;
       const txt =
-          e instanceof HTMLInputElement || e instanceof HTMLTextAreaElement
-            ? e.value
-            : e.innerText,
-        dictEntries = Object.entries(MAIN_DICT).filter(Boolean),
-        results = [];
-      for (let w = 0; w < txt.length; w++)
-        for (let i = 0; i < dictEntries.length; i++) {
-          const localDicts = dictEntries[i];
-          for (let j = 0; j < Object.values(localDicts).length; j++) {
-            const exps = Object.entries(localDicts[1]);
-            for (let k = 0; k < exps.length; k++) {
+        e instanceof HTMLInputElement || e instanceof HTMLTextAreaElement
+          ? e.value
+          : e.innerText;
+      if (txt === prevText) return;
+      async function processWithRAF() {
+        const dictEntries = Object.entries(MAIN_DICT).filter(Boolean),
+          results = [];
+        let w = 0,
+          i = 0,
+          k = 0;
+        let processedWork = 0;
+        return new Promise(resolve => {
+          function processChunk() {
+            const startTime = performance.now();
+            while (performance.now() - startTime < 16) {
+              if (w >= txt.length) {
+                resolve(results);
+                return;
+              }
+              if (i >= dictEntries.length) {
+                w++;
+                i = 0;
+                k = 0;
+                continue;
+              }
+              const localDicts = dictEntries[i],
+                exps = Object.entries(localDicts[1]);
+              if (k >= exps.length) {
+                i++;
+                k = 0;
+                continue;
+              }
               const exp = exps[k][1],
                 key = exps[k][0],
                 res = exp.exec(txt);
               if (
                 exp instanceof RegExp &&
                 res &&
-                !results.some((r) => res.index === r.foundIn)
-              )
+                !results.some(r => res.index === r.foundIn)
+              ) {
                 results.push({
                   k: key,
                   e: exp,
@@ -697,12 +680,13 @@ javascript: (() => {
                   foundIn: res.index,
                   endsIn: res.index + res[0].length,
                 });
-              else if (
+                break;
+              } else if (
                 typeof exp === "string" &&
                 res &&
                 txt[w].trim().toLowerCase() === exp &&
-                !results.some((r) => res.index === r.foundIn)
-              )
+                !results.some(r => res.index === r.foundIn)
+              ) {
                 results.push({
                   k: key,
                   e: exp,
@@ -710,158 +694,76 @@ javascript: (() => {
                   foundIn: res.index,
                   endsIn: res.index + res[0].length,
                 });
+                break;
+              }
+              k++;
+              processedWork++;
+            }
+            requestAnimationFrame(processChunk);
+          }
+          processChunk();
+        });
+      }
+      const results = await processWithRAF(),
+        hasLeak = results.length !== 0;
+      if (hasLeak) {
+        isDestroyed = false;
+        hidingAcc = 0;
+        alerter.show(
+          window.navigator.language.startsWith === "pt"
+            ? `Há dados sensíveis na sua prompt. Tome cuidado!`
+            : `There is sensitive data in your prompt. Be careful!`
+        );
+        const dmCls = "dismiss",
+          dmFlag = "data-listening-click",
+          alrtFlag = "data-listening-click",
+          alerterWindow = document.getElementById(promptAltIdf);
+        if (alerterWindow) {
+          let dm = alerterWindow.querySelector(`.${dmCls}`);
+          if (!dm) {
+            const dmBtn = document.createElement("button");
+            dmBtn.classList.add(dmCls);
+            dmBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+                  </svg>`;
+            dmBtn.style.display = "inline";
+            dmBtn.style.background = "transparent";
+            alerterWindow.appendChild(dmBtn);
+            if (
+              dmBtn.parentElement instanceof HTMLElement &&
+              dmBtn.parentElement.isConnected
+            ) {
+              dmBtn.parentElement.style.display = "flex";
+              dmBtn.parentElement.style.justifyContent = "space-between";
             }
           }
-        }
-      const hasLeak = results.length !== 0;
-      try {
-        if (hasLeak) {
-          isDestroyed = false;
-          hidingAcc = 0;
-          alerter.show(
-            window.navigator.language.startsWith === "pt"
-              ? `Há dados sensíveis na sua prompt. Tome cuidado!`
-              : // `${results.length} vazamento${
-                // results.length > 1 ? "s" : ""
-                // } de segurança na sua entrada!`
-                `There is sensitive data in your prompt. Be careful!`
-            // `${results.length} security leak${
-            // results.length > 1 ? "s" : ""
-            // } detected in your input!`
-          );
-          for (let r = 0; r < results.length; r++) {
-            if (!("value" in e)) {
-              // WON'T WORK IN DS, SINCE IT USES A TEXTAREA
-              const childs = e.querySelectorAll("*");
-              let collectedHTML = "";
-              for (const c of childs) {
-                const html = c.outerHTML,
-                  index = html.indexOf(results[r].foundIn);
-                if (index !== -1) {
-                  collectedHTML += html.slice(0, index);
-                  break;
-                }
-              }
-              const total =
-                (collectedHTML.match(/</g) || []).length +
-                (collectedHTML.match(/<\/?([a-zA-Z0-9\-]+)>?/g) || []).reduce(
-                  (sum, tag) => sum + tag.replace(/<\/?|\/?>/g, "").length,
-                  0
-                ) +
-                (collectedHTML.match(/\//g) || []).length +
-                (collectedHTML.match(/>/g) || []).length;
-              bearer = Array.from(childs).find((c) =>
-                c.innerText.includes(results[r].v)
-              );
-              console.log("--------- HTMLS ----------");
-              console.log(Array.from(childs).map((c) => c.innerHTML));
-              console.log("--------- VALUE ----------");
-              console.log(results[r].v);
-              console.log("--------- BEARER ELEMENT ----------");
-              console.log(bearer);
-              if (bearer) {
-                console.log("--------- HEAD SLICE ----------");
-                console.log(e.innerHTML.slice(0, results[r].foundIn));
-                console.log("--------- MID SLICE ----------");
-                console.log(
-                  e.innerHTML.slice(
-                    results[r].foundIn,
-                    results[r].endsIn + total + 1
-                  )
-                );
-                console.log("--------- TAIL ELEMENT ----------");
-                console.log(e.innerHTML.slice(results[r].endsIn + total));
-              }
-            } else {
-              console.log("--------- MID SLICE ----------");
-              console.log([e.slice(results[r].foundIn, results[r].endsIn)]);
-            }
-          }
-          try {
-            const dmCls = "dismiss",
-              dmFlag = "data-listening-click",
-              alrtFlag = "data-listening-click",
-              alerterWindow = document.getElementById(promptAltIdf);
-            if (alerterWindow) {
-              let dm = alerterWindow.querySelector(`.${dmCls}`);
-              if (!dm) {
-                const dmBtn = document.createElement("button");
-                dmBtn.classList.add(dmCls);
-                dmBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
-                </svg>`;
-                dmBtn.style.display = "inline";
-                dmBtn.style.background = "transparent";
-                alerterWindow.appendChild(dmBtn);
-                if (
-                  dmBtn.parentElement instanceof HTMLElement &&
-                  dmBtn.parentElement.isConnected
-                ) {
-                  dmBtn.parentElement.style.display = "flex";
-                  dmBtn.parentElement.style.justifyContent = "space-between";
-                }
-              }
-              dm = alerterWindow.querySelector(`.${dmCls}`);
-              if (dm) {
-                if (dm.getAttribute(dmFlag) !== "true") {
-                  dm.addEventListener("click", () => {
-                    const alerterWindow = document.getElementById(promptAltIdf),
-                      input =
-                        document.getElementById(gpsPrompt) ||
-                        document.getElementById(dsPrompt) ||
-                        document.querySelector(claudeFb);
-                    if (alerterWindow) {
-                      for (const { k, v } of [
-                        { k: "transform", v: "scale(0.1)" },
-                        { k: "opacity", v: "0.33" },
-                        {
-                          k: "marginLeft",
-                          v: `${input?.clientWidth * 0.25 || 0}px`,
-                        },
-                      ]) {
-                        if (
-                          !Object.getOwnPropertyDescriptor(
-                            alerterWindow.style[k]
-                          ) ||
-                          Object.getOwnPropertyDescriptor(
-                            alerterWindow.style[k]
-                          ).configurable
-                        )
-                          alerterWindow.style[k] = v;
-                      }
-                      setTimeout(() => {
-                        if (!alerterWindow) return;
-                        const cmpTfm =
-                          getComputedStyle(alerterWindow).transform;
-                        if (
-                          cmpTfm.slice(
-                            cmpTfm.indexOf("(") + 1 ?? 0,
-                            cmpTfm.indexOf(",")
-                          ) !== "1"
-                        )
-                          shouldShowMinimalAlert = true;
-                      }, 50);
-                    }
-                  });
-                  dm.setAttribute(dmFlag, "true");
-                }
-                dm.setAttribute(
-                  "aria-label",
-                  "Hide prompt security leak alert"
-                );
-                dm.setAttribute("aria-controls", promptAltIdf);
-              }
-              if (alerterWindow.getAttribute(alrtFlag) !== "true") {
-                alerterWindow.addEventListener("click", (ev) => {
-                  if (!shouldShowMinimalAlert || !ev?.currentTarget) return;
-                  const scl = "scale(1)";
+          dm = alerterWindow.querySelector(`.${dmCls}`);
+          if (dm) {
+            if (dm.getAttribute(dmFlag) !== "true") {
+              dm.addEventListener("click", () => {
+                const alerterWindow = document.getElementById(promptAltIdf),
+                  input =
+                    document.getElementById(gpsPrompt) ||
+                    document.getElementById(dsPrompt) ||
+                    document.querySelector(claudeFb);
+                if (alerterWindow) {
                   for (const { k, v } of [
-                    { k: "transform", v: scl },
-                    { k: "opacity", v: "1" },
-                    { k: "marginLeft", v: "0" },
-                  ])
-                    ev.currentTarget.style[k] = v;
-                  const targ = ev.currentTarget;
+                    { k: "transform", v: "scale(0.1)" },
+                    { k: "opacity", v: "0.33" },
+                    {
+                      k: "marginLeft",
+                      v: `${input?.clientWidth * 0.25 || 0}px`,
+                    },
+                  ]) {
+                    if (
+                      !Object.getOwnPropertyDescriptor(
+                        alerterWindow.style[k]
+                      ) ||
+                      Object.getOwnPropertyDescriptor(alerterWindow.style[k])
+                        .configurable
+                    )
+                      alerterWindow.style[k] = v;
+                  }
                   setTimeout(() => {
                     if (!alerterWindow) return;
                     const cmpTfm = getComputedStyle(alerterWindow).transform;
@@ -869,50 +771,71 @@ javascript: (() => {
                       cmpTfm.slice(
                         cmpTfm.indexOf("(") + 1 ?? 0,
                         cmpTfm.indexOf(",")
-                      ) === "1"
-                    ) {
-                      shouldShowMinimalAlert = false;
-                      if (!targ) return;
-                      targ.style.marginLeft = "0";
-                    }
-                  }, 500);
-                  if (ev.currentTarget.getAttribute(timingFlag) === "true")
-                    return;
-                  setTimeout(() => {
-                    const alerterWindow = document.getElementById(promptAltIdf);
-                    if (alerterWindow instanceof HTMLElement) return;
-                    alerterWindow.style.opacity = "0.5";
-                    alerterWindow.setAttribute(timingFlag, "false");
-                  }, 2000);
-                  ev.currentTarget.setAttribute(timingFlag, "true");
-                });
-                alerterWindow.setAttribute(alrtFlag, "true");
-              }
+                      ) !== "1"
+                    )
+                      shouldShowMinimalAlert = true;
+                  }, 50);
+                }
+              });
+              dm.setAttribute(dmFlag, "true");
             }
-          } catch {
-            // fail silently
-            console.log(e);
+            dm.setAttribute("aria-label", "Hide prompt security leak alert");
+            dm.setAttribute("aria-controls", promptAltIdf);
           }
-        } else {
-          const MAX_HIDE_PASSES = 10;
-          if (!alerter) return;
-          const win = document.getElementById(promptAltIdf);
-          const opacity = win ? parseFloat(getComputedStyle(win).opacity) : 0;
-          if (opacity > 0) hidingAcc++;
-          if (hidingAcc > MAX_HIDE_PASSES) {
-            alerter.destroy();
-            if (!win || parseFloat(getComputedStyle(win).opacity) === 0)
-              hidingAcc = 0;
-            isDestroyed = true;
-          } else !isDestroyed && alerter.hide();
+          if (alerterWindow.getAttribute(alrtFlag) !== "true") {
+            alerterWindow.addEventListener("click", ev => {
+              if (!shouldShowMinimalAlert || !ev?.currentTarget) return;
+              const scl = "scale(1)";
+              for (const { k, v } of [
+                { k: "transform", v: scl },
+                { k: "opacity", v: "1" },
+                { k: "marginLeft", v: "0" },
+              ])
+                ev.currentTarget.style[k] = v;
+              const targ = ev.currentTarget;
+              setTimeout(() => {
+                if (!alerterWindow) return;
+                const cmpTfm = getComputedStyle(alerterWindow).transform;
+                if (
+                  cmpTfm.slice(
+                    cmpTfm.indexOf("(") + 1 ?? 0,
+                    cmpTfm.indexOf(",")
+                  ) === "1"
+                ) {
+                  shouldShowMinimalAlert = false;
+                  if (!targ) return;
+                  targ.style.marginLeft = "0";
+                }
+              }, 500);
+              if (ev.currentTarget.getAttribute(timingFlag) === "true") return;
+              setTimeout(() => {
+                const alerterWindow = document.getElementById(promptAltIdf);
+                if (alerterWindow instanceof HTMLElement) return;
+                alerterWindow.style.opacity = "0.5";
+                alerterWindow.setAttribute(timingFlag, "false");
+              }, 2000);
+              ev.currentTarget.setAttribute(timingFlag, "true");
+            });
+            alerterWindow.setAttribute(alrtFlag, "true");
+          }
         }
-      } catch (e) {
-        // fail silently
-        console.log(e);
+      } else {
+        const MAX_HIDE_PASSES = 10;
+        if (!alerter) return;
+        const win = document.getElementById(promptAltIdf);
+        const opacity = win ? parseFloat(getComputedStyle(win).opacity) : 0;
+        if (opacity > 0) hidingAcc++;
+        if (hidingAcc > MAX_HIDE_PASSES) {
+          alerter.destroy();
+          if (!win || parseFloat(getComputedStyle(win).opacity) === 0)
+            hidingAcc = 0;
+          isDestroyed = true;
+        } else !isDestroyed && alerter.hide();
       }
     } catch (e) {
       // fail silently
-      console.log(e);
+      prevText = txt;
     }
-  }, 250);
+    prevText = txt;
+  }, 2500);
 })();
