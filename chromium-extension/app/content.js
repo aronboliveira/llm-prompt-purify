@@ -546,7 +546,7 @@ javascript: (() => {
         } catch (e) {
           const appendedEls = Array.from(
             alerterWindow.querySelectorAll("*")
-          ).filter(e => e && e.classList.contains(dmCls));
+          ).filter((e) => e && e.classList.contains(dmCls));
           for (const e of appendedEls) e?.remove();
           this.alert.innerText = message;
         }
@@ -688,7 +688,7 @@ javascript: (() => {
               if (
                 exp instanceof RegExp &&
                 res &&
-                !results.some(r => res.index === r.foundIn)
+                !results.some((r) => res.index === r.foundIn)
               )
                 results.push({
                   k: key,
@@ -701,7 +701,7 @@ javascript: (() => {
                 typeof exp === "string" &&
                 res &&
                 txt[w].trim().toLowerCase() === exp &&
-                !results.some(r => res.index === r.foundIn)
+                !results.some((r) => res.index === r.foundIn)
               )
                 results.push({
                   k: key,
@@ -750,11 +750,11 @@ javascript: (() => {
                 ) +
                 (collectedHTML.match(/\//g) || []).length +
                 (collectedHTML.match(/>/g) || []).length;
-              bearer = Array.from(childs).find(c =>
+              bearer = Array.from(childs).find((c) =>
                 c.innerText.includes(results[r].v)
               );
               console.log("--------- HTMLS ----------");
-              console.log(Array.from(childs).map(c => c.innerHTML));
+              console.log(Array.from(childs).map((c) => c.innerHTML));
               console.log("--------- VALUE ----------");
               console.log(results[r].v);
               console.log("--------- BEARER ELEMENT ----------");
@@ -852,7 +852,7 @@ javascript: (() => {
                 dm.setAttribute("aria-controls", promptAltIdf);
               }
               if (alerterWindow.getAttribute(alrtFlag) !== "true") {
-                alerterWindow.addEventListener("click", ev => {
+                alerterWindow.addEventListener("click", (ev) => {
                   if (!shouldShowMinimalAlert || !ev?.currentTarget) return;
                   const scl = "scale(1)";
                   for (const { k, v } of [
