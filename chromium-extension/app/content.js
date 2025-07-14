@@ -560,10 +560,10 @@ javascript: (() => {
       this._fadeInput();
     }
     destroy() {
-      if (!this.alert?.isConnected) return;
-      this.alert.classList.remove(this.showCls);
       if (!(this.alert instanceof HTMLElement && this.alert.isConnected))
         this.alert = document.getElementById(promptAltIdf);
+      if (!this.alert?.isConnected) return;
+      this.alert.classList.remove(this.showCls);
       if (this.alert?.isConnected) {
         this.alert.style.transform = "scale(0)";
         this.alert.style.opacity = "0";
@@ -636,6 +636,10 @@ javascript: (() => {
         e instanceof HTMLInputElement || e instanceof HTMLTextAreaElement
           ? e.value
           : e.innerText;
+      if (txt === "") {
+        alerter.destroy();
+        return;
+      }
       if (txt === prevText) return;
       async function processWithRAF() {
         const dictEntries = Object.entries(MAIN_DICT).filter(Boolean),
