@@ -392,56 +392,36 @@ javascript: (() => {
       const style = document.createElement("style");
       style.id = styleIdf;
       style.textContent = `
-        .${alertCls} {
-          position: fixed;
-          background-color: #830f;
-          color: white;
-          padding: 8px 12px;
-          border-radius: 6px;
-          font-size: 14px;
-          z-index: 10000;
-          display: none;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+				.${alertCls} {
+					position: fixed;
+					background-color: #dc3545;
+					color: white;
+					padding: 8px 12px;
+					border-radius: 6px;
+					font-size: 14px;
+					z-index: 10000;
+					display: none;
+					box-shadow: 0 2px 8px rgba(0,0,0,0.15);
           transition: transform 0.33s ease-in-out, opacity 0.5s ease-in-out, margin-left 0.33s ease-in-out;
-        }
-        .${alertCls}.${styleCls} {
-          display: block;
-        }
+				}
+				.${alertCls}.${styleCls} {
+					display: block;
+				}
+				.${alertCls}::after {
+					content: '';
+					position: absolute;
+					bottom: -6px;
+					left: 20px;
+					width: 0;
+					height: 0;
+					border-left: 6px solid transparent;
+					border-right: 6px solid transparent;
+					border-top: 6px solid #dc3545;
+				}
         .${alertCls}:hover {
-          opacity: 1 !important;
-        }
-      `;
-      // style.textContent = `
-      // 	.${alertCls} {
-      // 		position: fixed;
-      // 		background-color: #dc3545;
-      // 		color: white;
-      // 		padding: 8px 12px;
-      // 		border-radius: 6px;
-      // 		font-size: 14px;
-      // 		z-index: 10000;
-      // 		display: none;
-      // 		box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      //     transition: transform 0.33s ease-in-out, opacity 0.5s ease-in-out, margin-left 0.33s ease-in-out;
-      // 	}
-      // 	.${alertCls}.${styleCls} {
-      // 		display: block;
-      // 	}
-      // 	.${alertCls}::after {
-      // 		content: '';
-      // 		position: absolute;
-      // 		bottom: -6px;
-      // 		left: 20px;
-      // 		width: 0;
-      // 		height: 0;
-      // 		border-left: 6px solid transparent;
-      // 		border-right: 6px solid transparent;
-      // 		border-top: 6px solid #dc3545;
-      // 	}
-      //   .${alertCls}:hover {
-      // 		opacity: 1 !important;
-      // 	}
-      // `;
+					opacity: 1 !important;
+				}
+			`;
       document.head.appendChild(style);
     }
     createAlert() {
@@ -461,8 +441,7 @@ javascript: (() => {
       if (!this.alert || !this.input) return;
       const style = window.getComputedStyle(this.alert),
         current = parseFloat(style.marginLeft) || 0,
-        // target = shouldShowMinimalAlert ? this.input.clientWidth * 0.25 : 0;
-        target = shouldShowMinimalAlert ? "25rem" : 0;
+        target = shouldShowMinimalAlert ? this.input.clientWidth * 0.25 : 0;
       if (Math.abs(current - target) > 0.5)
         this.alert.style.marginLeft = `${target}px`;
     }
@@ -497,17 +476,17 @@ javascript: (() => {
             msgEl.classList.add(labelCls);
             msgEl.textContent = message;
             msgContainer.appendChild(msgEl);
-            // if (!document.querySelector(`.${applyBtnCls}`)) {
-            //   const msgApplyBtn = document.createElement("span");
-            //   msgApplyBtn.classList.add(applyBtnCls);
-            //   msgApplyBtn.title = window.navigator.language.startsWith("pt-")
-            //     ? "Clique aqui para aplicar as máscaras"
-            //     : "Click here to apply masks";
-            //   msgApplyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-repeat" viewBox="0 0 16 16">
-            //   <path d="M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z"/>
-            // </svg>`;
-            //   msgContainer.appendChild(msgApplyBtn);
-            // }
+            if (!document.querySelector(`.${applyBtnCls}`)) {
+              const msgApplyBtn = document.createElement("span");
+              msgApplyBtn.classList.add(applyBtnCls);
+              msgApplyBtn.title = window.navigator.language.startsWith("pt-")
+                ? "Clique aqui para aplicar as máscaras"
+                : "Click here to apply masks";
+              msgApplyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-repeat" viewBox="0 0 16 16">
+              <path d="M11 5.466V4H5a4 4 0 0 0-3.584 5.777.5.5 0 1 1-.896.446A5 5 0 0 1 5 3h6V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192m3.81.086a.5.5 0 0 1 .67.225A5 5 0 0 1 11 13H5v1.466a.25.25 0 0 1-.41.192l-2.36-1.966a.25.25 0 0 1 0-.384l2.36-1.966a.25.25 0 0 1 .41.192V12h6a4 4 0 0 0 3.585-5.777.5.5 0 0 1 .225-.67Z"/>
+            </svg>`;
+              msgContainer.appendChild(msgApplyBtn);
+            }
             try {
               const firstRule = `.${msgCtCls} {
               display: flex;
@@ -647,8 +626,7 @@ javascript: (() => {
       const rect = this.input.getBoundingClientRect();
       this.alert.style.left = rect.left + "px";
       this.alert.style.top = rect.top - 50 + "px";
-      // this.alert.style.width = rect.width + "px";
-      this.alert.style.width = "25rem";
+      this.alert.style.width = rect.width + "px";
     }
   }
   const alerter = new SimpleFloatingAlert(inputElement);
@@ -720,14 +698,12 @@ javascript: (() => {
           hidingAcc = 0;
           alerter.show(
             window.navigator.language.startsWith === "pt"
-              ? `Há dados sensíveis na sua prompt. Tome cuidado!`
-              : // `${results.length} vazamento${
-                // results.length > 1 ? "s" : ""
-                // } de segurança na sua entrada!`
-                `There is sensitive data in your prompt. Be careful!`
-            // `${results.length} security leak${
-            // results.length > 1 ? "s" : ""
-            // } detected in your input!`
+              ? `${results.length} vazamento${
+                  results.length > 1 ? "s" : ""
+                } de segurança na sua entrada!`
+              : `${results.length} security leak${
+                  results.length > 1 ? "s" : ""
+                } detected in your input!`
           );
           for (let r = 0; r < results.length; r++) {
             if (!("value" in e)) {
