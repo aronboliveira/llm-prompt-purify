@@ -8,15 +8,17 @@ javascript: (() => {
         // SSN: /\b\d{3}-\d{2}-\d{4}\b/,
         // URL: /\b(https?:\/\/[^\s/$.?#].[^\s]*)\b/gi,
         URN: /\b\s+urn:[a-z0-9][a-z0-9-]{1,31}:[^\s]+\b/gi,
-        PHONE: /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
+        PHONE:
+          /(?=.*[.\-]+)\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
         // CREDIT_CARD: /\b(?:\d[ -]*?){13,16}\b/,
         ENV_VAR: /\b[A-Z][A-Z0-9_]{2,}(?:_KEY|_SECRET|_TOKEN|_URL)*\b/,
-        API_KEY: /\b[Kk][eE][yY].{1,20}[A-Za-z0-9]{20,}\b/,
+        API_KEY:
+          /(?<=\b(?:API_KEY|SECRET_KEY|ACCESS_TOKEN)\s*[:=]\s*)[A-Za-z0-9]{20,}/,
         TOKEN:
           /\b(?:password|secret|token)\s*[:=]\s*['"]?[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}\b/gi,
         BUSINESS:
           /\b(?:company\s*(?:ID|number)|registration\s*number)\s*[:=]\s*[A-Z0-9\-]{4,}\b/gi,
-        CPF: /\b\d{3}[.\-]?\d{3}[.\-]?\d{3}[\-]?\d{2}\b/g,
+        CPF: /(?=.*[.\-]+)\b\d{3}[.\-]?\d{3}[.\-]?\d{3}[\-]?\d{2}\b/g,
         UUID: /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/gi,
         MAC_ADDRESS: /\b(?:[0-9A-F]{2}[:-]){5}(?:[0-9A-F]{2})\b/g,
         SENSITIVE_PATH:
@@ -24,7 +26,7 @@ javascript: (() => {
         JWT: /\b(?:eyJ[A-Za-z0-9-_=]+\.){2}[A-Za-z0-9-_=]+\b/gi,
         PRIVATE_KEY: /\b-----BEGIN\s(?:RSA|EC|OPENSSH)\sPRIVATE KEY-----\b/gi,
         AWS_KEYS: /\b(AWS|AKIA|ASIA)[A-Z0-9]{16,}\b/gi,
-        BANK_ACCOUNT: /\b(?:\d{8,18}|[A-Z]{2}\d{2}\s?(?:\d{4}\s?){3,5})\b/gi,
+        // BANK_ACCOUNT: /\b(?:\d{8,18}|[A-Z]{2}\d{2}\s?(?:\d{4}\s?){3,5})\b/gi,
         IBAN: /\b[A-Z]{2}\d{2}[\s\-]?(?:[A-Z0-9]{4}[\s\-]?){2,7}[A-Z0-9]{1,4}\b/gi,
         SWIFT_CODE: /\b[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?\b/gi,
         TAX_ID: /\b(?:tax\s*id|vat\s*number)\s*[:=]\s*[A-Z0-9\-]{6,12}\b/gi,
@@ -33,12 +35,12 @@ javascript: (() => {
         BITCOIN_ADDRESS: /\b(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}\b/gi,
         ETHEREUM_ADDRESS: /\b0x[a-fA-F0-9]{40}\b/gi,
         CRYPTO_PRIVATE_KEY: /\b[5KL][1-9A-HJ-NP-Za-km-z]{50,51}\b/gi,
-        VIN: /\b[A-HJ-NPR-Z0-9]{17}\b/gi,
+        // VIN: /\b[A-HJ-NPR-Z0-9]{17}\b/gi,
         LICENSE_PLATE: /\b[A-Z]{1,3}\s?-\s?[A-Z0-9]{1,4}\b/gi,
-        SOFTWARE_KEY: /\b[A-Z0-9]{4}(?:-?[A-Z0-9]{4}){3,}\b/gi,
+        SOFTWARE_KEY: /(?=.*[.\-]+)\b[A-Z0-9]{4}(?:-?[A-Z0-9]{4}){3,}\b/gi,
         // PRODUCT_KEY: /\b(?:\d{3}-){4}\d{3}\b/gi,
         // HEALTHCHECK: /\b(?:health|status|ping)\b/gi,
-        AUTH: /\b(?:auth|login|oauth2?|token)\b/gi,
+        // AUTH: /\b(?:auth|login|oauth2?|token)\b/gi,
         EXPIRY_DATE:
           /\b\s*(?:exp|valid)\s*[:-]?\s*(?:\d{2}\/\d{2}\/\d{4}|\d{4}-\d{2}-\d{2})\b/gi,
         // CONNECTION_STRING:
@@ -333,6 +335,7 @@ javascript: (() => {
         COMPANY_LABEL: /(?:azienda|societ[aà])\s*[:\-＝]*\s*/gi,
       }),
     }),
+    interv = 25,
     promptAltIdf = "prompt-security-alert",
     styleIdf = "simple-alert-styles",
     styleCls = "show",
@@ -509,7 +512,7 @@ javascript: (() => {
         } catch (e) {
           const appendedEls = Array.from(
             alerterWindow.querySelectorAll("*")
-          ).filter(e => e && e.classList.contains(dmCls));
+          ).filter((e) => e && e.classList.contains(dmCls));
           for (const e of appendedEls) e?.remove();
           this.alert.innerText = message;
         }
@@ -637,6 +640,10 @@ javascript: (() => {
         e instanceof HTMLInputElement || e instanceof HTMLTextAreaElement
           ? e.value
           : e.innerText;
+      if (!txt) {
+        alerter.destroy();
+        return;
+      }
       if (txt.length > 3000) {
         if (document.body.dataset.hidingAlert === "true") return;
         alerter.show(
@@ -647,11 +654,6 @@ javascript: (() => {
         return;
       }
       document.body.dataset.hidingAlert = "false";
-      alerter.hide();
-      if (txt === "") {
-        alerter.destroy();
-        return;
-      }
       if (txt === prevText) return;
       async function processWithRAF() {
         const dictEntries = Object.entries(MAIN_DICT).filter(Boolean),
@@ -660,10 +662,10 @@ javascript: (() => {
           i = 0,
           k = 0;
         let processedWork = 0;
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           function processChunk() {
             const startTime = performance.now();
-            while (performance.now() - startTime < 16) {
+            while (performance.now() - startTime < interv + 1) {
               if (w >= txt.length) {
                 resolve(results);
                 return;
@@ -687,8 +689,9 @@ javascript: (() => {
               if (
                 exp instanceof RegExp &&
                 res &&
-                !results.some(r => res.index === r.foundIn)
+                !results.some((r) => res.index === r.foundIn)
               ) {
+                console.log([k, exp]);
                 results.push({
                   k: key,
                   e: exp,
@@ -701,7 +704,7 @@ javascript: (() => {
                 typeof exp === "string" &&
                 res &&
                 txt[w].trim().toLowerCase() === exp &&
-                !results.some(r => res.index === r.foundIn)
+                !results.some((r) => res.index === r.foundIn)
               ) {
                 results.push({
                   k: key,
@@ -725,11 +728,13 @@ javascript: (() => {
       if (hasLeak) {
         isDestroyed = false;
         hidingAcc = 0;
-        alerter.show(
-          window.navigator.language.startsWith === "pt"
-            ? `Há dados sensíveis na sua prompt. Tome cuidado!`
-            : `There is sensitive data in your prompt. Be careful!`
-        );
+        !alerter.isCurrentlyShowing
+          ? alerter.show(
+              window.navigator.language.startsWith === "pt"
+                ? `Há dados sensíveis na sua prompt. Tome cuidado!`
+                : `There is sensitive data in your prompt. Be careful!`
+            )
+          : alerter.hide();
         const dmCls = "dismiss",
           dmFlag = "data-listening-click",
           alrtFlag = "data-listening-click",
@@ -799,7 +804,7 @@ javascript: (() => {
             dm.setAttribute("aria-controls", promptAltIdf);
           }
           if (alerterWindow.getAttribute(alrtFlag) !== "true") {
-            alerterWindow.addEventListener("click", ev => {
+            alerterWindow.addEventListener("click", (ev) => {
               if (!shouldShowMinimalAlert || !ev?.currentTarget) return;
               const scl = "scale(1)";
               for (const { k, v } of [
@@ -853,5 +858,5 @@ javascript: (() => {
       prevText = txt;
     }
     prevText = txt;
-  }, 2500);
+  }, interv * 100);
 })();
