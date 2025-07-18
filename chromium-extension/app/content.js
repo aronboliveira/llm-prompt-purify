@@ -11,7 +11,7 @@ javascript: (() => {
         PHONE: /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
         // CREDIT_CARD: /\b(?:\d[ -]*?){13,16}\b/,
         ENV_VAR: /\b[A-Z][A-Z0-9_]{2,}(?:_KEY|_SECRET|_TOKEN|_URL)*\b/,
-        API_KEY: /\b[Kk][eE][yY].*{1,20}[A-Za-z0-9]{20,}\b/,
+        API_KEY: /\b[Kk][eE][yY].{1,20}[A-Za-z0-9]{20,}\b/,
         TOKEN:
           /\b(?:password|secret|token)\s*[:=]\s*['"]?[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}\b/gi,
         BUSINESS:
@@ -836,7 +836,7 @@ javascript: (() => {
           }
         }
       } else {
-        const MAX_HIDE_PASSES = 10;
+        const MAX_HIDE_PASSES = 2;
         if (!alerter) return;
         const win = document.getElementById(promptAltIdf);
         const opacity = win ? parseFloat(getComputedStyle(win).opacity) : 0;
