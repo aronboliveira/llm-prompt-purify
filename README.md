@@ -13,6 +13,12 @@ _Multi-Language Security Solution for LLM Interactions_
 
 ---
 
+### Chromium extension (Light scan version)
+
+Available in the "extension" branch
+
+---
+
 ## 🌐 **Language Versions**
 
 ### Português (Brasil)
