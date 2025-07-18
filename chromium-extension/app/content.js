@@ -5,13 +5,13 @@ javascript: (() => {
   const MAIN_DICT = Object.freeze({
       common: Object.freeze({
         EMAIL: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,
-        SSN: /\b\d{3}-\d{2}-\d{4}\b/,
-        URL: /\b(https?:\/\/[^\s/$.?#].[^\s]*)\b/gi,
-        URN: /\burn:[a-z0-9][a-z0-9-]{1,31}:[^\s]+\b/gi,
+        // SSN: /\b\d{3}-\d{2}-\d{4}\b/,
+        // URL: /\b(https?:\/\/[^\s/$.?#].[^\s]*)\b/gi,
+        URN: /\b\s+urn:[a-z0-9][a-z0-9-]{1,31}:[^\s]+\b/gi,
         PHONE: /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
-        CREDIT_CARD: /\b(?:\d[ -]*?){13,16}\b/,
-        ENV_VAR: /\b[A-Z][A-Z0-9_]{2,}(?:_KEY|_SECRET|_TOKEN|_URL)?\b/,
-        API_KEY: /\b[A-Za-z0-9]{20,}\b/,
+        // CREDIT_CARD: /\b(?:\d[ -]*?){13,16}\b/,
+        ENV_VAR: /\b[A-Z][A-Z0-9_]{2,}(?:_KEY|_SECRET|_TOKEN|_URL)*\b/,
+        API_KEY: /\b[Kk][eE][yY].*{1,20}[A-Za-z0-9]{20,}\b/,
         TOKEN:
           /\b(?:password|secret|token)\s*[:=]\s*['"]?[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}\b/gi,
         BUSINESS:
@@ -20,7 +20,7 @@ javascript: (() => {
         UUID: /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/gi,
         MAC_ADDRESS: /\b(?:[0-9A-F]{2}[:-]){5}(?:[0-9A-F]{2})\b/g,
         SENSITIVE_PATH:
-          /\b(?:\/api\/v\d\/|\/admin\/)(?:users|keys|credentials)\b/gi,
+          /\b\s*(?:\/api\/v\d\/|\/admin\/)(?:users|keys|credentials)\b/gi,
         JWT: /\b(?:eyJ[A-Za-z0-9-_=]+\.){2}[A-Za-z0-9-_=]+\b/gi,
         PRIVATE_KEY: /\b-----BEGIN\s(?:RSA|EC|OPENSSH)\sPRIVATE KEY-----\b/gi,
         AWS_KEYS: /\b(AWS|AKIA|ASIA)[A-Z0-9]{16,}\b/gi,
@@ -36,31 +36,31 @@ javascript: (() => {
         VIN: /\b[A-HJ-NPR-Z0-9]{17}\b/gi,
         LICENSE_PLATE: /\b[A-Z]{1,3}\s?-\s?[A-Z0-9]{1,4}\b/gi,
         SOFTWARE_KEY: /\b[A-Z0-9]{4}(?:-?[A-Z0-9]{4}){3,}\b/gi,
-        PRODUCT_KEY: /\b(?:\d{3}-){4}\d{3}\b/gi,
-        HEALTHCHECK: /\b(?:health|status|ping)\b/gi,
+        // PRODUCT_KEY: /\b(?:\d{3}-){4}\d{3}\b/gi,
+        // HEALTHCHECK: /\b(?:health|status|ping)\b/gi,
         AUTH: /\b(?:auth|login|oauth2?|token)\b/gi,
         EXPIRY_DATE:
-          /\b(?:exp|valid)\s*[:-]?\s*(?:\d{2}\/\d{2}\/\d{4}|\d{4}-\d{2}-\d{2})\b/gi,
-        CONNECTION_STRING:
-          /\b(?:postgres(?:ql)?|mysql|mariadb|sqlite|mssql|oracle|cockroachdb|mongodb|redis|cassandra|cosmosdb|dynamodb|firestore|rethinkdb|couchdb|influxdb|riak|neo4j|arangodb|elasticsearch|bigtable|spanner|firebase|supabase|grpc|graphql):\/\/[^\s]+\b/gi,
+          /\b\s*(?:exp|valid)\s*[:-]?\s*(?:\d{2}\/\d{2}\/\d{4}|\d{4}-\d{2}-\d{2})\b/gi,
+        // CONNECTION_STRING:
+        //   /\b(?:postgres(?:ql)?|mysql|mariadb|sqlite|mssql|oracle|cockroachdb|mongodb|redis|cassandra|cosmosdb|dynamodb|firestore|rethinkdb|couchdb|influxdb|riak|neo4j|arangodb|elasticsearch|bigtable|spanner|firebase|supabase|grpc|graphql):\/\/[^\s]+\b/gi,
         ENDPOINT_SECRETS:
           /\b(?:api|auth|config|secrets)\/(?:[a-z0-9-]+\.(?:key|token|pem|cer|pgp|env|secret)|(?:staging|prod)\.config\.(?:json|yml))\b/gi,
         MEDICAL_RECORD:
           /\b(?:MRN|PID|NHI|HCN|[A-Z]{3}-\d{2}-\d{4})-?[\dA-Z]{8,12}\b/gi,
         BIOMETRIC_HASH:
           /\b(?:[a-f0-9]{64}|\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53})\b/gi,
-        LARAVEL:
-          /\b(?:api\/v\d+\/|oauth\/authorize|sanctum\/csrf-cookie|horizon\/dashboard|nova-api\/)\b/gi,
-        SPRING_BOOT:
-          /\b(?:actuator\/health|v\d+\/api\/|oauth2\/authorization\/|springfox\/swagger|hateoas\/.*_links)\b/gi,
-        DJANGO:
-          /\b(?:api\/\w+\/v\d+\/|graphql\/|admin\/login\/|rest-auth\/|dj-rest-auth\/)\b/gi,
-        EXPRESS:
-          /\b(?:api\/v\d+\/\w+|middleware\/auth|static\/uploads|socket\.io\/)\b/gi,
-        SWAGGER:
-          /\b(?:(?:swagger|openapi)(?:-ui)?\/|\/swagger-ui\/|\/redoc\/|\/apidocs\/)\b/gi,
-        GRAPHQL:
-          /\b(?:graphql(?:\/playground|\/voyager)?|\/gql\/|\/_introspection|\/schema\.(?:graphql|json))\b/gi,
+        // LARAVEL:
+        // /\b(?:api\/v\d+\/|oauth\/authorize|sanctum\/csrf-cookie|horizon\/dashboard|nova-api\/)\b/gi,
+        // SPRING_BOOT:
+        // /\b(?:actuator\/health|v\d+\/api\/|oauth2\/authorization\/|springfox\/swagger|hateoas\/.*_links)\b/gi,
+        // DJANGO:
+        // /\b(?:api\/\w+\/v\d+\/|graphql\/|admin\/login\/|rest-auth\/|dj-rest-auth\/)\b/gi,
+        // EXPRESS:
+        // /\b(?:api\/v\d+\/\w+|middleware\/auth|static\/uploads|socket\.io\/)\b/gi,
+        // SWAGGER:
+        // /\b(?:(?:swagger|openapi)(?:-ui)?\/|\/swagger-ui\/|\/redoc\/|\/apidocs\/)\b/gi,
+        // GRAPHQL:
+        // /\b(?:graphql(?:\/playground|\/voyager)?|\/gql\/|\/_introspection|\/schema\.(?:graphql|json))\b/gi,
         AWS_SECRET_KEY:
           /\baws[_-]secret[_-]access[_-]key\s*[:=]\s*[A-Za-z0-9\/+=]{40}\b/gi,
         GITHUB_PAT: /\bgh[pous]_[A-Za-z0-9]{36,}\b/gi,
@@ -145,7 +145,7 @@ javascript: (() => {
         TITULO_ELEITOR: /\b\d{12}\b/g,
         RG: /\b\d{1,2}\.?\d{3}\.?\d{3}-?[0-9Xx]\b/g,
         DOB_LABEL_PT: /(?:data\s*de\s*nascimento)\s*[:=-]?\s*/gi,
-        GENDER_LABEL_PT: /(?:sexo|g[eê]nero)\s*[:=-]?\s*/gi,
+        // GENDER_LABEL_PT: /(?:sexo|g[eê]nero)\s*[:=-]?\s*/gi,
         PROCESSO_CNJ: /\b\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}\b/g,
         PROCESSO_LABEL_PT:
           /\b(?:processo(?:\s*n[ºo°])?|n[ºo°]\s*do\s*processo)\s*[:=-]?\s*/gi,
@@ -200,7 +200,7 @@ javascript: (() => {
         EIN: /\b\d{2}-\d{7}\b/g,
         EIN_LABEL: /\b(?:ein|employer\s*identification\s*number)\s*[:=-]?\s*/gi,
 
-        CASE_NO_VALUE: /\b\d{1,2}:\d{2}-[a-z]{2}-\d{4,5}\b/gi,
+        // CASE_NO_VALUE: /\b\d{1,2}:\d{2}-[a-z]{2}-\d{4,5}\b/gi,
         CASE_LABEL_EN:
           /\b(?:case\s*(?:no|number|#)|docket\s*(?:no|number|#))\s*[:=-]?\s*/gi,
 
@@ -210,7 +210,7 @@ javascript: (() => {
         CONTRACT_NUMBER: /\bCNTR[-\s]?\d{6,10}\b/gi,
         CONTRACT_LABEL_EN: /\b(?:contract\s*(?:no|number))\s*[:=-]?\s*/gi,
 
-        EU_VAT: /\b[A-Z]{2}[A-Za-z0-9]{8,12}\b/gi,
+        // EU_VAT: /\b[A-Z]{2}[A-Za-z0-9]{8,12}\b/gi,
         VAT_LABEL: /\b(?:vat\s*(?:no|number))\s*[:=-]?\s*/gi,
       }),
       es: Object.freeze({
@@ -220,15 +220,15 @@ javascript: (() => {
         FULL_NAME_LABEL: /\b(?:nombre completo|nombre)\s*[:=-]\s*/gi,
         LAST_NAME_LABEL: /\b(?:apellido|apellidos)\s*[:=-]\s*/gi,
         COMPANY_LABEL: /\b(?:empresa|raz[oó]n social)\s*[:=-]\s*/gi,
-        CIF: /\b[A-Z][0-9]{7}[0-9A-J]\b/gi,
-        NIE: /\b[XZY]\d{7}[A-Z]\b/gi,
+        // CIF: /\b[A-Z][0-9]{7}[0-9A-J]\b/gi,
+        // NIE: /\b[XZY]\d{7}[A-Z]\b/gi,
         CONFIDENTIAL:
           /\b(?:confidential|proprietary)\s*[:-]?\s*['"]?[A-Za-z0-9!@#$%^&*()]+\b/gi,
         DNI: /\b\d{8}[A-Z]\b/gi,
         NIF: /\b[0-9KLMXYZ]\d{7}[A-Z]\b/gi,
         CURP_MX: /\b[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d\b/gi,
-        RFC_MX: /\b[A-Z&Ñ]{3,4}\d{6}[A-Z0-9]{3}\b/gi,
-        RUT_CL: /\b\d{7,8}-[0-9Kk]\b/gi,
+        // RFC_MX: /\b[A-Z&Ñ]{3,4}\d{6}[A-Z0-9]{3}\b/gi,
+        // RUT_CL: /\b\d{7,8}-[0-9Kk]\b/gi,
         DNI_LABEL: /(?:dni|nif)\s*[:=-]\s*/gi,
         CURP_LABEL: /(?:curp|rfc)\s*[:=-]\s*/gi,
         FECHA_NAC_LABEL: /(?:fecha\s*de\s*nacimiento)\s*[:=-]\s*/gi,
@@ -256,7 +256,7 @@ javascript: (() => {
         FULL_NAME_LABEL: /\b(?:Name|Vollst[aä]ndiger Name)\s*[:=-]\s*/gi,
         LAST_NAME_LABEL: /\b(?:Nachname|Familienname)\s*[:=-]\s*/gi,
         COMPANY_LABEL: /\b(?:Firma|Unternehmen|Firmenname)\s*[:=-]\s*/gi,
-        PERSONALAUSWEIS: /\b\d{9}\b/gi,
+        // PERSONALAUSWEIS: /\b\d{9}\b/gi,
       }),
       hb: Object.freeze({
         EMAIL_LABEL: /(?:אימייל|דוא״ל)\s*[：:＝\-]*\s*/gi,
@@ -267,9 +267,9 @@ javascript: (() => {
         COMPANY_LABEL: /(?:חברה)\s*[：:＝\-]*\s*/gi,
       }),
       in: Object.freeze({
-        AADHAAR: /\b\d{4}\s?\d{4}\s?\d{4}\b/gi,
-        PAN: /\b[A-Z]{5}\d{4}[A-Z]\b/gi,
-        IFSC: /\b[A-Z]{4}0[A-Z0-9]{6}\b/gi,
+        // AADHAAR: /\b\d{4}\s?\d{4}\s?\d{4}\b/gi,
+        // PAN: /\b[A-Z]{5}\d{4}[A-Z]\b/gi,
+        // IFSC: /\b[A-Z]{4}0[A-Z0-9]{6}\b/gi,
         AADHAAR_LABEL: /\b(?:aadhaar\s*(?:no|number|id))+\s*[:=-]\s*/gi,
         AADHAAR_LABEL_HD: /(?:आधार\s*संख्या\s*[：:＝\-]*\s*)/gi,
         PAN_LABEL: /\b(?:pan\s*(?:card|number))+\s*[:=-]\s*/gi,
@@ -557,7 +557,7 @@ javascript: (() => {
     }
     hide() {
       this._fadeAlert();
-      this._fadeInput();
+      typeof this._fadeInput === "function" && this._fadeInput();
     }
     destroy() {
       if (!(this.alert instanceof HTMLElement && this.alert.isConnected))
@@ -568,7 +568,7 @@ javascript: (() => {
         this.alert.style.transform = "scale(0)";
         this.alert.style.opacity = "0";
       }
-      this._fadeInput();
+      typeof this._fadeInput === "function" && this._fadeInput();
       this.isCurrentlyShowing = false;
     }
     _fadeAlert(soft = false) {
@@ -619,6 +619,7 @@ javascript: (() => {
   }
   let prevText = "";
   setInterval(async () => {
+    let txt = "";
     try {
       const e =
         document.getElementById(gpsPrompt) ||
@@ -636,6 +637,17 @@ javascript: (() => {
         e instanceof HTMLInputElement || e instanceof HTMLTextAreaElement
           ? e.value
           : e.innerText;
+      if (txt.length > 3000) {
+        if (document.body.dataset.hidingAlert === "true") return;
+        alerter.show(
+          "Prompt is too long to process (more than 3000 characters)."
+        );
+        setTimeout(alerter.destroy, 1000);
+        document.body.dataset.hidingAlert = "true";
+        return;
+      }
+      document.body.dataset.hidingAlert = "false";
+      alerter.hide();
       if (txt === "") {
         alerter.destroy();
         return;
