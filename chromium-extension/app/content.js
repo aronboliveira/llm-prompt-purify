@@ -28,7 +28,7 @@ javascript: (() => {
         AWS_KEYS: /\b(AWS|AKIA|ASIA)[A-Z0-9]{16,}\b/gi,
         // BANK_ACCOUNT: /\b(?:\d{8,18}|[A-Z]{2}\d{2}\s?(?:\d{4}\s?){3,5})\b/gi,
         IBAN: /\b[A-Z]{2}\d{2}[\s\-]?(?:[A-Z0-9]{4}[\s\-]?){2,7}[A-Z0-9]{1,4}\b/gi,
-        SWIFT_CODE: /\b[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?\b/gi,
+        // SWIFT_CODE: /\b[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?\b/gi,
         TAX_ID: /\b(?:tax\s*id|vat\s*number)\s*[:=]\s*[A-Z0-9\-]{6,12}\b/gi,
         // COORDINATES:
         //   /-?\d{1,3}(?:\.\d+)?[°º]?\s*[NS]?\s*,?\s*-?\d{1,3}(?:\.\d+)?[°º]?\s*[EW]?/gi,
@@ -512,7 +512,7 @@ javascript: (() => {
         } catch (e) {
           const appendedEls = Array.from(
             alerterWindow.querySelectorAll("*")
-          ).filter((e) => e && e.classList.contains(dmCls));
+          ).filter(e => e && e.classList.contains(dmCls));
           for (const e of appendedEls) e?.remove();
           this.alert.innerText = message;
         }
@@ -634,8 +634,9 @@ javascript: (() => {
           e instanceof HTMLTextAreaElement ||
           (e instanceof HTMLElement && e.contentEditable === "true")
         )
-      )
+      ) {
         return;
+      }
       const txt =
         e instanceof HTMLInputElement || e instanceof HTMLTextAreaElement
           ? e.value
@@ -644,11 +645,20 @@ javascript: (() => {
         alerter.destroy();
         return;
       }
+      let msg = "";
+      if (txt.length > 3000) {
+        msg = navigator.language.startsWith("pt-")
+          ? "A prompt é muito extensa (mais de 3000 caracteres)"
+          : "Prompt is too long to process (more than 3000 characters).";
+      } else {
+        msg = navigator.language.startsWith("pt-")
+          ? "Há dados sensíveis na sua prompt. Tome cuidado!"
+          : "There is sensitive data in your prompt. Be careful!";
+      }
+      if (!msg) return;
       if (txt.length > 3000) {
         if (document.body.dataset.hidingAlert === "true") return;
-        alerter.show(
-          "Prompt is too long to process (more than 3000 characters)."
-        );
+        alerter.show(msg);
         setTimeout(alerter.destroy, 1000);
         document.body.dataset.hidingAlert = "true";
         return;
@@ -662,7 +672,7 @@ javascript: (() => {
           i = 0,
           k = 0;
         let processedWork = 0;
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           function processChunk() {
             const startTime = performance.now();
             while (performance.now() - startTime < interv + 1) {
@@ -689,9 +699,8 @@ javascript: (() => {
               if (
                 exp instanceof RegExp &&
                 res &&
-                !results.some((r) => res.index === r.foundIn)
+                !results.some(r => res.index === r.foundIn)
               ) {
-                console.log([k, exp]);
                 results.push({
                   k: key,
                   e: exp,
@@ -704,7 +713,7 @@ javascript: (() => {
                 typeof exp === "string" &&
                 res &&
                 txt[w].trim().toLowerCase() === exp &&
-                !results.some((r) => res.index === r.foundIn)
+                !results.some(r => res.index === r.foundIn)
               ) {
                 results.push({
                   k: key,
@@ -728,13 +737,7 @@ javascript: (() => {
       if (hasLeak) {
         isDestroyed = false;
         hidingAcc = 0;
-        !alerter.isCurrentlyShowing
-          ? alerter.show(
-              window.navigator.language.startsWith === "pt"
-                ? `Há dados sensíveis na sua prompt. Tome cuidado!`
-                : `There is sensitive data in your prompt. Be careful!`
-            )
-          : alerter.hide();
+        !alerter.isCurrentlyShowing ? alerter.show(msg) : alerter.hide();
         const dmCls = "dismiss",
           dmFlag = "data-listening-click",
           alrtFlag = "data-listening-click",
@@ -804,7 +807,7 @@ javascript: (() => {
             dm.setAttribute("aria-controls", promptAltIdf);
           }
           if (alerterWindow.getAttribute(alrtFlag) !== "true") {
-            alerterWindow.addEventListener("click", (ev) => {
+            alerterWindow.addEventListener("click", ev => {
               if (!shouldShowMinimalAlert || !ev?.currentTarget) return;
               const scl = "scale(1)";
               for (const { k, v } of [
@@ -854,7 +857,6 @@ javascript: (() => {
         } else !isDestroyed && alerter.hide();
       }
     } catch (e) {
-      // fail silently
       prevText = txt;
     }
     prevText = txt;
