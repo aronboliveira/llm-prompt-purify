@@ -28,7 +28,7 @@ javascript: (() => {
         AWS_KEYS: /\b(AWS|AKIA|ASIA)[A-Z0-9]{16,}\b/gi,
         // BANK_ACCOUNT: /\b(?:\d{8,18}|[A-Z]{2}\d{2}\s?(?:\d{4}\s?){3,5})\b/gi,
         IBAN: /\b[A-Z]{2}\d{2}[\s\-]?(?:[A-Z0-9]{4}[\s\-]?){2,7}[A-Z0-9]{1,4}\b/gi,
-        SWIFT_CODE: /\b[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?\b/gi,
+        // SWIFT_CODE: /\b[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?\b/gi,
         TAX_ID: /\b(?:tax\s*id|vat\s*number)\s*[:=]\s*[A-Z0-9\-]{6,12}\b/gi,
         // COORDINATES:
         //   /-?\d{1,3}(?:\.\d+)?[°º]?\s*[NS]?\s*,?\s*-?\d{1,3}(?:\.\d+)?[°º]?\s*[EW]?/gi,
