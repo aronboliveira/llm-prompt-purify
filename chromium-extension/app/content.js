@@ -644,11 +644,20 @@ javascript: (() => {
         alerter.destroy();
         return;
       }
+      let msg = "";
+      if (txt.length > 3000) {
+        msg = window.language.startsWith("pt")
+          ? "A prompt é muito extensa (mais de 3000 caracteres)"
+          : "Prompt is too long to process (more than 3000 characters).";
+      } else {
+        msg = window.language.startsWith("pt")
+          ? "Há dados sensíveis na sua prompt. Tome cuidado!"
+          : "There is sensitive data in your prompt. Be careful!";
+      }
+      if (!msg) return;
       if (txt.length > 3000) {
         if (document.body.dataset.hidingAlert === "true") return;
-        alerter.show(
-          "Prompt is too long to process (more than 3000 characters)."
-        );
+        alerter.show(msg);
         setTimeout(alerter.destroy, 1000);
         document.body.dataset.hidingAlert = "true";
         return;
@@ -727,13 +736,7 @@ javascript: (() => {
       if (hasLeak) {
         isDestroyed = false;
         hidingAcc = 0;
-        !alerter.isCurrentlyShowing
-          ? alerter.show(
-              window.navigator.language.startsWith === "pt"
-                ? `Há dados sensíveis na sua prompt. Tome cuidado!`
-                : `There is sensitive data in your prompt. Be careful!`
-            )
-          : alerter.hide();
+        !alerter.isCurrentlyShowing ? alerter.show(msg) : alerter.hide();
         const dmCls = "dismiss",
           dmFlag = "data-listening-click",
           alrtFlag = "data-listening-click",
