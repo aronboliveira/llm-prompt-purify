@@ -634,8 +634,9 @@ javascript: (() => {
           e instanceof HTMLTextAreaElement ||
           (e instanceof HTMLElement && e.contentEditable === "true")
         )
-      )
+      ) {
         return;
+      }
       const txt =
         e instanceof HTMLInputElement || e instanceof HTMLTextAreaElement
           ? e.value
@@ -646,11 +647,11 @@ javascript: (() => {
       }
       let msg = "";
       if (txt.length > 3000) {
-        msg = window.language.startsWith("pt")
+        msg = navigator.language.startsWith("pt-")
           ? "A prompt é muito extensa (mais de 3000 caracteres)"
           : "Prompt is too long to process (more than 3000 characters).";
       } else {
-        msg = window.language.startsWith("pt")
+        msg = navigator.language.startsWith("pt-")
           ? "Há dados sensíveis na sua prompt. Tome cuidado!"
           : "There is sensitive data in your prompt. Be careful!";
       }
@@ -856,7 +857,6 @@ javascript: (() => {
         } else !isDestroyed && alerter.hide();
       }
     } catch (e) {
-      // fail silently
       prevText = txt;
     }
     prevText = txt;
