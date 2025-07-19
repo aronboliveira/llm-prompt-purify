@@ -691,7 +691,6 @@ javascript: (() => {
                 res &&
                 !results.some(r => res.index === r.foundIn)
               ) {
-                console.log([k, exp]);
                 results.push({
                   k: key,
                   e: exp,
