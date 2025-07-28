@@ -11,7 +11,7 @@ javascript: (() => {
         PHONE:
           /(?=.*[.\-]+)\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/,
         // CREDIT_CARD: /\b(?:\d[ -]*?){13,16}\b/,
-        ENV_VAR: /\b[A-Z][A-Z0-9_]{2,}(?:_KEY|_SECRET|_TOKEN|_URL)*\b/,
+        ENV_VAR: /\b[A-Z][A-Z0-9_]{2,}(?:_KEY|_SECRET|_TOKEN|_URL)+\b/,
         API_KEY:
           /(?<=\b(?:API_KEY|SECRET_KEY|ACCESS_TOKEN)\s*[:=]\s*)[A-Za-z0-9]{20,}/,
         TOKEN:
@@ -36,7 +36,7 @@ javascript: (() => {
         ETHEREUM_ADDRESS: /\b0x[a-fA-F0-9]{40}\b/gi,
         CRYPTO_PRIVATE_KEY: /\b[5KL][1-9A-HJ-NP-Za-km-z]{50,51}\b/gi,
         // VIN: /\b[A-HJ-NPR-Z0-9]{17}\b/gi,
-        LICENSE_PLATE: /\b[A-Z]{1,3}\s?-\s?[A-Z0-9]{1,4}\b/gi,
+        // LICENSE_PLATE: /\b[A-Z]{1,3}\s*-\s*[A-Z0-9]{1,4}\b/gi,
         SOFTWARE_KEY: /(?=.*[.\-]+)\b[A-Z0-9]{4}(?:-?[A-Z0-9]{4}){3,}\b/gi,
         // PRODUCT_KEY: /\b(?:\d{3}-){4}\d{3}\b/gi,
         // HEALTHCHECK: /\b(?:health|status|ping)\b/gi,
@@ -144,7 +144,7 @@ javascript: (() => {
         CNPJ: /\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g,
         CEP: /\b\d{5}-?\d{3}\b/g,
         CNS: /\b\d{3}\s?\d{4}\s?\d{4}\s?\d{4}\b/g,
-        TITULO_ELEITOR: /\b\d{12}\b/g,
+        TITULO_ELEITOR: /(?<=t[ií]tulo[\s-_]*eleitora?l?)\b\d{12}\b/gi,
         RG: /\b\d{1,2}\.?\d{3}\.?\d{3}-?[0-9Xx]\b/g,
         DOB_LABEL_PT: /(?:data\s*de\s*nascimento)\s*[:=-]?\s*/gi,
         // GENDER_LABEL_PT: /(?:sexo|g[eê]nero)\s*[:=-]?\s*/gi,
@@ -207,7 +207,7 @@ javascript: (() => {
           /\b(?:case\s*(?:no|number|#)|docket\s*(?:no|number|#))\s*[:=-]?\s*/gi,
 
         PO_NUMBER: /\bPO[-\s]?\d{5,10}\b/gi,
-        PO_LABEL: /\b(?:purchase\s*order|PO)\s*[:=-]?\s*/gi,
+        PO_LABEL: /\b(?:purchase\s*order|PO)\s*[:=-]+\s*/gi,
 
         CONTRACT_NUMBER: /\bCNTR[-\s]?\d{6,10}\b/gi,
         CONTRACT_LABEL_EN: /\b(?:contract\s*(?:no|number))\s*[:=-]?\s*/gi,
@@ -242,7 +242,7 @@ javascript: (() => {
         NIT_LABEL: /\b(?:nit)\s*[:=-]?\s*/gi,
 
         EXPEDIENTE_ES: /\b\d{4,7}\/\d{4}\b/gi,
-        EXPEDIENTE_LABEL_ES: /\b(?:expediente|exp)\s*[:=-]?\s*/gi,
+        EXPEDIENTE_LABEL_ES: /\b(?:expediente|exp)\s*[:=-]+\s*/gi,
 
         FACTURA_LABEL_ES:
           /\b(?:factura|n[úu]mero\s*de\s*factura)\s*[:=-]?\s*/gi,
