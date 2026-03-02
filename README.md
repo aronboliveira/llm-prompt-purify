@@ -1,162 +1,86 @@
-title: **LLM Prompt Purify**
-subtitle: Client-Side Sensitive Data Filtering Suite  
-contact: [aron.programador@gmail.com](mailto:aron.programador@gmail.com)
+# LLM Prompt Purify
 
----
+Client-side prompt sanitization for masking sensitive data before pasting content into web-based LLM interfaces.
 
-<div align="center">
+## What the app does
 
-![Privacy Shield](https://img.icons8.com/3d-fluency/94/security-checked.png)  
-_Multi-Language Security Solution for LLM Interactions_
+The app lets a user:
 
-</div>
+1. paste raw content into a textarea
+2. run a local scan in the browser
+3. get a masked output immediately
+4. disable individual masks if needed
+5. copy the current masked output
 
----
+The current rule focus is:
 
-### Chromium extension (Light scan version)
+- American English
+- Brazilian Portuguese
+- LatAm Spanish
 
-Available in the "extension" branch
+No prompt text is sent to a third party during masking.
 
----
+## Current architecture
 
-## 🌐 **Language Versions**
+- Angular standalone app
+- pure masking engine under `src/app/core/masking`
+- signal-based session state under `src/app/core/state`
+- Jest for unit coverage
+- Playwright for end-to-end flow checks
+- Angular SSR server in `server.ts`
 
-### Português (Brasil)
+## Project status
 
-**Finalidade:**  
-<em>Garantir proteção total de dados sensíveis durante o uso de LLMs através de filtragem local</em>
+This repository was overhauled from an earlier prototype. The current app is intentionally narrower:
 
-🔐 **Princípios de Segurança**
+- no modal-heavy review flow
+- no copied regex engine in a separate browser extension
+- no dead feedback/contact surfaces
+- no primary action that copies raw unmasked input
 
-- Processamento 100% client-side (navegador)
-- Zero transmissão de dados para terceiros
-- Arquitetura descentralizada
+## Local development
 
-🛠 **Stack Tecnológica**  
-| Frontend | Backend |  
-|----------|---------|  
-| Angular | Express |
+Install dependencies:
 
-<details><summary>🔍 <strong>Dados Protegidos</strong></summary>
+```bash
+npm install
+```
 
-- 📧 Comunicações pessoais
-- 🆔 Documentos oficiais (CPF/RG/CNH)
-- 🏡 Dados geolocalizados
-- 🔒 Credenciais de acesso
-- 💼 Informação corporativa sensível
-</details>
+Run the app:
 
----
+```bash
+npm start
+```
 
-### 🇺🇸 English (USA)
+Build:
 
-**Purpose:**  
-<em>Ensure complete protection of sensitive data during LLM usage through local filtering</em>
+```bash
+npm run build
+```
 
-🔐 **Security Principles**
+Run unit tests:
 
-- 100% client-side processing
-- Zero data transmission to third parties
-- Decentralized architecture
+```bash
+npm run test -- --runInBand
+```
 
-🛠 **Tech Stack**  
-| Frontend | Backend |  
-|----------|---------|  
-| Angular | Express |
+Run end-to-end tests:
 
-<details><summary>🔍 <strong>Protected Data</strong></summary>
+```bash
+npm run test:e2e
+```
 
-- 📧 Personal communications
-- 🆔 Official documents (SSN/ID/Drivers License)
-- 🏡 Geolocation data
-- 🔒 Access credentials
-- 💼 Sensitive corporate information
-</details>
+## Important paths
 
----
+- app shell: `src/app/app.component.ts`
+- masking engine: `src/app/core/masking/masking.engine.ts`
+- scan state: `src/app/core/state/scan-session.service.ts`
+- unit tests: `src/app/core/**/*.spec.ts`
+- e2e tests: `e2e/scan-workflow.spec.ts`
+- LLM workflow notes: `.notes/.llms/`
 
-### 🇪🇸 Español (LatAm)
+## Notes
 
-**Objetivo:**  
-<em>Garantizar protección total de datos sensibles usando LLMs mediante filtrado local</em>
-
-🔐 **Principios de Seguridad**
-
-- Procesamiento 100% en el cliente
-- Cero transmisión de datos
-- Arquitectura descentralizada
-
-🛠 **Stack Tecnológico**  
-| Frontend | Backend |  
-|----------|---------|  
-| Angular | Express |
-
-<details><summary>🔍 <strong>Datos Protegidos</strong></summary>
-
-- 📧 Comunicaciones personales
-- 🆔 Documentos oficiales
-- 🏡 Datos de geolocalización
-- 🔒 Credenciales de acceso
-- 💼 Información corporativa
-</details>
-
----
-
-### 🇩🇪 Deutsch (EU)
-
-**Zweck:**  
-<em>Sensibler Datenschutz bei LLM-Nutzung durch lokale Filterung</em>
-
-🔐 **Sicherheitsprinzipien**
-
-- 100% Client-seitige Verarbeitung
-- Keine Datenweitergabe
-- Dezentrale Architektur
-
-🛠 **Technologie-Stack**  
-| Frontend | Backend |  
-|----------|---------|  
-| Angular | Express |
-
-<details><summary>🔍 <strong>Geschützte Daten</strong></summary>
-
-- 📧 Persönliche Kommunikation
-- 🆔 Amtliche Dokumente
-- 🏡 Geolokalisierungsdaten
-- 🔒 Zugangsdaten
-- 💼 Unternehmenskritische Daten
-</details>
-
----
-
-<div align="center" style="margin-top:40px">
-
-**🛡️ Privacy by Design Architecture**  
-![System Architecture](https://img.icons8.com/3d-fluency/94/data-configuration.png)
-
-</div>
-
----
-
-## **Core Features**
-
-| ✅ Security          | 🚀 Performance     | 🔧 Customization     |
-| -------------------- | ------------------ | -------------------- |
-| Local Regex Matching | Instant Processing | Modular Rules Engine |
-| Heuristic Analysis   | Lightweight (<2MB) | Whitelist Management |
-| Memory Protection    | Multi-threaded     | Plugin System        |
-
----
-
-## **Contact & Support**
-
-📩 **Email:** [aron.programador@gmail.com](mailto:aron.programador@gmail.com)  
-🌍 **Documentation:** [prompt-purify.docs](https://example.com)  
-🐙 **GitHub:** [github.com/prompt-purify](https://github.com)
-
-<div align="center" style="margin-top:30px">
-
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)  
-_Open Source Security Solution - v2.3.1_
-
-</div>
+- `.notes/` now holds durable project and agent guidance.
+- `.tmp/` holds volatile logs and verification artifacts.
+- the old Chromium extension prototype was removed during the overhaul because it had drifted from the application behavior.
