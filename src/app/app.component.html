@@ -1,44 +1,134 @@
-<div class="container" id="mainContainer">
-  <app-fixed-header></app-fixed-header>
-  <main id="main" class="main">
-    <hgroup id="mainHeader"></hgroup>
-    <mat-form-field appearance="outline">
-      <mat-label>Type or paste your prompt here</mat-label>
+<div class="app-shell">
+  <header class="hero">
+    <div class="hero__copy">
+      <p class="eyebrow">Client-side prompt sanitization</p>
+      <h1>Paste once, scan once, copy the masked version.</h1>
+      <p class="hero__body">
+        LLM Prompt Purify detects likely credentials, personal identifiers, and structured private
+        fields locally in your browser. Every detected mask is enabled by default, and you can turn
+        off individual replacements before copying the final prompt.
+      </p>
+    </div>
+    <div class="hero__panel">
+      <p class="hero__stat-value">{{ vm().matchCount }}</p>
+      <p class="hero__stat-label">matches in the latest scan</p>
+      <p class="hero__stat-note">Focused coverage: EN-US, PT-BR, ES-LatAm</p>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="panel panel--input">
+      <div class="panel__header">
+        <div>
+          <p class="panel__eyebrow">Input</p>
+          <h2>Source prompt</h2>
+        </div>
+        <span class="char-count">{{ vm().sourceText.length }} chars</span>
+      </div>
+
+      <label class="sr-only" for="sourceText">Source prompt</label>
       <textarea
-        #promptInput
-        id="promptInput"
-        matInput
-        [(ngModel)]="userInput"
-        (ngModelChange)="setInput($event)"
-        [attr.maxLength]="_maxLength"
-        placeholder="Type your message here..."
-        rows="10"
+        id="sourceText"
+        class="editor"
+        data-testid="source-textarea"
+        [ngModel]="vm().sourceText"
+        (ngModelChange)="updateSourceText($event)"
+        placeholder="Paste the content you want to sanitize before sending it to an LLM."
+        spellcheck="false"
       ></textarea>
-    </mat-form-field>
-    <p>{{ userInput.length }}/{{ _maxLength }} characters</p>
-    <output id="resultOutput">{{ processedOutput }}</output>
-    <fieldset class="actions">
-      <app-scan-submit (scan)="checkPrompt()"></app-scan-submit>
-      <button
-        mat-icon-button
-        color="secondary"
-        aria-label="Click to copy the output"
-        matTooltip="Click to copy the output"
-        (click)="copyOutput()"
-      >
-        <mat-icon>content_copy</mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        color="accent"
-        aria-label="Download Output"
-        matTooltip="Download Output"
-        (click)="downloadZip()"
-      >
-        <mat-icon>download</mat-icon>
-      </button>
-      <app-compress-picker></app-compress-picker>
-    </fieldset>
+
+      <div class="panel__actions">
+        <button
+          class="button button--primary"
+          data-testid="scan-button"
+          [disabled]="vm().isScanning"
+          (click)="runScan()"
+        >
+          {{ vm().isScanning ? "Scanning..." : "Scan and mask" }}
+        </button>
+        <button
+          class="button button--secondary"
+          [disabled]="!vm().sourceText"
+          (click)="clear()"
+        >
+          Clear
+        </button>
+      </div>
+
+      @if (vm().errorMessage) {
+        <p class="notice notice--error" aria-live="polite">{{ vm().errorMessage }}</p>
+      } @else {
+        <p class="notice">
+          The scan stays local. No prompt text leaves the browser during masking.
+        </p>
+      }
+    </section>
+
+    <section class="panel panel--output">
+      <div class="panel__header">
+        <div>
+          <p class="panel__eyebrow">Output</p>
+          <h2>Masked prompt</h2>
+        </div>
+        <button
+          class="button button--secondary"
+          data-testid="copy-button"
+          [disabled]="!vm().canCopy"
+          (click)="copyMaskedOutput()"
+        >
+          Copy masked output
+        </button>
+      </div>
+
+      <div class="output" data-testid="masked-output" aria-live="polite">
+        @if (vm().hasResult) {
+          {{ vm().maskedText }}
+        } @else {
+          Run a scan to generate the safe-to-copy version of your prompt.
+        }
+      </div>
+
+      <div class="status-row">
+        @if (!vm().hasResult) {
+          <p class="notice">Nothing has been scanned yet.</p>
+        } @else if (!vm().hasMatches) {
+          <p class="notice notice--success">
+            No supported sensitive patterns were detected. The output matches your original text.
+          </p>
+        } @else {
+          <p class="notice notice--success">
+            {{ vm().activeMatches }} of {{ vm().matchCount }} masks are currently applied.
+          </p>
+        }
+
+        @if (copyFeedback() === "success") {
+          <p class="copy-feedback copy-feedback--success">Masked output copied.</p>
+        } @else if (copyFeedback() === "error") {
+          <p class="copy-feedback copy-feedback--error">
+            Clipboard access failed. Copy directly from the output panel instead.
+          </p>
+        }
+      </div>
+    </section>
   </main>
-  <app-under-development></app-under-development>
+
+  @if (vm().matches.length) {
+    <section class="review">
+      <div class="review__header">
+        <div>
+          <p class="panel__eyebrow">Review</p>
+          <h2>Mask toggles</h2>
+        </div>
+        <div class="review__actions">
+          <button class="button button--secondary" (click)="toggleAll(true)">Enable all</button>
+          <button class="button button--secondary" (click)="toggleAll(false)">Disable all</button>
+        </div>
+      </div>
+
+      <app-match-review
+        [matches]="vm().matches"
+        (matchToggled)="toggleMatch($event)"
+      ></app-match-review>
+    </section>
+  }
 </div>

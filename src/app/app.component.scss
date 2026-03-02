@@ -1,53 +1,237 @@
-@use "./styles/abstracts/vars.scss" as *;
-
-:host ::ng-deep {
-  #mainContainer {
-    padding-top: 5rem;
-  }
-  #mainHeader {
-    padding-bottom: 3rem;
-  }
+.app-shell {
+  display: grid;
+  gap: 1.5rem;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 2rem 1rem 3rem;
 }
 
-textarea {
-  width: 100%;
-  font-size: $gap-md;
+.hero {
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.24), transparent 32%),
+    linear-gradient(135deg, rgba(244, 250, 248, 0.96), rgba(255, 246, 232, 0.92));
+  border: 1px solid rgba(13, 57, 72, 0.08);
+  border-radius: 1.5rem;
+  box-shadow: 0 24px 60px rgba(11, 38, 61, 0.12);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.8fr) minmax(260px, 0.9fr);
+  overflow: hidden;
+  padding: 1.5rem;
 }
 
-.actions {
-  margin-top: $gap-md;
-  gap: $gap-md;
+.hero__copy,
+.hero__panel {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.hero__panel {
+  align-content: start;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(15, 118, 110, 0.12);
+  border-radius: 1.2rem;
+  padding: 1rem;
+}
+
+.hero__body,
+.hero__stat-label,
+.hero__stat-note,
+.notice {
+  color: #425466;
+}
+
+.hero h1,
+.panel h2 {
+  color: #0f172a;
+  margin: 0;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 0.96;
+  max-width: 11ch;
+}
+
+.hero__body {
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 62ch;
+}
+
+.hero__stat-value {
+  color: #0f766e;
+  font-family: "Menlo", "Consolas", monospace;
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  font-weight: 600;
+  margin: 0;
+}
+
+.hero__stat-label,
+.hero__stat-note,
+.panel__eyebrow,
+.eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.eyebrow,
+.panel__eyebrow {
+  color: #0f766e;
+}
+
+.workspace {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.panel,
+.review {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(11, 38, 61, 0.1);
+  border-radius: 1.4rem;
+  box-shadow: 0 22px 50px rgba(11, 38, 61, 0.08);
+  padding: 1.25rem;
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel__header,
+.review__header {
+  align-items: start;
   display: flex;
-  justify-content: center;
-  vertical-align: middle;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.char-count {
+  background: #f0f4f8;
+  border-radius: 999px;
+  color: #425466;
+  display: inline-flex;
+  font-family: "Menlo", "Consolas", monospace;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.editor,
+.output {
+  background: #f8fafc;
+  border: 1px solid rgba(11, 38, 61, 0.12);
+  border-radius: 1rem;
+  color: #0f172a;
+  font-family: "Menlo", "Consolas", monospace;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  min-height: 22rem;
+  padding: 1rem 1.05rem;
+}
+
+.editor {
+  resize: vertical;
+}
+
+.output {
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.panel__actions,
+.review__actions,
+.status-row {
+  align-items: center;
+  display: flex;
   flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.button {
+  appearance: none;
   border: none;
-  button {
-    margin-block: $cta-margin;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.8rem 1.15rem;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.button--primary {
+  background: linear-gradient(135deg, #0f766e, #115e59);
+  color: #f8fffe;
+}
+
+.button--secondary {
+  background: #e9eff4;
+  color: #0f172a;
+}
+
+.notice {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.notice--error {
+  color: #b42318;
+}
+
+.notice--success,
+.copy-feedback--success {
+  color: #0f766e;
+}
+
+.copy-feedback--error {
+  color: #b42318;
+}
+
+.copy-feedback {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.review {
+  display: grid;
+  gap: 1rem;
+}
+
+.sr-only {
+  block-size: 1px;
+  clip: rect(0 0 0 0);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .hero,
+  .workspace {
+    grid-template-columns: 1fr;
   }
-}
 
-#main {
-  width: 75%;
-  margin-inline: auto;
-  display: flex;
-  flex-direction: column;
-  @media screen and (max-width: 600px) {
-    margin-top: 5rem;
+  .hero h1 {
+    max-width: none;
   }
-}
-
-#mainContainer {
-  width: 100%;
-  height: 100%;
-  min-width: 50%;
-}
-
-#mainHeader {
-  display: flex;
-  justify-content: space-around;
-}
-
-#resultOutput {
-  color: rgba(255, 0, 0, 0.819);
 }

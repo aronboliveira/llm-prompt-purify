@@ -1,6 +1,5 @@
-import type { Config } from "jest";
-
-const config: Config = {
+/** @type {import("jest").Config} */
+module.exports = {
   preset: "jest-preset-angular",
   setupFilesAfterEnv: ["<rootDir>/setup-jest.ts"],
   testEnvironment: "jsdom",
@@ -11,8 +10,8 @@ const config: Config = {
     "^.+\\.(ts|mjs|js|html)$": [
       "jest-preset-angular",
       {
-        tsconfig: "<rootDir>/tsconfig.spec.json",
         stringifyContentPathRegex: "\\.(html|svg)$",
+        tsconfig: "<rootDir>/tsconfig.spec.json",
       },
     ],
   },
@@ -24,5 +23,3 @@ const config: Config = {
   ],
   coverageDirectory: "<rootDir>/.tmp/project-overhaul/jest-coverage",
 };
-
-export default config;
