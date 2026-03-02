@@ -1,0 +1,31 @@
+<div class="match-list">
+  @for (match of matches(); track match.id) {
+    <article class="match-card" [attr.data-testid]="'match-card-' + match.ruleId">
+      <div class="match-card__top">
+        <label class="match-card__toggle">
+          <input
+            type="checkbox"
+            [checked]="match.enabled"
+            [attr.data-testid]="'toggle-' + match.ruleId"
+            (change)="onMatchToggle(match.id, $event)"
+          />
+          <span>{{ match.label }}</span>
+        </label>
+        <div class="match-card__badges">
+          <span class="badge">{{ categoryLabels[match.category] }}</span>
+          <span class="badge badge--ghost">{{ localeLabels[match.locale] }}</span>
+        </div>
+      </div>
+
+      <div class="match-card__detail">
+        <span class="detail-label">Original</span>
+        <code>{{ preview(match.value) }}</code>
+      </div>
+
+      <div class="match-card__detail">
+        <span class="detail-label">Mask</span>
+        <code>{{ match.mask }}</code>
+      </div>
+    </article>
+  }
+</div>
