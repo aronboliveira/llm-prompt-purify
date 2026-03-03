@@ -7,6 +7,8 @@ import type {
   NegativeMaskFixture,
 } from "../../testing/declarations/testing.types";
 import {
+  FUZZY_LABEL_MASK_FIXTURES,
+  FUZZY_LABEL_NEGATIVE_FIXTURES,
   GLOBAL_CREDENTIAL_MASK_FIXTURES,
   GLOBAL_FINANCIAL_MASK_FIXTURES,
   GLOBAL_NEGATIVE_MASK_FIXTURES,
@@ -53,6 +55,20 @@ describe("MaskingEngine regression corpus", () => {
     for (const fixture of SCOPE_BOUNDARY_MASK_FIXTURES) {
       it(fixture.description, () => {
         assertBoundaryFixture(engine, fixture);
+      });
+    }
+  });
+
+  describe("fuzzy label corpus", () => {
+    for (const fixture of FUZZY_LABEL_MASK_FIXTURES) {
+      it(fixture.description, () => {
+        assertPositiveFixture(engine, fixture);
+      });
+    }
+
+    for (const fixture of FUZZY_LABEL_NEGATIVE_FIXTURES) {
+      it(fixture.description, () => {
+        assertNegativeFixture(engine, fixture);
       });
     }
   });

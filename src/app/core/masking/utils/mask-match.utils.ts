@@ -7,11 +7,25 @@ import type {
 } from "../declarations/masking.types";
 import { sanitizeCapturedValue } from "./mask-format.utils";
 
-interface CandidateMatch {
+export interface CandidateMatch {
   rule: DetectionRule;
   start: number;
   end: number;
   value: string;
+}
+
+export function buildCandidateMatch(
+  rule: DetectionRule,
+  start: number,
+  end: number,
+  value: string
+): CandidateMatch {
+  return {
+    end,
+    rule,
+    start,
+    value,
+  };
 }
 
 export function applyEnabledMasks(
@@ -56,12 +70,7 @@ export function extractCandidateMatch(
   if (typeof rule.valueGroup !== "number") {
     const value = sanitizeCapturedValue(match[0]);
     return value
-      ? {
-          end: match.index + value.length,
-          rule,
-          start: match.index,
-          value,
-        }
+      ? buildCandidateMatch(rule, match.index, match.index + value.length, value)
       : null;
   }
 
@@ -72,12 +81,7 @@ export function extractCandidateMatch(
   if (relativeIndex < 0) return null;
 
   const start = match.index + relativeIndex;
-  return {
-    end: start + capturedValue.length,
-    rule,
-    start,
-    value: capturedValue,
-  };
+  return buildCandidateMatch(rule, start, start + capturedValue.length, capturedValue);
 }
 
 export function resolveOverlaps(

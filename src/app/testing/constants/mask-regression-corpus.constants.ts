@@ -260,3 +260,93 @@ export const SCOPE_BOUNDARY_MASK_FIXTURES: readonly BoundaryMaskFixture[] = Obje
     sourceText: ["CPF: 529.982.247-25", "NIF: 245716840"].join("\n"),
   },
 ]);
+
+export const FUZZY_LABEL_MASK_FIXTURES: readonly LocaleMaskFixture[] = Object.freeze([
+  {
+    countryProfileIds: ["us"],
+    description: "masks password assignments when the label contains a small typo",
+    expectedRuleIds: ["secret-assignment"],
+    hiddenValues: ["Sup3rSecreta#2026"],
+    sourceText: "Passwrod: Sup3rSecreta#2026",
+  },
+  {
+    countryProfileIds: ["co"],
+    description: "masks phone numbers when the Spanish phone label is misspelled",
+    expectedRuleIds: ["labeled-phone"],
+    hiddenValues: ["+57 301 222 3344"],
+    sourceText: "Telefono principal: +57 301 222 3344",
+  },
+  {
+    countryProfileIds: ["br"],
+    description: "masks names when the Portuguese full-name label contains a typo",
+    expectedRuleIds: ["labeled-name"],
+    hiddenValues: ["Maria Clara Souza"],
+    sourceText: "Nome compoleto: Maria Clara Souza",
+  },
+  {
+    countryProfileIds: ["us"],
+    description: "masks addresses when the English address label is misspelled",
+    expectedRuleIds: ["labeled-address"],
+    hiddenValues: ["441 Market Street, San Francisco, CA"],
+    sourceText: "Adress: 441 Market Street, San Francisco, CA",
+  },
+  {
+    countryProfileIds: ["co"],
+    description: "masks cédula values when the label is misspelled but still close",
+    expectedRuleIds: ["cedula-labeled"],
+    hiddenValues: ["1020304050"],
+    sourceText: "Cedla de ciudadania: 1020304050",
+  },
+  {
+    countryProfileIds: ["in"],
+    description: "masks Aadhaar values when the label is misspelled",
+    expectedRuleIds: ["in-aadhaar-labeled"],
+    hiddenValues: ["2345 6789 1238"],
+    sourceText: "Aadhr: 2345 6789 1238",
+  },
+  {
+    countryProfileIds: ["pt"],
+    description: "masks Portuguese NIF values when the long-form label is slightly misspelled",
+    expectedRuleIds: ["pt-nif-labeled"],
+    hiddenValues: ["245716840"],
+    sourceText: "Numero de identificacao fsical: 245716840",
+  },
+]);
+
+export const FUZZY_LABEL_NEGATIVE_FIXTURES: readonly NegativeMaskFixture[] = Object.freeze([
+  {
+    countryProfileIds: ["us"],
+    description: "does not mask arbitrary prose labels that only vaguely resemble address",
+    excludedRuleIds: ["labeled-address"],
+    sourceText: "Addressable: roadmap section",
+    visibleValues: ["roadmap section"],
+  },
+  {
+    countryProfileIds: ["us"],
+    description: "does not mask short weak secrets even with a password-like typo label",
+    excludedRuleIds: ["secret-assignment"],
+    sourceText: "Passwrod: admin",
+    visibleValues: ["admin"],
+  },
+  {
+    countryProfileIds: ["co"],
+    description: "does not mask phone labels with invalid value length even if the label is close",
+    excludedRuleIds: ["labeled-phone"],
+    sourceText: "Telefono principal: 12345",
+    visibleValues: ["12345"],
+  },
+  {
+    countryProfileIds: ["in"],
+    description: "does not mask malformed Aadhaar values even when the label is fuzzy-matched",
+    excludedRuleIds: ["in-aadhaar-labeled"],
+    sourceText: "Aadhr: 2345 6789 1235",
+    visibleValues: ["2345 6789 1235"],
+  },
+  {
+    countryProfileIds: ["pt"],
+    description: "does not mask invalid NIF values through the fuzzy label path",
+    excludedRuleIds: ["pt-nif-labeled"],
+    sourceText: "Numero de identificacao fsical: 245716845",
+    visibleValues: ["245716845"],
+  },
+]);

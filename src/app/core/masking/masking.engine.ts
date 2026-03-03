@@ -6,6 +6,7 @@ import type {
   ScanResult,
 } from "./declarations/masking.types";
 import { filterRulesForScope } from "./utils/country-scope.utils";
+import { collectFuzzyLabelCandidates } from "./utils/fuzzy-label.utils";
 import { createDistinctMask } from "./utils/mask-format.utils";
 import {
   applyEnabledMasks,
@@ -78,7 +79,7 @@ export class MaskingEngine {
     scannedAt = new Date().toISOString()
   ): ScanResult {
     const activeRules = filterRulesForScope(MASKING_RULES, scopeSelection),
-      candidates = activeRules.flatMap(rule => {
+      regexCandidates = activeRules.flatMap(rule => {
         return Array.from(sourceText.matchAll(rule.patternFactory()))
           .map(match => extractCandidateMatch(match, rule))
           .filter((match): match is NonNullable<typeof match> => {
@@ -86,6 +87,8 @@ export class MaskingEngine {
             return rule.validator ? rule.validator(match.value) : true;
           });
       }),
+      fuzzyCandidates = collectFuzzyLabelCandidates(sourceText, activeRules),
+      candidates = [...regexCandidates, ...fuzzyCandidates],
       resolvedMatches = resolveOverlaps(candidates),
       maskByValue = new Map<string, string>(),
       matches = resolvedMatches.map(candidate => {
