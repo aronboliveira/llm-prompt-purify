@@ -19,10 +19,19 @@ export const HELP_TOPICS: Readonly<Record<HelpTopicId, HelpTopic>> = Object.free
     ],
     title: "How the mask controls work",
   },
+  country: {
+    id: "country",
+    paragraphs: [
+      "Use the flag picker to focus the scan on the country whose local identifiers are most likely to appear in the prompt. Shared global rules still run unless you switch the scan to global-only mode.",
+      "Global-only mode keeps the browser scanning for reusable patterns such as credentials, emails, payment strings, and shared labeled fields, but it skips country-specific document formats like CPF, CURP, RUT, or CUIT.",
+      "Changing the country or scan mode with text already loaded triggers a fresh local scan so the protected output stays aligned with the selected scope.",
+    ],
+    title: "How country focus changes the scan",
+  },
   coverage: {
     id: "coverage",
     paragraphs: [
-      "Current coverage is strongest for American English, Brazilian Portuguese, and LatAm Spanish. The rules focus on credentials, personal identifiers, contact data, financial strings, and structured addresses.",
+      "Current coverage is strongest for Brazil, the United States, Mexico, Argentina, Chile, Colombia, and Peru. The rules focus on credentials, personal identifiers, contact data, financial strings, and structured addresses.",
       "This is still pattern-based detection. Unsupported secrets, screenshots, prose-only descriptions, and uncommon document formats may pass through untouched.",
       "The safest habit is to scan, review the protected output, and only then paste the result into the target LLM.",
     ],

@@ -1,10 +1,17 @@
 import { computed, Injectable, signal } from "@angular/core";
 import {
+  COUNTRY_PROFILE_DEFINITIONS,
+  COUNTRY_PROFILE_ORDER,
   MASK_GROUP_DEFINITIONS,
   MASK_GROUP_ORDER,
 } from "../masking/constants/masking.constants";
 import { MaskingEngine } from "../masking/masking.engine";
-import type { MaskGroupId } from "../masking/declarations/masking.types";
+import { buildScanScopeSelection } from "../masking/utils/country-scope.utils";
+import type {
+  CountryProfileId,
+  DetectionMode,
+  MaskGroupId,
+} from "../masking/declarations/masking.types";
 import { createGroupPreferenceMap } from "../masking/utils/mask-group.utils";
 import { SCAN_PHASE_MESSAGES, SCAN_TIMINGS } from "./constants/scan-session.constants";
 import type {
@@ -13,8 +20,12 @@ import type {
   ScanSessionViewModel,
 } from "./declarations/scan-session.types";
 import {
+  loadPersistedCountryProfileId,
+  loadPersistedDetectionMode,
   loadPersistedGroupPreferences,
   loadPersistedSourceText,
+  persistCountryProfileId,
+  persistDetectionMode,
   persistGroupPreferences,
   persistSourceText,
 } from "./utils/scan-session-storage.utils";
@@ -24,6 +35,8 @@ import { waitFor } from "./utils/timing.utils";
 export class ScanSessionService {
   readonly #engine = new MaskingEngine();
   readonly #state = signal<ScanSessionState>({
+    countryProfileId: loadPersistedCountryProfileId(),
+    detectionMode: loadPersistedDetectionMode(),
     errorMessage: null,
     groupPreferences: loadPersistedGroupPreferences(),
     isScanning: false,
@@ -38,6 +51,14 @@ export class ScanSessionService {
   public readonly viewModel = computed<ScanSessionViewModel>(() => {
     const state = this.#state(),
       result = state.result,
+      countryProfiles = COUNTRY_PROFILE_ORDER.map(countryProfileId => {
+        const definition = COUNTRY_PROFILE_DEFINITIONS[countryProfileId];
+
+        return {
+          ...definition,
+          selected: definition.id === state.countryProfileId,
+        };
+      }),
       groups = MASK_GROUP_ORDER.map(groupId => {
         const preference = state.groupPreferences[groupId],
           definition = MASK_GROUP_DEFINITIONS[groupId];
@@ -53,6 +74,8 @@ export class ScanSessionService {
     return {
       activeMatches: result?.enabledMatches ?? 0,
       canCopy: !!result && !state.isScanning,
+      countryProfiles,
+      detectionMode: state.detectionMode,
       editableMatches: result?.matches.filter(match => !match.locked).length ?? 0,
       errorMessage: state.errorMessage,
       groups,
@@ -64,6 +87,8 @@ export class ScanSessionService {
       matches: result?.matches ?? [],
       scannedAt: result?.scannedAt ?? null,
       scanPhase: state.scanPhase,
+      selectedCountryProfile:
+        countryProfiles.find(countryProfile => countryProfile.selected) ?? countryProfiles[0],
       sourceText: state.sourceText,
       statusMessage: state.errorMessage ?? state.statusMessage,
     };
@@ -71,6 +96,8 @@ export class ScanSessionService {
 
   public clear(): void {
     this.#state.set({
+      countryProfileId: this.#state().countryProfileId,
+      detectionMode: this.#state().detectionMode,
       errorMessage: null,
       groupPreferences: this.#state().groupPreferences,
       isScanning: false,
@@ -112,7 +139,15 @@ export class ScanSessionService {
     try {
       const [result] = await Promise.all([
         Promise.resolve(
-          this.#engine.scan(sourceText, this.#state().groupPreferences, scannedAt)
+          this.#engine.scan(
+            sourceText,
+            this.#state().groupPreferences,
+            buildScanScopeSelection(
+              this.#state().countryProfileId,
+              this.#state().detectionMode
+            ),
+            scannedAt
+          )
         ),
         waitFor(SCAN_TIMINGS.minimumSpinnerMs),
       ]);
@@ -167,6 +202,36 @@ export class ScanSessionService {
         matchId
       ),
     }));
+  }
+
+  public setCountryProfile(countryProfileId: CountryProfileId): void {
+    const currentState = this.#state();
+    if (currentState.countryProfileId === countryProfileId) return;
+
+    this.#state.set({
+      ...currentState,
+      countryProfileId,
+      errorMessage: null,
+      result: null,
+      scanPhase: "idle",
+      statusMessage: SCAN_PHASE_MESSAGES.idle,
+    });
+    persistCountryProfileId(countryProfileId);
+  }
+
+  public setDetectionMode(detectionMode: DetectionMode): void {
+    const currentState = this.#state();
+    if (currentState.detectionMode === detectionMode) return;
+
+    this.#state.set({
+      ...currentState,
+      detectionMode,
+      errorMessage: null,
+      result: null,
+      scanPhase: "idle",
+      statusMessage: SCAN_PHASE_MESSAGES.idle,
+    });
+    persistDetectionMode(detectionMode);
   }
 
   public setAllEditableMatchesEnabled(enabled: boolean): void {
@@ -277,6 +342,8 @@ export class ScanSessionService {
     const currentState = this.#state();
 
     this.#state.set({
+      countryProfileId: currentState.countryProfileId,
+      detectionMode: currentState.detectionMode,
       errorMessage: null,
       groupPreferences: currentState.groupPreferences,
       isScanning: false,

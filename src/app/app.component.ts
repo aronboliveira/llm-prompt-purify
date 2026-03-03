@@ -4,7 +4,13 @@ import { FormsModule } from "@angular/forms";
 import { DomSanitizer } from "@angular/platform-browser";
 
 import { ToastCenterService } from "./core/feedback/toast-center.service";
-import type { MaskGroupId } from "./core/masking/declarations/masking.types";
+import { DETECTION_MODE_COPY } from "./core/masking/constants/masking.constants";
+import type {
+  CountryProfileId,
+  DetectionMode,
+  MaskGroupId,
+} from "./core/masking/declarations/masking.types";
+import { isKnownCountryProfileId } from "./core/masking/utils/country-scope.utils";
 import { ScanSessionService } from "./core/state/scan-session.service";
 import { HELP_TOPICS } from "./features/scanner/constants/help-topics.constants";
 import { WORKFLOW_SNIPPETS } from "./features/scanner/constants/workflow-snippets.constants";
@@ -104,7 +110,7 @@ export class AppComponent {
 
   protected async runScan(): Promise<void> {
     const scanSucceeded = await this.#scanSession.runScan(),
-      { hasMatches, matchCount } = this.vm();
+      { detectionMode, hasMatches, matchCount, selectedCountryProfile } = this.vm();
 
     if (!scanSucceeded) {
       this.#toastCenter.push(
@@ -117,7 +123,7 @@ export class AppComponent {
 
     if (hasMatches) {
       this.#toastCenter.push(
-        `${matchCount} sensitive patterns were masked locally. Review or regenerate them before copying.`,
+        `${matchCount} sensitive patterns were masked locally using ${selectedCountryProfile.flagEmoji} ${selectedCountryProfile.label} and ${DETECTION_MODE_COPY[detectionMode].toLowerCase()}. Review or regenerate them before copying.`,
         "Protected output ready",
         "success"
       );
@@ -136,15 +142,15 @@ export class AppComponent {
 
     switch (snippetId) {
       case "paste":
-        return viewModel.sourceText ? "done" : "active";
+        return viewModel.selectedCountryProfile ? "done" : "active";
       case "scan":
+        return viewModel.sourceText ? "done" : "active";
+      case "review":
         if (viewModel.isScanning) return "active";
         return viewModel.hasResult ? "done" : "idle";
-      case "review":
+      case "copy":
         if (!viewModel.hasResult) return "idle";
         return viewModel.matchCount ? "active" : "done";
-      case "copy":
-        return viewModel.hasResult ? "active" : "idle";
       default:
         return "idle";
     }
@@ -192,6 +198,41 @@ export class AppComponent {
 
   protected toggleMatch(event: { enabled: boolean; matchId: string }): void {
     this.#scanSession.toggleMatch(event.matchId, event.enabled);
+  }
+
+  protected async updateCountryProfile(value: string): Promise<void> {
+    if (!isKnownCountryProfileId(value)) return;
+
+    this.#scanSession.setCountryProfile(value as CountryProfileId);
+    const { selectedCountryProfile, sourceText } = this.vm();
+
+    this.#toastCenter.push(
+      `Country focus set to ${selectedCountryProfile.flagEmoji} ${selectedCountryProfile.label}.`,
+      "Country focus updated",
+      "info"
+    );
+
+    if (sourceText.trim()) await this.runScan();
+  }
+
+  protected async updateDetectionMode(event: Event): Promise<void> {
+    const inputElement = event.target;
+    if (!(inputElement instanceof HTMLInputElement)) return;
+
+    const detectionMode: DetectionMode = inputElement.checked
+      ? "global-only"
+      : "country-plus-global";
+
+    this.#scanSession.setDetectionMode(detectionMode);
+    this.#toastCenter.push(
+      inputElement.checked
+        ? "The scan will now track only shared global identifiers and ignore country-specific document patterns."
+        : "The scan will now combine shared global rules with the selected country profile.",
+      inputElement.checked ? "Global-only scan enabled" : "Country rules enabled",
+      "info"
+    );
+
+    if (this.vm().sourceText.trim()) await this.runScan();
   }
 
   protected updateSourceText(value: string): void {

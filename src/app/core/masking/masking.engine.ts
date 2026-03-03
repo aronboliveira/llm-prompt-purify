@@ -1,9 +1,11 @@
 import { MASKING_RULES } from "./constants/masking-rules.constants";
 import type {
   MaskGroupPreferenceMap,
+  ScanScopeSelection,
   ScanMatch,
   ScanResult,
 } from "./declarations/masking.types";
+import { filterRulesForScope } from "./utils/country-scope.utils";
 import { createDistinctMask } from "./utils/mask-format.utils";
 import {
   applyEnabledMasks,
@@ -72,9 +74,11 @@ export class MaskingEngine {
   public scan(
     sourceText: string,
     groupPreferences: MaskGroupPreferenceMap,
+    scopeSelection: ScanScopeSelection,
     scannedAt = new Date().toISOString()
   ): ScanResult {
-    const candidates = MASKING_RULES.flatMap(rule => {
+    const activeRules = filterRulesForScope(MASKING_RULES, scopeSelection),
+      candidates = activeRules.flatMap(rule => {
         return Array.from(sourceText.matchAll(rule.patternFactory()))
           .map(match => extractCandidateMatch(match, rule))
           .filter((match): match is NonNullable<typeof match> => {
