@@ -1,5 +1,6 @@
 import { DEFAULT_GROUP_PREFERENCES } from "./constants/masking.constants";
 import { MaskingEngine } from "./masking.engine";
+import { buildScanScopeSelection } from "./utils/country-scope.utils";
 import { createGroupPreferenceMap } from "./utils/mask-group.utils";
 import {
   BRAZILIAN_PORTUGUESE_MASK_FIXTURES,
@@ -8,11 +9,14 @@ import {
 } from "../../testing/constants/locale-mask-fixtures.constants";
 
 describe("MaskingEngine", () => {
-  const engine = new MaskingEngine();
+  const engine = new MaskingEngine(),
+    brazilScope = buildScanScopeSelection("br", "country-plus-global"),
+    globalOnlyBrazilScope = buildScanScopeSelection("br", "global-only"),
+    unitedStatesScope = buildScanScopeSelection("us", "country-plus-global");
 
   it("returns the original text when nothing supported is detected", () => {
     const sourceText = "Summarize this product update for the engineering weekly digest.",
-      result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES);
+      result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, brazilScope);
 
     expect(result.hasMatches).toBe(false);
     expect(result.maskedText).toBe(sourceText);
@@ -21,7 +25,7 @@ describe("MaskingEngine", () => {
 
   it("masks repeated email values with the same generated token", () => {
     const sourceText = "Email maria@example.com and copy maria@example.com into the CRM.",
-      result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES);
+      result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, brazilScope);
 
     expect(result.matches).toHaveLength(2);
     expect(result.matches[0].ruleId).toBe("email-address");
@@ -32,11 +36,13 @@ describe("MaskingEngine", () => {
   it("masks valid credit card numbers and ignores invalid ones", () => {
     const validResult = engine.scan(
         "Charge card 4111 1111 1111 1111 today.",
-        DEFAULT_GROUP_PREFERENCES
+        DEFAULT_GROUP_PREFERENCES,
+        brazilScope
       ),
       invalidResult = engine.scan(
         "Ignore 4111 1111 1111 1112 because it is not valid.",
-        DEFAULT_GROUP_PREFERENCES
+        DEFAULT_GROUP_PREFERENCES,
+        brazilScope
       );
 
     expect(validResult.matches.some(match => match.ruleId === "credit-card")).toBe(true);
@@ -47,7 +53,7 @@ describe("MaskingEngine", () => {
   it("masks explicit credential assignments", () => {
     const sourceText =
         "api_key=sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890\nBearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload.signature",
-      result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES);
+      result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, brazilScope);
 
     expect(result.matches.map(match => match.ruleId)).toEqual(
       expect.arrayContaining(["openai-style-key", "jwt-token"])
@@ -59,7 +65,7 @@ describe("MaskingEngine", () => {
   it("rebuilds the output when one mask is disabled", () => {
     const sourceText =
         "Email: maria@example.com\nToken: sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
-      scanResult = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES),
+      scanResult = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, brazilScope),
       matches = scanResult.matches.map(match =>
         match.ruleId === "email-address" ? { ...match, enabled: false } : match
       ),
@@ -75,7 +81,7 @@ describe("MaskingEngine", () => {
       groupPreferences = createGroupPreferenceMap({
         identifier: { enabled: false },
       }),
-      result = engine.scan(sourceText, groupPreferences);
+      result = engine.scan(sourceText, groupPreferences, brazilScope);
 
     expect(result.maskedText).toContain("529.982.247-25");
     expect(result.maskedText).not.toContain("maria@example.com");
@@ -83,7 +89,7 @@ describe("MaskingEngine", () => {
 
   it("regenerates repeated values with a fresh but consistent replacement", () => {
     const sourceText = "Email maria@example.com and maria@example.com again.",
-      result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES),
+      result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, brazilScope),
       regenerated = engine.regenerateMatch(
         result.sourceText,
         result.matches,
@@ -95,10 +101,33 @@ describe("MaskingEngine", () => {
     expect(regenerated.matches[0].mask).toBe(regenerated.matches[1].mask);
   });
 
+  it("uses global-only mode to ignore country-specific identifiers while keeping shared rules", () => {
+    const sourceText =
+        "CPF: 529.982.247-25\nEmail: maria@example.com\nToken: sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+      result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, globalOnlyBrazilScope);
+
+    expect(result.matches.map(match => match.ruleId)).toEqual(
+      expect.arrayContaining(["email-address", "openai-style-key"])
+    );
+    expect(result.matches.some(match => match.ruleId === "cpf")).toBe(false);
+    expect(result.maskedText).toContain("529.982.247-25");
+    expect(result.maskedText).not.toContain("maria@example.com");
+    expect(result.maskedText).not.toContain("sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
+  });
+
+  it("does not activate Brazilian document rules when the country scope is set to the United States", () => {
+    const sourceText = "CPF: 529.982.247-25\nEmail: maria@example.com",
+      result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, unitedStatesScope);
+
+    expect(result.matches.some(match => match.ruleId === "cpf")).toBe(false);
+    expect(result.maskedText).toContain("529.982.247-25");
+    expect(result.maskedText).not.toContain("maria@example.com");
+  });
+
   describe("American English coverage", () => {
     it("masks SSNs and US phone numbers", () => {
       const sourceText = "SSN: 123-45-6789\nReach me at (415) 555-2671",
-        result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES);
+        result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, unitedStatesScope);
 
       expect(result.matches.map(match => match.ruleId)).toEqual(
         expect.arrayContaining(["us-phone", "us-ssn"])
@@ -110,7 +139,7 @@ describe("MaskingEngine", () => {
     it("masks structured English labels for names and addresses", () => {
       const sourceText =
           "Full name: Emily Carter\nAddress: 441 Market Street, San Francisco, CA",
-        result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES);
+        result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, unitedStatesScope);
 
       expect(result.matches.map(match => match.ruleId)).toEqual(
         expect.arrayContaining(["labeled-address", "labeled-name"])
@@ -123,7 +152,14 @@ describe("MaskingEngine", () => {
   describe("Brazilian Portuguese coverage", () => {
     for (const fixture of BRAZILIAN_PORTUGUESE_MASK_FIXTURES) {
       it(fixture.description, () => {
-        const result = engine.scan(fixture.sourceText, DEFAULT_GROUP_PREFERENCES);
+        const result = engine.scan(
+          fixture.sourceText,
+          DEFAULT_GROUP_PREFERENCES,
+          buildScanScopeSelection(
+            fixture.countryProfileId,
+            fixture.detectionMode ?? "country-plus-global"
+          )
+        );
 
         expect(result.matches.map(match => match.ruleId)).toEqual(
           expect.arrayContaining(fixture.expectedRuleIds)
@@ -137,7 +173,7 @@ describe("MaskingEngine", () => {
 
     it("masks Brazilian phone numbers and labeled CNH data", () => {
       const sourceText = "+55 (11) 99876-5432\nCNH: 12345678901",
-        result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES);
+        result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, brazilScope);
 
       expect(result.matches.map(match => match.ruleId)).toEqual(
         expect.arrayContaining(["br-phone", "cnh-labeled"])
@@ -150,7 +186,14 @@ describe("MaskingEngine", () => {
   describe("LatAm Spanish coverage", () => {
     for (const fixture of LATAM_SPANISH_MASK_FIXTURES) {
       it(fixture.description, () => {
-        const result = engine.scan(fixture.sourceText, DEFAULT_GROUP_PREFERENCES);
+        const result = engine.scan(
+          fixture.sourceText,
+          DEFAULT_GROUP_PREFERENCES,
+          buildScanScopeSelection(
+            fixture.countryProfileId,
+            fixture.detectionMode ?? "country-plus-global"
+          )
+        );
 
         expect(result.matches.map(match => match.ruleId)).toEqual(
           expect.arrayContaining(fixture.expectedRuleIds)
@@ -165,7 +208,7 @@ describe("MaskingEngine", () => {
     it("masks structured Spanish labels for names, addresses, and phone numbers", () => {
       const sourceText =
           "Nombre completo: Camila Torres Rivera\nDirección: Calle 85 # 12-34, Bogotá\nTeléfono: +57 301 222 3344",
-        result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES);
+        result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, buildScanScopeSelection("co", "country-plus-global"));
 
       expect(result.matches.map(match => match.ruleId)).toEqual(
         expect.arrayContaining(["labeled-address", "labeled-name", "labeled-phone"])
@@ -179,7 +222,14 @@ describe("MaskingEngine", () => {
   describe("Locale false-positive guardrails", () => {
     for (const fixture of NEGATIVE_LOCALE_MASK_FIXTURES) {
       it(fixture.description, () => {
-        const result = engine.scan(fixture.sourceText, DEFAULT_GROUP_PREFERENCES);
+        const result = engine.scan(
+          fixture.sourceText,
+          DEFAULT_GROUP_PREFERENCES,
+          buildScanScopeSelection(
+            fixture.countryProfileId,
+            fixture.detectionMode ?? "country-plus-global"
+          )
+        );
 
         for (const excludedRuleId of fixture.excludedRuleIds) {
           expect(result.matches.some(match => match.ruleId === excludedRuleId)).toBe(false);
