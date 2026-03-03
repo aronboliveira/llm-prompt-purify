@@ -20,3 +20,14 @@ export interface NegativeMaskFixture {
   sourceText: string;
   visibleValues: readonly string[];
 }
+
+export interface BoundaryMaskFixture {
+  countryProfileIds: readonly CountryProfileId[];
+  description: string;
+  detectionMode?: DetectionMode;
+  excludedRuleIds?: readonly string[];
+  expectedRuleIds?: readonly string[];
+  hiddenValues?: readonly string[];
+  sourceText: string;
+  visibleValues?: readonly string[];
+}
