@@ -21,15 +21,17 @@ describe("ScanSessionService", () => {
     );
   });
 
-  it("stores the selected country profile and detection mode", () => {
+  it("stores the selected country scope and detection mode", () => {
     const service = new ScanSessionService();
 
-    service.setCountryProfile("cl");
+    service.setCountryProfiles(["cl", "latam-es"]);
     service.setDetectionMode("global-only");
 
-    expect(service.state().countryProfileId).toBe("cl");
+    expect(service.state().countryProfileIds).toEqual(["latam-es", "cl"]);
     expect(service.state().detectionMode).toBe("global-only");
-    expect(sessionStorage.getItem("llm-prompt-purify:country-profile:v1")).toBe("cl");
+    expect(sessionStorage.getItem("llm-prompt-purify:country-profiles:v2")).toBe(
+      JSON.stringify(["latam-es", "cl"])
+    );
     expect(sessionStorage.getItem("llm-prompt-purify:detection-mode:v1")).toBe("global-only");
   });
 
@@ -51,7 +53,7 @@ describe("ScanSessionService", () => {
   it("uses global-only mode to skip country-specific document matches", async () => {
     const service = new ScanSessionService();
 
-    service.setCountryProfile("br");
+    service.setCountryProfiles(["br"]);
     service.setDetectionMode("global-only");
     service.updateSourceText("CPF: 529.982.247-25\nEmail: maria@example.com");
     const scanPromise = service.runScan();
@@ -96,21 +98,23 @@ describe("ScanSessionService", () => {
   });
 
   it("clears the current session state", () => {
-    const service = new ScanSessionService();
+    const service = new ScanSessionService(),
+      initialCountryProfileIds = service.state().countryProfileIds;
 
     service.updateSourceText("Token: sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
     service.clear();
 
     expect(service.state()).toEqual({
-      countryProfileId: "br",
-      detectionMode: "country-plus-global",
+      countryProfileIds: initialCountryProfileIds,
+      detectionMode: "selected-plus-global",
       errorMessage: null,
       groupPreferences: service.state().groupPreferences,
       isScanning: false,
       result: null,
       scanPhase: "idle",
       sourceText: "",
-      statusMessage: "Pick a country focus, paste the original prompt, then run a local scan.",
+      statusMessage:
+        "Pick the masking scope, paste the raw prompt, and the protected output will rebuild locally.",
     });
     expect(sessionStorage.getItem("llm-prompt-purify:source-text:v2")).toBeNull();
   });

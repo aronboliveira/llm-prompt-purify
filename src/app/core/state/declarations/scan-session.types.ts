@@ -11,7 +11,7 @@ import type {
 export type ScanPhase = "detecting" | "idle" | "masking" | "ready";
 
 export interface ScanSessionState {
-  countryProfileId: CountryProfileId;
+  countryProfileIds: readonly CountryProfileId[];
   detectionMode: DetectionMode;
   errorMessage: string | null;
   groupPreferences: MaskGroupPreferenceMap;
@@ -38,7 +38,8 @@ export interface ScanSessionViewModel {
   matches: readonly ScanMatch[];
   scannedAt: string | null;
   scanPhase: ScanPhase;
-  selectedCountryProfile: CountryProfileSummary;
+  selectedCountryProfile: CountryProfileSummary | null;
+  selectedCountryProfiles: readonly CountryProfileSummary[];
   sourceText: string;
   statusMessage: string;
 }

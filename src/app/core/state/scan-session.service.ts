@@ -1,12 +1,16 @@
 import { computed, Injectable, signal } from "@angular/core";
 import {
   COUNTRY_PROFILE_DEFINITIONS,
+  DEFAULT_COUNTRY_PROFILE_IDS,
   COUNTRY_PROFILE_ORDER,
   MASK_GROUP_DEFINITIONS,
   MASK_GROUP_ORDER,
 } from "../masking/constants/masking.constants";
 import { MaskingEngine } from "../masking/masking.engine";
-import { buildScanScopeSelection } from "../masking/utils/country-scope.utils";
+import {
+  buildScanScopeSelection,
+  normalizeCountryProfileIds,
+} from "../masking/utils/country-scope.utils";
 import type {
   CountryProfileId,
   DetectionMode,
@@ -20,11 +24,11 @@ import type {
   ScanSessionViewModel,
 } from "./declarations/scan-session.types";
 import {
-  loadPersistedCountryProfileId,
+  loadPersistedCountryProfileIds,
   loadPersistedDetectionMode,
   loadPersistedGroupPreferences,
   loadPersistedSourceText,
-  persistCountryProfileId,
+  persistCountryProfileIds,
   persistDetectionMode,
   persistGroupPreferences,
   persistSourceText,
@@ -34,8 +38,10 @@ import { waitFor } from "./utils/timing.utils";
 @Injectable({ providedIn: "root" })
 export class ScanSessionService {
   readonly #engine = new MaskingEngine();
+  #queuedRefreshTimer: ReturnType<typeof setTimeout> | null = null;
+  #refreshRequestId = 0;
   readonly #state = signal<ScanSessionState>({
-    countryProfileId: loadPersistedCountryProfileId(),
+    countryProfileIds: loadPersistedCountryProfileIds(),
     detectionMode: loadPersistedDetectionMode(),
     errorMessage: null,
     groupPreferences: loadPersistedGroupPreferences(),
@@ -56,9 +62,10 @@ export class ScanSessionService {
 
         return {
           ...definition,
-          selected: definition.id === state.countryProfileId,
+          selected: state.countryProfileIds.includes(definition.id),
         };
       }),
+      selectedCountryProfiles = countryProfiles.filter(countryProfile => countryProfile.selected),
       groups = MASK_GROUP_ORDER.map(groupId => {
         const preference = state.groupPreferences[groupId],
           definition = MASK_GROUP_DEFINITIONS[groupId];
@@ -87,16 +94,17 @@ export class ScanSessionService {
       matches: result?.matches ?? [],
       scannedAt: result?.scannedAt ?? null,
       scanPhase: state.scanPhase,
-      selectedCountryProfile:
-        countryProfiles.find(countryProfile => countryProfile.selected) ?? countryProfiles[0],
+      selectedCountryProfile: selectedCountryProfiles[0] ?? null,
+      selectedCountryProfiles,
       sourceText: state.sourceText,
       statusMessage: state.errorMessage ?? state.statusMessage,
     };
   });
 
   public clear(): void {
+    this.#cancelRefreshes();
     this.#state.set({
-      countryProfileId: this.#state().countryProfileId,
+      countryProfileIds: this.#state().countryProfileIds,
       detectionMode: this.#state().detectionMode,
       errorMessage: null,
       groupPreferences: this.#state().groupPreferences,
@@ -109,12 +117,13 @@ export class ScanSessionService {
     persistSourceText("");
   }
 
-  public async runScan(): Promise<boolean> {
+  public async refreshMaskedOutput(): Promise<boolean> {
+    this.#clearQueuedRefresh();
     const sourceText = this.#state().sourceText;
     if (!sourceText.trim()) {
       this.#state.update(state => ({
         ...state,
-        errorMessage: "Paste the original prompt before running the local scan.",
+        errorMessage: null,
         result: null,
         scanPhase: "idle",
         statusMessage: SCAN_PHASE_MESSAGES.idle,
@@ -122,17 +131,18 @@ export class ScanSessionService {
       return false;
     }
 
-    const scannedAt = new Date().toISOString();
+    const scannedAt = new Date().toISOString(),
+      refreshRequestId = ++this.#refreshRequestId;
     this.#state.update(state => ({
       ...state,
       errorMessage: null,
       isScanning: true,
-      result: null,
       scanPhase: "detecting",
       statusMessage: SCAN_PHASE_MESSAGES.detecting,
     }));
 
     const phaseTimer = setTimeout(() => {
+      if (refreshRequestId !== this.#refreshRequestId) return;
       this.#setPhase("masking");
     }, SCAN_TIMINGS.phaseSwapMs);
 
@@ -143,7 +153,7 @@ export class ScanSessionService {
             sourceText,
             this.#state().groupPreferences,
             buildScanScopeSelection(
-              this.#state().countryProfileId,
+              this.#state().countryProfileIds,
               this.#state().detectionMode
             ),
             scannedAt
@@ -151,6 +161,11 @@ export class ScanSessionService {
         ),
         waitFor(SCAN_TIMINGS.minimumSpinnerMs),
       ]);
+
+      if (refreshRequestId !== this.#refreshRequestId) {
+        clearTimeout(phaseTimer);
+        return false;
+      }
 
       clearTimeout(phaseTimer);
       this.#state.update(state => ({
@@ -179,6 +194,10 @@ export class ScanSessionService {
     }
   }
 
+  public async runScan(): Promise<boolean> {
+    return this.refreshMaskedOutput();
+  }
+
   public regenerateAllMasks(): void {
     const result = this.#state().result;
     if (!result) return;
@@ -204,19 +223,58 @@ export class ScanSessionService {
     }));
   }
 
+  public scheduleRefresh(delayMs: number = SCAN_TIMINGS.autoRefreshDebounceMs): void {
+    this.#clearQueuedRefresh();
+
+    if (!this.#state().sourceText.trim()) {
+      this.#state.update(state => ({
+        ...state,
+        errorMessage: null,
+        isScanning: false,
+        result: null,
+        scanPhase: "idle",
+        statusMessage: SCAN_PHASE_MESSAGES.idle,
+      }));
+      return;
+    }
+
+    this.#state.update(state => ({
+      ...state,
+      errorMessage: null,
+      isScanning: true,
+      scanPhase: "detecting",
+      statusMessage: SCAN_PHASE_MESSAGES.detecting,
+    }));
+
+    this.#queuedRefreshTimer = setTimeout(() => {
+      this.#queuedRefreshTimer = null;
+      void this.refreshMaskedOutput();
+    }, delayMs);
+  }
+
   public setCountryProfile(countryProfileId: CountryProfileId): void {
-    const currentState = this.#state();
-    if (currentState.countryProfileId === countryProfileId) return;
+    this.setCountryProfiles([countryProfileId]);
+  }
+
+  public setCountryProfiles(countryProfileIds: readonly CountryProfileId[]): void {
+    const currentState = this.#state(),
+      normalizedCountryProfileIds = normalizeCountryProfileIds(countryProfileIds).length
+        ? normalizeCountryProfileIds(countryProfileIds)
+        : DEFAULT_COUNTRY_PROFILE_IDS;
+    if (
+      hasSameCountrySelection(currentState.countryProfileIds, normalizedCountryProfileIds)
+    ) return;
 
     this.#state.set({
       ...currentState,
-      countryProfileId,
+      countryProfileIds: normalizedCountryProfileIds,
       errorMessage: null,
-      result: null,
       scanPhase: "idle",
       statusMessage: SCAN_PHASE_MESSAGES.idle,
     });
-    persistCountryProfileId(countryProfileId);
+    persistCountryProfileIds(normalizedCountryProfileIds);
+
+    if (currentState.sourceText.trim()) this.scheduleRefresh();
   }
 
   public setDetectionMode(detectionMode: DetectionMode): void {
@@ -227,11 +285,12 @@ export class ScanSessionService {
       ...currentState,
       detectionMode,
       errorMessage: null,
-      result: null,
       scanPhase: "idle",
       statusMessage: SCAN_PHASE_MESSAGES.idle,
     });
     persistDetectionMode(detectionMode);
+
+    if (currentState.sourceText.trim()) this.scheduleRefresh();
   }
 
   public setAllEditableMatchesEnabled(enabled: boolean): void {
@@ -342,20 +401,20 @@ export class ScanSessionService {
     const currentState = this.#state();
 
     this.#state.set({
-      countryProfileId: currentState.countryProfileId,
+      countryProfileIds: currentState.countryProfileIds,
       detectionMode: currentState.detectionMode,
       errorMessage: null,
       groupPreferences: currentState.groupPreferences,
       isScanning: false,
-      result:
-        currentState.result?.sourceText === sourceText
-          ? currentState.result
-          : null,
+      result: sourceText.trim() ? currentState.result : null,
       scanPhase: "idle",
       sourceText,
       statusMessage: SCAN_PHASE_MESSAGES.idle,
     });
     persistSourceText(sourceText);
+
+    if (sourceText.trim()) this.scheduleRefresh();
+    else this.#cancelRefreshes();
   }
 
   #setPhase(phase: ScanPhase): void {
@@ -365,4 +424,25 @@ export class ScanSessionService {
       statusMessage: SCAN_PHASE_MESSAGES[phase],
     }));
   }
+
+  #cancelRefreshes(): void {
+    this.#clearQueuedRefresh();
+    this.#refreshRequestId += 1;
+  }
+
+  #clearQueuedRefresh(): void {
+    if (!this.#queuedRefreshTimer) return;
+    clearTimeout(this.#queuedRefreshTimer);
+    this.#queuedRefreshTimer = null;
+  }
+}
+
+function hasSameCountrySelection(
+  leftCountryProfileIds: readonly CountryProfileId[],
+  rightCountryProfileIds: readonly CountryProfileId[]
+): boolean {
+  if (leftCountryProfileIds.length !== rightCountryProfileIds.length) return false;
+  return leftCountryProfileIds.every((countryProfileId, index) => {
+    return countryProfileId === rightCountryProfileIds[index];
+  });
 }

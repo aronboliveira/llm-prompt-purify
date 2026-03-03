@@ -1,0 +1,50 @@
+@if (isOpen()) {
+  <div class="modal-backdrop" role="presentation" (click)="closeOnBackdrop($event)">
+    <section aria-labelledby="country-scope-title" aria-modal="true" class="modal" role="dialog">
+      <header class="modal__header">
+        <div>
+          <div class="modal__title-row">
+            <h2 id="country-scope-title">Choose countries and language scopes</h2>
+            <button class="help-trigger" type="button" (click)="openHelp()">(?)</button>
+          </div>
+          <p class="modal__body-copy">
+            Keep the selection tight when possible. Mixing unrelated language families widens the
+            rule set and can hurt masking precision.
+          </p>
+        </div>
+        <button aria-label="Close countries" class="modal__close" type="button" (click)="close()">
+          Close
+        </button>
+      </header>
+
+      @if (mixedLanguageWarning()) {
+        <small class="modal__warning" data-tone="warning">
+          Mixed languages detected: {{ selectedLanguageSummary() }}. This is supported, but it is
+          not the recommended default.
+        </small>
+      }
+
+      <div class="country-grid">
+        @for (countryProfile of countryProfiles(); track countryProfile.id) {
+          <label class="country-card" [attr.data-selected]="countryProfile.selected">
+            <input
+              type="checkbox"
+              [checked]="countryProfile.selected"
+              [disabled]="countryProfile.selected && selectedCount() === 1"
+              [attr.data-testid]="'country-toggle-' + countryProfile.id"
+              (change)="onCountryToggle(countryProfile.id, $event)"
+            />
+            <span class="country-card__flag">{{ countryProfile.flagEmoji }}</span>
+            <span class="country-card__copy">
+              <span class="country-card__title">{{ countryProfile.label }}</span>
+              <span class="country-card__meta">
+                {{ countryProfile.localeLabel }} · {{ countryProfile.languageLabel }}
+              </span>
+              <span class="country-card__description">{{ countryProfile.description }}</span>
+            </span>
+          </label>
+        }
+      </div>
+    </section>
+  </div>
+}

@@ -10,15 +10,23 @@ import type {
   DetectionMode,
   MaskGroupId,
 } from "./core/masking/declarations/masking.types";
-import { isKnownCountryProfileId } from "./core/masking/utils/country-scope.utils";
+import {
+  hasMixedLanguageSelection,
+  summarizeCountrySelection,
+  summarizeSelectedLanguages,
+} from "./core/masking/utils/country-selection.utils";
 import { ScanSessionService } from "./core/state/scan-session.service";
+import { FeedbackSheetComponent } from "./features/feedback/components/feedback-sheet/feedback-sheet.component";
 import { HELP_TOPICS } from "./features/scanner/constants/help-topics.constants";
 import { WORKFLOW_SNIPPETS } from "./features/scanner/constants/workflow-snippets.constants";
+import { WORKSPACE_COPY } from "./features/scanner/constants/workspace.constants";
+import { CountryScopeModalComponent } from "./features/scanner/components/country-scope-modal/country-scope-modal.component";
 import { HelpModalComponent } from "./features/scanner/components/help-modal/help-modal.component";
 import { MaskGroupPanelComponent } from "./features/scanner/components/mask-group-panel/mask-group-panel.component";
-import { MatchReviewComponent } from "./features/scanner/components/match-review.component";
+import { MaskingSettingsModalComponent } from "./features/scanner/components/masking-settings-modal/masking-settings-modal.component";
 import { ToastStackComponent } from "./features/scanner/components/toast-stack/toast-stack.component";
 import type { HelpTopic, HelpTopicId } from "./features/scanner/declarations/help-topic.types";
+import { toggleCountrySelection } from "./features/scanner/utils/country-selection-form.utils";
 import { MATERIAL_ICONS } from "./shared/constants/material-icons.constants";
 import { createTrustedHtmlMap } from "./shared/utils/trusted-html.utils";
 
@@ -26,10 +34,12 @@ import { createTrustedHtmlMap } from "./shared/utils/trusted-html.utils";
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
+    CountryScopeModalComponent,
+    FeedbackSheetComponent,
     FormsModule,
     HelpModalComponent,
     MaskGroupPanelComponent,
-    MatchReviewComponent,
+    MaskingSettingsModalComponent,
     ToastStackComponent,
   ],
   selector: "app-root",
@@ -39,12 +49,30 @@ import { createTrustedHtmlMap } from "./shared/utils/trusted-html.utils";
 })
 export class AppComponent {
   readonly #activeHelpTopic = signal<HelpTopic | null>(null);
-  readonly #scanSession = inject(ScanSessionService);
+  readonly #isCountryModalOpen = signal(false);
+  readonly #isSettingsModalOpen = signal(false);
   readonly #sanitizer = inject(DomSanitizer);
+  readonly #scanSession = inject(ScanSessionService);
   readonly #toastCenter = inject(ToastCenterService);
 
+  public constructor() {
+    if (this.#scanSession.state().sourceText.trim()) this.#scanSession.scheduleRefresh(0);
+  }
+
   protected readonly activeHelpTopic = this.#activeHelpTopic.asReadonly();
+  protected readonly copy = WORKSPACE_COPY;
   protected readonly icons = createTrustedHtmlMap(this.#sanitizer, MATERIAL_ICONS);
+  protected readonly isCountryModalOpen = this.#isCountryModalOpen.asReadonly();
+  protected readonly isSettingsModalOpen = this.#isSettingsModalOpen.asReadonly();
+  protected readonly hasMixedLanguageSelection = computed(() => {
+    return hasMixedLanguageSelection(this.vm().selectedCountryProfiles);
+  });
+  protected readonly selectedCountrySummary = computed(() => {
+    return summarizeCountrySelection(this.vm().selectedCountryProfiles);
+  });
+  protected readonly selectedLanguageSummary = computed(() => {
+    return summarizeSelectedLanguages(this.vm().selectedCountryProfiles);
+  });
   protected readonly toasts = this.#toastCenter.toasts;
   protected readonly vm = computed(() => this.#scanSession.viewModel());
   protected readonly workflowSnippets = WORKFLOW_SNIPPETS;
@@ -52,20 +80,39 @@ export class AppComponent {
   protected clear(): void {
     this.#scanSession.clear();
     this.#toastCenter.push(
-      "The raw prompt and generated output were cleared from this local session.",
+      "The raw prompt and protected output were cleared from this local session.",
       "Workspace reset",
       "info"
     );
   }
 
+  protected closeCountryModal(): void {
+    this.#isCountryModalOpen.set(false);
+  }
+
+  protected closeHelp(): void {
+    this.#activeHelpTopic.set(null);
+  }
+
+  protected closeSettingsModal(): void {
+    this.#isSettingsModalOpen.set(false);
+  }
+
   protected async copyMaskedOutput(): Promise<void> {
     const { maskedText } = this.vm();
-    if (!maskedText) return;
+    if (!maskedText) {
+      this.#toastCenter.push(
+        "The protected output is still empty. Paste the raw prompt first and wait for the local masking pass.",
+        "Nothing to copy",
+        "error"
+      );
+      return;
+    }
 
     try {
       await navigator.clipboard.writeText(maskedText);
       this.#toastCenter.push(
-        "Only the protected output was copied, so you can paste it back into the LLM safely.",
+        "Only the masked output was copied, so you can paste it back into the LLM without exposing the raw prompt.",
         "Protected prompt copied",
         "success"
       );
@@ -82,18 +129,22 @@ export class AppComponent {
     this.#toastCenter.dismiss(toastId);
   }
 
+  protected openCountryModal(): void {
+    this.#isCountryModalOpen.set(true);
+  }
+
   protected openHelp(topicId: HelpTopicId): void {
     this.#activeHelpTopic.set(HELP_TOPICS[topicId]);
   }
 
-  protected closeHelp(): void {
-    this.#activeHelpTopic.set(null);
+  protected openSettingsModal(): void {
+    this.#isSettingsModalOpen.set(true);
   }
 
   protected regenerateAllMasks(): void {
     this.#scanSession.regenerateAllMasks();
     this.#toastCenter.push(
-      "Fresh random replacements were generated for every detected sensitive value.",
+      "Fresh random replacements were generated for every active mask in the protected output.",
       "Masks regenerated",
       "success"
     );
@@ -102,37 +153,8 @@ export class AppComponent {
   protected regenerateMatch(matchId: string): void {
     this.#scanSession.regenerateMatch(matchId);
     this.#toastCenter.push(
-      "That sensitive value now uses a new random replacement in the protected output.",
+      "That mask now uses a new random replacement in the protected output.",
       "Mask regenerated",
-      "info"
-    );
-  }
-
-  protected async runScan(): Promise<void> {
-    const scanSucceeded = await this.#scanSession.runScan(),
-      { detectionMode, hasMatches, matchCount, selectedCountryProfile } = this.vm();
-
-    if (!scanSucceeded) {
-      this.#toastCenter.push(
-        "Add the original prompt first, then run the local scan again.",
-        "Nothing to scan yet",
-        "error"
-      );
-      return;
-    }
-
-    if (hasMatches) {
-      this.#toastCenter.push(
-        `${matchCount} sensitive patterns were masked locally using ${selectedCountryProfile.flagEmoji} ${selectedCountryProfile.label} and ${DETECTION_MODE_COPY[detectionMode].toLowerCase()}. Review or regenerate them before copying.`,
-        "Protected output ready",
-        "success"
-      );
-      return;
-    }
-
-    this.#toastCenter.push(
-      "No supported sensitive patterns were found in this pass, so the output matches the original prompt.",
-      "No masks were needed",
       "info"
     );
   }
@@ -142,15 +164,16 @@ export class AppComponent {
 
     switch (snippetId) {
       case "paste":
-        return viewModel.selectedCountryProfile ? "done" : "active";
-      case "scan":
         return viewModel.sourceText ? "done" : "active";
-      case "review":
+      case "scan":
         if (viewModel.isScanning) return "active";
         return viewModel.hasResult ? "done" : "idle";
+      case "review":
+        if (!viewModel.hasResult) return "idle";
+        return viewModel.hasMatches ? "active" : "done";
       case "copy":
         if (!viewModel.hasResult) return "idle";
-        return viewModel.matchCount ? "active" : "done";
+        return viewModel.canCopy ? "active" : "idle";
       default:
         return "idle";
     }
@@ -163,23 +186,44 @@ export class AppComponent {
     return "info";
   }
 
-  protected toggleAllEditable(enabled: boolean): void {
-    this.#scanSession.setAllEditableMatchesEnabled(enabled);
+  protected toggleCountryProfile(event: {
+    countryProfileId: CountryProfileId;
+    selected: boolean;
+  }): void {
+    const currentSelection = this.vm().selectedCountryProfiles.map(countryProfile => countryProfile.id),
+      nextSelection = toggleCountrySelection(
+        currentSelection,
+        event.countryProfileId,
+        event.selected
+      );
+
+    this.#scanSession.setCountryProfiles(nextSelection);
+    const nextSelectedCountryProfiles = this.#scanSession.viewModel().selectedCountryProfiles;
+
     this.#toastCenter.push(
-      enabled
-        ? "Every editable mask is active again in the protected output."
-        : "Only locked mask groups remain active in the protected output.",
-      enabled ? "Optional masks enabled" : "Optional masks disabled",
+      `Country scope updated to ${summarizeCountrySelection(nextSelectedCountryProfiles)}.`,
+      "Country scope updated",
       "info"
     );
+
+    if (
+      hasMixedLanguageSelection(nextSelectedCountryProfiles) &&
+      this.vm().detectionMode !== "global-only"
+    ) {
+      this.#toastCenter.push(
+        "Mixed-language country scopes are enabled. This can reduce precision, so keep the selection narrow when possible.",
+        "Mixed language scope",
+        "info"
+      );
+    }
   }
 
   protected toggleGroupAlwaysOn(event: { alwaysOn: boolean; groupId: MaskGroupId }): void {
     this.#scanSession.toggleGroupAlwaysOn(event.groupId, event.alwaysOn);
     this.#toastCenter.push(
       event.alwaysOn
-        ? "This group will stay masked even during per-match review."
-        : "This group can now be adjusted per match again.",
+        ? "This group will stay masked until you explicitly unlock it."
+        : "This group can now be adjusted per individual match again.",
       event.alwaysOn ? "Group locked on" : "Group unlocked",
       "info"
     );
@@ -189,8 +233,8 @@ export class AppComponent {
     this.#scanSession.toggleGroupEnabled(event.groupId, event.enabled);
     this.#toastCenter.push(
       event.enabled
-        ? "This mask group is active for the current prompt."
-        : "This mask group is currently passing through unchanged values.",
+        ? "This group is active again in the protected output."
+        : "This group is currently passing through original values.",
       event.enabled ? "Group enabled" : "Group disabled",
       "info"
     );
@@ -200,42 +244,32 @@ export class AppComponent {
     this.#scanSession.toggleMatch(event.matchId, event.enabled);
   }
 
-  protected async updateCountryProfile(value: string): Promise<void> {
-    if (!isKnownCountryProfileId(value)) return;
-
-    this.#scanSession.setCountryProfile(value as CountryProfileId);
-    const { selectedCountryProfile, sourceText } = this.vm();
-
-    this.#toastCenter.push(
-      `Country focus set to ${selectedCountryProfile.flagEmoji} ${selectedCountryProfile.label}.`,
-      "Country focus updated",
-      "info"
-    );
-
-    if (sourceText.trim()) await this.runScan();
-  }
-
-  protected async updateDetectionMode(event: Event): Promise<void> {
-    const inputElement = event.target;
-    if (!(inputElement instanceof HTMLInputElement)) return;
-
-    const detectionMode: DetectionMode = inputElement.checked
-      ? "global-only"
-      : "country-plus-global";
-
+  protected updateDetectionMode(detectionMode: DetectionMode): void {
     this.#scanSession.setDetectionMode(detectionMode);
     this.#toastCenter.push(
-      inputElement.checked
-        ? "The scan will now track only shared global identifiers and ignore country-specific document patterns."
-        : "The scan will now combine shared global rules with the selected country profile.",
-      inputElement.checked ? "Global-only scan enabled" : "Country rules enabled",
+      detectionMode === "global-only"
+        ? "The detector is now limited to global identifiers and shared credential patterns."
+        : "The detector is now combining the selected countries with shared global rules.",
+      detectionMode === "global-only" ? "Global-only mode enabled" : "Country rules enabled",
       "info"
     );
-
-    if (this.vm().sourceText.trim()) await this.runScan();
   }
 
   protected updateSourceText(value: string): void {
     this.#scanSession.updateSourceText(value);
+  }
+
+  protected scopeCopy(): string {
+    const selectedCountrySummary = this.selectedCountrySummary();
+
+    if (this.vm().detectionMode === "global-only") {
+      return `${selectedCountrySummary} selected, but only global identifiers are active.`;
+    }
+
+    return `${selectedCountrySummary} plus shared global rules.`;
+  }
+
+  protected detectionModeCopy(): string {
+    return DETECTION_MODE_COPY[this.vm().detectionMode];
   }
 }

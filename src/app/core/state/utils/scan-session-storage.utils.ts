@@ -1,5 +1,5 @@
 import {
-  DEFAULT_COUNTRY_PROFILE_ID,
+  DEFAULT_COUNTRY_PROFILE_IDS,
   DEFAULT_GROUP_PREFERENCES,
 } from "../../masking/constants/masking.constants";
 import type {
@@ -7,9 +7,13 @@ import type {
   DetectionMode,
   MaskGroupPreferenceMap,
 } from "../../masking/declarations/masking.types";
-import { isKnownCountryProfileId } from "../../masking/utils/country-scope.utils";
+import {
+  isKnownCountryProfileId,
+  normalizeCountryProfileIds,
+} from "../../masking/utils/country-scope.utils";
 import { createGroupPreferenceMap } from "../../masking/utils/mask-group.utils";
 import { SESSION_STORAGE_KEYS } from "../constants/scan-session.constants";
+import { detectBrowserCountryProfileIds } from "./country-profile-defaults.utils";
 
 export function loadPersistedGroupPreferences(): MaskGroupPreferenceMap {
   try {
@@ -34,33 +38,49 @@ export function loadPersistedSourceText(): string {
   }
 }
 
-export function loadPersistedCountryProfileId(): CountryProfileId {
+export function loadPersistedCountryProfileIds(): readonly CountryProfileId[] {
   try {
-    if (typeof sessionStorage === "undefined") return DEFAULT_COUNTRY_PROFILE_ID;
+    if (typeof sessionStorage === "undefined") return detectBrowserCountryProfileIds();
 
-    const rawValue = sessionStorage.getItem(SESSION_STORAGE_KEYS.countryProfileId);
-    if (!rawValue || !isKnownCountryProfileId(rawValue)) return DEFAULT_COUNTRY_PROFILE_ID;
-    return rawValue;
+    const rawValue = sessionStorage.getItem(SESSION_STORAGE_KEYS.countryProfileIds);
+    if (rawValue) {
+      const parsed = JSON.parse(rawValue) as string[],
+        countryProfileIds = normalizeCountryProfileIds(
+          parsed.filter(isKnownCountryProfileId) as CountryProfileId[]
+        );
+
+      if (countryProfileIds.length) return countryProfileIds;
+    }
+
+    const legacyCountryProfileId = sessionStorage.getItem(SESSION_STORAGE_KEYS.countryProfileId);
+    if (legacyCountryProfileId && isKnownCountryProfileId(legacyCountryProfileId)) {
+      return Object.freeze([legacyCountryProfileId]);
+    }
+
+    return detectBrowserCountryProfileIds();
   } catch {
-    return DEFAULT_COUNTRY_PROFILE_ID;
+    return DEFAULT_COUNTRY_PROFILE_IDS;
   }
 }
 
 export function loadPersistedDetectionMode(): DetectionMode {
   try {
-    if (typeof sessionStorage === "undefined") return "country-plus-global";
+    if (typeof sessionStorage === "undefined") return "selected-plus-global";
 
     const rawValue = sessionStorage.getItem(SESSION_STORAGE_KEYS.detectionMode);
-    return rawValue === "global-only" ? "global-only" : "country-plus-global";
+    return rawValue === "global-only" ? "global-only" : "selected-plus-global";
   } catch {
-    return "country-plus-global";
+    return "selected-plus-global";
   }
 }
 
-export function persistCountryProfileId(countryProfileId: CountryProfileId): void {
+export function persistCountryProfileIds(countryProfileIds: readonly CountryProfileId[]): void {
   try {
     if (typeof sessionStorage === "undefined") return;
-    sessionStorage.setItem(SESSION_STORAGE_KEYS.countryProfileId, countryProfileId);
+    sessionStorage.setItem(
+      SESSION_STORAGE_KEYS.countryProfileIds,
+      JSON.stringify(normalizeCountryProfileIds(countryProfileIds))
+    );
   } catch {
     // Storage is optional and must not block local masking.
   }

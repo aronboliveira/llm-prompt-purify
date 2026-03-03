@@ -4,15 +4,16 @@ import { buildScanScopeSelection } from "./utils/country-scope.utils";
 import { createGroupPreferenceMap } from "./utils/mask-group.utils";
 import {
   BRAZILIAN_PORTUGUESE_MASK_FIXTURES,
-  LATAM_SPANISH_MASK_FIXTURES,
+  GLOBAL_SCOPE_MASK_FIXTURES,
+  INTERNATIONAL_MASK_FIXTURES,
   NEGATIVE_LOCALE_MASK_FIXTURES,
 } from "../../testing/constants/locale-mask-fixtures.constants";
 
 describe("MaskingEngine", () => {
   const engine = new MaskingEngine(),
-    brazilScope = buildScanScopeSelection("br", "country-plus-global"),
-    globalOnlyBrazilScope = buildScanScopeSelection("br", "global-only"),
-    unitedStatesScope = buildScanScopeSelection("us", "country-plus-global");
+    brazilScope = buildScanScopeSelection(["br"], "selected-plus-global"),
+    globalOnlyBrazilScope = buildScanScopeSelection(["br"], "global-only"),
+    unitedStatesScope = buildScanScopeSelection(["us"], "selected-plus-global");
 
   it("returns the original text when nothing supported is detected", () => {
     const sourceText = "Summarize this product update for the engineering weekly digest.",
@@ -156,8 +157,8 @@ describe("MaskingEngine", () => {
           fixture.sourceText,
           DEFAULT_GROUP_PREFERENCES,
           buildScanScopeSelection(
-            fixture.countryProfileId,
-            fixture.detectionMode ?? "country-plus-global"
+            fixture.countryProfileIds,
+            fixture.detectionMode ?? "selected-plus-global"
           )
         );
 
@@ -183,15 +184,36 @@ describe("MaskingEngine", () => {
     });
   });
 
-  describe("LatAm Spanish coverage", () => {
-    for (const fixture of LATAM_SPANISH_MASK_FIXTURES) {
+  describe("International coverage", () => {
+    for (const fixture of INTERNATIONAL_MASK_FIXTURES) {
       it(fixture.description, () => {
         const result = engine.scan(
           fixture.sourceText,
           DEFAULT_GROUP_PREFERENCES,
           buildScanScopeSelection(
-            fixture.countryProfileId,
-            fixture.detectionMode ?? "country-plus-global"
+            fixture.countryProfileIds,
+            fixture.detectionMode ?? "selected-plus-global"
+          )
+        );
+
+        expect(result.matches.map(match => match.ruleId)).toEqual(
+          expect.arrayContaining(fixture.expectedRuleIds)
+        );
+
+        for (const hiddenValue of fixture.hiddenValues) {
+          expect(result.maskedText).not.toContain(hiddenValue);
+        }
+      });
+    }
+
+    for (const fixture of GLOBAL_SCOPE_MASK_FIXTURES) {
+      it(fixture.description, () => {
+        const result = engine.scan(
+          fixture.sourceText,
+          DEFAULT_GROUP_PREFERENCES,
+          buildScanScopeSelection(
+            fixture.countryProfileIds,
+            fixture.detectionMode ?? "selected-plus-global"
           )
         );
 
@@ -208,7 +230,11 @@ describe("MaskingEngine", () => {
     it("masks structured Spanish labels for names, addresses, and phone numbers", () => {
       const sourceText =
           "Nombre completo: Camila Torres Rivera\nDirección: Calle 85 # 12-34, Bogotá\nTeléfono: +57 301 222 3344",
-        result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES, buildScanScopeSelection("co", "country-plus-global"));
+        result = engine.scan(
+          sourceText,
+          DEFAULT_GROUP_PREFERENCES,
+          buildScanScopeSelection(["co"], "selected-plus-global")
+        );
 
       expect(result.matches.map(match => match.ruleId)).toEqual(
         expect.arrayContaining(["labeled-address", "labeled-name", "labeled-phone"])
@@ -226,8 +252,8 @@ describe("MaskingEngine", () => {
           fixture.sourceText,
           DEFAULT_GROUP_PREFERENCES,
           buildScanScopeSelection(
-            fixture.countryProfileId,
-            fixture.detectionMode ?? "country-plus-global"
+            fixture.countryProfileIds,
+            fixture.detectionMode ?? "selected-plus-global"
           )
         );
 

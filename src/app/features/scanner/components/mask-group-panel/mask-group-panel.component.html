@@ -1,38 +1,75 @@
-<div class="group-grid">
-  @for (group of groups(); track group.id) {
-    <article class="group-card" [attr.data-state]="group.enabled ? 'enabled' : 'disabled'">
-      <div class="group-card__header">
-        <div>
-          <p class="group-card__title">{{ group.label }}</p>
-          <p class="group-card__count">{{ group.matchCount }} matches in latest scan</p>
-        </div>
-        <span class="group-card__state">{{ group.enabled ? "On" : "Off" }}</span>
-      </div>
+<form class="mask-form">
+  @for (section of sections(); track section.group.id) {
+    <fieldset
+      class="mask-fieldset"
+      [attr.data-state]="section.group.enabled ? 'enabled' : 'disabled'"
+    >
+      <legend class="mask-fieldset__legend">
+        <span>{{ section.group.label }}</span>
+        <small>{{ section.group.matchCount }} local matches</small>
+      </legend>
 
-      <p class="group-card__description">{{ group.description }}</p>
+      <p class="mask-fieldset__description">{{ section.group.description }}</p>
 
-      <label class="group-card__toggle">
-        <input
-          type="checkbox"
-          [checked]="group.enabled"
-          [attr.data-testid]="'group-toggle-' + group.id"
-          (change)="onEnabledToggle(group.id, $event)"
-        />
-        <span>{{ group.toggleLabel }}</span>
-      </label>
-
-      @if (group.supportsAlwaysOn && group.alwaysOnLabel) {
-        <label class="group-card__toggle group-card__toggle--subtle">
+      <div class="mask-fieldset__toggles">
+        <label class="mask-toggle">
           <input
             type="checkbox"
-            [checked]="group.alwaysOn"
-            [disabled]="!group.enabled"
-            [attr.data-testid]="'group-lock-' + group.id"
-            (change)="onAlwaysOnToggle(group.id, $event)"
+            [checked]="section.group.enabled"
+            [attr.data-testid]="'group-toggle-' + section.group.id"
+            (change)="onEnabledToggle(section.group.id, $event)"
           />
-          <span>{{ group.alwaysOnLabel }}</span>
+          <span>{{ section.group.toggleLabel }}</span>
         </label>
+
+        @if (section.group.supportsAlwaysOn && section.group.alwaysOnLabel) {
+          <label class="mask-toggle mask-toggle--subtle">
+            <input
+              type="checkbox"
+              [checked]="section.group.alwaysOn"
+              [disabled]="!section.group.enabled"
+              [attr.data-testid]="'group-lock-' + section.group.id"
+              (change)="onAlwaysOnToggle(section.group.id, $event)"
+            />
+            <span>{{ section.group.alwaysOnLabel }}</span>
+          </label>
+        }
+      </div>
+
+      @if (section.matches.length) {
+        <div class="mask-row-list">
+          @for (match of section.matches; track match.id) {
+            <label
+              class="mask-row"
+              [attr.data-locked]="match.locked"
+              [attr.data-enabled]="match.enabled"
+            >
+              <input
+                type="checkbox"
+                [checked]="match.enabled"
+                [disabled]="match.locked || !section.group.enabled"
+                [attr.data-testid]="'toggle-' + match.ruleId"
+                (change)="onMatchToggle(match.id, $event)"
+              />
+              <span class="mask-row__copy">{{ formatMatchValue(match) }}</span>
+              <button
+                class="mask-row__action"
+                type="button"
+                [disabled]="!section.group.enabled"
+                [attr.data-testid]="'regenerate-' + match.ruleId"
+                (click)="onMatchRegenerate(match.id)"
+              >
+                <span aria-hidden="true" class="mask-row__icon" [innerHTML]="icons.refresh"></span>
+                <span>Regenerate</span>
+              </button>
+            </label>
+          }
+        </div>
+      } @else {
+        <p class="mask-fieldset__empty">
+          No matches from this group are currently present in the protected output.
+        </p>
       }
-    </article>
+    </fieldset>
   }
-</div>
+</form>
