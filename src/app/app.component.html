@@ -1,32 +1,70 @@
-<div class="app-shell">
+<div
+  class="app-shell"
+  [attr.data-state]="vm().isScanning ? 'scanning' : vm().hasResult ? 'ready' : 'idle'"
+>
   <header class="hero">
     <div class="hero__copy">
-      <p class="eyebrow">Client-side prompt sanitization</p>
-      <h1>Paste once, scan once, copy the masked version.</h1>
+      <p class="eyebrow">Client-side prompt protection</p>
+      <h1>Paste the raw prompt. Copy back only the protected one.</h1>
       <p class="hero__body">
-        LLM Prompt Purify detects likely credentials, personal identifiers, and structured private
-        fields locally in your browser. Every detected mask is enabled by default, and you can turn
-        off individual replacements before copying the final prompt.
+        The basic flow is fixed on purpose: paste the original prompt, wait for the local scan,
+        review the protected output in the output block, adjust masks if needed, and then copy only
+        the masked version back into the LLM.
       </p>
+
+      <div class="hero__notice">
+        <span aria-hidden="true" class="hero__notice-icon" [innerHTML]="icons.privacy"></span>
+        <div>
+          <p class="hero__notice-title">Everything happens in your browser.</p>
+          <p class="hero__notice-body">
+            No prompt text needs to leave this device to produce the protected output.
+          </p>
+        </div>
+        <button class="help-trigger" type="button" (click)="openHelp('clientside')">(?)</button>
+      </div>
     </div>
+
     <div class="hero__panel">
-      <p class="hero__stat-value">{{ vm().matchCount }}</p>
-      <p class="hero__stat-label">matches in the latest scan</p>
+      <div>
+        <p class="hero__stat-value">{{ vm().matchCount }}</p>
+        <p class="hero__stat-label">matches in the latest scan</p>
+      </div>
+      <div>
+        <p class="hero__stat-value">{{ vm().activeMatches }}</p>
+        <p class="hero__stat-label">masks active right now</p>
+      </div>
       <p class="hero__stat-note">Focused coverage: EN-US, PT-BR, ES-LatAm</p>
     </div>
   </header>
+
+  <section aria-label="Workflow steps" class="snippet-strip">
+    @for (snippet of workflowSnippets; track snippet.id) {
+      <article class="snippet" [attr.data-state]="snippetState(snippet.id)">
+        <p class="snippet__title">{{ snippet.title }}</p>
+        <p class="snippet__body">{{ snippet.body }}</p>
+      </article>
+    }
+  </section>
 
   <main class="workspace">
     <section class="panel panel--input">
       <div class="panel__header">
         <div>
           <p class="panel__eyebrow">Input</p>
-          <h2>Source prompt</h2>
+          <div class="panel__title-row">
+            <h2>Original prompt</h2>
+            <button class="help-trigger" type="button" (click)="openHelp('workflow')">(?)</button>
+          </div>
         </div>
         <span class="char-count">{{ vm().sourceText.length }} chars</span>
       </div>
 
-      <label class="sr-only" for="sourceText">Source prompt</label>
+      <p class="panel__body">
+        Paste the original version here. Unsupported formats can still slip through, so the output
+        panel is where you confirm what remains visible before copying anything.
+      </p>
+
+      <label class="sr-only" for="sourceText">Original prompt</label>
       <textarea
         id="sourceText"
         class="editor"
@@ -42,93 +80,154 @@
           class="button button--primary"
           data-testid="scan-button"
           [disabled]="vm().isScanning"
+          type="button"
           (click)="runScan()"
         >
-          {{ vm().isScanning ? "Scanning..." : "Scan and mask" }}
+          {{ vm().isScanning ? "Scanning locally..." : "Scan and build protected output" }}
         </button>
         <button
           class="button button--secondary"
           [disabled]="!vm().sourceText"
+          type="button"
           (click)="clear()"
         >
-          Clear
+          Clear local draft
         </button>
       </div>
 
-      @if (vm().errorMessage) {
-        <p class="notice notice--error" aria-live="polite">{{ vm().errorMessage }}</p>
-      } @else {
-        <p class="notice">
-          The scan stays local. No prompt text leaves the browser during masking.
-        </p>
-      }
+      <p class="notice">
+        The input stays local. Only the processed output block below should be copied into the LLM.
+      </p>
     </section>
 
     <section class="panel panel--output">
       <div class="panel__header">
         <div>
           <p class="panel__eyebrow">Output</p>
-          <h2>Masked prompt</h2>
+          <div class="panel__title-row">
+            <h2>Protected prompt</h2>
+            <button class="help-trigger" type="button" (click)="openHelp('coverage')">(?)</button>
+          </div>
         </div>
         <button
-          class="button button--secondary"
+          class="button button--secondary button--icon"
           data-testid="copy-button"
           [disabled]="!vm().canCopy"
+          type="button"
           (click)="copyMaskedOutput()"
         >
-          Copy masked output
+          <span aria-hidden="true" class="button__icon" [innerHTML]="icons.copy"></span>
+          <span>Copy protected output</span>
         </button>
       </div>
 
-      <div class="output" data-testid="masked-output" aria-live="polite">
-        @if (vm().hasResult) {
+      <p class="panel__body">
+        This output block is the only text meant to leave the page. If you still spot something
+        sensitive, fix it here through the controls before you paste it anywhere else.
+      </p>
+
+      <output
+        class="output"
+        data-testid="masked-output"
+        [attr.data-state]="vm().isScanning ? 'scanning' : vm().hasResult ? 'ready' : 'idle'"
+        aria-live="polite"
+      >
+        @if (vm().isScanning) {
+          <span aria-hidden="true" class="spinner"></span>
+          <span class="output__message">{{ vm().statusMessage }}</span>
+        } @else if (vm().hasResult) {
           {{ vm().maskedText }}
         } @else {
-          Run a scan to generate the safe-to-copy version of your prompt.
+          Run a scan to populate the protected output before copying anything into the LLM.
         }
-      </div>
+      </output>
 
       <div class="status-row">
-        @if (!vm().hasResult) {
-          <p class="notice">Nothing has been scanned yet.</p>
-        } @else if (!vm().hasMatches) {
-          <p class="notice notice--success">
-            No supported sensitive patterns were detected. The output matches your original text.
+        <p class="status-pill" [attr.data-tone]="statusTone()">{{ vm().statusMessage }}</p>
+        @if (vm().hasResult && vm().hasMatches) {
+          <p class="status-pill" data-tone="success">
+            {{ vm().activeMatches }} of {{ vm().matchCount }} masks are active
           </p>
-        } @else {
-          <p class="notice notice--success">
-            {{ vm().activeMatches }} of {{ vm().matchCount }} masks are currently applied.
-          </p>
-        }
-
-        @if (copyFeedback() === "success") {
-          <p class="copy-feedback copy-feedback--success">Masked output copied.</p>
-        } @else if (copyFeedback() === "error") {
-          <p class="copy-feedback copy-feedback--error">
-            Clipboard access failed. Copy directly from the output panel instead.
-          </p>
+        } @else if (vm().hasResult && !vm().hasMatches) {
+          <p class="status-pill" data-tone="info">No supported sensitive patterns were found</p>
         }
       </div>
     </section>
   </main>
+
+  <section class="panel panel--controls">
+    <div class="panel__header">
+      <div>
+        <p class="panel__eyebrow">Mask groups</p>
+        <div class="panel__title-row">
+          <h2>Quick policy controls</h2>
+          <button class="help-trigger" type="button" (click)="openHelp('controls')">(?)</button>
+        </div>
+      </div>
+      <div class="panel__actions panel__actions--compact">
+        <button
+          class="button button--secondary button--icon"
+          [disabled]="!vm().matches.length"
+          type="button"
+          (click)="regenerateAllMasks()"
+        >
+          <span aria-hidden="true" class="button__icon" [innerHTML]="icons.refresh"></span>
+          <span>Regenerate all masks</span>
+        </button>
+        <button
+          class="button button--secondary"
+          [disabled]="!vm().matches.length"
+          type="button"
+          (click)="toggleAllEditable(true)"
+        >
+          Enable editable masks
+        </button>
+        <button
+          class="button button--secondary"
+          [disabled]="!vm().matches.length"
+          type="button"
+          (click)="toggleAllEditable(false)"
+        >
+          Disable editable masks
+        </button>
+      </div>
+    </div>
+
+    <p class="panel__body">
+      Use this panel to disable broad groups before or after scanning. Credentials can also be
+      forced to stay masked, while personal identifiers and other groups can be relaxed when the
+      prompt is already synthetic.
+    </p>
+
+    <app-mask-group-panel
+      [groups]="vm().groups"
+      (groupAlwaysOnToggled)="toggleGroupAlwaysOn($event)"
+      (groupEnabledToggled)="toggleGroupEnabled($event)"
+    ></app-mask-group-panel>
+  </section>
 
   @if (vm().matches.length) {
     <section class="review">
       <div class="review__header">
         <div>
           <p class="panel__eyebrow">Review</p>
-          <h2>Mask toggles</h2>
-        </div>
-        <div class="review__actions">
-          <button class="button button--secondary" (click)="toggleAll(true)">Enable all</button>
-          <button class="button button--secondary" (click)="toggleAll(false)">Disable all</button>
+          <h2>Per-match controls</h2>
         </div>
       </div>
 
+      <p class="review__body">
+        The menu below is where you take off a single mask or regenerate a specific replacement.
+        Locked credentials stay on until you change the group policy above.
+      </p>
+
       <app-match-review
         [matches]="vm().matches"
+        (matchRegenerated)="regenerateMatch($event)"
         (matchToggled)="toggleMatch($event)"
       ></app-match-review>
     </section>
   }
+
+  <app-help-modal [topic]="activeHelpTopic()" (closed)="closeHelp()"></app-help-modal>
+  <app-toast-stack [toasts]="toasts()" (dismissed)="dismissToast($event)"></app-toast-stack>
 </div>

@@ -1,0 +1,38 @@
+<div class="group-grid">
+  @for (group of groups(); track group.id) {
+    <article class="group-card" [attr.data-state]="group.enabled ? 'enabled' : 'disabled'">
+      <div class="group-card__header">
+        <div>
+          <p class="group-card__title">{{ group.label }}</p>
+          <p class="group-card__count">{{ group.matchCount }} matches in latest scan</p>
+        </div>
+        <span class="group-card__state">{{ group.enabled ? "On" : "Off" }}</span>
+      </div>
+
+      <p class="group-card__description">{{ group.description }}</p>
+
+      <label class="group-card__toggle">
+        <input
+          type="checkbox"
+          [checked]="group.enabled"
+          [attr.data-testid]="'group-toggle-' + group.id"
+          (change)="onEnabledToggle(group.id, $event)"
+        />
+        <span>{{ group.toggleLabel }}</span>
+      </label>
+
+      @if (group.supportsAlwaysOn && group.alwaysOnLabel) {
+        <label class="group-card__toggle group-card__toggle--subtle">
+          <input
+            type="checkbox"
+            [checked]="group.alwaysOn"
+            [disabled]="!group.enabled"
+            [attr.data-testid]="'group-lock-' + group.id"
+            (change)="onAlwaysOnToggle(group.id, $event)"
+          />
+          <span>{{ group.alwaysOnLabel }}</span>
+        </label>
+      }
+    </article>
+  }
+</div>

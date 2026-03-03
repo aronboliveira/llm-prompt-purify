@@ -1,0 +1,35 @@
+@if (topic(); as activeTopic) {
+  <div
+    class="modal-backdrop"
+    role="presentation"
+    (click)="closeOnBackdrop($event)"
+  >
+    <section
+      aria-labelledby="help-modal-title"
+      aria-modal="true"
+      class="modal"
+      role="dialog"
+    >
+      <header class="modal__header">
+        <div class="modal__title-wrap">
+          <span aria-hidden="true" class="modal__icon" [innerHTML]="icons.help"></span>
+          <h2 id="help-modal-title">{{ activeTopic.title }}</h2>
+        </div>
+        <button
+          aria-label="Close help"
+          class="modal__close"
+          type="button"
+          (click)="close()"
+        >
+          Close
+        </button>
+      </header>
+
+      <div class="modal__body">
+        @for (paragraph of activeTopic.paragraphs; track paragraph) {
+          <p>{{ paragraph }}</p>
+        }
+      </div>
+    </section>
+  </div>
+}

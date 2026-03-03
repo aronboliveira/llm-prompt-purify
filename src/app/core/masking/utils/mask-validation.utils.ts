@@ -1,70 +1,4 @@
-import { MASK_CHARACTER_SETS } from "./masking.constants";
-import type { DetectionRule, ScanMatch } from "./masking.types";
-
-interface CandidateMatch {
-  rule: DetectionRule;
-  start: number;
-  end: number;
-  value: string;
-}
-
-export function applyEnabledMasks(
-  sourceText: string,
-  matches: readonly ScanMatch[]
-): string {
-  const enabledMatches = [...matches]
-    .filter(match => match.enabled)
-    .sort((left, right) => left.start - right.start);
-
-  if (!enabledMatches.length) return sourceText;
-
-  let cursor = 0,
-    maskedText = "";
-  for (const match of enabledMatches) {
-    maskedText += sourceText.slice(cursor, match.start);
-    maskedText += match.mask;
-    cursor = match.end;
-  }
-  maskedText += sourceText.slice(cursor);
-  return maskedText;
-}
-
-export function createMask(value: string): string {
-  return Array.from(value).map(remapCharacter).join("");
-}
-
-export function extractCandidateMatch(
-  match: RegExpMatchArray,
-  rule: DetectionRule
-): CandidateMatch | null {
-  if (typeof match.index !== "number") return null;
-
-  if (typeof rule.valueGroup !== "number") {
-    const value = sanitizeCapturedValue(match[0]);
-    return value
-      ? {
-          end: match.index + value.length,
-          rule,
-          start: match.index,
-          value,
-        }
-      : null;
-  }
-
-  const capturedValue = sanitizeCapturedValue(match[rule.valueGroup] ?? "");
-  if (!capturedValue) return null;
-
-  const relativeIndex = match[0].indexOf(capturedValue);
-  if (relativeIndex < 0) return null;
-
-  const start = match.index + relativeIndex;
-  return {
-    end: start + capturedValue.length,
-    rule,
-    start,
-    value: capturedValue,
-  };
-}
+import { sanitizeCapturedValue } from "./mask-format.utils";
 
 export function isLikelyCreditCard(value: string): boolean {
   const digitsOnly = value.replace(/\D/g, "");
@@ -162,38 +96,6 @@ export function looksSecretLike(value: string): boolean {
   return [hasDigit, hasLower, hasSymbol, hasUpper].filter(Boolean).length >= 2;
 }
 
-export function redactPreview(value: string): string {
-  if (value.length <= 6) return value[0] ? `${value[0]}***` : "";
-  return `${value.slice(0, 3)}***${value.slice(-2)}`;
-}
-
-export function resolveOverlaps(
-  candidates: readonly CandidateMatch[]
-): readonly CandidateMatch[] {
-  if (candidates.length <= 1) return [...candidates];
-
-  const sorted = [...candidates].sort((left, right) => {
-    if (left.start !== right.start) return left.start - right.start;
-    if (left.rule.priority !== right.rule.priority)
-      return right.rule.priority - left.rule.priority;
-    return right.value.length - left.value.length;
-  });
-
-  const resolved: CandidateMatch[] = [];
-  for (const candidate of sorted) {
-    const previous = resolved.at(-1);
-    if (!previous || candidate.start >= previous.end) {
-      resolved.push(candidate);
-      continue;
-    }
-
-    if (scoreCandidate(candidate) > scoreCandidate(previous))
-      resolved[resolved.length - 1] = candidate;
-  }
-
-  return resolved.sort((left, right) => left.start - right.start);
-}
-
 function calculateCpfDigit(value: string, factor: number): number {
   const total = Array.from(value).reduce((sum, digit, index) => {
     return sum + Number(digit) * (factor - index);
@@ -210,32 +112,4 @@ function calculateWeightedDigit(value: string, weights: readonly number[]): numb
 
   const remainder = total % 11;
   return remainder < 2 ? 0 : 11 - remainder;
-}
-
-function pickRandom(characterSet: string): string {
-  const index = randomNumber(characterSet.length);
-  return characterSet[index];
-}
-
-function randomNumber(max: number): number {
-  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
-    return crypto.getRandomValues(new Uint32Array(1))[0] % max;
-  }
-  return Math.floor(Math.random() * max);
-}
-
-function remapCharacter(character: string): string {
-  if (/\d/u.test(character)) return pickRandom(MASK_CHARACTER_SETS.digits);
-  if (/\p{Lu}/u.test(character)) return pickRandom(MASK_CHARACTER_SETS.uppercase);
-  if (/\p{Ll}/u.test(character)) return pickRandom(MASK_CHARACTER_SETS.lowercase);
-  if (/\s/u.test(character)) return character;
-  return pickRandom(MASK_CHARACTER_SETS.symbols);
-}
-
-function sanitizeCapturedValue(value: string): string {
-  return value.trim().replace(/[;:,]+$/g, "");
-}
-
-function scoreCandidate(candidate: CandidateMatch): number {
-  return candidate.rule.priority * 1000 + candidate.value.length;
 }

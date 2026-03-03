@@ -1,0 +1,74 @@
+@use "../../../../shared/styles/design" as ui;
+
+.modal-backdrop {
+  align-items: center;
+  background: rgba(7, 22, 38, 0.56);
+  display: grid;
+  inset: 0;
+  padding: 1.5rem;
+  position: fixed;
+  z-index: 40;
+}
+
+.modal {
+  @include ui.surface-card(1.1, 0.18);
+
+  margin: 0 auto;
+  max-inline-size: 42rem;
+  padding: 1.25rem;
+  transform: translateY(0);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+  width: min(100%, 42rem);
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
+
+.modal__header,
+.modal__title-wrap {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.modal__header {
+  justify-content: space-between;
+  margin-block-end: 1rem;
+}
+
+.modal__icon {
+  color: #0f766e;
+  display: inline-flex;
+}
+
+.modal__icon :is(svg) {
+  fill: currentColor;
+}
+
+.modal h2,
+.modal p {
+  margin: 0;
+}
+
+.modal__body {
+  display: grid;
+  gap: 0.9rem;
+  line-height: 1.7;
+}
+
+.modal__close {
+  @include ui.focus-ring();
+
+  background: #eff5f8;
+  border: none;
+  border-radius: 999px;
+  color: #0f172a;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
+}

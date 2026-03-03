@@ -1,0 +1,30 @@
+@function panel-radius($size: 1) {
+  @return 1rem + ($size * 0.35rem);
+}
+
+@function shadow-alpha($strength) {
+  @return rgba(11, 38, 61, $strength);
+}
+
+@mixin focus-ring($color: rgba(15, 118, 110, 0.34)) {
+  &:focus-visible {
+    outline: 3px solid $color;
+    outline-offset: 3px;
+  }
+}
+
+@mixin surface-card($blur: 0.9, $strength: 0.12) {
+  backdrop-filter: blur(18px * $blur);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(11, 38, 61, 0.08);
+  border-radius: panel-radius();
+  box-shadow: 0 24px 64px shadow-alpha($strength);
+}
+
+@mixin section-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin: 0;
+  text-transform: uppercase;
+}

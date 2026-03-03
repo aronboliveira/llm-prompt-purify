@@ -1,19 +1,35 @@
 <div class="match-list">
   @for (match of matches(); track match.id) {
-    <article class="match-card" [attr.data-testid]="'match-card-' + match.ruleId">
+    <article
+      class="match-card"
+      [attr.data-state]="match.enabled ? 'enabled' : 'disabled'"
+      [attr.data-testid]="'match-card-' + match.ruleId"
+    >
       <div class="match-card__top">
         <label class="match-card__toggle">
           <input
             type="checkbox"
             [checked]="match.enabled"
+            [disabled]="match.locked"
             [attr.data-testid]="'toggle-' + match.ruleId"
             (change)="onMatchToggle(match.id, $event)"
           />
           <span>{{ match.label }}</span>
         </label>
-        <div class="match-card__badges">
-          <span class="badge">{{ categoryLabels[match.category] }}</span>
-          <span class="badge badge--ghost">{{ localeLabels[match.locale] }}</span>
+        <div class="match-card__actions">
+          <button
+            class="match-card__action"
+            type="button"
+            [attr.data-testid]="'regenerate-' + match.ruleId"
+            (click)="onMatchRegenerate(match.id)"
+          >
+            <span aria-hidden="true" class="match-card__icon" [innerHTML]="icons.refresh"></span>
+            <span>Regenerate</span>
+          </button>
+          <div class="match-card__badges">
+            <span class="badge">{{ categoryLabels[match.category] }}</span>
+            <span class="badge badge--ghost">{{ localeLabels[match.locale] }}</span>
+          </div>
         </div>
       </div>
 
@@ -26,6 +42,17 @@
         <span class="detail-label">Mask</span>
         <code>{{ match.mask }}</code>
       </div>
+
+      @if (match.locked) {
+        <p class="match-card__note">
+          This group is set to always stay masked, so the toggle is intentionally locked.
+        </p>
+      } @else if (!match.enabled) {
+        <p class="match-card__note">
+          This specific mask is currently off, so the original value is passing through to the
+          protected output.
+        </p>
+      }
     </article>
   }
 </div>
