@@ -1,0 +1,87 @@
+@use "../../../../shared/styles/design" as ui;
+
+.group-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.group-card {
+  @include ui.surface-card(0.65, 0.08);
+
+  container-type: inline-size;
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.group-card[data-state="enabled"] {
+  border-color: rgba(15, 118, 110, 0.18);
+}
+
+.group-card[data-state="disabled"] {
+  opacity: 0.8;
+}
+
+.group-card__header {
+  align-items: start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.group-card__title,
+.group-card__count,
+.group-card__description {
+  margin: 0;
+}
+
+.group-card__title {
+  font-weight: 700;
+}
+
+.group-card__count {
+  color: #51616f;
+  font-size: 0.84rem;
+}
+
+.group-card__description {
+  color: #3c4d5e;
+  line-height: 1.6;
+}
+
+.group-card__state {
+  background: #eef7f6;
+  border-radius: 999px;
+  color: #0f766e;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.6rem;
+  text-transform: uppercase;
+}
+
+.group-card__toggle {
+  @include ui.focus-ring();
+
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 0.65rem;
+  width: fit-content;
+}
+
+.group-card__toggle--subtle {
+  color: #425466;
+}
+
+.group-card__toggle input {
+  accent-color: #0f766e;
+}
+
+@container (max-width: 28rem) {
+  .group-card__header {
+    flex-direction: column;
+  }
+}

@@ -1,4 +1,4 @@
-import type { DetectionRule } from "./masking.types";
+import type { DetectionRule } from "../declarations/masking.types";
 import {
   isLikelyCreditCard,
   isLikelyIban,
@@ -8,7 +8,7 @@ import {
   looksLikeStructuredAddress,
   looksLikeStructuredName,
   looksSecretLike,
-} from "./masking.utils";
+} from "../utils/mask-validation.utils";
 
 export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   {

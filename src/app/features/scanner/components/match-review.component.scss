@@ -1,16 +1,21 @@
+@use "../../../shared/styles/design" as ui;
+
 .match-list {
   display: grid;
   gap: 1rem;
 }
 
 .match-card {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(11, 38, 61, 0.12);
-  border-radius: 1rem;
-  box-shadow: 0 18px 40px rgba(11, 38, 61, 0.08);
+  @include ui.surface-card(0.6, 0.08);
+
+  container-type: inline-size;
   display: grid;
   gap: 0.85rem;
   padding: 1rem 1.1rem;
+}
+
+.match-card[data-state="disabled"] {
+  opacity: 0.82;
 }
 
 .match-card__top {
@@ -20,18 +25,49 @@
   justify-content: space-between;
 }
 
+.match-card__actions,
 .match-card__toggle {
   align-items: center;
+  display: flex;
+  gap: 0.65rem;
+}
+
+.match-card__toggle {
   cursor: pointer;
   display: inline-flex;
   font-weight: 600;
-  gap: 0.65rem;
 }
 
 .match-card__toggle input {
   accent-color: #0f766e;
   inline-size: 1rem;
   margin: 0;
+}
+
+.match-card__action {
+  @include ui.focus-ring();
+
+  align-items: center;
+  background: #eff5f8;
+  border: none;
+  border-radius: 999px;
+  color: #0f172a;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 700;
+  gap: 0.45rem;
+  padding: 0.55rem 0.8rem;
+}
+
+.match-card__icon {
+  display: inline-flex;
+}
+
+.match-card__icon :is(svg) {
+  fill: currentColor;
+  height: 1rem;
+  width: 1rem;
 }
 
 .match-card__badges {
@@ -44,6 +80,13 @@
 .match-card__detail {
   display: grid;
   gap: 0.25rem;
+}
+
+.match-card__note {
+  color: #51616f;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .detail-label {
@@ -79,4 +122,16 @@ code {
 .badge--ghost {
   background: #f0f4f8;
   color: #425466;
+}
+
+@container (max-width: 36rem) {
+  .match-card__top,
+  .match-card__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .match-card__badges {
+    justify-content: flex-start;
+  }
 }

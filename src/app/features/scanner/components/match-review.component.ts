@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, input, output } from "@angular/core";
-import { MASK_CATEGORY_LABELS, MASK_LOCALE_LABELS } from "../../../core/masking/masking.constants";
-import { redactPreview } from "../../../core/masking/masking.utils";
-import type { ScanMatch } from "../../../core/masking/masking.types";
+import { ChangeDetectionStrategy, Component, inject, input, output } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
+import { MASK_CATEGORY_LABELS, MASK_LOCALE_LABELS } from "../../../core/masking/constants/masking.constants";
+import type { ScanMatch } from "../../../core/masking/declarations/masking.types";
+import { redactPreview } from "../../../core/masking/utils/mask-format.utils";
+import { MATERIAL_ICONS } from "../../../shared/constants/material-icons.constants";
+import { createTrustedHtmlMap } from "../../../shared/utils/trusted-html.utils";
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -11,11 +14,18 @@ import type { ScanMatch } from "../../../core/masking/masking.types";
   styleUrl: "./match-review.component.scss",
 })
 export class MatchReviewComponent {
+  readonly #sanitizer = inject(DomSanitizer);
   readonly matches = input.required<readonly ScanMatch[]>();
+  readonly matchRegenerated = output<string>();
   readonly matchToggled = output<{ enabled: boolean; matchId: string }>();
 
   protected readonly categoryLabels = MASK_CATEGORY_LABELS;
+  protected readonly icons = createTrustedHtmlMap(this.#sanitizer, MATERIAL_ICONS);
   protected readonly localeLabels = MASK_LOCALE_LABELS;
+
+  protected onMatchRegenerate(matchId: string): void {
+    this.matchRegenerated.emit(matchId);
+  }
 
   protected onMatchToggle(matchId: string, event: Event): void {
     const inputElement = event.target;

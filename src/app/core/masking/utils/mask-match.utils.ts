@@ -1,0 +1,124 @@
+import { MASK_GROUP_ORDER } from "../constants/masking.constants";
+import type {
+  DetectionRule,
+  MaskGroupId,
+  MaskGroupPreferenceMap,
+  ScanMatch,
+} from "../declarations/masking.types";
+import { sanitizeCapturedValue } from "./mask-format.utils";
+
+interface CandidateMatch {
+  rule: DetectionRule;
+  start: number;
+  end: number;
+  value: string;
+}
+
+export function applyEnabledMasks(
+  sourceText: string,
+  matches: readonly ScanMatch[]
+): string {
+  const enabledMatches = [...matches]
+    .filter(match => match.enabled)
+    .sort((left, right) => left.start - right.start);
+
+  if (!enabledMatches.length) return sourceText;
+
+  let cursor = 0,
+    maskedText = "";
+  for (const match of enabledMatches) {
+    maskedText += sourceText.slice(cursor, match.start);
+    maskedText += match.mask;
+    cursor = match.end;
+  }
+  maskedText += sourceText.slice(cursor);
+  return maskedText;
+}
+
+export function applyGroupPreferences(
+  matches: readonly ScanMatch[],
+  preferences: MaskGroupPreferenceMap
+): readonly ScanMatch[] {
+  return matches.map(match => {
+    const preference = preferences[match.groupId];
+    if (!preference.enabled) return { ...match, enabled: false, locked: false };
+    if (preference.alwaysOn) return { ...match, enabled: true, locked: true };
+    return { ...match, locked: false };
+  });
+}
+
+export function extractCandidateMatch(
+  match: RegExpMatchArray,
+  rule: DetectionRule
+): CandidateMatch | null {
+  if (typeof match.index !== "number") return null;
+
+  if (typeof rule.valueGroup !== "number") {
+    const value = sanitizeCapturedValue(match[0]);
+    return value
+      ? {
+          end: match.index + value.length,
+          rule,
+          start: match.index,
+          value,
+        }
+      : null;
+  }
+
+  const capturedValue = sanitizeCapturedValue(match[rule.valueGroup] ?? "");
+  if (!capturedValue) return null;
+
+  const relativeIndex = match[0].indexOf(capturedValue);
+  if (relativeIndex < 0) return null;
+
+  const start = match.index + relativeIndex;
+  return {
+    end: start + capturedValue.length,
+    rule,
+    start,
+    value: capturedValue,
+  };
+}
+
+export function resolveOverlaps(
+  candidates: readonly CandidateMatch[]
+): readonly CandidateMatch[] {
+  if (candidates.length <= 1) return [...candidates];
+
+  const sorted = [...candidates].sort((left, right) => {
+    if (left.start !== right.start) return left.start - right.start;
+    if (left.rule.priority !== right.rule.priority)
+      return right.rule.priority - left.rule.priority;
+    return right.value.length - left.value.length;
+  });
+
+  const resolved: CandidateMatch[] = [];
+  for (const candidate of sorted) {
+    const previous = resolved.at(-1);
+    if (!previous || candidate.start >= previous.end) {
+      resolved.push(candidate);
+      continue;
+    }
+
+    if (scoreCandidate(candidate) > scoreCandidate(previous))
+      resolved[resolved.length - 1] = candidate;
+  }
+
+  return resolved.sort((left, right) => left.start - right.start);
+}
+
+export function summarizeGroupCounts(
+  matches: readonly ScanMatch[]
+): Readonly<Record<MaskGroupId, number>> {
+  const counts = Object.fromEntries(MASK_GROUP_ORDER.map(groupId => [groupId, 0])) as Record<
+    MaskGroupId,
+    number
+  >;
+
+  for (const match of matches) counts[match.groupId] += 1;
+  return Object.freeze(counts);
+}
+
+function scoreCandidate(candidate: CandidateMatch): number {
+  return candidate.rule.priority * 1000 + candidate.value.length;
+}
