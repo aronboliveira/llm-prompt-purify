@@ -7,6 +7,7 @@ test.describe("scan workflow", () => {
   }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await page.goto("/");
+    await page.getByTestId("country-picker").selectOption("br");
 
     await page.getByTestId("source-textarea").fill(
       [
@@ -36,8 +37,29 @@ test.describe("scan workflow", () => {
     await expect(page.getByText("Protected prompt copied")).toBeVisible();
   });
 
+  test("can rescope the scan by country and switch to global-only mode", async ({ page }) => {
+    await page.goto("/");
+    await page.getByTestId("country-picker").selectOption("cl");
+
+    await page
+      .getByTestId("source-textarea")
+      .fill("RUT: 12.345.678-5\nEmail: maria@example.com");
+    await page.getByTestId("scan-button").click();
+
+    const output = page.getByTestId("masked-output");
+    await expect(output).not.toContainText("12.345.678-5");
+    await expect(output).not.toContainText("maria@example.com");
+
+    await page.getByTestId("global-only-toggle").check();
+
+    await expect(output).toContainText("12.345.678-5");
+    await expect(output).not.toContainText("maria@example.com");
+    await expect(page.getByText("Global-only scan enabled")).toBeVisible();
+  });
+
   test("can regenerate a single mask and open help content", async ({ page }) => {
     await page.goto("/");
+    await page.getByTestId("country-picker").selectOption("br");
 
     await page.getByTestId("source-textarea").fill("Email: maria@example.com");
     await page.getByTestId("scan-button").click();
@@ -59,6 +81,7 @@ test.describe("scan workflow", () => {
     const safeText = "Summarize this release note for the internal engineering newsletter.";
 
     await page.goto("/");
+    await page.getByTestId("country-picker").selectOption("us");
     await page.getByTestId("source-textarea").fill(safeText);
     await page.getByTestId("scan-button").click();
 
