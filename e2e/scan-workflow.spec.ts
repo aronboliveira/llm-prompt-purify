@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("scan workflow", () => {
-  test("applies masks by default and allows one mask to be disabled", async ({
+  test("shows a scan spinner, protects output, and lets the user relax a group after review", async ({
     context,
     page,
   }) => {
@@ -19,18 +19,40 @@ test.describe("scan workflow", () => {
     await page.getByTestId("scan-button").click();
 
     const output = page.getByTestId("masked-output");
+    await expect(output).toContainText("Scanning the text locally for risky patterns...");
     await expect(output).not.toContainText("maria@example.com");
     await expect(output).not.toContainText("sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
     await expect(output).not.toContainText("529.982.247-25");
 
-    await page.getByTestId("toggle-email-address").uncheck();
+    await expect(page.getByTestId("toggle-openai-style-key")).toBeDisabled();
+    await expect(page.getByTestId("group-lock-credential")).toBeChecked();
 
-    await expect(output).toContainText("maria@example.com");
+    await page.getByTestId("group-toggle-identifier").uncheck();
+
+    await expect(output).toContainText("529.982.247-25");
     await expect(output).not.toContainText("sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
-    await expect(output).not.toContainText("529.982.247-25");
 
     await page.getByTestId("copy-button").click();
-    await expect(page.getByText("Masked output copied.")).toBeVisible();
+    await expect(page.getByText("Protected prompt copied")).toBeVisible();
+  });
+
+  test("can regenerate a single mask and open help content", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByTestId("source-textarea").fill("Email: maria@example.com");
+    await page.getByTestId("scan-button").click();
+
+    const output = page.getByTestId("masked-output"),
+      firstOutput = await output.textContent();
+
+    await page.getByTestId("regenerate-email-address").click();
+
+    await expect(output).not.toHaveText(firstOutput ?? "");
+
+    await page.locator(".hero .help-trigger").click();
+    await expect(page.getByRole("dialog")).toContainText("Everything in this screen runs in the browser.");
+    await page.getByRole("button", { name: "Close help" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
   });
 
   test("keeps safe text unchanged when no supported match is found", async ({ page }) => {
@@ -42,9 +64,7 @@ test.describe("scan workflow", () => {
 
     await expect(page.getByTestId("masked-output")).toContainText(safeText);
     await expect(
-      page.getByText(
-        "No supported sensitive patterns were detected. The output matches your original text."
-      )
+      page.locator(".status-pill", { hasText: "No supported sensitive patterns were found" })
     ).toBeVisible();
   });
 });
