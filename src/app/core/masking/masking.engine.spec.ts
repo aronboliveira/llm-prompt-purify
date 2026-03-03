@@ -1,7 +1,11 @@
 import { DEFAULT_GROUP_PREFERENCES } from "./constants/masking.constants";
-import type { ScanMatch } from "./declarations/masking.types";
 import { MaskingEngine } from "./masking.engine";
 import { createGroupPreferenceMap } from "./utils/mask-group.utils";
+import {
+  BRAZILIAN_PORTUGUESE_MASK_FIXTURES,
+  LATAM_SPANISH_MASK_FIXTURES,
+  NEGATIVE_LOCALE_MASK_FIXTURES,
+} from "../../testing/constants/locale-mask-fixtures.constants";
 
 describe("MaskingEngine", () => {
   const engine = new MaskingEngine();
@@ -117,22 +121,19 @@ describe("MaskingEngine", () => {
   });
 
   describe("Brazilian Portuguese coverage", () => {
-    it("masks valid CPF and CNPJ values", () => {
-      const sourceText = "CPF: 529.982.247-25\nCNPJ: 04.252.011/0001-10",
-        result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES);
+    for (const fixture of BRAZILIAN_PORTUGUESE_MASK_FIXTURES) {
+      it(fixture.description, () => {
+        const result = engine.scan(fixture.sourceText, DEFAULT_GROUP_PREFERENCES);
 
-      expect(result.matches.map(match => match.ruleId)).toEqual(
-        expect.arrayContaining(["cpf", "cnpj"])
-      );
-      expect(result.maskedText).not.toContain("529.982.247-25");
-      expect(result.maskedText).not.toContain("04.252.011/0001-10");
-    });
+        expect(result.matches.map(match => match.ruleId)).toEqual(
+          expect.arrayContaining(fixture.expectedRuleIds)
+        );
 
-    it("ignores invalid CPF values", () => {
-      const result = engine.scan("CPF: 111.111.111-11", DEFAULT_GROUP_PREFERENCES);
-
-      expect(result.matches.some(match => match.ruleId === "cpf")).toBe(false);
-    });
+        for (const hiddenValue of fixture.hiddenValues) {
+          expect(result.maskedText).not.toContain(hiddenValue);
+        }
+      });
+    }
 
     it("masks Brazilian phone numbers and labeled CNH data", () => {
       const sourceText = "+55 (11) 99876-5432\nCNH: 12345678901",
@@ -147,23 +148,19 @@ describe("MaskingEngine", () => {
   });
 
   describe("LatAm Spanish coverage", () => {
-    it("masks CURP, RFC, CUIT, and NIT patterns", () => {
-      const sourceText = [
-          "CURP: GODE561231HDFRRN09",
-          "RFC: XAXX010101000",
-          "CUIT: 20-12345678-3",
-          "NIT: 900.373.076-1",
-        ].join("\n"),
-        result = engine.scan(sourceText, DEFAULT_GROUP_PREFERENCES);
+    for (const fixture of LATAM_SPANISH_MASK_FIXTURES) {
+      it(fixture.description, () => {
+        const result = engine.scan(fixture.sourceText, DEFAULT_GROUP_PREFERENCES);
 
-      expect(result.matches.map(match => match.ruleId)).toEqual(
-        expect.arrayContaining(["cuit", "curp", "nit", "rfc"])
-      );
-      expect(result.maskedText).not.toContain("GODE561231HDFRRN09");
-      expect(result.maskedText).not.toContain("XAXX010101000");
-      expect(result.maskedText).not.toContain("20-12345678-3");
-      expect(result.maskedText).not.toContain("900.373.076-1");
-    });
+        expect(result.matches.map(match => match.ruleId)).toEqual(
+          expect.arrayContaining(fixture.expectedRuleIds)
+        );
+
+        for (const hiddenValue of fixture.hiddenValues) {
+          expect(result.maskedText).not.toContain(hiddenValue);
+        }
+      });
+    }
 
     it("masks structured Spanish labels for names, addresses, and phone numbers", () => {
       const sourceText =
@@ -177,5 +174,21 @@ describe("MaskingEngine", () => {
       expect(result.maskedText).not.toContain("Calle 85 # 12-34, Bogotá");
       expect(result.maskedText).not.toContain("+57 301 222 3344");
     });
+  });
+
+  describe("Locale false-positive guardrails", () => {
+    for (const fixture of NEGATIVE_LOCALE_MASK_FIXTURES) {
+      it(fixture.description, () => {
+        const result = engine.scan(fixture.sourceText, DEFAULT_GROUP_PREFERENCES);
+
+        for (const excludedRuleId of fixture.excludedRuleIds) {
+          expect(result.matches.some(match => match.ruleId === excludedRuleId)).toBe(false);
+        }
+
+        for (const visibleValue of fixture.visibleValues) {
+          expect(result.maskedText).toContain(visibleValue);
+        }
+      });
+    }
   });
 });

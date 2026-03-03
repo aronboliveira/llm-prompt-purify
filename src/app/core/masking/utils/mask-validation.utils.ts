@@ -40,6 +40,13 @@ export function isLikelyPhoneNumber(value: string): boolean {
   return digitsOnly.length >= 10 && digitsOnly.length <= 13;
 }
 
+export function isLikelyBrazilianStateId(value: string): boolean {
+  const normalized = value.replace(/[^0-9X]/giu, "").toUpperCase(),
+    digitsOnly = normalized.replace(/X/g, "");
+
+  return /^\d{7,9}[\dX]?$/u.test(normalized) && !/^(\d)\1+$/u.test(digitsOnly);
+}
+
 export function isValidCnpj(value: string): boolean {
   const digits = value.replace(/\D/g, "");
   if (!/^\d{14}$/.test(digits) || /^(\d)\1+$/.test(digits)) return false;
@@ -64,6 +71,41 @@ export function isValidCpf(value: string): boolean {
     secondDigit = calculateCpfDigit(`${digits.slice(0, 9)}${firstDigit}`, 11);
 
   return digits.endsWith(`${firstDigit}${secondDigit}`);
+}
+
+export function isValidChileanRut(value: string): boolean {
+  const normalized = value.replace(/[.\-]/g, "").toUpperCase();
+  if (!/^\d{7,8}[0-9K]$/u.test(normalized)) return false;
+
+  const body = normalized.slice(0, -1),
+    verifier = normalized.slice(-1);
+  let sum = 0,
+    multiplier = 2;
+
+  for (let index = body.length - 1; index >= 0; index -= 1) {
+    sum += Number(body[index]) * multiplier;
+    multiplier = multiplier === 7 ? 2 : multiplier + 1;
+  }
+
+  const remainder = 11 - (sum % 11),
+    expectedVerifier =
+      remainder === 11 ? "0" : remainder === 10 ? "K" : String(remainder);
+
+  return verifier === expectedVerifier;
+}
+
+export function isValidPisPasep(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  if (!/^\d{11}$/.test(digits) || /^(\d)\1+$/.test(digits)) return false;
+
+  const weights = [3, 2, 9, 8, 7, 6, 5, 4, 3, 2],
+    total = Array.from(digits.slice(0, 10)).reduce((sum, digit, index) => {
+      return sum + Number(digit) * weights[index];
+    }, 0),
+    remainder = 11 - (total % 11),
+    verifier = remainder === 10 || remainder === 11 ? 0 : remainder;
+
+  return Number(digits[10]) === verifier;
 }
 
 export function looksLikeStructuredAddress(value: string): boolean {
@@ -94,6 +136,21 @@ export function looksSecretLike(value: string): boolean {
     hasUpper = /[A-Z]/.test(normalized);
 
   return [hasDigit, hasLower, hasSymbol, hasUpper].filter(Boolean).length >= 2;
+}
+
+export function looksLikeBrazilianVoterId(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  return /^\d{12}$/u.test(digits) && !/^(\d)\1+$/u.test(digits);
+}
+
+export function looksLikeLatamNationalId(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  return /^\d{6,12}$/u.test(digits) && !/^(\d)\1+$/u.test(digits);
+}
+
+export function looksLikeLatamTaxId(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  return /^\d{11,13}$/u.test(digits) && !/^(\d)\1+$/u.test(digits);
 }
 
 function calculateCpfDigit(value: string, factor: number): number {
