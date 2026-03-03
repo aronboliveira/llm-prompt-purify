@@ -64,6 +64,70 @@
         panel is where you confirm what remains visible before copying anything.
       </p>
 
+      <section class="scope-panel">
+        <div class="scope-panel__header">
+          <div>
+            <p class="panel__eyebrow">Detection focus</p>
+            <div class="panel__title-row">
+              <h3>Country picker</h3>
+              <button class="help-trigger" type="button" (click)="openHelp('country')">(?)</button>
+            </div>
+          </div>
+          <p class="scope-panel__pill">
+            {{ vm().selectedCountryProfile.flagEmoji }} {{ vm().selectedCountryProfile.label }}
+          </p>
+        </div>
+
+        <p class="scope-panel__body">
+          Pick the country whose local document formats should be scanned, or switch to global-only
+          mode if you want to keep the detector focused on shared identifiers and credentials.
+        </p>
+
+        <div class="scope-panel__controls">
+          <label class="scope-field">
+            <span class="scope-field__label">Country focus</span>
+            <select
+              class="scope-field__control"
+              data-testid="country-picker"
+              [ngModel]="vm().selectedCountryProfile.id"
+              (ngModelChange)="updateCountryProfile($event)"
+            >
+              @for (countryProfile of vm().countryProfiles; track countryProfile.id) {
+                <option [value]="countryProfile.id">
+                  {{ countryProfile.flagEmoji }} {{ countryProfile.label }}
+                </option>
+              }
+            </select>
+          </label>
+
+          <label class="scope-toggle">
+            <input
+              type="checkbox"
+              data-testid="global-only-toggle"
+              [checked]="vm().detectionMode === 'global-only'"
+              (change)="updateDetectionMode($event)"
+            />
+            <span class="scope-toggle__copy">
+              <span class="scope-toggle__title">Track only global identifiers</span>
+              <span class="scope-toggle__body">
+                Keep shared credentials, emails, financial patterns, and generic labeled fields, but
+                skip country-specific document rules.
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <p class="scope-panel__summary">
+          {{ vm().selectedCountryProfile.flagEmoji }} {{ vm().selectedCountryProfile.label }} is
+          selected.
+          @if (vm().detectionMode === "global-only") {
+            Country-specific rules are paused until you turn global-only mode off.
+          } @else {
+            Shared global rules and this country's document patterns will be scanned together.
+          }
+        </p>
+      </section>
+
       <label class="sr-only" for="sourceText">Original prompt</label>
       <textarea
         id="sourceText"
@@ -96,7 +160,8 @@
       </div>
 
       <p class="notice">
-        The input stays local. Only the processed output block below should be copied into the LLM.
+        The input stays local. Only the processed output block below should be copied into the LLM,
+        and it reflects the country focus currently selected above.
       </p>
     </section>
 
@@ -124,6 +189,16 @@
       <p class="panel__body">
         This output block is the only text meant to leave the page. If you still spot something
         sensitive, fix it here through the controls before you paste it anywhere else.
+      </p>
+
+      <p class="scope-panel__summary scope-panel__summary--compact">
+        Active scan scope:
+        {{ vm().selectedCountryProfile.flagEmoji }} {{ vm().selectedCountryProfile.label }}
+        @if (vm().detectionMode === "global-only") {
+          with only global identifiers.
+        } @else {
+          plus shared global rules.
+        }
       </p>
 
       <output

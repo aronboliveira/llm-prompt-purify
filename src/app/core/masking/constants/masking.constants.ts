@@ -1,4 +1,7 @@
 import type {
+  CountryProfileDefinition,
+  CountryProfileId,
+  DetectionMode,
   MaskGroupDefinition,
   MaskGroupId,
   MaskGroupPreferenceMap,
@@ -23,11 +26,83 @@ export const MASK_LOCALE_LABELS: Readonly<Record<SupportedLocale, string>> =
     shared: "Shared",
   });
 
+export const COUNTRY_PROFILE_ORDER: readonly CountryProfileId[] = Object.freeze([
+  "br",
+  "us",
+  "mx",
+  "ar",
+  "cl",
+  "co",
+  "pe",
+]);
+
+export const COUNTRY_PROFILE_DEFINITIONS: Readonly<
+  Record<CountryProfileId, CountryProfileDefinition>
+> = Object.freeze({
+  ar: {
+    description: "Shared global rules plus Argentina-focused identifiers such as CUIT and DNI.",
+    flagEmoji: "🇦🇷",
+    id: "ar",
+    label: "Argentina",
+    localeLabel: "ES-AR",
+  },
+  br: {
+    description:
+      "Shared global rules plus Brazil-focused identifiers such as CPF, CNPJ, RG, CEP, and PIS/PASEP.",
+    flagEmoji: "🇧🇷",
+    id: "br",
+    label: "Brazil",
+    localeLabel: "PT-BR",
+  },
+  cl: {
+    description: "Shared global rules plus Chile-focused identifiers such as RUT.",
+    flagEmoji: "🇨🇱",
+    id: "cl",
+    label: "Chile",
+    localeLabel: "ES-CL",
+  },
+  co: {
+    description: "Shared global rules plus Colombia-focused identifiers such as cédula and NIT.",
+    flagEmoji: "🇨🇴",
+    id: "co",
+    label: "Colombia",
+    localeLabel: "ES-CO",
+  },
+  mx: {
+    description: "Shared global rules plus Mexico-focused identifiers such as CURP and RFC.",
+    flagEmoji: "🇲🇽",
+    id: "mx",
+    label: "Mexico",
+    localeLabel: "ES-MX",
+  },
+  pe: {
+    description: "Shared global rules plus Peru-focused identifiers such as DNI and RUC.",
+    flagEmoji: "🇵🇪",
+    id: "pe",
+    label: "Peru",
+    localeLabel: "ES-PE",
+  },
+  us: {
+    description: "Shared global rules plus United States-focused identifiers such as SSN.",
+    flagEmoji: "🇺🇸",
+    id: "us",
+    label: "United States",
+    localeLabel: "EN-US",
+  },
+});
+
 export const MASK_CHARACTER_SETS = Object.freeze({
   digits: "23456789",
   lowercase: "abcdefghijkmnopqrstuvwxyz",
   symbols: "!@#$%&*?",
   uppercase: "ABCDEFGHJKLMNPQRSTUVWXYZ",
+});
+
+export const DEFAULT_COUNTRY_PROFILE_ID: CountryProfileId = "br";
+
+export const DETECTION_MODE_COPY: Readonly<Record<DetectionMode, string>> = Object.freeze({
+  "country-plus-global": "Country + global rules",
+  "global-only": "Global identifiers only",
 });
 
 export const MASK_GROUP_ORDER: readonly MaskGroupId[] = Object.freeze([

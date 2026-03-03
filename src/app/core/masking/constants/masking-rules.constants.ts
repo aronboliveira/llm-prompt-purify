@@ -4,8 +4,8 @@ import {
   isLikelyCreditCard,
   isLikelyIban,
   isLikelyPhoneNumber,
-  isValidCnpj,
   isValidChileanRut,
+  isValidCnpj,
   isValidCpf,
   isValidPisPasep,
   looksLikeBrazilianVoterId,
@@ -19,6 +19,7 @@ import {
 export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   {
     category: "personal",
+    coverage: "global",
     confidence: "high",
     id: "email-address",
     label: "Email address",
@@ -28,6 +29,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "credential",
+    coverage: "global",
     confidence: "high",
     id: "jwt-token",
     label: "JWT token",
@@ -37,6 +39,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "credential",
+    coverage: "global",
     confidence: "high",
     id: "openai-style-key",
     label: "API key",
@@ -46,6 +49,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "credential",
+    coverage: "global",
     confidence: "high",
     id: "aws-access-key",
     label: "AWS access key",
@@ -55,6 +59,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "credential",
+    coverage: "global",
     confidence: "high",
     id: "aws-secret-key",
     label: "AWS secret access key",
@@ -66,6 +71,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "credential",
+    coverage: "global",
     confidence: "high",
     id: "github-pat",
     label: "GitHub token",
@@ -75,6 +81,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "credential",
+    coverage: "global",
     confidence: "high",
     id: "slack-webhook",
     label: "Slack webhook",
@@ -85,6 +92,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "credential",
+    coverage: "global",
     confidence: "high",
     id: "secret-assignment",
     label: "Credential assignment",
@@ -97,6 +105,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "credential",
+    coverage: "global",
     confidence: "high",
     id: "bearer-token",
     label: "Bearer token",
@@ -108,6 +117,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "financial",
+    coverage: "global",
     confidence: "high",
     id: "credit-card",
     label: "Credit card number",
@@ -118,6 +128,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "financial",
+    coverage: "global",
     confidence: "high",
     id: "iban",
     label: "IBAN",
@@ -128,6 +139,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["us"],
+    coverage: "country",
     confidence: "high",
     id: "us-ssn",
     label: "US Social Security number",
@@ -137,6 +150,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "personal",
+    countryProfileIds: ["us"],
+    coverage: "country",
     confidence: "medium",
     id: "us-phone",
     label: "US phone number",
@@ -148,6 +163,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
     confidence: "high",
     id: "cpf",
     label: "CPF",
@@ -158,6 +175,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
     confidence: "high",
     id: "cnpj",
     label: "CNPJ",
@@ -168,6 +187,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "personal",
+    countryProfileIds: ["br"],
+    coverage: "country",
     confidence: "medium",
     id: "br-phone",
     label: "Brazil phone number",
@@ -178,6 +199,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "location",
+    countryProfileIds: ["br"],
+    coverage: "country",
     confidence: "high",
     id: "cep-labeled",
     label: "CEP",
@@ -188,6 +211,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
     confidence: "high",
     id: "cnh-labeled",
     label: "CNH",
@@ -199,6 +224,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
     confidence: "high",
     id: "pis-pasep-labeled",
     label: "PIS/PASEP",
@@ -211,6 +238,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
     confidence: "high",
     id: "rg-labeled",
     label: "RG",
@@ -223,6 +252,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
     confidence: "medium",
     id: "titulo-eleitor-labeled",
     label: "Titulo de eleitor",
@@ -235,6 +266,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["cl"],
+    coverage: "country",
     confidence: "high",
     id: "chile-rut",
     label: "Chilean RUT",
@@ -245,6 +278,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["mx"],
+    coverage: "country",
     confidence: "high",
     id: "curp",
     label: "CURP",
@@ -254,6 +289,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["mx"],
+    coverage: "country",
     confidence: "high",
     id: "rfc",
     label: "RFC",
@@ -263,6 +300,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["ar"],
+    coverage: "country",
     confidence: "high",
     id: "cuit",
     label: "CUIT",
@@ -272,6 +311,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["co"],
+    coverage: "country",
     confidence: "high",
     id: "nit",
     label: "NIT",
@@ -281,6 +322,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["co"],
+    coverage: "country",
     confidence: "high",
     id: "cedula-labeled",
     label: "Cedula",
@@ -293,6 +336,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["ar", "pe"],
+    coverage: "country",
     confidence: "high",
     id: "dni-labeled",
     label: "DNI",
@@ -305,6 +350,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["pe"],
+    coverage: "country",
     confidence: "high",
     id: "ruc-labeled",
     label: "RUC",
@@ -316,6 +363,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "personal",
+    coverage: "global",
     confidence: "medium",
     id: "labeled-phone",
     label: "Labeled phone number",
@@ -328,6 +376,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "personal",
+    coverage: "global",
     confidence: "medium",
     id: "labeled-name",
     label: "Labeled full name",
@@ -340,6 +389,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "location",
+    coverage: "global",
     confidence: "medium",
     id: "labeled-address",
     label: "Labeled address",
@@ -352,6 +402,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    coverage: "global",
     confidence: "medium",
     id: "labeled-passport",
     label: "Passport number",

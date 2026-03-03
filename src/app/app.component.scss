@@ -65,7 +65,8 @@
 }
 
 .hero h1,
-.panel h2 {
+.panel h2,
+.scope-panel h3 {
   color: var(--ink);
   margin: 0;
 }
@@ -193,6 +194,96 @@
   border: 1px solid var(--panel-border);
   container-type: inline-size;
   padding: 1.2rem;
+}
+
+.scope-panel {
+  background: rgba(246, 251, 253, 0.92);
+  border: 1px solid rgba(15, 118, 110, 0.12);
+  border-radius: ui.panel-radius(0.6);
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.scope-panel__header,
+.scope-panel__controls,
+.scope-toggle,
+.scope-field {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.scope-panel__header {
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.scope-panel__body,
+.scope-panel__summary,
+.scope-toggle__body {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.scope-panel__pill {
+  background: #edf9f6;
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin: 0;
+  padding: 0.4rem 0.75rem;
+}
+
+.scope-panel__controls {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+}
+
+.scope-field__label,
+.scope-toggle__title {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.scope-field__control {
+  @include ui.focus-ring();
+
+  appearance: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 250, 252, 0.98));
+  border: 1px solid rgba(11, 38, 61, 0.12);
+  border-radius: ui.panel-radius(0.4);
+  color: var(--ink);
+  font: inherit;
+  padding: 0.85rem 1rem;
+}
+
+.scope-toggle {
+  @include ui.focus-ring();
+
+  align-items: start;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(11, 38, 61, 0.08);
+  border-radius: ui.panel-radius(0.4);
+  cursor: pointer;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 0.85rem 1rem;
+}
+
+.scope-toggle input {
+  accent-color: var(--accent);
+  margin: 0.2rem 0 0;
+}
+
+.scope-toggle__copy {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.scope-panel__summary--compact {
+  border-block-start: 1px solid rgba(11, 38, 61, 0.08);
+  padding-block-start: 0.85rem;
 }
 
 .panel--controls {
@@ -420,6 +511,11 @@
 
   .button--icon {
     justify-content: center;
+  }
+
+  .scope-panel__header,
+  .scope-panel__controls {
+    grid-template-columns: 1fr;
   }
 }
 

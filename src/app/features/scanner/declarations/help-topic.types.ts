@@ -1,4 +1,4 @@
-export type HelpTopicId = "clientside" | "controls" | "coverage" | "workflow";
+export type HelpTopicId = "clientside" | "controls" | "country" | "coverage" | "workflow";
 
 export interface HelpTopic {
   id: HelpTopicId;

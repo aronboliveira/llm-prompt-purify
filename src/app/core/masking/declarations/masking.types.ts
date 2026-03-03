@@ -9,13 +9,19 @@ export type MaskGroupId = MatchCategory;
 
 export type MatchConfidence = "high" | "medium";
 
+export type CountryProfileId = "ar" | "br" | "cl" | "co" | "mx" | "pe" | "us";
+
+export type DetectionMode = "country-plus-global" | "global-only";
+
 export type SupportedLocale = "en-US" | "es-LatAm" | "pt-BR" | "shared";
 
 export interface DetectionRule {
+  coverage: "country" | "global";
   id: string;
   label: string;
   category: MatchCategory;
   confidence: MatchConfidence;
+  countryProfileIds?: readonly CountryProfileId[];
   locale: SupportedLocale;
   priority: number;
   patternFactory: () => RegExp;
@@ -29,6 +35,18 @@ export interface MaskGroupPreference {
 }
 
 export type MaskGroupPreferenceMap = Readonly<Record<MaskGroupId, MaskGroupPreference>>;
+
+export interface CountryProfileDefinition {
+  description: string;
+  flagEmoji: string;
+  id: CountryProfileId;
+  label: string;
+  localeLabel: string;
+}
+
+export interface CountryProfileSummary extends CountryProfileDefinition {
+  selected: boolean;
+}
 
 export interface MaskGroupDefinition {
   id: MaskGroupId;
@@ -70,4 +88,9 @@ export interface ScanResult {
   hasMatches: boolean;
   scannedAt: string;
   groupCounts: Readonly<Record<MaskGroupId, number>>;
+}
+
+export interface ScanScopeSelection {
+  countryProfileId: CountryProfileId;
+  detectionMode: DetectionMode;
 }
