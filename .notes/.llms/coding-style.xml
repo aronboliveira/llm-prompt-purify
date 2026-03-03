@@ -161,9 +161,18 @@
 
     <rule id="workflow-contract">
       <description>
-        The product workflow is fixed unless a refactor explicitly replaces it:
-        paste original prompt, run local scan, render the protected result in an <code>&lt;output&gt;</code> block,
-        review group and per-match controls, then copy only the protected text.
+        The product workflow is a translator-style local transform:
+        choose the masking scope, paste the raw prompt, wait for the short local masking pass,
+        render the protected result in an <code>&lt;output&gt;</code> block, adjust group and per-match controls inline,
+        then copy only the protected text.
+      </description>
+    </rule>
+
+    <rule id="country-scope-contract">
+      <description>
+        Country scope is multi-select and may mix specific countries with broader regional profiles.
+        Keep browser-locale defaults, language-family warnings, and global-only mode in the state layer,
+        not hardcoded into view templates.
       </description>
     </rule>
 
