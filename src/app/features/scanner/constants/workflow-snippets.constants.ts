@@ -2,23 +2,23 @@ import type { WorkflowSnippet } from "../declarations/workflow.types";
 
 export const WORKFLOW_SNIPPETS: readonly WorkflowSnippet[] = Object.freeze([
   {
-    body: "Pick the country focus or switch to global-only tracking before you paste the prompt.",
+    body: "Choose the country scope you want active, or keep the detector in global-only mode.",
     id: "paste",
-    title: "1. Set scan focus",
+    title: "1. Set scope",
   },
   {
-    body: "Paste the original prompt or notes you plan to send to an LLM.",
+    body: "Paste the original prompt on the left. No submit step is required in this layout.",
     id: "scan",
-    title: "2. Paste original",
+    title: "2. Paste raw version",
   },
   {
-    body: "Run a client-side scan and wait for the protected output to be assembled.",
+    body: "Wait for the short local spinner while the protected output rebuilds on the right.",
     id: "review",
-    title: "3. Scan locally",
+    title: "3. Let it mask locally",
   },
   {
-    body: "Toggle whole groups off, regenerate masks, and then copy only the protected result.",
+    body: "Disable groups or single masks if needed, then copy only the protected output into the LLM.",
     id: "copy",
-    title: "4. Review and paste protected output",
+    title: "4. Refine and copy",
   },
 ]);

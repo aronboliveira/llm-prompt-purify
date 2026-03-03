@@ -7,11 +7,11 @@ import type {
 } from "../declarations/masking.types";
 
 export function buildScanScopeSelection(
-  countryProfileId: CountryProfileId,
+  countryProfileIds: readonly CountryProfileId[],
   detectionMode: DetectionMode
 ): ScanScopeSelection {
   return {
-    countryProfileId,
+    countryProfileIds: normalizeCountryProfileIds(countryProfileIds),
     detectionMode,
   };
 }
@@ -29,9 +29,23 @@ export function isRuleEnabledForScope(
 ): boolean {
   if (rule.coverage === "global") return true;
   if (scopeSelection.detectionMode === "global-only") return false;
-  return !!rule.countryProfileIds?.includes(scopeSelection.countryProfileId);
+  return scopeSelection.countryProfileIds.some(countryProfileId =>
+    rule.countryProfileIds?.includes(countryProfileId)
+  );
 }
 
 export function isKnownCountryProfileId(value: string): value is CountryProfileId {
   return COUNTRY_PROFILE_ORDER.includes(value as CountryProfileId);
+}
+
+export function normalizeCountryProfileIds(
+  countryProfileIds: readonly CountryProfileId[]
+): readonly CountryProfileId[] {
+  const knownCountryProfileIds = countryProfileIds.filter(isKnownCountryProfileId);
+
+  return Object.freeze(
+    COUNTRY_PROFILE_ORDER.filter(countryProfileId =>
+      knownCountryProfileIds.includes(countryProfileId)
+    )
+  );
 }

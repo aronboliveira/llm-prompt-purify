@@ -4,7 +4,7 @@ import type {
 } from "../../core/masking/declarations/masking.types";
 
 export interface LocaleMaskFixture {
-  countryProfileId: CountryProfileId;
+  countryProfileIds: readonly CountryProfileId[];
   detectionMode?: DetectionMode;
   description: string;
   expectedRuleIds: readonly string[];
@@ -13,7 +13,7 @@ export interface LocaleMaskFixture {
 }
 
 export interface NegativeMaskFixture {
-  countryProfileId: CountryProfileId;
+  countryProfileIds: readonly CountryProfileId[];
   description: string;
   detectionMode?: DetectionMode;
   excludedRuleIds: readonly string[];

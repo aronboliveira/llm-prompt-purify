@@ -1,0 +1,58 @@
+@if (isOpen()) {
+  <div class="modal-backdrop" role="presentation" (click)="closeOnBackdrop($event)">
+    <section aria-labelledby="masking-settings-title" aria-modal="true" class="modal" role="dialog">
+      <header class="modal__header">
+        <div class="modal__title-wrap">
+          <span aria-hidden="true" class="modal__icon" [innerHTML]="icons.settings"></span>
+          <div>
+            <div class="modal__title-row">
+              <h2 id="masking-settings-title">Masking settings</h2>
+              <button class="help-trigger" type="button" (click)="openHelp()">(?)</button>
+            </div>
+            <p class="modal__body-copy">
+              These settings change how the local detector scopes the prompt before you copy the
+              protected output.
+            </p>
+          </div>
+        </div>
+        <button aria-label="Close settings" class="modal__close" type="button" (click)="close()">
+          Close
+        </button>
+      </header>
+
+      <label class="settings-toggle">
+        <input
+          type="checkbox"
+          data-testid="global-only-toggle"
+          [checked]="detectionMode() === 'global-only'"
+          (change)="onGlobalOnlyChange($event)"
+        />
+        <span class="settings-toggle__copy">
+          <span class="settings-toggle__title">Track only global identifiers</span>
+          <span class="settings-toggle__body">
+            Keep shared rules such as API keys, credentials, emails, payment strings, and labeled
+            contact fields, but skip country-specific document patterns.
+          </span>
+        </span>
+      </label>
+
+      <div class="settings-card-grid">
+        <article class="settings-card">
+          <h3>Client-side only</h3>
+          <p>
+            The raw prompt, the detected matches, and the regenerated masks stay in this browser
+            session unless you copy the protected output yourself.
+          </p>
+        </article>
+
+        <article class="settings-card">
+          <h3>Live refresh</h3>
+          <p>
+            Text and masking controls rebuild the output automatically. There is no submit step in
+            this layout.
+          </p>
+        </article>
+      </div>
+    </section>
+  </div>
+}

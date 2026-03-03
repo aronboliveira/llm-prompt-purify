@@ -9,11 +9,41 @@ export type MaskGroupId = MatchCategory;
 
 export type MatchConfidence = "high" | "medium";
 
-export type CountryProfileId = "ar" | "br" | "cl" | "co" | "mx" | "pe" | "us";
+export type CountryProfileId =
+  | "ar"
+  | "br"
+  | "cl"
+  | "cn"
+  | "co"
+  | "es"
+  | "in"
+  | "latam-es"
+  | "mx"
+  | "pe"
+  | "pt"
+  | "ru"
+  | "us";
 
-export type DetectionMode = "country-plus-global" | "global-only";
+export type DetectionMode = "global-only" | "selected-plus-global";
 
-export type SupportedLocale = "en-US" | "es-LatAm" | "pt-BR" | "shared";
+export type CountryLanguageFamily =
+  | "english"
+  | "indic"
+  | "mandarin"
+  | "portuguese"
+  | "russian"
+  | "spanish";
+
+export type SupportedLocale =
+  | "en-IN"
+  | "en-US"
+  | "es-ES"
+  | "es-LatAm"
+  | "pt-BR"
+  | "pt-PT"
+  | "ru-RU"
+  | "shared"
+  | "zh-CN";
 
 export interface DetectionRule {
   coverage: "country" | "global";
@@ -41,6 +71,8 @@ export interface CountryProfileDefinition {
   flagEmoji: string;
   id: CountryProfileId;
   label: string;
+  languageFamily: CountryLanguageFamily;
+  languageLabel: string;
   localeLabel: string;
 }
 
@@ -91,6 +123,6 @@ export interface ScanResult {
 }
 
 export interface ScanScopeSelection {
-  countryProfileId: CountryProfileId;
+  countryProfileIds: readonly CountryProfileId[];
   detectionMode: DetectionMode;
 }

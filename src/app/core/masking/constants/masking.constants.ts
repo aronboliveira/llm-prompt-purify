@@ -2,6 +2,7 @@ import type {
   CountryProfileDefinition,
   CountryProfileId,
   DetectionMode,
+  CountryLanguageFamily,
   MaskGroupDefinition,
   MaskGroupId,
   MaskGroupPreferenceMap,
@@ -20,20 +21,31 @@ export const MASK_CATEGORY_LABELS: Readonly<Record<MatchCategory, string>> =
 
 export const MASK_LOCALE_LABELS: Readonly<Record<SupportedLocale, string>> =
   Object.freeze({
+    "en-IN": "EN-IN",
     "en-US": "EN-US",
+    "es-ES": "ES-ES",
     "es-LatAm": "ES-LatAm",
     "pt-BR": "PT-BR",
+    "pt-PT": "PT-PT",
+    "ru-RU": "RU-RU",
     shared: "Shared",
+    "zh-CN": "ZH-CN",
   });
 
 export const COUNTRY_PROFILE_ORDER: readonly CountryProfileId[] = Object.freeze([
   "br",
+  "pt",
+  "es",
+  "latam-es",
   "us",
   "mx",
   "ar",
   "cl",
   "co",
   "pe",
+  "cn",
+  "ru",
+  "in",
 ]);
 
 export const COUNTRY_PROFILE_DEFINITIONS: Readonly<
@@ -44,6 +56,8 @@ export const COUNTRY_PROFILE_DEFINITIONS: Readonly<
     flagEmoji: "🇦🇷",
     id: "ar",
     label: "Argentina",
+    languageFamily: "spanish",
+    languageLabel: "Spanish",
     localeLabel: "ES-AR",
   },
   br: {
@@ -52,6 +66,8 @@ export const COUNTRY_PROFILE_DEFINITIONS: Readonly<
     flagEmoji: "🇧🇷",
     id: "br",
     label: "Brazil",
+    languageFamily: "portuguese",
+    languageLabel: "Portuguese",
     localeLabel: "PT-BR",
   },
   cl: {
@@ -59,20 +75,66 @@ export const COUNTRY_PROFILE_DEFINITIONS: Readonly<
     flagEmoji: "🇨🇱",
     id: "cl",
     label: "Chile",
+    languageFamily: "spanish",
+    languageLabel: "Spanish",
     localeLabel: "ES-CL",
+  },
+  cn: {
+    description:
+      "Shared global rules plus China-focused identifiers such as mainland resident IDs and mobile formats.",
+    flagEmoji: "🇨🇳",
+    id: "cn",
+    label: "China",
+    languageFamily: "mandarin",
+    languageLabel: "Mandarin Chinese",
+    localeLabel: "ZH-CN",
   },
   co: {
     description: "Shared global rules plus Colombia-focused identifiers such as cédula and NIT.",
     flagEmoji: "🇨🇴",
     id: "co",
     label: "Colombia",
+    languageFamily: "spanish",
+    languageLabel: "Spanish",
     localeLabel: "ES-CO",
+  },
+  es: {
+    description:
+      "Shared global rules plus Spain-focused identifiers such as DNI, NIE, and CIF.",
+    flagEmoji: "🇪🇸",
+    id: "es",
+    label: "Spain",
+    languageFamily: "spanish",
+    languageLabel: "Spanish",
+    localeLabel: "ES-ES",
+  },
+  in: {
+    description:
+      "Shared global rules plus India-focused identifiers such as Aadhaar, PAN, and GSTIN.",
+    flagEmoji: "🇮🇳",
+    id: "in",
+    label: "India",
+    languageFamily: "indic",
+    languageLabel: "English / Indic scripts",
+    localeLabel: "EN-IN",
+  },
+  "latam-es": {
+    description:
+      "Shared global rules plus broad Spanish-speaking Latin America identifiers across the region.",
+    flagEmoji: "🌎",
+    id: "latam-es",
+    label: "LatAm Spanish",
+    languageFamily: "spanish",
+    languageLabel: "Spanish",
+    localeLabel: "ES-LatAm",
   },
   mx: {
     description: "Shared global rules plus Mexico-focused identifiers such as CURP and RFC.",
     flagEmoji: "🇲🇽",
     id: "mx",
     label: "Mexico",
+    languageFamily: "spanish",
+    languageLabel: "Spanish",
     localeLabel: "ES-MX",
   },
   pe: {
@@ -80,13 +142,37 @@ export const COUNTRY_PROFILE_DEFINITIONS: Readonly<
     flagEmoji: "🇵🇪",
     id: "pe",
     label: "Peru",
+    languageFamily: "spanish",
+    languageLabel: "Spanish",
     localeLabel: "ES-PE",
+  },
+  pt: {
+    description:
+      "Shared global rules plus Portugal-focused identifiers such as NIF and NISS.",
+    flagEmoji: "🇵🇹",
+    id: "pt",
+    label: "Portugal",
+    languageFamily: "portuguese",
+    languageLabel: "Portuguese",
+    localeLabel: "PT-PT",
+  },
+  ru: {
+    description:
+      "Shared global rules plus Russia-focused identifiers such as INN and SNILS.",
+    flagEmoji: "🇷🇺",
+    id: "ru",
+    label: "Russia",
+    languageFamily: "russian",
+    languageLabel: "Russian",
+    localeLabel: "RU-RU",
   },
   us: {
     description: "Shared global rules plus United States-focused identifiers such as SSN.",
     flagEmoji: "🇺🇸",
     id: "us",
     label: "United States",
+    languageFamily: "english",
+    languageLabel: "English",
     localeLabel: "EN-US",
   },
 });
@@ -98,11 +184,21 @@ export const MASK_CHARACTER_SETS = Object.freeze({
   uppercase: "ABCDEFGHJKLMNPQRSTUVWXYZ",
 });
 
-export const DEFAULT_COUNTRY_PROFILE_ID: CountryProfileId = "br";
+export const DEFAULT_COUNTRY_PROFILE_IDS: readonly CountryProfileId[] = Object.freeze(["br"]);
+
+export const COUNTRY_LANGUAGE_LABELS: Readonly<Record<CountryLanguageFamily, string>> =
+  Object.freeze({
+    english: "English",
+    indic: "Indic languages",
+    mandarin: "Mandarin Chinese",
+    portuguese: "Portuguese",
+    russian: "Russian",
+    spanish: "Spanish",
+  });
 
 export const DETECTION_MODE_COPY: Readonly<Record<DetectionMode, string>> = Object.freeze({
-  "country-plus-global": "Country + global rules",
   "global-only": "Global identifiers only",
+  "selected-plus-global": "Selected countries + global rules",
 });
 
 export const MASK_GROUP_ORDER: readonly MaskGroupId[] = Object.freeze([
