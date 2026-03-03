@@ -311,6 +311,41 @@ export const FUZZY_LABEL_MASK_FIXTURES: readonly LocaleMaskFixture[] = Object.fr
     hiddenValues: ["245716840"],
     sourceText: "Numero de identificacao fsical: 245716840",
   },
+  {
+    countryProfileIds: ["cn"],
+    description: "masks Chinese resident IDs when the pinyin label is spaced differently",
+    expectedRuleIds: ["cn-resident-id-labeled"],
+    hiddenValues: ["11010519491231002X"],
+    sourceText: "Shen fen zheng: 11010519491231002X",
+  },
+  {
+    countryProfileIds: ["ru"],
+    description: "masks Russian SNILS values when the Latin label contains an OCR digit",
+    expectedRuleIds: ["ru-snils-labeled"],
+    hiddenValues: ["112-233-445 95"],
+    sourceText: "Sni1s: 112-233-445 95",
+  },
+  {
+    countryProfileIds: ["in"],
+    description: "masks Indian PAN values when the long-form label is misspelled",
+    expectedRuleIds: ["in-pan-labeled"],
+    hiddenValues: ["ABCDE1234F"],
+    sourceText: "Permament account number: ABCDE1234F",
+  },
+  {
+    countryProfileIds: ["in"],
+    description: "masks Indian GSTIN values when the long-form label contains OCR noise",
+    expectedRuleIds: ["in-gstin-labeled"],
+    hiddenValues: ["27ABCDE1234F1Z5"],
+    sourceText: "Goods and services tax nurnber: 27ABCDE1234F1Z5",
+  },
+  {
+    countryProfileIds: ["pe"],
+    description: "masks Peruvian RUC values when the long-form label is fuzzy matched",
+    expectedRuleIds: ["ruc-labeled"],
+    hiddenValues: ["20123456786"],
+    sourceText: "Registro un1co de contribuyentes: 20123456786",
+  },
 ]);
 
 export const FUZZY_LABEL_NEGATIVE_FIXTURES: readonly NegativeMaskFixture[] = Object.freeze([
@@ -348,5 +383,33 @@ export const FUZZY_LABEL_NEGATIVE_FIXTURES: readonly NegativeMaskFixture[] = Obj
     excludedRuleIds: ["pt-nif-labeled"],
     sourceText: "Numero de identificacao fsical: 245716845",
     visibleValues: ["245716845"],
+  },
+  {
+    countryProfileIds: ["cn"],
+    description: "does not mask invalid Chinese resident IDs through spaced pinyin labels",
+    excludedRuleIds: ["cn-resident-id-labeled"],
+    sourceText: "Shen fen zheng: 110105194912310021",
+    visibleValues: ["110105194912310021"],
+  },
+  {
+    countryProfileIds: ["in"],
+    description: "does not mask invalid PAN values through fuzzy long-form labels",
+    excludedRuleIds: ["in-pan-labeled"],
+    sourceText: "Permament account number: ABCD1234F",
+    visibleValues: ["ABCD1234F"],
+  },
+  {
+    countryProfileIds: ["in"],
+    description: "does not mask invalid GSTIN values through fuzzy long-form labels",
+    excludedRuleIds: ["in-gstin-labeled"],
+    sourceText: "Goods and services tax nurnber: 27ABCDE1234F1Y5",
+    visibleValues: ["27ABCDE1234F1Y5"],
+  },
+  {
+    countryProfileIds: ["pe"],
+    description: "does not mask invalid RUC values through fuzzy long-form labels",
+    excludedRuleIds: ["ruc-labeled"],
+    sourceText: "Registro un1co de contribuyentes: 20123456780",
+    visibleValues: ["20123456780"],
   },
 ]);
