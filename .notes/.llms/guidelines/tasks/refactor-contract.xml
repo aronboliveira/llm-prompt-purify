@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taskContract version="1.0">
+  <objective>
+    Rebuild the Angular application around a low-friction prompt-protection flow that stays client-side,
+    masks sensitive strings by default, and exposes review controls without leaking the original prompt.
+  </objective>
+
+  <layers>
+    <layer name="core.masking">
+      <responsibility>
+        Detect sensitive patterns, normalize overlaps, generate masks, rebuild output,
+        and support regeneration without UI dependencies.
+      </responsibility>
+      <constraints>
+        <item>Rules live in constants folders.</item>
+        <item>Declarations live in declarations folders.</item>
+        <item>Pure helpers and validators live in utils folders.</item>
+      </constraints>
+    </layer>
+
+    <layer name="core.state">
+      <responsibility>
+        Own source text, async scan state, group preferences, protected results, and session persistence.
+      </responsibility>
+      <constraints>
+        <item>State transitions must expose user-readable status text.</item>
+        <item>Copy safety must be derived from masked output availability.</item>
+      </constraints>
+    </layer>
+
+    <layer name="features.scanner.ui">
+      <responsibility>
+        Present the fixed workflow: input, suspense scan, protected output, group controls, per-match controls, and help.
+      </responsibility>
+      <constraints>
+        <item>The result is rendered in an output element.</item>
+        <item>Mask groups can be disabled.</item>
+        <item>Credentials can remain always masked.</item>
+        <item>Help content is accessible through question-mark triggers.</item>
+      </constraints>
+    </layer>
+  </layers>
+
+  <qualityBars>
+    <item>Client-side processing must be explicit in the UI.</item>
+    <item>Regex coverage must prioritize EN-US, PT-BR, and ES-LatAm.</item>
+    <item>Toasts and status snippets must explain scan and copy outcomes.</item>
+    <item>Repeated strings must be centralized to preserve DRY.</item>
+  </qualityBars>
+</taskContract>

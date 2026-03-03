@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <codingStyle version="2.0">
-  <language name="AngularTypeScript" scope="src,chromium-extension">
+  <language name="AngularTypeScript" scope="src">
     <rule id="standalone-first-architecture">
       <description>
         Prefer Angular standalone components, directives, and pipes for new work.
@@ -19,11 +19,11 @@
     <rule id="typed-contract-location">
       <description>
         Keep reusable interfaces, type aliases, and DTO-like contracts in dedicated
-        <code>.types.ts</code> files inside the closest feature or shared domain folder.
+        <code>declarations/</code> folders inside the closest feature or shared domain folder.
         Avoid large inline type declarations inside Angular components and services.
       </description>
-      <example path="src/app/core/masking/masking.types.ts" />
-      <example path="src/app/features/scanner/scanner.types.ts" />
+      <example path="src/app/core/masking/declarations/masking.types.ts" />
+      <example path="src/app/features/scanner/declarations/help-topic.types.ts" />
     </rule>
 
     <rule id="component-thinness">
@@ -71,16 +71,28 @@
     <rule id="constants-modularization">
       <description>
         Move rule catalogs, static labels, storage keys, and configuration maps into dedicated
-        <code>.constants.ts</code> files. Avoid embedding long readonly dictionaries inside components.
+        <code>constants/</code> folders and <code>.constants.ts</code> files.
+        Avoid embedding long readonly dictionaries inside components.
       </description>
-      <example path="src/app/core/masking/masking.constants.ts" />
+      <example path="src/app/core/masking/constants/masking.constants.ts" />
+      <example path="src/app/features/scanner/constants/help-topics.constants.ts" />
+    </rule>
+
+    <rule id="utility-isolation">
+      <description>
+        Keep stateless helpers such as formatting, timing, storage helpers, validators, and HTML trust helpers
+        in explicit <code>utils/</code> folders. Do not hide these helpers as private component methods when they
+        are reusable outside one class.
+      </description>
+      <example path="src/app/core/masking/utils/mask-validation.utils.ts" />
+      <example path="src/app/shared/utils/trusted-html.utils.ts" />
     </rule>
 
     <rule id="pure-engine-policy">
       <description>
-        The masking engine must expose deterministic pure functions for:
-        token detection, match normalization, mask generation, and masked-output assembly.
-        UI code may consume these functions but must not redefine them.
+        The masking engine may be wrapped in a class, but its detection, normalization,
+        mask generation, and output assembly must remain deterministic and testable.
+        UI code may consume these APIs but must not redefine them.
       </description>
     </rule>
 
@@ -144,6 +156,43 @@
       <description>
         The primary copy and export actions must always operate on the currently masked output.
         If the masked output is stale or unavailable, the UI must block the action and explain why.
+      </description>
+    </rule>
+
+    <rule id="workflow-contract">
+      <description>
+        The product workflow is fixed unless a refactor explicitly replaces it:
+        paste original prompt, run local scan, render the protected result in an <code>&lt;output&gt;</code> block,
+        review group and per-match controls, then copy only the protected text.
+      </description>
+    </rule>
+
+    <rule id="clientside-disclosure">
+      <description>
+        UI copy must explicitly disclose that masking happens client-side and must clearly communicate what the
+        rule-based scanner can still miss.
+      </description>
+    </rule>
+
+    <rule id="feedback-patterns">
+      <description>
+        User-critical actions must produce visible feedback through status snippets, toasts, or modal help copy.
+        Do not rely on silent state changes for scan, copy, group-policy, or regenerate actions.
+      </description>
+    </rule>
+
+    <rule id="scss-capability-usage">
+      <description>
+        Prefer SCSS architecture that uses shared mixins, functions, container queries, media queries,
+        pseudo-classes, pseudo-elements, and progressive enhancement primitives such as <code>@starting-style</code>
+        or <code>@position-try</code> when they improve clarity.
+      </description>
+    </rule>
+
+    <rule id="dry-repetition-ban">
+      <description>
+        Repeated strings, labels, static help copy, workflow snippets, and repeated UI states must be centralized.
+        Copying similar values across templates and services without a shared source is a regression.
       </description>
     </rule>
   </language>
