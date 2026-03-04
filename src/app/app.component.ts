@@ -141,8 +141,8 @@ export class AppComponent {
     this.#isSettingsModalOpen.set(true);
   }
 
-  protected regenerateAllMasks(): void {
-    this.#scanSession.regenerateAllMasks();
+  protected async regenerateAllMasks(): Promise<void> {
+    await this.#scanSession.regenerateAllMasks();
     this.#toastCenter.push(
       "Fresh random replacements were generated for every active mask in the protected output.",
       "Masks regenerated",
@@ -150,8 +150,8 @@ export class AppComponent {
     );
   }
 
-  protected regenerateMatch(matchId: string): void {
-    this.#scanSession.regenerateMatch(matchId);
+  protected async regenerateMatch(matchId: string): Promise<void> {
+    await this.#scanSession.regenerateMatch(matchId);
     this.#toastCenter.push(
       "That mask now uses a new random replacement in the protected output.",
       "Mask regenerated",

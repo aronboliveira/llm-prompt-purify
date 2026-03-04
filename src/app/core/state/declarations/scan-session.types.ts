@@ -8,7 +8,7 @@ import type {
   ScanResult,
 } from "../../masking/declarations/masking.types";
 
-export type ScanPhase = "detecting" | "idle" | "masking" | "ready";
+export type ScanPhase = "detecting" | "idle" | "masking" | "ready" | "validating";
 
 export interface ScanSessionState {
   countryProfileIds: readonly CountryProfileId[];
