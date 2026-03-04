@@ -1,7 +1,9 @@
 import type {
   MaskGroupSummary,
   ScanMatch,
-} from "../../../core/masking/declarations/masking.types";
+} from "@core/masking/declarations/masking.types";
+
+export type StatusTone = "error" | "info" | "success";
 
 export interface MaskControlSection {
   group: MaskGroupSummary;

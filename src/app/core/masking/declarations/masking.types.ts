@@ -46,17 +46,24 @@ export type SupportedLocale =
   | "zh-CN";
 
 export interface DetectionRule {
-  coverage: "country" | "global";
-  id: string;
-  label: string;
   category: MatchCategory;
   confidence: MatchConfidence;
   countryProfileIds?: readonly CountryProfileId[];
+  coverage: "country" | "global";
+  id: string;
+  label: string;
   locale: SupportedLocale;
-  priority: number;
   patternFactory: () => RegExp;
-  valueGroup?: number;
+  priority: number;
   validator?: (value: string) => boolean;
+  valueGroup?: number;
+}
+
+export interface CandidateMatch {
+  end: number;
+  rule: DetectionRule;
+  start: number;
+  value: string;
 }
 
 export interface MaskGroupPreference {
@@ -64,7 +71,9 @@ export interface MaskGroupPreference {
   alwaysOn: boolean;
 }
 
-export type MaskGroupPreferenceMap = Readonly<Record<MaskGroupId, MaskGroupPreference>>;
+export type MaskGroupPreferenceMap = Readonly<
+  Record<MaskGroupId, MaskGroupPreference>
+>;
 
 export interface CountryProfileDefinition {
   description: string;
