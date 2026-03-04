@@ -1,9 +1,10 @@
 import { DOCUMENT } from "@angular/common";
-import { Injectable, inject, signal } from "@angular/core";
+import { inject, Injectable, signal } from "@angular/core";
 
-export type ThemeMode = "light" | "dark" | "system";
+import { THEME_STORAGE_KEY } from "./constants/theme.constants";
+import type { ThemeMode } from "./declarations/theme.types";
 
-const STORAGE_KEY = "llmpp-theme";
+export type { ThemeMode } from "./declarations/theme.types";
 
 /**
  * S-005: Theme service for dark mode support.
@@ -62,9 +63,9 @@ export class ThemeService {
   #persistTheme(mode: ThemeMode): void {
     try {
       if (mode === "system") {
-        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(THEME_STORAGE_KEY);
       } else {
-        localStorage.setItem(STORAGE_KEY, mode);
+        localStorage.setItem(THEME_STORAGE_KEY, mode);
       }
     } catch {
       // localStorage unavailable (SSR, private browsing)
@@ -73,7 +74,7 @@ export class ThemeService {
 
   #getStoredTheme(): ThemeMode | null {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(THEME_STORAGE_KEY);
       if (stored === "light" || stored === "dark") {
         return stored;
       }

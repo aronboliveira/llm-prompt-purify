@@ -1,24 +1,18 @@
 import { DOCUMENT } from "@angular/common";
-import { Injectable, inject } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
+
 import type {
   CountryProfileId,
   DetectionMode,
   MaskGroupPreferenceMap,
 } from "../masking/declarations/masking.types";
+import {
+  PROFILE_FILE_NAME_PREFIX,
+  PROFILE_VERSION,
+} from "./constants/profile-export.constants";
+import type { MaskingProfile } from "./declarations/profile-export.types";
 
-export interface MaskingProfile {
-  version: 1;
-  exportedAt: string;
-  name: string;
-  settings: {
-    detectionMode: DetectionMode;
-    selectedCountries: CountryProfileId[];
-    groupPreferences: MaskGroupPreferenceMap;
-  };
-}
-
-const PROFILE_VERSION = 1;
-const FILE_NAME_PREFIX = "llmpp-profile";
+export type { MaskingProfile } from "./declarations/profile-export.types";
 
 /**
  * S-006: Export/Import masking profiles for portability and team sharing.
@@ -53,7 +47,7 @@ export class ProfileExportService {
 
     const anchor = this.#document.createElement("a");
     anchor.href = url;
-    anchor.download = `${FILE_NAME_PREFIX}-${this.#sanitizeFileName(name)}.json`;
+    anchor.download = `${PROFILE_FILE_NAME_PREFIX}-${this.#sanitizeFileName(name)}.json`;
     anchor.click();
 
     URL.revokeObjectURL(url);

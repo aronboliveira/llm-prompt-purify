@@ -1,4 +1,5 @@
 import { Injectable, signal } from "@angular/core";
+
 import {
   COUNTRY_PROFILE_DEFINITIONS,
   COUNTRY_PROFILE_ORDER,
@@ -10,6 +11,7 @@ import type {
   DetectionMode,
 } from "../masking/declarations/masking.types";
 import { normalizeCountryProfileIds } from "../masking/utils/country-scope.utils";
+import type { CountryScopeState } from "./declarations/country-scope.types";
 import {
   loadPersistedCountryProfileIds,
   loadPersistedDetectionMode,
@@ -17,10 +19,7 @@ import {
   persistDetectionMode,
 } from "./utils/scan-session-storage.utils";
 
-export interface CountryScopeState {
-  countryProfileIds: readonly CountryProfileId[];
-  detectionMode: DetectionMode;
-}
+export type { CountryScopeState } from "./declarations/country-scope.types";
 
 /**
  * LG-007: Extracted country scope management from ScanSessionService.

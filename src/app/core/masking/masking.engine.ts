@@ -1,9 +1,9 @@
 import { MASKING_RULES } from "./constants/masking-rules.constants";
 import type {
   MaskGroupPreferenceMap,
-  ScanScopeSelection,
   ScanMatch,
   ScanResult,
+  ScanScopeSelection,
 } from "./declarations/masking.types";
 import { filterRulesForScope } from "./utils/country-scope.utils";
 import { collectFuzzyLabelCandidates } from "./utils/fuzzy-label.utils";
@@ -20,9 +20,11 @@ export class MaskingEngine {
   public rebuild(
     sourceText: string,
     matches: readonly ScanMatch[],
-    scannedAt: string
+    scannedAt: string,
   ): ScanResult {
-    const normalizedMatches = [...matches].sort((left, right) => left.start - right.start),
+    const normalizedMatches = [...matches].sort(
+        (left, right) => left.start - right.start,
+      ),
       maskedText = applyEnabledMasks(sourceText, normalizedMatches),
       enabledMatches = normalizedMatches.filter(match => match.enabled).length;
 
@@ -41,12 +43,13 @@ export class MaskingEngine {
   public regenerateAll(
     sourceText: string,
     matches: readonly ScanMatch[],
-    scannedAt: string
+    scannedAt: string,
   ): ScanResult {
     const nextMasks = new Map<string, string>(),
       updatedMatches = matches.map(match => {
         const nextMask =
-          nextMasks.get(match.value) ?? createDistinctMask(match.value, nextMasks.get(match.value));
+          nextMasks.get(match.value) ??
+          createDistinctMask(match.value, nextMasks.get(match.value));
 
         nextMasks.set(match.value, nextMask);
         return { ...match, mask: nextMask };
@@ -59,14 +62,16 @@ export class MaskingEngine {
     sourceText: string,
     matches: readonly ScanMatch[],
     scannedAt: string,
-    matchId: string
+    matchId: string,
   ): ScanResult {
     const targetMatch = matches.find(match => match.id === matchId);
     if (!targetMatch) return this.rebuild(sourceText, matches, scannedAt);
 
     const nextMask = createDistinctMask(targetMatch.value, targetMatch.mask),
       updatedMatches = matches.map(match =>
-        match.value === targetMatch.value ? { ...match, mask: nextMask } : match
+        match.value === targetMatch.value
+          ? { ...match, mask: nextMask }
+          : match,
       );
 
     return this.rebuild(sourceText, updatedMatches, scannedAt);
@@ -76,7 +81,7 @@ export class MaskingEngine {
     sourceText: string,
     groupPreferences: MaskGroupPreferenceMap,
     scopeSelection: ScanScopeSelection,
-    scannedAt = new Date().toISOString()
+    scannedAt = new Date().toISOString(),
   ): ScanResult {
     const activeRules = filterRulesForScope(MASKING_RULES, scopeSelection),
       regexCandidates = activeRules.flatMap(rule => {
@@ -92,7 +97,9 @@ export class MaskingEngine {
       resolvedMatches = resolveOverlaps(candidates),
       maskByValue = new Map<string, string>(),
       matches = resolvedMatches.map(candidate => {
-        const mask = maskByValue.get(candidate.value) ?? createDistinctMask(candidate.value);
+        const mask =
+          maskByValue.get(candidate.value) ??
+          createDistinctMask(candidate.value);
         maskByValue.set(candidate.value, mask);
 
         return {

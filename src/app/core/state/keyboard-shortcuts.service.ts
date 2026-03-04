@@ -1,17 +1,12 @@
 import { DOCUMENT } from "@angular/common";
-import { DestroyRef, Injectable, inject, signal } from "@angular/core";
+import { DestroyRef, inject, Injectable, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { fromEvent } from "rxjs";
 import { filter } from "rxjs/operators";
+import { fromEvent } from "rxjs";
 
-export interface KeyboardShortcut {
-  key: string;
-  ctrl?: boolean;
-  shift?: boolean;
-  alt?: boolean;
-  description: string;
-  action: () => void;
-}
+import type { KeyboardShortcut } from "./declarations/keyboard-shortcuts.types";
+
+export type { KeyboardShortcut } from "./declarations/keyboard-shortcuts.types";
 
 /**
  * S-004: Global keyboard shortcuts service for power users.

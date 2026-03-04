@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
-import { MaskingEngine } from "../masking/masking.engine";
-import { buildScanScopeSelection } from "../masking/utils/country-scope.utils";
+
 import type {
   CountryProfileId,
   DetectionMode,
@@ -8,13 +7,11 @@ import type {
   ScanMatch,
   ScanResult,
 } from "../masking/declarations/masking.types";
+import { MaskingEngine } from "../masking/masking.engine";
+import { buildScanScopeSelection } from "../masking/utils/country-scope.utils";
+import type { ScanEngineParams } from "./declarations/scan-engine.types";
 
-export interface ScanEngineParams {
-  sourceText: string;
-  groupPreferences: MaskGroupPreferenceMap;
-  countryProfileIds: readonly CountryProfileId[];
-  detectionMode: DetectionMode;
-}
+export type { ScanEngineParams } from "./declarations/scan-engine.types";
 
 /**
  * LG-007: Extracted scan engine operations from ScanSessionService.

@@ -1,31 +1,44 @@
 import { computed, Inject, inject, Injectable, signal } from "@angular/core";
+
+import type { MaskSafetyHardener } from "../mask-safety/declarations/mask-safety.types";
+import { MaskSafetyHardeningService } from "../mask-safety/mask-safety-hardening.service";
 import {
   COUNTRY_PROFILE_DEFINITIONS,
-  DEFAULT_COUNTRY_PROFILE_IDS,
   COUNTRY_PROFILE_ORDER,
+  DEFAULT_COUNTRY_PROFILE_IDS,
   MASK_GROUP_DEFINITIONS,
   MASK_GROUP_ORDER,
 } from "../masking/constants/masking.constants";
-import { MaskingEngine } from "../masking/masking.engine";
-import {
-  buildScanScopeSelection,
-  normalizeCountryProfileIds,
-} from "../masking/utils/country-scope.utils";
 import type {
   CountryProfileId,
   DetectionMode,
   MaskGroupId,
   ScanResult,
 } from "../masking/declarations/masking.types";
-import { createGroupPreferenceMap } from "../masking/utils/mask-group.utils";
-import { MaskSafetyHardeningService } from "../mask-safety/mask-safety-hardening.service";
-import type { MaskSafetyHardener } from "../mask-safety/declarations/mask-safety.types";
-import { SCAN_PHASE_MESSAGES, SCAN_TIMINGS } from "./constants/scan-session.constants";
+import { MaskingEngine } from "../masking/masking.engine";
+import {
+  buildScanScopeSelection,
+  normalizeCountryProfileIds,
+} from "../masking/utils/country-scope.utils";
+import {
+  SCAN_PHASE_MESSAGES,
+  SCAN_TIMINGS,
+} from "./constants/scan-session.constants";
 import type {
   ScanPhase,
   ScanSessionState,
   ScanSessionViewModel,
 } from "./declarations/scan-session.types";
+import {
+  applyAlwaysOnToMatches,
+  applyEnabledToMatches,
+  computeNextAlwaysOnPreferences,
+  computeNextEnabledPreferences,
+} from "./utils/group-preference.utils";
+import {
+  setAllEditableMatchesEnabled,
+  toggleMatchEnabled,
+} from "./utils/match-control.utils";
 import {
   loadPersistedCountryProfileIds,
   loadPersistedDetectionMode,
@@ -57,9 +70,10 @@ export class ScanSessionService {
   });
 
   public constructor(
-    @Inject(MaskSafetyHardeningService) maskSafetyHardener?: MaskSafetyHardener
+    @Inject(MaskSafetyHardeningService) maskSafetyHardener?: MaskSafetyHardener,
   ) {
-    this.#maskSafetyHardener = maskSafetyHardener ?? inject(MaskSafetyHardeningService);
+    this.#maskSafetyHardener =
+      maskSafetyHardener ?? inject(MaskSafetyHardeningService);
   }
 
   public readonly state = this.#state.asReadonly();
@@ -75,7 +89,9 @@ export class ScanSessionService {
           selected: state.countryProfileIds.includes(definition.id),
         };
       }),
-      selectedCountryProfiles = countryProfiles.filter(countryProfile => countryProfile.selected),
+      selectedCountryProfiles = countryProfiles.filter(
+        countryProfile => countryProfile.selected,
+      ),
       groups = MASK_GROUP_ORDER.map(groupId => {
         const preference = state.groupPreferences[groupId],
           definition = MASK_GROUP_DEFINITIONS[groupId];
@@ -93,7 +109,8 @@ export class ScanSessionService {
       canCopy: !!result && !state.isScanning,
       countryProfiles,
       detectionMode: state.detectionMode,
-      editableMatches: result?.matches.filter(match => !match.locked).length ?? 0,
+      editableMatches:
+        result?.matches.filter(match => !match.locked).length ?? 0,
       errorMessage: state.errorMessage,
       groups,
       hasMatches: !!result?.hasMatches,
@@ -157,9 +174,9 @@ export class ScanSessionService {
         this.#state().groupPreferences,
         buildScanScopeSelection(
           this.#state().countryProfileIds,
-          this.#state().detectionMode
+          this.#state().detectionMode,
         ),
-        scannedAt
+        scannedAt,
       );
       this.#setPhase("validating");
 
@@ -215,7 +232,11 @@ export class ScanSessionService {
 
     try {
       const nextResult = await this.#hardenResult(
-        this.#engine.regenerateAll(result.sourceText, result.matches, result.scannedAt)
+        this.#engine.regenerateAll(
+          result.sourceText,
+          result.matches,
+          result.scannedAt,
+        ),
       );
 
       this.#state.update(state => ({
@@ -257,8 +278,8 @@ export class ScanSessionService {
           result.sourceText,
           result.matches,
           result.scannedAt,
-          matchId
-        )
+          matchId,
+        ),
       );
 
       this.#state.update(state => ({
@@ -282,7 +303,9 @@ export class ScanSessionService {
     }
   }
 
-  public scheduleRefresh(delayMs: number = SCAN_TIMINGS.autoRefreshDebounceMs): void {
+  public scheduleRefresh(
+    delayMs: number = SCAN_TIMINGS.autoRefreshDebounceMs,
+  ): void {
     this.#clearQueuedRefresh();
 
     if (!this.#state().sourceText.trim()) {
@@ -315,14 +338,22 @@ export class ScanSessionService {
     this.setCountryProfiles([countryProfileId]);
   }
 
-  public setCountryProfiles(countryProfileIds: readonly CountryProfileId[]): void {
+  public setCountryProfiles(
+    countryProfileIds: readonly CountryProfileId[],
+  ): void {
     const currentState = this.#state(),
-      normalizedCountryProfileIds = normalizeCountryProfileIds(countryProfileIds).length
+      normalizedCountryProfileIds = normalizeCountryProfileIds(
+        countryProfileIds,
+      ).length
         ? normalizeCountryProfileIds(countryProfileIds)
         : DEFAULT_COUNTRY_PROFILE_IDS;
     if (
-      hasSameCountrySelection(currentState.countryProfileIds, normalizedCountryProfileIds)
-    ) return;
+      hasSameCountrySelection(
+        currentState.countryProfileIds,
+        normalizedCountryProfileIds,
+      )
+    )
+      return;
 
     this.#state.set({
       ...currentState,
@@ -357,40 +388,36 @@ export class ScanSessionService {
       result = state.result;
     if (!result) return;
 
-    const matches = result.matches.map(match => {
-      if (match.locked || !state.groupPreferences[match.groupId].enabled) return match;
-      return { ...match, enabled };
-    });
+    const matches = setAllEditableMatchesEnabled(
+      result.matches,
+      state.groupPreferences,
+      enabled,
+    );
 
     this.#state.update(state => ({
       ...state,
-      result: this.#engine.rebuild(result.sourceText, matches, result.scannedAt),
+      result: this.#engine.rebuild(
+        result.sourceText,
+        matches,
+        result.scannedAt,
+      ),
     }));
   }
 
   public toggleGroupAlwaysOn(groupId: MaskGroupId, alwaysOn: boolean): void {
-    const nextPreferences = createGroupPreferenceMap({
-      ...this.#state().groupPreferences,
-      [groupId]: {
-        alwaysOn,
-        enabled: alwaysOn ? true : this.#state().groupPreferences[groupId].enabled,
-      },
-    });
+    const nextPreferences = computeNextAlwaysOnPreferences(
+      this.#state().groupPreferences,
+      groupId,
+      alwaysOn,
+    );
 
     this.#state.update(state => {
       const currentResult = state.result,
         nextResult = currentResult
           ? this.#engine.rebuild(
               currentResult.sourceText,
-              currentResult.matches.map(match => {
-                if (match.groupId !== groupId) return match;
-                return {
-                  ...match,
-                  enabled: alwaysOn ? true : match.enabled,
-                  locked: alwaysOn,
-                };
-              }),
-              currentResult.scannedAt
+              applyAlwaysOnToMatches(currentResult.matches, groupId, alwaysOn),
+              currentResult.scannedAt,
             )
           : null;
 
@@ -406,28 +433,24 @@ export class ScanSessionService {
 
   public toggleGroupEnabled(groupId: MaskGroupId, enabled: boolean): void {
     const currentPreferences = this.#state().groupPreferences,
-      nextPreferences = createGroupPreferenceMap({
-        ...currentPreferences,
-        [groupId]: {
-          alwaysOn: enabled ? currentPreferences[groupId].alwaysOn : false,
-          enabled,
-        },
-      });
+      nextPreferences = computeNextEnabledPreferences(
+        currentPreferences,
+        groupId,
+        enabled,
+      );
 
     this.#state.update(state => {
       const currentResult = state.result,
         nextResult = currentResult
           ? this.#engine.rebuild(
               currentResult.sourceText,
-              currentResult.matches.map(match => {
-                if (match.groupId !== groupId) return match;
-                return {
-                  ...match,
-                  enabled,
-                  locked: enabled ? nextPreferences[groupId].alwaysOn : false,
-                };
-              }),
-              currentResult.scannedAt
+              applyEnabledToMatches(
+                currentResult.matches,
+                groupId,
+                enabled,
+                nextPreferences[groupId].alwaysOn,
+              ),
+              currentResult.scannedAt,
             )
           : null;
 
@@ -445,14 +468,15 @@ export class ScanSessionService {
     const result = this.#state().result;
     if (!result) return;
 
-    const matches = result.matches.map(match => {
-      if (match.id !== matchId || match.locked) return match;
-      return { ...match, enabled };
-    });
+    const matches = toggleMatchEnabled(result.matches, matchId, enabled);
 
     this.#state.update(state => ({
       ...state,
-      result: this.#engine.rebuild(result.sourceText, matches, result.scannedAt),
+      result: this.#engine.rebuild(
+        result.sourceText,
+        matches,
+        result.scannedAt,
+      ),
     }));
   }
 
@@ -485,12 +509,14 @@ export class ScanSessionService {
   }
 
   async #hardenResult(localResult: ScanResult): Promise<ScanResult> {
-    const hardeningResult = await this.#maskSafetyHardener.hardenMatches(localResult.matches);
+    const hardeningResult = await this.#maskSafetyHardener.hardenMatches(
+      localResult.matches,
+    );
 
     return this.#engine.rebuild(
       localResult.sourceText,
       hardeningResult.matches,
-      localResult.scannedAt
+      localResult.scannedAt,
     );
   }
 
@@ -508,9 +534,10 @@ export class ScanSessionService {
 
 function hasSameCountrySelection(
   leftCountryProfileIds: readonly CountryProfileId[],
-  rightCountryProfileIds: readonly CountryProfileId[]
+  rightCountryProfileIds: readonly CountryProfileId[],
 ): boolean {
-  if (leftCountryProfileIds.length !== rightCountryProfileIds.length) return false;
+  if (leftCountryProfileIds.length !== rightCountryProfileIds.length)
+    return false;
   return leftCountryProfileIds.every((countryProfileId, index) => {
     return countryProfileId === rightCountryProfileIds[index];
   });
