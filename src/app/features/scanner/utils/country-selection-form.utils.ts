@@ -1,4 +1,4 @@
-import type { CountryProfileId } from "../../../core/masking/declarations/masking.types";
+import type { CountryProfileId } from "@core/masking/declarations/masking.types";
 
 export function toggleCountrySelection(
   currentCountryProfileIds: readonly CountryProfileId[],

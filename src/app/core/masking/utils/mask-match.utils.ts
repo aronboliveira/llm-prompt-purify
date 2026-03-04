@@ -1,18 +1,12 @@
 import { MASK_GROUP_ORDER } from "../constants/masking.constants";
 import type {
+  CandidateMatch,
   DetectionRule,
   MaskGroupId,
   MaskGroupPreferenceMap,
   ScanMatch,
 } from "../declarations/masking.types";
 import { sanitizeCapturedValue } from "./mask-format.utils";
-
-export interface CandidateMatch {
-  rule: DetectionRule;
-  start: number;
-  end: number;
-  value: string;
-}
 
 export function buildCandidateMatch(
   rule: DetectionRule,

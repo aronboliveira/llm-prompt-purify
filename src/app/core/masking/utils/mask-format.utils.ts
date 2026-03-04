@@ -1,6 +1,7 @@
-import { MASK_CHARACTER_SETS } from "../constants/masking.constants";
-
-const MAX_MASK_RETRIES = 8;
+import {
+  MASK_CHARACTER_SETS,
+  MAX_MASK_RETRIES,
+} from "../constants/masking.constants";
 
 /**
  * LG-004: Creates a visually distinct mask. If randomization fails to produce

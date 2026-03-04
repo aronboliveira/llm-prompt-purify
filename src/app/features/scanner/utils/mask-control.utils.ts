@@ -1,7 +1,7 @@
 import type {
   MaskGroupSummary,
   ScanMatch,
-} from "../../../core/masking/declarations/masking.types";
+} from "@core/masking/declarations/masking.types";
 import type { MaskControlSection } from "../declarations/mask-control.types";
 
 export function buildMaskControlSections(

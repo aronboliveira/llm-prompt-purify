@@ -5,9 +5,12 @@ import {
   FUZZY_LABEL_SPECS,
 } from "../constants/fuzzy-label.constants";
 import type { FuzzyLabelRuleSpec } from "../declarations/fuzzy-label.types";
-import type { DetectionRule } from "../declarations/masking.types";
+import type {
+  CandidateMatch,
+  DetectionRule,
+} from "../declarations/masking.types";
 import { sanitizeCapturedValue } from "./mask-format.utils";
-import { buildCandidateMatch, type CandidateMatch } from "./mask-match.utils";
+import { buildCandidateMatch } from "./mask-match.utils";
 
 // LG-001: Whitelist of known short labels (< 4 chars) that should still trigger fuzzy matching
 const SHORT_LABEL_WHITELIST = new Set([
@@ -41,9 +44,7 @@ let cachedFuseKey: string | null = null;
 let cachedFuse: Fuse<FuzzyLabelAliasEntry> | null = null;
 let cachedAliasEntries: readonly FuzzyLabelAliasEntry[] | null = null;
 
-function getFuseMatcher(
-  activeRuleIds: readonly string[],
-): {
+function getFuseMatcher(activeRuleIds: readonly string[]): {
   matcher: Fuse<FuzzyLabelAliasEntry>;
   entries: readonly FuzzyLabelAliasEntry[];
 } | null {
