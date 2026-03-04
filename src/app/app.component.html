@@ -1,107 +1,52 @@
 <div
   class="app-shell"
   [attr.data-language-risk]="hasMixedLanguageSelection()"
-  [attr.data-state]="vm().isScanning ? 'scanning' : vm().hasResult ? 'ready' : 'idle'"
+  [attr.data-state]="
+    vm().isScanning ? 'scanning' : vm().hasResult ? 'ready' : 'idle'
+  "
   [style.--selected-country-count]="vm().selectedCountryProfiles.length"
 >
   <app-feedback-sheet></app-feedback-sheet>
 
-  <header class="hero">
-    <div class="hero__copy">
-      <p class="eyebrow">Client-side prompt protection</p>
-      <h1>{{ copy.heroTitle }}</h1>
-      <p class="hero__body">{{ copy.heroBody }}</p>
+  <app-product-header
+    [title]="'LLM Prompt Purifier'"
+    [tagline]="'Client-side prompt protection'"
+  ></app-product-header>
 
-      <div class="hero__notice">
-        <span aria-hidden="true" class="hero__notice-icon" [innerHTML]="icons.privacy"></span>
-        <div>
-          <p class="hero__notice-title">{{ copy.clientsideTitle }}</p>
-          <p class="hero__notice-body">{{ copy.clientsideBody }}</p>
-        </div>
-        <button class="help-trigger" type="button" (click)="openHelp('clientside')">(?)</button>
-      </div>
-    </div>
+  <app-hero-section
+    [body]="copy.heroBody"
+    [noticeIcon]="icons.privacy"
+    [noticeTitle]="copy.clientsideTitle"
+    [noticeBody]="copy.clientsideBody"
+    (helpRequested)="openHelp('clientside')"
+  ></app-hero-section>
 
-    <div class="hero__panel">
-      <div>
-        <p class="hero__stat-label">Selected scope</p>
-        <p class="hero__stat-value">{{ selectedCountrySummary() }}</p>
-      </div>
-      <div>
-        <p class="hero__stat-label">Masking mode</p>
-        <p class="hero__stat-note">{{ detectionModeCopy() }}</p>
-      </div>
-      <div>
-        <p class="hero__stat-label">Active matches</p>
-        <p class="hero__stat-note">{{ vm().activeMatches }} of {{ vm().matchCount }}</p>
-      </div>
-    </div>
-  </header>
+  <app-workflow-strip
+    [snippets]="workflowSnippets"
+    [stateResolver]="snippetState.bind(this)"
+    [footerText]="copy.heroTitle"
+  ></app-workflow-strip>
 
-  <section aria-label="Workflow steps" class="snippet-strip">
-    @for (snippet of workflowSnippets; track snippet.id) {
-      <article class="snippet" [attr.data-state]="snippetState(snippet.id)">
-        <p class="snippet__title">{{ snippet.title }}</p>
-        <p class="snippet__body">{{ snippet.body }}</p>
-      </article>
-    }
-  </section>
-
-  <section class="toolbar">
-    <div class="toolbar__actions">
-      <button
-        class="toolbar__button toolbar__button--scope"
-        data-testid="country-modal-button"
-        type="button"
-        (click)="openCountryModal()"
-      >
-        <span class="toolbar__button-label">Countries</span>
-        <span class="toolbar__button-value">{{ selectedCountrySummary() }}</span>
-      </button>
-
-      <button
-        class="toolbar__button toolbar__button--settings"
-        data-testid="settings-button"
-        type="button"
-        (click)="openSettingsModal()"
-      >
-        <span aria-hidden="true" class="toolbar__icon" [innerHTML]="icons.settings"></span>
-        <span>Masking settings</span>
-      </button>
-    </div>
-
-    <p class="toolbar__summary">{{ scopeCopy() }}</p>
-
-    @if (hasMixedLanguageSelection() && vm().detectionMode !== "global-only") {
-      <small class="toolbar__warning">
-        {{ copy.languageWarning }}
-      </small>
-    }
-  </section>
+  <app-scanner-toolbar
+    [countrySummary]="selectedCountrySummary()"
+    [scopeDescription]="scopeCopy()"
+    [settingsIcon]="icons.settings"
+    [warning]="copy.languageWarning"
+    [showWarning]="
+      hasMixedLanguageSelection() && vm().detectionMode !== 'global-only'
+    "
+    (countryModalRequested)="openCountryModal()"
+    (settingsModalRequested)="openSettingsModal()"
+  ></app-scanner-toolbar>
 
   <main class="translator">
-    <section class="pane pane--raw">
-      <div class="pane__header">
-        <div class="pane__title-wrap">
-          <h2>{{ copy.rawTitle }}</h2>
-          <button class="help-trigger" type="button" (click)="openHelp('workflow')">(?)</button>
-        </div>
-        <span class="char-count">{{ vm().sourceText.length }} chars</span>
-      </div>
-
-      <p class="pane__body">{{ copy.rawBody }}</p>
-
-      <label class="sr-only" for="sourceText">Raw version</label>
-      <textarea
-        id="sourceText"
-        class="editor"
-        data-testid="source-textarea"
-        [ngModel]="vm().sourceText"
-        (ngModelChange)="updateSourceText($event)"
-        placeholder="Paste the content you want to protect before sending it to a web LLM."
-        spellcheck="false"
-      ></textarea>
-    </section>
+    <app-raw-prompt-pane
+      [title]="copy.rawTitle"
+      [body]="copy.rawBody"
+      [sourceText]="vm().sourceText"
+      (helpRequested)="openHelp('workflow')"
+      (sourceTextChanged)="updateSourceText($event)"
+    ></app-raw-prompt-pane>
 
     <div class="translator__bridge" aria-hidden="true">
       <span>Raw version</span>
@@ -109,95 +54,39 @@
       <span>Masked version</span>
     </div>
 
-    <section class="pane pane--masked">
-      <div class="pane__header">
-        <div class="pane__title-wrap">
-          <h2>{{ copy.outputTitle }}</h2>
-          <button class="help-trigger" type="button" (click)="openHelp('coverage')">(?)</button>
-        </div>
-        <button
-          class="toolbar__button toolbar__button--copy"
-          data-testid="copy-button"
-          [disabled]="!vm().canCopy"
-          type="button"
-          (click)="copyMaskedOutput()"
-        >
-          <span aria-hidden="true" class="toolbar__icon" [innerHTML]="icons.copy"></span>
-          <span>Copy protected output</span>
-        </button>
-      </div>
-
-      <p class="pane__body">{{ copy.outputBody }}</p>
-
-      <output
-        class="output"
-        data-testid="masked-output"
-        [attr.data-state]="vm().isScanning ? 'scanning' : vm().hasResult ? 'ready' : 'idle'"
-        aria-live="polite"
-      >
-        <span class="output__text">
-          @if (vm().hasResult) {
-            {{ vm().maskedText }}
-          } @else {
-            {{ copy.emptyOutput }}
-          }
-        </span>
-
-        @if (vm().isScanning) {
-          <span class="output__overlay">
-            <span aria-hidden="true" class="spinner"></span>
-            <span>{{ vm().statusMessage }}</span>
-          </span>
-        }
-      </output>
-
-      <div class="status-row">
-        <p class="status-pill" [attr.data-tone]="statusTone()">{{ vm().statusMessage }}</p>
-        <p class="status-pill" data-tone="info">{{ detectionModeCopy() }}</p>
-      </div>
-
-      <div class="pane__actions">
-        <button
-          class="toolbar__button"
-          [disabled]="!vm().matches.length"
-          type="button"
-          (click)="regenerateAllMasks()"
-        >
-          <span aria-hidden="true" class="toolbar__icon" [innerHTML]="icons.refresh"></span>
-          <span>Regenerate all masks</span>
-        </button>
-
-        <button
-          class="toolbar__button toolbar__button--ghost"
-          [disabled]="!vm().sourceText"
-          type="button"
-          (click)="clear()"
-        >
-          Clear local text
-        </button>
-      </div>
-    </section>
+    <app-masked-output-pane
+      [title]="copy.outputTitle"
+      [body]="copy.outputBody"
+      [maskedText]="vm().maskedText"
+      [emptyPlaceholder]="copy.emptyOutput"
+      [statusMessage]="vm().statusMessage"
+      [detectionModeLabel]="detectionModeCopy()"
+      [statusTone]="statusTone()"
+      [copyIcon]="icons.copy"
+      [refreshIcon]="icons.refresh"
+      [isScanning]="vm().isScanning"
+      [hasResult]="vm().hasResult"
+      [canCopy]="vm().canCopy"
+      [hasMatches]="vm().matches.length > 0"
+      [hasSourceText]="!!vm().sourceText"
+      (helpRequested)="openHelp('coverage')"
+      (copyRequested)="copyMaskedOutput()"
+      (regenerateRequested)="regenerateAllMasks()"
+      (clearRequested)="clear()"
+    ></app-masked-output-pane>
   </main>
 
-  <section class="controls">
-    <div class="controls__header">
-      <div class="pane__title-wrap">
-        <h2>{{ copy.controlsTitle }}</h2>
-        <button class="help-trigger" type="button" (click)="openHelp('controls')">(?)</button>
-      </div>
-    </div>
-
-    <p class="controls__body">{{ copy.controlsBody }}</p>
-
-    <app-mask-group-panel
-      [groups]="vm().groups"
-      [matches]="vm().matches"
-      (groupAlwaysOnToggled)="toggleGroupAlwaysOn($event)"
-      (groupEnabledToggled)="toggleGroupEnabled($event)"
-      (matchRegenerated)="regenerateMatch($event)"
-      (matchToggled)="toggleMatch($event)"
-    ></app-mask-group-panel>
-  </section>
+  <app-controls-panel
+    [title]="copy.controlsTitle"
+    [body]="copy.controlsBody"
+    [groups]="vm().groups"
+    [matches]="vm().matches"
+    (helpRequested)="openHelp('controls')"
+    (groupAlwaysOnToggled)="toggleGroupAlwaysOn($event)"
+    (groupEnabledToggled)="toggleGroupEnabled($event)"
+    (matchRegenerated)="regenerateMatch($event)"
+    (matchToggled)="toggleMatch($event)"
+  ></app-controls-panel>
 
   <app-country-scope-modal
     [countryProfiles]="vm().countryProfiles"
@@ -217,6 +106,12 @@
     (helpRequested)="openHelp('controls')"
   ></app-masking-settings-modal>
 
-  <app-help-modal [topic]="activeHelpTopic()" (closed)="closeHelp()"></app-help-modal>
-  <app-toast-stack [toasts]="toasts()" (dismissed)="dismissToast($event)"></app-toast-stack>
+  <app-help-modal
+    [topic]="activeHelpTopic()"
+    (closed)="closeHelp()"
+  ></app-help-modal>
+  <app-toast-stack
+    [toasts]="toasts()"
+    (dismissed)="dismissToast($event)"
+  ></app-toast-stack>
 </div>
