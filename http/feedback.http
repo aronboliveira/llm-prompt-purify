@@ -1,0 +1,75 @@
+# Feedback API Tests
+# Use with VS Code REST Client or IntelliJ HTTP Client
+
+@baseUrl = http://localhost:5147
+
+### Submit Feedback - Bug Report
+# Report a bug with all required fields
+POST {{baseUrl}}/api/feedback
+Content-Type: application/json
+
+{
+  "category": "bug",
+  "email": "tester@example.com",
+  "message": "Found an issue when masking SSN numbers with hyphens. The mask format doesn't match the original structure.",
+  "name": "Test User",
+  "rating": 4,
+  "subject": "SSN masking format issue",
+  "wantsReply": true
+}
+
+### Submit Feedback - Feature Request
+# Request a new feature
+POST {{baseUrl}}/api/feedback
+Content-Type: application/json
+
+{
+  "category": "feature",
+  "email": "developer@example.com",
+  "message": "Would love to see support for custom masking patterns that I can define myself.",
+  "name": "Developer",
+  "rating": 5,
+  "subject": "Custom masking patterns",
+  "wantsReply": false
+}
+
+### Submit Feedback - Minimal (no optional fields)
+# Submit with only required fields
+POST {{baseUrl}}/api/feedback
+Content-Type: application/json
+
+{
+  "category": "general",
+  "message": "Great tool for privacy protection!"
+}
+
+### Submit Feedback - Invalid Category
+# Should return validation error
+POST {{baseUrl}}/api/feedback
+Content-Type: application/json
+
+{
+  "category": "invalid-category",
+  "message": "This should fail validation"
+}
+
+### Submit Feedback - Missing Message
+# Should return validation error
+POST {{baseUrl}}/api/feedback
+Content-Type: application/json
+
+{
+  "category": "bug",
+  "message": ""
+}
+
+### Submit Feedback - Invalid Email Format
+# Should return validation error
+POST {{baseUrl}}/api/feedback
+Content-Type: application/json
+
+{
+  "category": "bug",
+  "email": "not-an-email",
+  "message": "Test message with invalid email"
+}
