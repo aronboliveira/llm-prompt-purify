@@ -1,0 +1,14 @@
+<section aria-label="Workflow steps" class="workflow-strip">
+  @for (snippet of snippets(); track snippet.id) {
+    <article
+      class="workflow-strip__card"
+      [attr.data-state]="stateResolver()(snippet.id)"
+    >
+      <p class="workflow-strip__title">{{ snippet.title }}</p>
+      <p class="workflow-strip__body">{{ snippet.body }}</p>
+      @if (footerText()) {
+        <small class="workflow-strip__footer">{{ footerText() }}</small>
+      }
+    </article>
+  }
+</section>

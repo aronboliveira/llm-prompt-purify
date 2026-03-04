@@ -1,0 +1,18 @@
+<section class="hero">
+  <p class="hero__body">{{ body() }}</p>
+
+  <div class="hero__notice">
+    <span
+      aria-hidden="true"
+      class="hero__notice-icon"
+      [innerHTML]="noticeIcon()"
+    ></span>
+    <div>
+      <p class="hero__notice-title">{{ noticeTitle() }}</p>
+      <p class="hero__notice-body">{{ noticeBody() }}</p>
+    </div>
+    <button class="help-trigger" type="button" (click)="requestHelp()">
+      (?)
+    </button>
+  </div>
+</section>

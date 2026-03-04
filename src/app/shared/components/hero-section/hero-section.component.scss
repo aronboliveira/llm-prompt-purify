@@ -1,0 +1,53 @@
+@use "../../../shared/styles/design" as ui;
+
+.hero {
+  @include ui.entrance-slide(Y, 1rem);
+  @include ui.surface-card();
+
+  border: 1px solid var(--panel-border);
+  display: grid;
+  gap: 1rem;
+  margin-block-end: 1rem;
+  overflow: clip;
+  padding: 1.3rem;
+}
+
+.hero__body {
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.hero__notice {
+  align-items: center;
+  background: rgba(248, 255, 254, 0.94);
+  border: 1px solid rgba(15, 118, 110, 0.12);
+  border-radius: ui.panel-radius(0.35);
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding: 0.95rem 1rem;
+}
+
+.hero__notice-icon {
+  @include ui.icon-embed(1.1rem);
+}
+
+.hero__notice-title,
+.hero__notice-body {
+  margin: 0;
+}
+
+.hero__notice-title {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.hero__notice-body {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.help-trigger {
+  @include ui.help-button;
+}
