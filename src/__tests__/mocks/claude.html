@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mock Claude Interface</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #1a1a2e;
+        color: #e2e2e2;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #2d2d44;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #16162a;
+      }
+      .header h1 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #d4a574;
+      }
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        max-width: 52rem;
+        margin: 0 auto;
+        padding: 1.5rem;
+        width: 100%;
+      }
+      .messages {
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: 1rem;
+      }
+      .message {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 1rem;
+      }
+      .message.human {
+        background: #2d2d44;
+        border-left: 3px solid #d4a574;
+      }
+      .message.assistant {
+        background: transparent;
+        border-left: 3px solid #7c8aff;
+      }
+      .input-container {
+        background: #252540;
+        border-radius: 1rem;
+        padding: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+      .contenteditable-input {
+        min-height: 80px;
+        width: 100%;
+        background: transparent;
+        color: #e2e2e2;
+        font-size: 1rem;
+        outline: none;
+        line-height: 1.6;
+        border: none;
+        font-family: inherit;
+      }
+      .contenteditable-input:empty::before {
+        content: attr(data-placeholder);
+        color: #6b6b8a;
+      }
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 0.75rem;
+        gap: 0.5rem;
+      }
+      .send-btn {
+        background: #d4a574;
+        color: #1a1a2e;
+        border: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .send-btn:hover {
+        background: #e0b584;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <h1>Claude Mock</h1>
+      <span>Test Environment</span>
+    </header>
+
+    <main class="main">
+      <div class="messages">
+        <div class="message assistant">
+          <p>Hello! I'm Claude, an AI assistant. How can I help you today?</p>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <div
+          id="claude-input"
+          class="contenteditable-input"
+          contenteditable="true"
+          role="textbox"
+          aria-multiline="true"
+          aria-label="Message Claude"
+          data-placeholder="Message Claude..."
+          data-testid="claude-input"
+        ></div>
+        <div class="actions">
+          <button class="send-btn" type="button" aria-label="Send message">
+            Send
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const input = document.getElementById("claude-input");
+
+      // Test data with various sensitive patterns
+      const testPrompts = [
+        "My AWS credentials: AKIAIOSFODNN7EXAMPLE / wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        "Database connection: postgresql://admin:secretpass123@db.example.com:5432/production",
+        "Private key starts with: -----BEGIN RSA PRIVATE KEY----- MIIEowIBAAKCAQEA...",
+        "My passport number is AB1234567 and DOB is 01/15/1985",
+        "Internal IP: 192.168.1.100, MAC: 00:1B:44:11:3A:B7",
+      ];
+
+      window.testPrompts = testPrompts;
+      window.setPromptText = function (text) {
+        input.innerText = text;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      };
+      window.getPromptText = function () {
+        return input.innerText;
+      };
+    </script>
+  </body>
+</html>
