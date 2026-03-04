@@ -58,6 +58,17 @@ export const GLOBAL_CREDENTIAL_MASK_FIXTURES: readonly LocaleMaskFixture[] = Obj
       "JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload.signature",
     ].join("\n"),
   },
+  {
+    countryProfileIds: ["pt"],
+    description: "masks locale-specific secret flags from Portuguese and Spanish vocabulary",
+    expectedRuleIds: ["secret-assignment"],
+    hiddenValues: ["ChaveSegura#2026", "ClaveSegura#2026", "PalavraP4sse#2026"],
+    sourceText: [
+      "Chave de API: ChaveSegura#2026",
+      "Llave API: ClaveSegura#2026",
+      "Palavra-passe: PalavraP4sse#2026",
+    ].join("\n"),
+  },
 ]);
 
 export const GLOBAL_PERSONAL_MASK_FIXTURES: readonly LocaleMaskFixture[] = Object.freeze([
@@ -142,6 +153,13 @@ export const GLOBAL_NEGATIVE_MASK_FIXTURES: readonly NegativeMaskFixture[] = Obj
     excludedRuleIds: ["secret-assignment"],
     sourceText: "token=internal",
     visibleValues: ["internal"],
+  },
+  {
+    countryProfileIds: ["pt"],
+    description: "ignores localized credential flags when the assigned value is weak",
+    excludedRuleIds: ["secret-assignment"],
+    sourceText: "Chave de API: interna",
+    visibleValues: ["interna"],
   },
   {
     countryProfileIds: ["us"],
