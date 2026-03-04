@@ -1,27 +1,38 @@
 import { CommonModule } from "@angular/common";
 import { HttpErrorResponse } from "@angular/common/http";
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+} from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { DomSanitizer } from "@angular/platform-browser";
 
 import {
   DEFAULT_FEEDBACK_DRAFT,
+  EMAIL_PATTERN,
   FEEDBACK_CATEGORY_IDS,
   FEEDBACK_CATEGORY_OPTIONS,
   FEEDBACK_MESSAGE_MAX,
   FEEDBACK_RATING_OPTIONS,
-} from "../../../../core/feedback/constants/feedback.constants";
+} from "@core/feedback/constants/feedback.constants";
 import type {
   FeedbackCategoryId,
   FeedbackDraft,
   FeedbackFieldErrorMap,
   FeedbackFieldId,
   FeedbackSubmissionRequest,
-} from "../../../../core/feedback/declarations/feedback.types";
-import { FeedbackApiService } from "../../../../core/feedback/feedback-api.service";
-import { ToastCenterService } from "../../../../core/feedback/toast-center.service";
-import { MATERIAL_ICONS } from "../../../../shared/constants/material-icons.constants";
-import { createTrustedHtmlMap } from "../../../../shared/utils/trusted-html.utils";
+} from "@core/feedback/declarations/feedback.types";
+import { FeedbackApiService } from "@core/feedback/feedback-api.service";
+import { ToastCenterService } from "@core/feedback/toast-center.service";
+import {
+  isFeedbackCategoryId,
+  isFeedbackFieldId,
+} from "@core/feedback/utils/feedback.utils";
+import { MATERIAL_ICONS } from "@shared/constants/material-icons.constants";
+import { createTrustedHtmlMap } from "@shared/utils/trusted-html.utils";
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,13 +54,19 @@ export class FeedbackSheetComponent {
   protected readonly categoryOptions = FEEDBACK_CATEGORY_OPTIONS;
   protected readonly categoryHelper = computed(() => {
     return (
-      this.categoryOptions.find(option => option.id === this.#draft().category)?.helper ?? ""
+      this.categoryOptions.find(option => option.id === this.#draft().category)
+        ?.helper ?? ""
     );
   });
   protected readonly draft = this.#draft.asReadonly();
   protected readonly fieldErrors = this.#fieldErrors.asReadonly();
-  protected readonly icons = createTrustedHtmlMap(this.#sanitizer, MATERIAL_ICONS);
-  protected readonly isAppraisal = computed(() => this.#draft().category === "appraisal");
+  protected readonly icons = createTrustedHtmlMap(
+    this.#sanitizer,
+    MATERIAL_ICONS,
+  );
+  protected readonly isAppraisal = computed(
+    () => this.#draft().category === "appraisal",
+  );
   protected readonly isOpen = this.#isOpen.asReadonly();
   protected readonly isSubmitting = this.#isSubmitting.asReadonly();
   protected readonly maxMessageLength = FEEDBACK_MESSAGE_MAX;
@@ -71,7 +88,8 @@ export class FeedbackSheetComponent {
   }
 
   protected closeOnBackdrop(event: MouseEvent): void {
-    if (event.target === event.currentTarget && !this.#isSubmitting()) this.close();
+    if (event.target === event.currentTarget && !this.#isSubmitting())
+      this.close();
   }
 
   protected open(): void {
@@ -103,7 +121,7 @@ export class FeedbackSheetComponent {
       this.#toastCenter.push(
         "Some feedback fields still need attention before the note can be sent.",
         "Check the feedback form",
-        "error"
+        "error",
       );
       return;
     }
@@ -112,29 +130,36 @@ export class FeedbackSheetComponent {
     this.#isSubmitting.set(true);
 
     try {
-      const response = await this.#feedbackApi.submit(this.#toRequest(this.#draft()));
+      const response = await this.#feedbackApi.submit(
+        this.#toRequest(this.#draft()),
+      );
       this.#toastCenter.push(
         response.deliveryStatus === "emailed"
           ? "The note was stored and forwarded to the developers."
           : "The note was stored, but email forwarding is not configured in this environment.",
-        response.deliveryStatus === "emailed" ? "Feedback sent" : "Feedback stored",
-        response.deliveryStatus === "emailed" ? "success" : "info"
+        response.deliveryStatus === "emailed"
+          ? "Feedback sent"
+          : "Feedback stored",
+        response.deliveryStatus === "emailed" ? "success" : "info",
       );
       this.#draft.set(DEFAULT_FEEDBACK_DRAFT);
       this.close();
     } catch (error) {
-      if (error instanceof HttpErrorResponse && this.#hasValidationErrors(error.error)) {
+      if (
+        error instanceof HttpErrorResponse &&
+        this.#hasValidationErrors(error.error)
+      ) {
         this.#fieldErrors.set(this.#mapServerErrors(error.error.errors));
         this.#toastCenter.push(
           "The backend rejected this submission because one or more fields are incomplete.",
           "Fix the feedback form",
-          "error"
+          "error",
         );
       } else {
         this.#toastCenter.push(
           "The feedback endpoint could not be reached. Start the backend container and try again.",
           "Feedback failed",
-          "error"
+          "error",
         );
       }
     } finally {
@@ -146,14 +171,20 @@ export class FeedbackSheetComponent {
     const inputElement = event.target;
     if (!(inputElement instanceof HTMLInputElement)) return;
 
-    this.#draft.update(draft => ({ ...draft, wantsReply: inputElement.checked }));
-    if (!inputElement.checked && this.#draft().category !== "contact-developers")
+    this.#draft.update(draft => ({
+      ...draft,
+      wantsReply: inputElement.checked,
+    }));
+    if (
+      !inputElement.checked &&
+      this.#draft().category !== "contact-developers"
+    )
       this.#clearFieldError("email");
   }
 
   protected updateTextField(
     field: "email" | "message" | "name" | "subject",
-    value: string
+    value: string,
   ): void {
     this.#draft.update(draft => ({ ...draft, [field]: value }));
     this.#clearFieldError(field);
@@ -170,25 +201,30 @@ export class FeedbackSheetComponent {
   }
 
   #hasValidationErrors(
-    errorBody: unknown
+    errorBody: unknown,
   ): errorBody is { errors: Record<string, readonly string[]> } {
     if (!errorBody || typeof errorBody !== "object") return false;
 
     return (
-      "errors" in errorBody
-      && !!(errorBody as { errors?: unknown }).errors
-      && typeof (errorBody as { errors?: unknown }).errors === "object"
+      "errors" in errorBody &&
+      !!(errorBody as { errors?: unknown }).errors &&
+      typeof (errorBody as { errors?: unknown }).errors === "object"
     );
   }
 
-  #mapServerErrors(errors: Record<string, readonly string[]>): FeedbackFieldErrorMap {
-    return Object.entries(errors).reduce<FeedbackFieldErrorMap>((carry, [field, messages]) => {
-      const firstMessage = messages[0];
-      if (!firstMessage || !isFeedbackFieldId(field)) return carry;
+  #mapServerErrors(
+    errors: Record<string, readonly string[]>,
+  ): FeedbackFieldErrorMap {
+    return Object.entries(errors).reduce<FeedbackFieldErrorMap>(
+      (carry, [field, messages]) => {
+        const firstMessage = messages[0];
+        if (!firstMessage || !isFeedbackFieldId(field)) return carry;
 
-      carry[field] = firstMessage;
-      return carry;
-    }, {});
+        carry[field] = firstMessage;
+        return carry;
+      },
+      {},
+    );
   }
 
   #toRequest(draft: FeedbackDraft): FeedbackSubmissionRequest {
@@ -220,7 +256,8 @@ export class FeedbackSheetComponent {
 
     if (this.needsEmail()) {
       if (!draft.email.trim())
-        errors.email = "Add an email address if you want the developers to reply.";
+        errors.email =
+          "Add an email address if you want the developers to reply.";
       else if (!EMAIL_PATTERN.test(draft.email.trim()))
         errors.email = "Use a valid email address.";
     } else if (draft.email.trim() && !EMAIL_PATTERN.test(draft.email.trim())) {
@@ -235,14 +272,4 @@ export class FeedbackSheetComponent {
 
     return errors;
   }
-}
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
-
-function isFeedbackCategoryId(value: string): value is FeedbackCategoryId {
-  return FEEDBACK_CATEGORY_IDS.includes(value as FeedbackCategoryId);
-}
-
-function isFeedbackFieldId(value: string): value is FeedbackFieldId {
-  return ["category", "email", "message", "name", "rating", "subject"].includes(value);
 }

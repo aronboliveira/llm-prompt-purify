@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, inject, input, output } from "@angu
 import { CommonModule } from "@angular/common";
 import { DomSanitizer } from "@angular/platform-browser";
 
-import { MATERIAL_ICONS } from "../../../../shared/constants/material-icons.constants";
-import { createTrustedHtmlMap } from "../../../../shared/utils/trusted-html.utils";
+import { MATERIAL_ICONS } from "@shared/constants/material-icons.constants";
+import { createTrustedHtmlMap } from "@shared/utils/trusted-html.utils";
 import type { HelpTopic } from "../../declarations/help-topic.types";
 
 @Component({

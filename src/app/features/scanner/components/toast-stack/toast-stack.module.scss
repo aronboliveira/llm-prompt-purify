@@ -1,0 +1,59 @@
+/**
+ * Toast Stack - Dynamically mounted notification styles
+ * This file is imported globally for proper styling of mounted/unmounted elements
+ */
+
+@use "../../../../shared/styles/design" as ui;
+
+.toast-stack {
+  display: grid;
+  gap: var(--space-sm, 0.75rem);
+  inset-block-end: 1rem;
+  inset-inline-end: 1rem;
+  pointer-events: none;
+  position: fixed;
+  width: min(24rem, calc(100vw - 2rem));
+  z-index: 50;
+}
+
+.toast {
+  @include ui.surface-card(0.7, 0.14);
+  @include ui.entrance-slide(Y, var(--space-sm, 0.75rem));
+
+  align-items: start;
+  display: grid;
+  gap: var(--space-md, 0.8rem);
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: var(--space-lg, 1rem);
+  pointer-events: auto;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+
+  &[data-tone="success"] {
+    border-color: var(--mask-highlight, rgba(15, 118, 110, 0.18));
+  }
+
+  &[data-tone="error"] {
+    border-color: rgba(180, 35, 24, 0.2);
+  }
+
+  &__title,
+  &__body {
+    margin: 0;
+  }
+
+  &__title {
+    font-weight: 700;
+    margin-block-end: 0.2rem;
+  }
+
+  &__body {
+    color: var(--text-muted, #425466);
+    line-height: 1.45;
+  }
+
+  &__close {
+    @include ui.close-button(var(--space-xs, 0.55rem) var(--space-md, 0.8rem));
+  }
+}

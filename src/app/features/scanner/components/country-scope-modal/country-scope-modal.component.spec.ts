@@ -2,7 +2,7 @@ import { TestBed } from "@angular/core/testing";
 
 import {
   TEST_COUNTRY_PROFILES,
-} from "../../../../testing/constants/component-fixtures.constants";
+} from "@testing/constants/component-fixtures.constants";
 import { CountryScopeModalComponent } from "./country-scope-modal.component";
 
 describe("CountryScopeModalComponent", () => {

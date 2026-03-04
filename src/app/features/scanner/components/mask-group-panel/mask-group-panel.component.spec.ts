@@ -3,7 +3,7 @@ import { TestBed } from "@angular/core/testing";
 import {
   TEST_MASK_GROUP_SUMMARIES,
   TEST_SCAN_MATCHES,
-} from "../../../../testing/constants/component-fixtures.constants";
+} from "@testing/constants/component-fixtures.constants";
 import { MaskGroupPanelComponent } from "./mask-group-panel.component";
 
 describe("MaskGroupPanelComponent", () => {

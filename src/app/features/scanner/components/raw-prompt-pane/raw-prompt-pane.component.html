@@ -1,0 +1,24 @@
+<section class="pane pane--raw">
+  <div class="pane__header">
+    <div class="pane__title-wrap">
+      <h2>{{ title() }}</h2>
+      <button class="help-trigger" type="button" (click)="requestHelp()">
+        (?)
+      </button>
+    </div>
+    <span class="char-count">{{ sourceText().length }} chars</span>
+  </div>
+
+  <p class="pane__body">{{ body() }}</p>
+
+  <label class="sr-only" for="sourceText">Raw version</label>
+  <textarea
+    id="sourceText"
+    class="editor"
+    data-testid="source-textarea"
+    [ngModel]="sourceText()"
+    (ngModelChange)="updateSourceText($event)"
+    [placeholder]="placeholder()"
+    spellcheck="false"
+  ></textarea>
+</section>

@@ -1,0 +1,198 @@
+@use "../../../../shared/styles/design" as ui;
+
+.pane {
+  @include ui.surface-card();
+  @include ui.entrance-slide(Y, 0.8rem);
+
+  border: 1px solid var(--panel-border);
+  container-type: inline-size;
+  display: grid;
+  gap: 0.9rem;
+  min-block-size: 100%;
+  padding: 1.1rem;
+  position: relative;
+}
+
+.pane--masked::before {
+  background: linear-gradient(90deg, rgba(15, 118, 110, 0.08), transparent);
+  block-size: 0.24rem;
+  border-radius: 999px;
+  content: "";
+  inline-size: 100%;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  position: absolute;
+}
+
+.pane__header {
+  @include ui.flex-bar();
+
+  justify-content: space-between;
+}
+
+.pane__title-wrap {
+  @include ui.flex-bar();
+
+  align-items: baseline;
+}
+
+.pane__title-wrap h2 {
+  color: var(--ink);
+  font-weight: 700;
+  margin: 0;
+}
+
+.pane__body {
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.pane__button {
+  @include ui.focus-ring();
+
+  align-items: center;
+  background: #eef6f8;
+  border: none;
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 700;
+  gap: 0.55rem;
+  padding: 0.75rem 1rem;
+}
+
+.pane__button:hover:not(:disabled) {
+  background: #e0f2ef;
+}
+
+.pane__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.pane__button--copy {
+  border: 1px solid rgba(11, 38, 61, 0.08);
+}
+
+.pane__button--ghost {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.pane__icon {
+  @include ui.icon-embed(1.1rem);
+}
+
+.pane__actions {
+  @include ui.flex-bar();
+
+  flex-wrap: wrap;
+}
+
+.output {
+  @include ui.mono-font;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.96),
+    rgba(246, 250, 252, 0.96)
+  );
+  border: 1px solid ui.panel-border(0.1);
+  border-radius: ui.panel-radius(0.45);
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  min-block-size: 28rem;
+  overflow: auto;
+  padding: 1rem 1.05rem;
+  position: relative;
+  white-space: pre-wrap;
+  width: 100%;
+}
+
+.output__text {
+  display: block;
+  min-block-size: 100%;
+}
+
+.output__overlay {
+  align-items: center;
+  backdrop-filter: blur(8px);
+  background: rgba(247, 251, 252, 0.86);
+  display: grid;
+  gap: 0.85rem;
+  inset: 0;
+  justify-items: center;
+  padding: 1rem;
+  position: absolute;
+  text-align: center;
+}
+
+.spinner {
+  animation: spin 0.95s linear infinite;
+  border: 3px solid rgba(15, 118, 110, 0.18);
+  border-block-start-color: var(--accent);
+  block-size: 2.1rem;
+  border-radius: 999px;
+  inline-size: 2.1rem;
+}
+
+.status-row {
+  @include ui.flex-bar();
+}
+
+.status-pill {
+  @include ui.pill-chip();
+
+  margin: 0;
+}
+
+.status-pill[data-tone="error"] {
+  background: rgba(239, 68, 68, 0.12);
+  color: #991b1b;
+}
+
+.status-pill[data-tone="info"] {
+  color: var(--muted);
+}
+
+.status-pill[data-tone="success"] {
+  background: rgba(15, 118, 110, 0.12);
+  color: var(--accent);
+}
+
+.help-trigger {
+  @include ui.help-button;
+}
+
+@container (max-width: 34rem) {
+  .pane__header {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .pane__title-wrap {
+    align-items: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 48rem) {
+  .pane__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pane__button,
+  .pane__button--copy {
+    inline-size: 100%;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

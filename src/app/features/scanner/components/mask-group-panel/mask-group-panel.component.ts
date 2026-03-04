@@ -6,9 +6,9 @@ import type {
   MaskGroupId,
   MaskGroupSummary,
   ScanMatch,
-} from "../../../../core/masking/declarations/masking.types";
-import { MATERIAL_ICONS } from "../../../../shared/constants/material-icons.constants";
-import { createTrustedHtmlMap } from "../../../../shared/utils/trusted-html.utils";
+} from "@core/masking/declarations/masking.types";
+import { MATERIAL_ICONS } from "@shared/constants/material-icons.constants";
+import { createTrustedHtmlMap } from "@shared/utils/trusted-html.utils";
 import { buildMaskControlSections, formatMaskControlValue } from "../../utils/mask-control.utils";
 
 @Component({

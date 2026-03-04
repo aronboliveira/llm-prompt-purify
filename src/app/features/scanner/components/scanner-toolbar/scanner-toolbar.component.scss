@@ -1,0 +1,111 @@
+@use "../../../../shared/styles/design" as ui;
+
+.scanner-toolbar {
+  @include ui.surface-card();
+
+  border: 1px solid var(--panel-border);
+  display: grid;
+  gap: 0.55rem;
+  margin-block-end: 1rem;
+  padding: 1rem;
+  position: relative;
+}
+
+.scanner-toolbar__actions {
+  @include ui.flex-bar();
+
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.scanner-toolbar__button {
+  @include ui.focus-ring();
+
+  align-items: center;
+  background: #eef6f8;
+  border: none;
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 700;
+  gap: 0.55rem;
+  padding: 0.75rem 1rem;
+}
+
+.scanner-toolbar__button:hover:not(:disabled) {
+  background: #e0f2ef;
+}
+
+.scanner-toolbar__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.scanner-toolbar__button--scope {
+  anchor-name: --scope-trigger;
+  background: rgba(237, 249, 246, 0.96);
+  border: 1px solid rgba(15, 118, 110, 0.14);
+  justify-content: space-between;
+  min-inline-size: min(100%, 22rem);
+}
+
+.scanner-toolbar__button--settings {
+  border: 1px solid rgba(11, 38, 61, 0.08);
+}
+
+.scanner-toolbar__button-label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.scanner-toolbar__button-value {
+  color: var(--ink);
+}
+
+.scanner-toolbar__icon {
+  @include ui.icon-embed(1.1rem);
+}
+
+.scanner-toolbar__summary {
+  color: var(--muted);
+  font-weight: 600;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.scanner-toolbar__warning {
+  @include ui.warning-banner(0.65rem 0.8rem);
+  @include ui.entrance-slide(Y, -0.4rem);
+}
+
+@supports (position-anchor: --scope-trigger) {
+  @position-try --scope-warning-inline {
+    inset-area: block-end span-inline-end;
+  }
+
+  .scanner-toolbar__warning {
+    inline-size: min(28rem, 100%);
+    inset: auto;
+    margin: 0;
+    position: absolute;
+    position-anchor: --scope-trigger;
+    position-area: block-end;
+    position-try-fallbacks: --scope-warning-inline;
+  }
+}
+
+@media (max-width: 48rem) {
+  .scanner-toolbar__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .scanner-toolbar__button,
+  .scanner-toolbar__button--scope {
+    inline-size: 100%;
+  }
+}

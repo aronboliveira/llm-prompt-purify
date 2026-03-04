@@ -1,0 +1,82 @@
+<section class="pane pane--masked">
+  <div class="pane__header">
+    <div class="pane__title-wrap">
+      <h2>{{ title() }}</h2>
+      <button class="help-trigger" type="button" (click)="requestHelp()">
+        (?)
+      </button>
+    </div>
+    <button
+      class="pane__button pane__button--copy"
+      data-testid="copy-button"
+      [disabled]="!canCopy()"
+      type="button"
+      (click)="requestCopy()"
+    >
+      <span
+        aria-hidden="true"
+        class="pane__icon"
+        [innerHTML]="copyIcon()"
+      ></span>
+      <span>Copy protected output</span>
+    </button>
+  </div>
+
+  <p class="pane__body">{{ body() }}</p>
+
+  <output
+    class="output"
+    data-testid="masked-output"
+    [attr.data-state]="
+      isScanning() ? 'scanning' : hasResult() ? 'ready' : 'idle'
+    "
+    aria-live="polite"
+  >
+    <span class="output__text">
+      @if (hasResult()) {
+        {{ maskedText() }}
+      } @else {
+        {{ emptyPlaceholder() }}
+      }
+    </span>
+
+    @if (isScanning()) {
+      <span class="output__overlay">
+        <span aria-hidden="true" class="spinner"></span>
+        <span>{{ statusMessage() }}</span>
+      </span>
+    }
+  </output>
+
+  <div class="status-row">
+    <p class="status-pill" [attr.data-tone]="statusTone()">
+      {{ statusMessage() }}
+    </p>
+    <p class="status-pill" data-tone="info">{{ detectionModeLabel() }}</p>
+  </div>
+
+  <div class="pane__actions">
+    <button
+      class="pane__button"
+      [disabled]="!hasMatches()"
+      type="button"
+      (click)="requestRegenerate()"
+    >
+      <span
+        aria-hidden="true"
+        class="pane__icon"
+        [innerHTML]="refreshIcon()"
+      ></span>
+      <span>Regenerate all masks</span>
+    </button>
+
+    <button
+      class="pane__button pane__button--ghost"
+      [disabled]="!hasSourceText()"
+      type="button"
+      (click)="requestClear()"
+    >
+      Clear local text
+    </button>
+  </div>
+</section>

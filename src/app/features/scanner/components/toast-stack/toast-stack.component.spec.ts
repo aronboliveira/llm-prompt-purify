@@ -1,6 +1,6 @@
 import { TestBed } from "@angular/core/testing";
 
-import { TEST_TOAST_MESSAGES } from "../../../../testing/constants/component-fixtures.constants";
+import { TEST_TOAST_MESSAGES } from "@testing/constants/component-fixtures.constants";
 import { ToastStackComponent } from "./toast-stack.component";
 
 describe("ToastStackComponent", () => {

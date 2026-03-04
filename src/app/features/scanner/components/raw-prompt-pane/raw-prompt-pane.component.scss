@@ -1,0 +1,106 @@
+@use "../../../../shared/styles/design" as ui;
+
+.pane {
+  @include ui.surface-card();
+  @include ui.entrance-slide(Y, 0.8rem);
+
+  border: 1px solid var(--panel-border);
+  container-type: inline-size;
+  display: grid;
+  gap: 0.9rem;
+  min-block-size: 100%;
+  padding: 1.1rem;
+  position: relative;
+}
+
+.pane--raw::before {
+  background: linear-gradient(90deg, rgba(15, 118, 110, 0.08), transparent);
+  block-size: 0.24rem;
+  border-radius: 999px;
+  content: "";
+  inline-size: 100%;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  position: absolute;
+}
+
+.pane__header {
+  @include ui.flex-bar();
+
+  justify-content: space-between;
+}
+
+.pane__title-wrap {
+  @include ui.flex-bar();
+
+  align-items: baseline;
+}
+
+.pane__title-wrap h2 {
+  color: var(--ink);
+  font-weight: 700;
+  margin: 0;
+}
+
+.pane__body {
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.char-count {
+  @include ui.pill-chip();
+  @include ui.mono-font;
+
+  color: var(--muted);
+}
+
+.editor {
+  @include ui.mono-font;
+  @include ui.focus-ring();
+
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.96),
+    rgba(246, 250, 252, 0.96)
+  );
+  border: 1px solid ui.panel-border(0.1);
+  border-radius: ui.panel-radius(0.45);
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  min-block-size: 28rem;
+  padding: 1rem 1.05rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.editor::placeholder {
+  color: #70808f;
+}
+
+.help-trigger {
+  @include ui.help-button;
+}
+
+.sr-only {
+  block-size: 1px;
+  clip: rect(0 0 0 0);
+  inline-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+}
+
+@container (max-width: 34rem) {
+  .pane__header {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .pane__title-wrap {
+    align-items: center;
+    flex-wrap: wrap;
+  }
+}

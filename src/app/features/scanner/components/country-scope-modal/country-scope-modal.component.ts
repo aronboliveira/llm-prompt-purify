@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, computed, input, output } from "@angular/core";
 
-import type { CountryProfileId, CountryProfileSummary } from "../../../../core/masking/declarations/masking.types";
+import type { CountryProfileId, CountryProfileSummary } from "@core/masking/declarations/masking.types";
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

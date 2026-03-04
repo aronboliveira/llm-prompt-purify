@@ -1,0 +1,33 @@
+<section class="scanner-toolbar">
+  <div class="scanner-toolbar__actions">
+    <button
+      class="scanner-toolbar__button scanner-toolbar__button--scope"
+      data-testid="country-modal-button"
+      type="button"
+      (click)="openCountryModal()"
+    >
+      <span class="scanner-toolbar__button-label">Countries</span>
+      <span class="scanner-toolbar__button-value">{{ countrySummary() }}</span>
+    </button>
+
+    <button
+      class="scanner-toolbar__button scanner-toolbar__button--settings"
+      data-testid="settings-button"
+      type="button"
+      (click)="openSettingsModal()"
+    >
+      <span
+        aria-hidden="true"
+        class="scanner-toolbar__icon"
+        [innerHTML]="settingsIcon()"
+      ></span>
+      <span>Masking settings</span>
+    </button>
+  </div>
+
+  <p class="scanner-toolbar__summary">{{ scopeDescription() }}</p>
+
+  @if (showWarning() && warning()) {
+    <small class="scanner-toolbar__warning">{{ warning() }}</small>
+  }
+</section>

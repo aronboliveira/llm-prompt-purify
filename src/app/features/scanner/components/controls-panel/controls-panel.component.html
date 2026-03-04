@@ -1,0 +1,21 @@
+<section class="controls">
+  <div class="controls__header">
+    <div class="controls__title-wrap">
+      <h2>{{ title() }}</h2>
+      <button class="help-trigger" type="button" (click)="requestHelp()">
+        (?)
+      </button>
+    </div>
+  </div>
+
+  <p class="controls__body">{{ body() }}</p>
+
+  <app-mask-group-panel
+    [groups]="groups()"
+    [matches]="matches()"
+    (groupAlwaysOnToggled)="groupAlwaysOnToggled.emit($event)"
+    (groupEnabledToggled)="groupEnabledToggled.emit($event)"
+    (matchRegenerated)="matchRegenerated.emit($event)"
+    (matchToggled)="matchToggled.emit($event)"
+  ></app-mask-group-panel>
+</section>

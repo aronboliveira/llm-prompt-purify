@@ -1,6 +1,6 @@
 import { TestBed } from "@angular/core/testing";
 
-import { TEST_HELP_TOPIC } from "../../../../testing/constants/component-fixtures.constants";
+import { TEST_HELP_TOPIC } from "@testing/constants/component-fixtures.constants";
 import { HelpModalComponent } from "./help-modal.component";
 
 describe("HelpModalComponent", () => {

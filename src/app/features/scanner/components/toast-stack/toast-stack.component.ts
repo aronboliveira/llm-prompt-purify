@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
-import type { ToastMessage } from "../../../../core/feedback/declarations/toast.types";
+import type { ToastMessage } from "@core/feedback/declarations/toast.types";
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

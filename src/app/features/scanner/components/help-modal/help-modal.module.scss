@@ -1,0 +1,51 @@
+/**
+ * Help Modal - Dynamically mounted overlay styles
+ * This file is imported globally for proper styling of mounted/unmounted elements
+ */
+
+@use "../../../../shared/styles/design" as ui;
+@use "../../../../shared/styles/modal" as modal;
+
+.help-modal-backdrop {
+  @include modal.modal-backdrop;
+
+  &[data-state="closed"] {
+    display: none;
+  }
+}
+
+.help-modal {
+  @include modal.modal-shell(42rem);
+
+  &__header {
+    @include ui.flex-bar();
+
+    justify-content: space-between;
+    margin-block-end: 1rem;
+  }
+
+  &__title-wrap {
+    @include ui.flex-bar();
+  }
+
+  &__icon {
+    @include ui.icon-embed();
+
+    color: ui.accent();
+  }
+
+  &__body {
+    display: grid;
+    gap: 0.9rem;
+    line-height: 1.7;
+  }
+
+  &__close {
+    @include modal.modal-close-button;
+  }
+
+  h2,
+  p {
+    margin: 0;
+  }
+}
