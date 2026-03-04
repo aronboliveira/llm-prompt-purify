@@ -21,6 +21,27 @@ export function createMask(value: string): string {
   return Array.from(value).map(remapCharacter).join("");
 }
 
+export function invalidateCandidateMask(value: string): string {
+  const characters = Array.from(value);
+  let lastAlphaNumericIndex = -1;
+
+  for (let index = characters.length - 1; index >= 0; index -= 1) {
+    if (/[0-9A-Za-z]/u.test(characters[index])) {
+      lastAlphaNumericIndex = index;
+      break;
+    }
+  }
+
+  if (lastAlphaNumericIndex < 0) return value;
+
+  return characters
+    .map((character, index) => {
+      if (index !== lastAlphaNumericIndex) return character;
+      return remapToDifferentCharacter(character);
+    })
+    .join("");
+}
+
 export function redactPreview(value: string): string {
   if (value.length <= 6) return value[0] ? `${value[0]}***` : "";
   return `${value.slice(0, 3)}***${value.slice(-2)}`;
@@ -48,4 +69,17 @@ function remapCharacter(character: string): string {
   if (/\p{Ll}/u.test(character)) return pickRandom(MASK_CHARACTER_SETS.lowercase);
   if (/\s/u.test(character)) return character;
   return pickRandom(MASK_CHARACTER_SETS.symbols);
+}
+
+function remapToDifferentCharacter(character: string): string {
+  if (/\d/u.test(character)) return cycleCharacter(character, "0123456789");
+  if (/\p{Lu}/u.test(character)) return cycleCharacter(character, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  if (/\p{Ll}/u.test(character)) return cycleCharacter(character, "abcdefghijklmnopqrstuvwxyz");
+  return cycleCharacter(character, MASK_CHARACTER_SETS.symbols);
+}
+
+function cycleCharacter(character: string, characterSet: string): string {
+  const currentIndex = characterSet.indexOf(character);
+  if (currentIndex < 0) return characterSet[0] ?? character;
+  return characterSet[(currentIndex + 1) % characterSet.length];
 }

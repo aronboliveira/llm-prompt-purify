@@ -1,3 +1,8 @@
+import type { ScanMatch } from "../masking/declarations/masking.types";
+import type {
+  MaskSafetyHardener,
+  MaskSafetyHardeningResult,
+} from "../mask-safety/declarations/mask-safety.types";
 import { ScanSessionService } from "./scan-session.service";
 
 describe("ScanSessionService", () => {
@@ -11,7 +16,7 @@ describe("ScanSessionService", () => {
   });
 
   it("stores source text in session storage when updated", () => {
-    const service = new ScanSessionService();
+    const service = createService();
 
     service.updateSourceText("Email maria@example.com");
 
@@ -22,7 +27,7 @@ describe("ScanSessionService", () => {
   });
 
   it("stores the selected country scope and detection mode", () => {
-    const service = new ScanSessionService();
+    const service = createService();
 
     service.setCountryProfiles(["cl", "latam-es"]);
     service.setDetectionMode("global-only");
@@ -36,7 +41,7 @@ describe("ScanSessionService", () => {
   });
 
   it("creates a scan result and can disable editable matches", async () => {
-    const service = new ScanSessionService();
+    const service = createService();
 
     service.updateSourceText("Email: maria@example.com\nCPF: 529.982.247-25");
     const scanPromise = service.runScan();
@@ -51,7 +56,7 @@ describe("ScanSessionService", () => {
   });
 
   it("uses global-only mode to skip country-specific document matches", async () => {
-    const service = new ScanSessionService();
+    const service = createService();
 
     service.setCountryProfiles(["br"]);
     service.setDetectionMode("global-only");
@@ -66,7 +71,7 @@ describe("ScanSessionService", () => {
   });
 
   it("can disable a whole mask group after scanning", async () => {
-    const service = new ScanSessionService();
+    const service = createService();
 
     service.updateSourceText("Token: sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890\nCPF: 529.982.247-25");
     const scanPromise = service.runScan();
@@ -81,8 +86,8 @@ describe("ScanSessionService", () => {
     );
   });
 
-  it("can regenerate an existing mask", async () => {
-    const service = new ScanSessionService();
+  it("can regenerate an existing mask after hardening", async () => {
+    const service = createService();
 
     service.updateSourceText("Email: maria@example.com");
     const scanPromise = service.runScan();
@@ -92,13 +97,31 @@ describe("ScanSessionService", () => {
     const firstMask = service.state().result?.matches[0].mask ?? "",
       matchId = service.state().result?.matches[0].id ?? "";
 
-    service.regenerateMatch(matchId);
+    await service.regenerateMatch(matchId);
 
     expect(service.state().result?.matches[0].mask).not.toBe(firstMask);
   });
 
+  it("applies async mask hardening before publishing the scan result", async () => {
+    const service = createService({
+      hardenMatches: async matches => ({
+        matches: matches.map((match, index) =>
+          index === 0 ? { ...match, mask: "111.111.111-11" } : match
+        ),
+      }),
+    });
+
+    service.setCountryProfiles(["br"]);
+    service.updateSourceText("CPF: 529.982.247-25");
+    const scanPromise = service.runScan();
+    jest.advanceTimersByTime(1000);
+    await scanPromise;
+
+    expect(service.state().result?.matches[0].mask).toBe("111.111.111-11");
+  });
+
   it("clears the current session state", () => {
-    const service = new ScanSessionService(),
+    const service = createService(),
       initialCountryProfileIds = service.state().countryProfileIds;
 
     service.updateSourceText("Token: sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
@@ -119,3 +142,17 @@ describe("ScanSessionService", () => {
     expect(sessionStorage.getItem("llm-prompt-purify:source-text:v2")).toBeNull();
   });
 });
+
+function createService(maskSafetyHardener: MaskSafetyHardener = createPassthroughHardener()) {
+  return new ScanSessionService(maskSafetyHardener);
+}
+
+function createPassthroughHardener(): MaskSafetyHardener {
+  return {
+    hardenMatches(matches: readonly ScanMatch[]): Promise<MaskSafetyHardeningResult> {
+      return Promise.resolve({
+        matches,
+      });
+    },
+  };
+}

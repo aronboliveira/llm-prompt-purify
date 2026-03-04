@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from "@angular/core";
+import { computed, Inject, inject, Injectable, signal } from "@angular/core";
 import {
   COUNTRY_PROFILE_DEFINITIONS,
   DEFAULT_COUNTRY_PROFILE_IDS,
@@ -15,8 +15,11 @@ import type {
   CountryProfileId,
   DetectionMode,
   MaskGroupId,
+  ScanResult,
 } from "../masking/declarations/masking.types";
 import { createGroupPreferenceMap } from "../masking/utils/mask-group.utils";
+import { MaskSafetyHardeningService } from "../mask-safety/mask-safety-hardening.service";
+import type { MaskSafetyHardener } from "../mask-safety/declarations/mask-safety.types";
 import { SCAN_PHASE_MESSAGES, SCAN_TIMINGS } from "./constants/scan-session.constants";
 import type {
   ScanPhase,
@@ -38,6 +41,7 @@ import { waitFor } from "./utils/timing.utils";
 @Injectable({ providedIn: "root" })
 export class ScanSessionService {
   readonly #engine = new MaskingEngine();
+  readonly #maskSafetyHardener: MaskSafetyHardener;
   #queuedRefreshTimer: ReturnType<typeof setTimeout> | null = null;
   #refreshRequestId = 0;
   readonly #state = signal<ScanSessionState>({
@@ -51,6 +55,12 @@ export class ScanSessionService {
     sourceText: loadPersistedSourceText(),
     statusMessage: SCAN_PHASE_MESSAGES.idle,
   });
+
+  public constructor(
+    @Inject(MaskSafetyHardeningService) maskSafetyHardener?: MaskSafetyHardener
+  ) {
+    this.#maskSafetyHardener = maskSafetyHardener ?? inject(MaskSafetyHardeningService);
+  }
 
   public readonly state = this.#state.asReadonly();
 
@@ -141,33 +151,27 @@ export class ScanSessionService {
       statusMessage: SCAN_PHASE_MESSAGES.detecting,
     }));
 
-    const phaseTimer = setTimeout(() => {
-      if (refreshRequestId !== this.#refreshRequestId) return;
-      this.#setPhase("masking");
-    }, SCAN_TIMINGS.phaseSwapMs);
-
     try {
-      const [result] = await Promise.all([
-        Promise.resolve(
-          this.#engine.scan(
-            sourceText,
-            this.#state().groupPreferences,
-            buildScanScopeSelection(
-              this.#state().countryProfileIds,
-              this.#state().detectionMode
-            ),
-            scannedAt
-          )
+      const localResult = this.#engine.scan(
+        sourceText,
+        this.#state().groupPreferences,
+        buildScanScopeSelection(
+          this.#state().countryProfileIds,
+          this.#state().detectionMode
         ),
+        scannedAt
+      );
+      this.#setPhase("validating");
+
+      const [result] = await Promise.all([
+        this.#hardenResult(localResult),
         waitFor(SCAN_TIMINGS.minimumSpinnerMs),
       ]);
 
       if (refreshRequestId !== this.#refreshRequestId) {
-        clearTimeout(phaseTimer);
         return false;
       }
 
-      clearTimeout(phaseTimer);
       this.#state.update(state => ({
         ...state,
         errorMessage: null,
@@ -178,7 +182,6 @@ export class ScanSessionService {
       }));
       return true;
     } catch (error) {
-      clearTimeout(phaseTimer);
       this.#state.update(state => ({
         ...state,
         errorMessage:
@@ -198,29 +201,85 @@ export class ScanSessionService {
     return this.refreshMaskedOutput();
   }
 
-  public regenerateAllMasks(): void {
+  public async regenerateAllMasks(): Promise<void> {
     const result = this.#state().result;
     if (!result) return;
 
     this.#state.update(state => ({
       ...state,
-      result: this.#engine.regenerateAll(result.sourceText, result.matches, result.scannedAt),
+      errorMessage: null,
+      isScanning: true,
+      scanPhase: "validating",
+      statusMessage: SCAN_PHASE_MESSAGES.validating,
     }));
+
+    try {
+      const nextResult = await this.#hardenResult(
+        this.#engine.regenerateAll(result.sourceText, result.matches, result.scannedAt)
+      );
+
+      this.#state.update(state => ({
+        ...state,
+        isScanning: false,
+        result: nextResult,
+        scanPhase: "ready",
+        statusMessage: SCAN_PHASE_MESSAGES.ready,
+      }));
+    } catch (error) {
+      this.#state.update(state => ({
+        ...state,
+        errorMessage:
+          error instanceof Error
+            ? error.message
+            : "The local mask regeneration failed before a new protected output could be produced.",
+        isScanning: false,
+        scanPhase: "idle",
+        statusMessage: SCAN_PHASE_MESSAGES.idle,
+      }));
+    }
   }
 
-  public regenerateMatch(matchId: string): void {
+  public async regenerateMatch(matchId: string): Promise<void> {
     const result = this.#state().result;
     if (!result) return;
 
     this.#state.update(state => ({
       ...state,
-      result: this.#engine.regenerateMatch(
-        result.sourceText,
-        result.matches,
-        result.scannedAt,
-        matchId
-      ),
+      errorMessage: null,
+      isScanning: true,
+      scanPhase: "validating",
+      statusMessage: SCAN_PHASE_MESSAGES.validating,
     }));
+
+    try {
+      const nextResult = await this.#hardenResult(
+        this.#engine.regenerateMatch(
+          result.sourceText,
+          result.matches,
+          result.scannedAt,
+          matchId
+        )
+      );
+
+      this.#state.update(state => ({
+        ...state,
+        isScanning: false,
+        result: nextResult,
+        scanPhase: "ready",
+        statusMessage: SCAN_PHASE_MESSAGES.ready,
+      }));
+    } catch (error) {
+      this.#state.update(state => ({
+        ...state,
+        errorMessage:
+          error instanceof Error
+            ? error.message
+            : "That mask could not be regenerated safely.",
+        isScanning: false,
+        scanPhase: "idle",
+        statusMessage: SCAN_PHASE_MESSAGES.idle,
+      }));
+    }
   }
 
   public scheduleRefresh(delayMs: number = SCAN_TIMINGS.autoRefreshDebounceMs): void {
@@ -423,6 +482,16 @@ export class ScanSessionService {
       scanPhase: phase,
       statusMessage: SCAN_PHASE_MESSAGES[phase],
     }));
+  }
+
+  async #hardenResult(localResult: ScanResult): Promise<ScanResult> {
+    const hardeningResult = await this.#maskSafetyHardener.hardenMatches(localResult.matches);
+
+    return this.#engine.rebuild(
+      localResult.sourceText,
+      hardeningResult.matches,
+      localResult.scannedAt
+    );
   }
 
   #cancelRefreshes(): void {

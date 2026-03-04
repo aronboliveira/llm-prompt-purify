@@ -3,6 +3,8 @@ export const SCAN_PHASE_MESSAGES = Object.freeze({
   idle: "Pick the masking scope, paste the raw prompt, and the protected output will rebuild locally.",
   masking: "Building the protected output and updating the mask controls...",
   ready: "Protected output ready. Refine masks if needed, then copy only the protected text.",
+  validating:
+    "Checking generated masks against compromising-identifier safety validators...",
 });
 
 export const SCAN_TIMINGS = Object.freeze({
