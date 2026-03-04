@@ -30,25 +30,26 @@
 }
 
 // ─── Design‑token functions ────────────────────────────────────────────────
+// These provide fallback values; prefer CSS custom properties in new code
 
 @function ink() {
-  @return #0f172a;
+  @return var(--page-text, #0f172a);
 }
 
 @function muted() {
-  @return #49606f;
+  @return var(--text-muted, #49606f);
 }
 
 @function accent() {
-  @return #0f766e;
+  @return var(--accent-primary, #0f766e);
 }
 
 @function panel-border($alpha: 0.08) {
-  @return rgba(11, 38, 61, $alpha);
+  @return var(--panel-border, rgba(11, 38, 61, $alpha));
 }
 
 @function subtle-bg($alpha: 0.92) {
-  @return rgba(248, 251, 253, $alpha);
+  @return var(--surface-subtle, rgba(248, 251, 253, $alpha));
 }
 
 // ─── Reusable pattern mixins ───────────────────────────────────────────────
@@ -67,9 +68,13 @@
   }
 }
 
-@mixin pill-chip($bg: #eff5f8, $font-size: 0.82rem, $padding: 0.38rem 0.75rem) {
+@mixin pill-chip(
+  $bg: var(--surface-subtle, #eff5f8),
+  $font-size: 0.82rem,
+  $padding: var(--space-xs, 0.38rem) var(--space-sm, 0.75rem)
+) {
   background: $bg;
-  border-radius: 999px;
+  border-radius: var(--radius-pill, 999px);
   display: inline-flex;
   font-size: $font-size;
   padding: $padding;
@@ -78,22 +83,22 @@
 @mixin help-button {
   @include focus-ring();
 
-  background: #eff5f8;
+  background: var(--surface-subtle, #eff5f8);
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill, 999px);
   color: ink();
   cursor: pointer;
   font: inherit;
   font-weight: 700;
-  padding: 0.15rem 0.55rem;
+  padding: 0.15rem var(--space-xs, 0.55rem);
 }
 
 @mixin close-button($padding: 0.7rem 1rem) {
   @include focus-ring();
 
-  background: #eff5f8;
+  background: var(--surface-subtle, #eff5f8);
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill, 999px);
   color: ink();
   cursor: pointer;
   font: inherit;
