@@ -35,11 +35,43 @@ export const BRAZILIAN_PORTUGUESE_MASK_FIXTURES: readonly LocaleMaskFixture[] =
       ].join("\n"),
     },
     {
+      countryProfileIds: ["br"],
+      description: "masks Brazilian identifiers through expanded local flag dictionaries",
+      expectedRuleIds: [
+        "cep-labeled",
+        "pis-pasep-labeled",
+        "rg-labeled",
+        "titulo-eleitor-labeled",
+      ],
+      hiddenValues: [
+        "12.345.678-9",
+        "120.44565.38-4",
+        "01310-100",
+        "1234 5678 9012",
+      ],
+      sourceText: [
+        "Carteira de identidade: 12.345.678-9",
+        "Número do PIS: 120.44565.38-4",
+        "Código postal: 01310-100",
+        "Inscrição eleitoral: 1234 5678 9012",
+      ].join("\n"),
+    },
+    {
       countryProfileIds: ["pt"],
       description: "masks Portuguese NIF and NISS values",
       expectedRuleIds: ["pt-nif-labeled", "pt-niss-labeled"],
       hiddenValues: ["245716840", "12345678901"],
       sourceText: ["NIF: 245716840", "NISS: 12345678901"].join("\n"),
+    },
+    {
+      countryProfileIds: ["pt"],
+      description: "masks Portuguese identifiers through expanded local flag dictionaries",
+      expectedRuleIds: ["pt-nif-labeled", "pt-niss-labeled"],
+      hiddenValues: ["245716840", "12345678901"],
+      sourceText: [
+        "Número de contribuinte: 245716840",
+        "Número de segurança social: 12345678901",
+      ].join("\n"),
     },
   ]);
 
@@ -80,12 +112,19 @@ export const INTERNATIONAL_MASK_FIXTURES: readonly LocaleMaskFixture[] = Object.
     hiddenValues: ["12.345.678-5"],
     sourceText: ["RUT: 12.345.678-5"].join("\n"),
   },
-    {
-      countryProfileIds: ["co"],
-      description: "masks Colombian cédula and NIT values",
-      expectedRuleIds: ["cedula-labeled", "nit"],
-      hiddenValues: ["1020304050", "9003730764"],
-      sourceText: ["Cédula de ciudadanía: 1020304050", "NIT: 9003730764"].join("\n"),
+  {
+    countryProfileIds: ["co"],
+    description: "masks Colombian cédula and NIT values",
+    expectedRuleIds: ["cedula-labeled", "nit"],
+    hiddenValues: ["1020304050", "9003730764"],
+    sourceText: ["Cédula de ciudadanía: 1020304050", "NIT: 9003730764"].join("\n"),
+  },
+  {
+    countryProfileIds: ["co"],
+    description: "masks Colombian identifiers through expanded cédula flags",
+    expectedRuleIds: ["cedula-labeled", "nit"],
+    hiddenValues: ["1020304050", "9003730764"],
+    sourceText: ["Número de cédula: 1020304050", "NIT: 9003730764"].join("\n"),
   },
   {
     countryProfileIds: ["pe"],
@@ -95,11 +134,31 @@ export const INTERNATIONAL_MASK_FIXTURES: readonly LocaleMaskFixture[] = Object.
     sourceText: ["DNI: 12345678", "RUC: 20123456786"].join("\n"),
   },
   {
+    countryProfileIds: ["pe"],
+    description: "masks Peruvian RUC values through expanded local flag dictionaries",
+    expectedRuleIds: ["dni-labeled", "ruc-labeled"],
+    hiddenValues: ["12345678", "20123456786"],
+    sourceText: [
+      "Documento de identidad: 12345678",
+      "Registro único de contribuyentes: 20123456786",
+    ].join("\n"),
+  },
+  {
     countryProfileIds: ["es"],
     description: "masks Spanish DNI and NIE values",
     expectedRuleIds: ["es-dni-labeled", "es-nie-labeled"],
     hiddenValues: ["12345678Z", "X1234567L"],
     sourceText: ["DNI: 12345678Z", "NIE: X1234567L"].join("\n"),
+  },
+  {
+    countryProfileIds: ["es"],
+    description: "masks Spanish identifiers through expanded local flag dictionaries",
+    expectedRuleIds: ["es-dni-labeled", "es-nie-labeled"],
+    hiddenValues: ["12345678Z", "X1234567L"],
+    sourceText: [
+      "Documento de identidad: 12345678Z",
+      "Identidad de extranjero: X1234567L",
+    ].join("\n"),
   },
   {
     countryProfileIds: ["cn"],
@@ -112,11 +171,31 @@ export const INTERNATIONAL_MASK_FIXTURES: readonly LocaleMaskFixture[] = Object.
     ].join("\n"),
   },
   {
+    countryProfileIds: ["cn"],
+    description: "masks Chinese resident IDs through native-script flag dictionaries",
+    expectedRuleIds: ["cn-phone", "cn-resident-id-labeled"],
+    hiddenValues: ["11010519491231002X", "+86 13800138000"],
+    sourceText: [
+      "身份证号: 11010519491231002X",
+      "Phone: +86 13800138000",
+    ].join("\n"),
+  },
+  {
     countryProfileIds: ["ru"],
     description: "masks Russian INN and SNILS values",
     expectedRuleIds: ["ru-inn-labeled", "ru-snils-labeled"],
     hiddenValues: ["7715964180", "112-233-445 95"],
     sourceText: ["INN: 7715964180", "SNILS: 112-233-445 95"].join("\n"),
+  },
+  {
+    countryProfileIds: ["ru"],
+    description: "masks Russian identifiers through Cyrillic flag dictionaries",
+    expectedRuleIds: ["ru-inn-labeled", "ru-snils-labeled"],
+    hiddenValues: ["7715964180", "112-233-445 95"],
+    sourceText: [
+      "Идентификационный номер налогоплательщика: 7715964180",
+      "Страховой номер: 112-233-445 95",
+    ].join("\n"),
   },
     {
       countryProfileIds: ["in"],
@@ -128,6 +207,17 @@ export const INTERNATIONAL_MASK_FIXTURES: readonly LocaleMaskFixture[] = Object.
         "PAN: ABCDE1234F",
         "GSTIN: 27ABCDE1234F1Z5",
       ].join("\n"),
+  },
+  {
+    countryProfileIds: ["in"],
+    description: "masks Indian identifiers through expanded English flag dictionaries",
+    expectedRuleIds: ["in-aadhaar-labeled", "in-gstin-labeled", "in-pan-labeled"],
+    hiddenValues: ["2345 6789 1238", "ABCDE1234F", "27ABCDE1234F1Z5"],
+    sourceText: [
+      "Aadhaar number: 2345 6789 1238",
+      "PAN number: ABCDE1234F",
+      "GST identification number: 27ABCDE1234F1Z5",
+    ].join("\n"),
   },
   {
     countryProfileIds: ["latam-es"],
@@ -190,6 +280,16 @@ export const NEGATIVE_LOCALE_MASK_FIXTURES: readonly NegativeMaskFixture[] =
       visibleValues: ["245716845"],
     },
     {
+      countryProfileIds: ["pt"],
+      description: "ignores invalid Portuguese identifiers through expanded local flags",
+      excludedRuleIds: ["pt-nif-labeled", "pt-niss-labeled"],
+      sourceText: [
+        "Número de contribuinte: 245716845",
+        "Número de segurança social: 11111111111",
+      ].join("\n"),
+      visibleValues: ["245716845", "11111111111"],
+    },
+    {
       countryProfileIds: ["es"],
       description: "ignores invalid Spanish NIE values",
       excludedRuleIds: ["es-nie-labeled"],
@@ -197,10 +297,27 @@ export const NEGATIVE_LOCALE_MASK_FIXTURES: readonly NegativeMaskFixture[] =
       visibleValues: ["X1234567A"],
     },
     {
+      countryProfileIds: ["es"],
+      description: "ignores invalid Spanish identifiers through expanded local flags",
+      excludedRuleIds: ["es-dni-labeled", "es-nie-labeled"],
+      sourceText: [
+        "Documento de identidad: 12345678A",
+        "Identidad de extranjero: X1234567A",
+      ].join("\n"),
+      visibleValues: ["12345678A", "X1234567A"],
+    },
+    {
       countryProfileIds: ["cn"],
       description: "ignores invalid Chinese resident IDs",
       excludedRuleIds: ["cn-resident-id-labeled"],
       sourceText: "National ID: 110105194912310021",
+      visibleValues: ["110105194912310021"],
+    },
+    {
+      countryProfileIds: ["cn"],
+      description: "ignores invalid Chinese resident IDs through native-script flags",
+      excludedRuleIds: ["cn-resident-id-labeled"],
+      sourceText: "身份证号: 110105194912310021",
       visibleValues: ["110105194912310021"],
     },
     {
@@ -211,10 +328,31 @@ export const NEGATIVE_LOCALE_MASK_FIXTURES: readonly NegativeMaskFixture[] =
       visibleValues: ["7715964181"],
     },
     {
+      countryProfileIds: ["ru"],
+      description: "ignores invalid Russian identifiers through Cyrillic flags",
+      excludedRuleIds: ["ru-inn-labeled", "ru-snils-labeled"],
+      sourceText: [
+        "Идентификационный номер налогоплательщика: 7715964181",
+        "Страховой номер: 112-233-445 94",
+      ].join("\n"),
+      visibleValues: ["7715964181", "112-233-445 94"],
+    },
+    {
       countryProfileIds: ["in"],
       description: "ignores invalid Aadhaar values",
       excludedRuleIds: ["in-aadhaar-labeled"],
       sourceText: "Aadhaar: 2345 6789 1235",
       visibleValues: ["2345 6789 1235"],
+    },
+    {
+      countryProfileIds: ["in"],
+      description: "ignores invalid Indian identifiers through expanded English flags",
+      excludedRuleIds: ["in-aadhaar-labeled", "in-pan-labeled", "in-gstin-labeled"],
+      sourceText: [
+        "Aadhaar number: 2345 6789 1235",
+        "PAN number: ABCD1234F",
+        "GST identification number: 27ABCDE1234F1Y5",
+      ].join("\n"),
+      visibleValues: ["2345 6789 1235", "ABCD1234F", "27ABCDE1234F1Y5"],
     },
   ]);

@@ -1,5 +1,30 @@
 import type { DetectionRule } from "../declarations/masking.types";
 import {
+  BR_CEP_LABEL_FLAGS,
+  BR_CNH_LABEL_FLAGS,
+  BR_PIS_PASEP_LABEL_FLAGS,
+  BR_RG_LABEL_FLAGS,
+  BR_VOTER_LABEL_FLAGS,
+  CN_RESIDENT_ID_LABEL_FLAGS,
+  ES_DNI_LABEL_FLAGS,
+  ES_NIE_LABEL_FLAGS,
+  IN_AADHAAR_LABEL_FLAGS,
+  IN_GSTIN_LABEL_FLAGS,
+  IN_PAN_LABEL_FLAGS,
+  LATAM_CEDULA_LABEL_FLAGS,
+  LATAM_DNI_LABEL_FLAGS,
+  LATAM_RUC_LABEL_FLAGS,
+  PT_NIF_LABEL_FLAGS,
+  PT_NISS_LABEL_FLAGS,
+  RU_INN_LABEL_FLAGS,
+  RU_SNILS_LABEL_FLAGS,
+  SECRET_ASSIGNMENT_FLAGS,
+  SHARED_ADDRESS_LABEL_FLAGS,
+  SHARED_NAME_LABEL_FLAGS,
+  SHARED_PASSPORT_LABEL_FLAGS,
+  SHARED_PHONE_LABEL_FLAGS,
+} from "./mask-flag-dictionaries.constants";
+import {
   isValidArgentineCuit,
   isLikelyBrazilianStateId,
   isValidChineseResidentId,
@@ -25,6 +50,7 @@ import {
   looksLikeStructuredName,
   looksSecretLike,
 } from "../utils/mask-validation.utils";
+import { createDelimitedLabelValuePattern } from "../utils/mask-pattern.utils";
 
 export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   {
@@ -107,8 +133,11 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "secret-assignment",
     label: "Credential assignment",
     locale: "shared",
-    patternFactory: () =>
-      /\b(?:access[_-]?token|api[_-]?key|client[_-]?secret|password|refresh[_-]?token|secret|senha|token|contrase(?:n|ñ)a)\b\s*[:=]\s*["']?([A-Za-z0-9._~+/=-]{8,})["']?/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      SECRET_ASSIGNMENT_FLAGS,
+      String.raw`[A-Za-z0-9._~+/=-]{8,}`,
+      { delimiterPattern: String.raw`[:=]`, quoteWrapped: true }
+    ),
     priority: 118,
     validator: looksSecretLike,
     valueGroup: 1,
@@ -215,7 +244,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "cep-labeled",
     label: "CEP",
     locale: "pt-BR",
-    patternFactory: () => /\b(?:cep)\b\s*[:=-]\s*(\d{5}-?\d{3})\b/giu,
+    patternFactory: () =>
+      createDelimitedLabelValuePattern(BR_CEP_LABEL_FLAGS, String.raw`\d{5}-?\d{3}`),
     priority: 109,
     valueGroup: 1,
   },
@@ -228,7 +258,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "CNH",
     locale: "pt-BR",
     patternFactory: () =>
-      /\b(?:cnh|carteira\s*nacional\s*de\s*habilita(?:c|ç)[aã]o)\b\s*[:=-]\s*(\d{11})/giu,
+      createDelimitedLabelValuePattern(BR_CNH_LABEL_FLAGS, String.raw`\d{11}`),
     priority: 110,
     valueGroup: 1,
   },
@@ -240,8 +270,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "pis-pasep-labeled",
     label: "PIS/PASEP",
     locale: "pt-BR",
-    patternFactory: () =>
-      /\b(?:nis|pis|pasep)\b\s*[:=-]\s*(\d{3}\.?\d{5}\.?\d{2}-?\d|\d{11})\b/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      BR_PIS_PASEP_LABEL_FLAGS,
+      String.raw`\d{3}\.?\d{5}\.?\d{2}-?\d|\d{11}`
+    ),
     priority: 111,
     validator: isValidPisPasep,
     valueGroup: 1,
@@ -254,8 +286,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "rg-labeled",
     label: "RG",
     locale: "pt-BR",
-    patternFactory: () =>
-      /\b(?:rg|registro\s+geral|identidade)\b\s*[:=-]\s*([0-9]{1,2}\.?\d{3}\.?\d{3}-?[\dXx])\b/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      BR_RG_LABEL_FLAGS,
+      String.raw`[0-9]{1,2}\.?\d{3}\.?\d{3}-?[\dXx]`
+    ),
     priority: 111,
     validator: isLikelyBrazilianStateId,
     valueGroup: 1,
@@ -268,8 +302,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "titulo-eleitor-labeled",
     label: "Titulo de eleitor",
     locale: "pt-BR",
-    patternFactory: () =>
-      /\b(?:t[ií]tulo(?:\s+de)?\s+eleitor)\b\s*[:=-]\s*((?:\d[\s.-]*){12})/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      BR_VOTER_LABEL_FLAGS,
+      String.raw`(?:\d[\s.-]*){12}`
+    ),
     priority: 100,
     validator: looksLikeBrazilianVoterId,
     valueGroup: 1,
@@ -341,7 +377,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "Cedula",
     locale: "es-LatAm",
     patternFactory: () =>
-      /\b(?:c[eé]dula(?:\s+de\s+(?:ciudadan[ií]a|identidad))?)\b\s*[:=-]\s*(\d{6,12})\b/giu,
+      createDelimitedLabelValuePattern(LATAM_CEDULA_LABEL_FLAGS, String.raw`\d{6,12}`),
     priority: 115,
     validator: looksLikeLatamNationalId,
     valueGroup: 1,
@@ -355,7 +391,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "DNI",
     locale: "es-LatAm",
     patternFactory: () =>
-      /\b(?:dni|documento\s+nacional\s+de\s+identidad)\b\s*[:=-]\s*(\d{7,8})\b/giu,
+      createDelimitedLabelValuePattern(LATAM_DNI_LABEL_FLAGS, String.raw`\d{7,8}`),
     priority: 110,
     validator: looksLikeLatamNationalId,
     valueGroup: 1,
@@ -368,7 +404,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "ruc-labeled",
     label: "RUC",
     locale: "es-LatAm",
-    patternFactory: () => /\b(?:ruc)\b\s*[:=-]\s*(\d{11,13})\b/giu,
+    patternFactory: () =>
+      createDelimitedLabelValuePattern(LATAM_RUC_LABEL_FLAGS, String.raw`\d{11,13}`),
     priority: 110,
     validator: isValidPeruvianRuc,
     valueGroup: 1,
@@ -382,7 +419,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "NIF",
     locale: "pt-PT",
     patternFactory: () =>
-      /\b(?:nif|n[uú]mero\s+de\s+identifica(?:c|ç)[aã]o\s+fiscal)\b\s*[:=-]\s*(\d{9})\b/giu,
+      createDelimitedLabelValuePattern(PT_NIF_LABEL_FLAGS, String.raw`\d{9}`),
     priority: 112,
     validator: isValidPortugueseNif,
     valueGroup: 1,
@@ -396,7 +433,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "NISS",
     locale: "pt-PT",
     patternFactory: () =>
-      /\b(?:niss|n[uú]mero\s+de\s+identifica(?:c|ç)[aã]o\s+da\s+seguran[cç]a\s+social)\b\s*[:=-]\s*(\d{11})\b/giu,
+      createDelimitedLabelValuePattern(PT_NISS_LABEL_FLAGS, String.raw`\d{11}`),
     priority: 102,
     validator: looksLikeLatamTaxId,
     valueGroup: 1,
@@ -410,7 +447,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "Spanish DNI",
     locale: "es-ES",
     patternFactory: () =>
-      /\b(?:dni|documento\s+nacional\s+de\s+identidad)\b\s*[:=-]\s*(\d{8}[A-Z])\b/giu,
+      createDelimitedLabelValuePattern(ES_DNI_LABEL_FLAGS, String.raw`\d{8}[A-Z]`),
     priority: 114,
     validator: isValidSpanishDni,
     valueGroup: 1,
@@ -423,8 +460,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "es-nie-labeled",
     label: "Spanish NIE",
     locale: "es-ES",
-    patternFactory: () =>
-      /\b(?:nie|n[uú]mero\s+de\s+identidad\s+de\s+extranjero)\b\s*[:=-]\s*([XYZ]\d{7}[A-Z])\b/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      ES_NIE_LABEL_FLAGS,
+      String.raw`[XYZ]\d{7}[A-Z]`
+    ),
     priority: 113,
     validator: isValidSpanishNie,
     valueGroup: 1,
@@ -437,8 +476,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "cn-resident-id-labeled",
     label: "Chinese resident ID",
     locale: "zh-CN",
-    patternFactory: () =>
-      /\b(?:resident\s*id|national\s*id|shenfen(?:zheng)?|id\s*card)\b\s*[:=-]\s*(\d{17}[\dXx])\b/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      CN_RESIDENT_ID_LABEL_FLAGS,
+      String.raw`\d{17}[\dXx]`
+    ),
     priority: 113,
     validator: isValidChineseResidentId,
     valueGroup: 1,
@@ -464,7 +505,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "Russian INN",
     locale: "ru-RU",
     patternFactory: () =>
-      /\b(?:inn|инн)\b\s*[:=-]\s*(\d{10}|\d{12})\b/giu,
+      createDelimitedLabelValuePattern(RU_INN_LABEL_FLAGS, String.raw`\d{10}|\d{12}`),
     priority: 112,
     validator: isValidRussianInn,
     valueGroup: 1,
@@ -477,8 +518,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "ru-snils-labeled",
     label: "Russian SNILS",
     locale: "ru-RU",
-    patternFactory: () =>
-      /\b(?:snils|снилс)\b\s*[:=-]\s*(\d{3}-?\d{3}-?\d{3}\s?\d{2})\b/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      RU_SNILS_LABEL_FLAGS,
+      String.raw`\d{3}-?\d{3}-?\d{3}\s?\d{2}`
+    ),
     priority: 112,
     validator: isValidRussianSnils,
     valueGroup: 1,
@@ -491,8 +534,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "in-aadhaar-labeled",
     label: "Aadhaar",
     locale: "en-IN",
-    patternFactory: () =>
-      /\b(?:aadhaar|aadhar)\b\s*[:=-]\s*(\d{4}\s?\d{4}\s?\d{4})\b/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      IN_AADHAAR_LABEL_FLAGS,
+      String.raw`\d{4}\s?\d{4}\s?\d{4}`
+    ),
     priority: 112,
     validator: isValidIndianAadhaar,
     valueGroup: 1,
@@ -505,8 +550,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "in-pan-labeled",
     label: "PAN",
     locale: "en-IN",
-    patternFactory: () =>
-      /\b(?:pan|permanent\s+account\s+number)\b\s*[:=-]\s*([A-Z]{5}\d{4}[A-Z])\b/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      IN_PAN_LABEL_FLAGS,
+      String.raw`[A-Z]{5}\d{4}[A-Z]`
+    ),
     priority: 111,
     valueGroup: 1,
   },
@@ -518,8 +565,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "in-gstin-labeled",
     label: "GSTIN",
     locale: "en-IN",
-    patternFactory: () =>
-      /\b(?:gstin|gst\s+number)\b\s*[:=-]\s*(\d{2}[A-Z]{5}\d{4}[A-Z][A-Z0-9][Zz][A-Z0-9])\b/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      IN_GSTIN_LABEL_FLAGS,
+      String.raw`\d{2}[A-Z]{5}\d{4}[A-Z][A-Z0-9][Zz][A-Z0-9]`
+    ),
     priority: 110,
     valueGroup: 1,
   },
@@ -530,8 +579,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "labeled-phone",
     label: "Labeled phone number",
     locale: "shared",
-    patternFactory: () =>
-      /\b(?:celular|m[oó]vil|movil|phone|tel(?:é|e)?fono|telefone)\b\s*[:=-]\s*(\+?[0-9()\s.-]{8,20}\d)/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      SHARED_PHONE_LABEL_FLAGS,
+      String.raw`\+?[0-9()\s.-]{8,20}\d`
+    ),
     priority: 96,
     validator: isLikelyPhoneNumber,
     valueGroup: 1,
@@ -543,8 +594,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "labeled-name",
     label: "Labeled full name",
     locale: "shared",
-    patternFactory: () =>
-      /\b(?:full\s*name|name|nome(?:\s+completo)?|nombre(?:\s+completo)?)\b\s*[:=-]\s*([^\n\r,;]{3,80})/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      SHARED_NAME_LABEL_FLAGS,
+      String.raw`[^\n\r,;]{3,80}`
+    ),
     priority: 44,
     validator: looksLikeStructuredName,
     valueGroup: 1,
@@ -556,8 +609,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "labeled-address",
     label: "Labeled address",
     locale: "shared",
-    patternFactory: () =>
-      /\b(?:address|direcci[oó]n|endere(?:c|ç)o)\b\s*[:=-]\s*([^\n\r]{6,120})/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      SHARED_ADDRESS_LABEL_FLAGS,
+      String.raw`[^\n\r]{6,120}`
+    ),
     priority: 42,
     validator: looksLikeStructuredAddress,
     valueGroup: 1,
@@ -569,8 +624,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "labeled-passport",
     label: "Passport number",
     locale: "shared",
-    patternFactory: () =>
-      /\b(?:passport|pasaporte|passaporte)\b(?:\s*(?:no|number|n[uú]mero))?\s*[:=-]\s*([A-Z0-9<]{6,12})/giu,
+    patternFactory: () => createDelimitedLabelValuePattern(
+      SHARED_PASSPORT_LABEL_FLAGS,
+      String.raw`[A-Z0-9<]{6,12}`
+    ),
     priority: 92,
     valueGroup: 1,
   },
