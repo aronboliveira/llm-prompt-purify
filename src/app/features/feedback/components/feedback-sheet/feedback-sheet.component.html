@@ -1,0 +1,194 @@
+<button
+  class="feedback-trigger"
+  data-testid="feedback-trigger"
+  type="button"
+  (click)="open()"
+>
+  <span aria-hidden="true" class="feedback-trigger__icon" [innerHTML]="icons.feedback"></span>
+  <span>Feedback</span>
+</button>
+
+@if (isOpen()) {
+  <div class="feedback-backdrop" role="presentation" (click)="closeOnBackdrop($event)">
+    <aside class="feedback-sheet" aria-labelledby="feedback-sheet-title" aria-modal="true" role="dialog">
+      <header class="feedback-sheet__header">
+        <div class="feedback-sheet__title-wrap">
+          <span aria-hidden="true" class="feedback-sheet__icon" [innerHTML]="icons.feedback"></span>
+          <div>
+            <p class="feedback-sheet__eyebrow">Optional</p>
+            <h2 id="feedback-sheet-title">Send feedback to the developers</h2>
+          </div>
+        </div>
+
+        <button
+          aria-label="Close feedback form"
+          class="feedback-sheet__close"
+          [disabled]="isSubmitting()"
+          type="button"
+          (click)="close()"
+        >
+          <span aria-hidden="true" [innerHTML]="icons.close"></span>
+        </button>
+      </header>
+
+      <p class="feedback-sheet__body">
+        This note is stored by the backend and, when SMTP is configured, forwarded to the
+        developers. Keep raw secrets out of the message even here.
+      </p>
+
+      <form class="feedback-form" novalidate (ngSubmit)="submit()">
+        <label class="feedback-field">
+          <span class="feedback-field__label">Kind of feedback</span>
+          <select
+            class="feedback-field__control"
+            data-testid="feedback-category"
+            [ngModel]="draft().category"
+            name="feedbackCategory"
+            (ngModelChange)="setCategory($event)"
+          >
+            @for (option of categoryOptions; track option.id) {
+              <option [value]="option.id">{{ option.label }}</option>
+            }
+          </select>
+          <span class="feedback-field__hint">{{ categoryHelper() }}</span>
+          @if (fieldErrors().category; as categoryError) {
+            <span class="feedback-field__error">{{ categoryError }}</span>
+          }
+        </label>
+
+        @if (isAppraisal()) {
+          <fieldset class="feedback-rating">
+            <legend class="feedback-field__label">Appraisal rating</legend>
+            <div class="feedback-rating__options">
+              @for (rating of ratingOptions; track rating) {
+                <button
+                  class="feedback-rating__option"
+                  [attr.data-state]="draft().rating === rating ? 'active' : 'idle'"
+                  type="button"
+                  (click)="setRating(rating)"
+                >
+                  {{ rating }}
+                </button>
+              }
+            </div>
+            @if (fieldErrors().rating; as ratingError) {
+              <span class="feedback-field__error">{{ ratingError }}</span>
+            }
+          </fieldset>
+        }
+
+        <div class="feedback-form__split">
+          <label class="feedback-field">
+            <span class="feedback-field__label">Name</span>
+            <input
+              class="feedback-field__control"
+              data-testid="feedback-name"
+              [ngModel]="draft().name"
+              maxlength="80"
+              name="feedbackName"
+              placeholder="Optional"
+              type="text"
+              (ngModelChange)="updateTextField('name', $event)"
+            />
+            @if (fieldErrors().name; as nameError) {
+              <span class="feedback-field__error">{{ nameError }}</span>
+            }
+          </label>
+
+          <label class="feedback-field">
+            <span class="feedback-field__label">
+              Email @if (needsEmail()) { <span class="feedback-field__required">Required</span> }
+            </span>
+            <input
+              class="feedback-field__control"
+              data-testid="feedback-email"
+              [ngModel]="draft().email"
+              maxlength="160"
+              name="feedbackEmail"
+              placeholder="name@example.com"
+              type="email"
+              (ngModelChange)="updateTextField('email', $event)"
+            />
+            @if (fieldErrors().email; as emailError) {
+              <span class="feedback-field__error">{{ emailError }}</span>
+            }
+          </label>
+        </div>
+
+        <label class="feedback-field">
+          <span class="feedback-field__label">
+            Subject @if (needsSubject()) { <span class="feedback-field__required">Required</span> }
+          </span>
+          <input
+            class="feedback-field__control"
+            data-testid="feedback-subject"
+            [ngModel]="draft().subject"
+            maxlength="160"
+            name="feedbackSubject"
+            placeholder="Optional summary"
+            type="text"
+            (ngModelChange)="updateTextField('subject', $event)"
+          />
+          @if (fieldErrors().subject; as subjectError) {
+            <span class="feedback-field__error">{{ subjectError }}</span>
+          }
+        </label>
+
+        <label class="feedback-field feedback-field--textarea">
+          <span class="feedback-field__label">Message</span>
+          <textarea
+            class="feedback-field__control feedback-field__control--textarea"
+            data-testid="feedback-message"
+            [ngModel]="draft().message"
+            maxlength="4000"
+            name="feedbackMessage"
+            placeholder="Share the bug, appraisal, or note you want the developers to see."
+            rows="7"
+            (ngModelChange)="updateTextField('message', $event)"
+          ></textarea>
+          <span class="feedback-field__meta">
+            <span>Max {{ maxMessageLength }} characters</span>
+            <span>{{ remainingCharacters() }} left</span>
+          </span>
+          @if (fieldErrors().message; as messageError) {
+            <span class="feedback-field__error">{{ messageError }}</span>
+          }
+        </label>
+
+        <label class="feedback-toggle">
+          <input
+            type="checkbox"
+            [checked]="draft().wantsReply"
+            (change)="toggleReply($event)"
+          />
+          <span>
+            <span class="feedback-toggle__title">I want a reply from the developers</span>
+            <span class="feedback-toggle__body">
+              This makes the email field required and sets the reply-to address for the developer
+              email.
+            </span>
+          </span>
+        </label>
+
+        <div class="feedback-form__actions">
+          <button
+            class="feedback-button feedback-button--secondary"
+            [disabled]="isSubmitting()"
+            type="button"
+            (click)="close()"
+          >
+            Cancel
+          </button>
+          <button
+            class="feedback-button feedback-button--primary"
+            data-testid="feedback-submit"
+            [disabled]="isSubmitting()"
+            type="submit"
+          >
+            {{ isSubmitting() ? "Sending..." : "Submit feedback" }}
+          </button>
+        </div>
+      </form>
+    </aside>
+  </div>
+}

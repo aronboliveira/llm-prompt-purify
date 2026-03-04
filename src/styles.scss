@@ -1,9 +1,46 @@
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
   font-family: "Trebuchet MS", "Avenir Next", sans-serif;
   line-height: 1.5;
+
+  /* S-005: Light mode tokens (default) */
   --page-text: #0f172a;
   --page-bg: #eef4f6;
+  --surface-bg: #ffffff;
+  --surface-border: #d1d5db;
+  --accent-primary: #0f766e;
+  --accent-secondary: #f59e0b;
+  --mask-highlight: rgba(15, 118, 110, 0.18);
+  --gradient-top: rgba(15, 118, 110, 0.12);
+  --gradient-bottom: rgba(245, 158, 11, 0.12);
+}
+
+/* S-005: Dark mode tokens */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page-text: #e2e8f0;
+    --page-bg: #0f172a;
+    --surface-bg: #1e293b;
+    --surface-border: #475569;
+    --accent-primary: #2dd4bf;
+    --accent-secondary: #fbbf24;
+    --mask-highlight: rgba(45, 212, 191, 0.22);
+    --gradient-top: rgba(45, 212, 191, 0.1);
+    --gradient-bottom: rgba(251, 191, 36, 0.1);
+  }
+}
+
+/* S-005: Manual dark mode override */
+:root[data-theme="dark"] {
+  --page-text: #e2e8f0;
+  --page-bg: #0f172a;
+  --surface-bg: #1e293b;
+  --surface-border: #475569;
+  --accent-primary: #2dd4bf;
+  --accent-secondary: #fbbf24;
+  --mask-highlight: rgba(45, 212, 191, 0.22);
+  --gradient-top: rgba(45, 212, 191, 0.1);
+  --gradient-bottom: rgba(251, 191, 36, 0.1);
 }
 
 * {
@@ -17,9 +54,13 @@ body {
 
 body {
   background:
-    radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 32%),
-    radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.12), transparent 28%),
-    linear-gradient(180deg, #f8fbfc, var(--page-bg));
+    radial-gradient(circle at top left, var(--gradient-top), transparent 32%),
+    radial-gradient(
+      circle at bottom right,
+      var(--gradient-bottom),
+      transparent 28%
+    ),
+    linear-gradient(180deg, var(--surface-bg), var(--page-bg));
   color: var(--page-text);
   margin: 0;
 }
@@ -34,5 +75,5 @@ textarea {
 }
 
 ::selection {
-  background: rgba(15, 118, 110, 0.18);
+  background: var(--mask-highlight);
 }

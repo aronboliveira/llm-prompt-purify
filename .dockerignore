@@ -1,0 +1,10 @@
+.angular
+.git
+.notes
+.sct
+.tmp
+backend/**/bin
+backend/**/obj
+dist
+node_modules
+test-results

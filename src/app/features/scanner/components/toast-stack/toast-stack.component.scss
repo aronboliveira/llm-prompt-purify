@@ -19,6 +19,7 @@
 
 .toast {
   @include ui.surface-card(0.7, 0.14);
+  @include ui.entrance-slide(Y, 0.75rem);
 
   align-items: start;
   display: grid;
@@ -29,11 +30,6 @@
   transition:
     opacity 180ms ease,
     transform 180ms ease;
-
-  @starting-style {
-    opacity: 0;
-    transform: translateY(0.75rem);
-  }
 }
 
 .toast[data-tone="success"] {
@@ -60,14 +56,5 @@
 }
 
 .toast__close {
-  @include ui.focus-ring();
-
-  background: #eff5f8;
-  border: none;
-  border-radius: 999px;
-  color: #0f172a;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-  padding: 0.55rem 0.8rem;
+  @include ui.close-button(0.55rem 0.8rem);
 }

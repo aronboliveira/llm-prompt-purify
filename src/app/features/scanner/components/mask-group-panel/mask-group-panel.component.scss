@@ -8,7 +8,7 @@
 .mask-fieldset {
   @include ui.surface-card(0.58, 0.08);
 
-  border: 1px solid rgba(11, 38, 61, 0.08);
+  border: 1px solid ui.panel-border();
   display: grid;
   gap: 0.85rem;
   margin: 0;
@@ -22,9 +22,7 @@
 .mask-fieldset__legend,
 .mask-fieldset__toggles,
 .mask-row {
-  align-items: center;
-  display: flex;
-  gap: 0.75rem;
+  @include ui.flex-bar();
 }
 
 .mask-fieldset__legend {
@@ -64,7 +62,7 @@
 
 .mask-toggle input,
 .mask-row input {
-  accent-color: #0f766e;
+  @include ui.accent-input;
 }
 
 .mask-row-list {
@@ -75,8 +73,8 @@
 .mask-row {
   @include ui.focus-ring(rgba(15, 118, 110, 0.24));
 
-  background: rgba(248, 251, 253, 0.92);
-  border: 1px solid rgba(11, 38, 61, 0.08);
+  background: ui.subtle-bg();
+  border: 1px solid ui.panel-border();
   border-radius: ui.panel-radius(0.25);
   padding: 0.8rem 0.9rem;
 }
@@ -86,7 +84,11 @@
 }
 
 .mask-row[data-locked="true"]::before {
-  background: linear-gradient(90deg, rgba(15, 118, 110, 0.9), rgba(15, 118, 110, 0.2));
+  background: linear-gradient(
+    90deg,
+    rgba(15, 118, 110, 0.9),
+    rgba(15, 118, 110, 0.2)
+  );
   block-size: 100%;
   border-radius: 999px;
   content: "";
@@ -100,8 +102,9 @@
 }
 
 .mask-row__copy {
+  @include ui.mono-font;
+
   flex: 1;
-  font-family: "Menlo", "Consolas", monospace;
   font-size: 0.88rem;
   line-height: 1.6;
 }
@@ -111,9 +114,9 @@
 
   align-items: center;
   background: #eff6f8;
-  border: 1px solid rgba(11, 38, 61, 0.08);
+  border: 1px solid ui.panel-border();
   border-radius: 999px;
-  color: #0f172a;
+  color: ui.ink();
   cursor: pointer;
   display: inline-flex;
   font: inherit;
@@ -132,13 +135,7 @@
 }
 
 .mask-row__icon {
-  display: inline-flex;
-}
-
-.mask-row__icon :is(svg) {
-  fill: currentColor;
-  height: 1rem;
-  width: 1rem;
+  @include ui.icon-embed(1rem);
 }
 
 @container (max-width: 36rem) {

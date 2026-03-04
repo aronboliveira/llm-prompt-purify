@@ -28,3 +28,112 @@
   margin: 0;
   text-transform: uppercase;
 }
+
+// ─── Design‑token functions ────────────────────────────────────────────────
+
+@function ink() {
+  @return #0f172a;
+}
+
+@function muted() {
+  @return #49606f;
+}
+
+@function accent() {
+  @return #0f766e;
+}
+
+@function panel-border($alpha: 0.08) {
+  @return rgba(11, 38, 61, $alpha);
+}
+
+@function subtle-bg($alpha: 0.92) {
+  @return rgba(248, 251, 253, $alpha);
+}
+
+// ─── Reusable pattern mixins ───────────────────────────────────────────────
+
+@mixin mono-font {
+  font-family: "Menlo", "Consolas", monospace;
+}
+
+@mixin icon-embed($size: 1.1rem) {
+  display: inline-flex;
+
+  :is(svg) {
+    fill: currentColor;
+    height: $size;
+    width: $size;
+  }
+}
+
+@mixin pill-chip($bg: #eff5f8, $font-size: 0.82rem, $padding: 0.38rem 0.75rem) {
+  background: $bg;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: $font-size;
+  padding: $padding;
+}
+
+@mixin help-button {
+  @include focus-ring();
+
+  background: #eff5f8;
+  border: none;
+  border-radius: 999px;
+  color: ink();
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+}
+
+@mixin close-button($padding: 0.7rem 1rem) {
+  @include focus-ring();
+
+  background: #eff5f8;
+  border: none;
+  border-radius: 999px;
+  color: ink();
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  padding: $padding;
+}
+
+@mixin entrance-slide($axis: Y, $distance: 1rem) {
+  @starting-style {
+    opacity: 0;
+
+    @if $axis == X {
+      transform: translateX($distance);
+    } @else {
+      transform: translateY($distance);
+    }
+  }
+}
+
+@mixin warning-banner($padding: 0.75rem 0.9rem) {
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(180, 83, 9, 0.18);
+  border-radius: panel-radius(0.2);
+  color: #92400e;
+  display: block;
+  padding: $padding;
+}
+
+@mixin body-text($line-height: 1.6) {
+  color: muted();
+  line-height: $line-height;
+  margin: 0;
+}
+
+@mixin flex-bar($gap: 0.75rem, $align: center) {
+  align-items: $align;
+  display: flex;
+  gap: $gap;
+}
+
+@mixin accent-input {
+  accent-color: accent();
+}

@@ -23,9 +23,12 @@ No prompt text is sent to a third party during masking.
 ## Current architecture
 
 - Angular standalone app
+- .NET 8 feedback API under `backend/LLMPromptPurify.Api`
+- PostgreSQL persistence for stored feedback submissions
 - pure masking engine under `src/app/core/masking`
 - signal-based session state under `src/app/core/state`
 - Jest for unit coverage
+- xUnit for backend unit coverage
 - Playwright for end-to-end flow checks
 - Angular SSR server in `server.ts`
 
@@ -70,9 +73,32 @@ Run end-to-end tests:
 npm run test:e2e
 ```
 
+## Docker stack
+
+Copy the sample environment file, then fill the SMTP values from `.sct/app-password.yml`:
+
+```bash
+cp .env.docker.example .env.docker
+```
+
+Build and run the frontend, backend, and database containers:
+
+```bash
+docker compose --env-file .env.docker up --build
+```
+
+The services are exposed as:
+
+- frontend: `http://127.0.0.1:4200`
+- backend: `http://127.0.0.1:8080/api/health`
+- database: internal `db:5432` inside the Compose network
+
 ## Important paths
 
 - app shell: `src/app/app.component.ts`
+- feedback UI: `src/app/features/feedback/components/feedback-sheet`
+- feedback API: `backend/LLMPromptPurify.Api`
+- backend tests: `backend/LLMPromptPurify.Api.Tests`
 - masking engine: `src/app/core/masking/masking.engine.ts`
 - scan state: `src/app/core/state/scan-session.service.ts`
 - unit tests: `src/app/core/**/*.spec.ts`
