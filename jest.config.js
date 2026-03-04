@@ -6,6 +6,12 @@ module.exports = {
   roots: ["<rootDir>/src"],
   testMatch: ["**/*.spec.ts"],
   moduleFileExtensions: ["ts", "html", "js", "json"],
+  moduleNameMapper: {
+    "^@core/(.*)$": "<rootDir>/src/app/core/$1",
+    "^@shared/(.*)$": "<rootDir>/src/app/shared/$1",
+    "^@features/(.*)$": "<rootDir>/src/app/features/$1",
+    "^@testing/(.*)$": "<rootDir>/src/app/testing/$1",
+  },
   transform: {
     "^.+\\.(ts|mjs|js|html)$": [
       "jest-preset-angular",
