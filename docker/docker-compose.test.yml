@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  mock-server:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ..:/app
+    command: npx tsx scripts/mock-server.ts
+    ports:
+      - "3456:3456"
+    healthcheck:
+      test:
+        ["CMD", "wget", "-q", "--spider", "http://localhost:3456/chatgpt.html"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  unit-tests:
+    build:
+      context: ..
+      dockerfile: docker/test.Dockerfile
+    command: npm test
+    volumes:
+      - ../coverage:/app/coverage
+
+  e2e-playwright:
+    build:
+      context: ..
+      dockerfile: docker/test.Dockerfile
+    command: npm run test:e2e
+    volumes:
+      - ../test-results:/app/test-results
+      - ../playwright-report:/app/playwright-report
+
+  e2e-cypress:
+    build:
+      context: ..
+      dockerfile: docker/test.Dockerfile
+    depends_on:
+      mock-server:
+        condition: service_healthy
+    environment:
+      - CYPRESS_baseUrl=http://mock-server:3456
+    command: npx cypress run
+    volumes:
+      - ../cypress/screenshots:/app/cypress/screenshots
+      - ../cypress/videos:/app/cypress/videos
+
+  all-tests:
+    build:
+      context: ..
+      dockerfile: docker/test.Dockerfile
+    depends_on:
+      mock-server:
+        condition: service_healthy
+    environment:
+      - CYPRESS_baseUrl=http://mock-server:3456
+    command: sh -c "npm test && npm run test:e2e && npx cypress run"
+    volumes:
+      - ../coverage:/app/coverage
+      - ../test-results:/app/test-results
+      - ../cypress/screenshots:/app/cypress/screenshots
