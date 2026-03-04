@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/LLMPromptPurify.Api.props" />
+</Project>

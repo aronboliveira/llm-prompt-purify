@@ -2,15 +2,16 @@ export const SCAN_PHASE_MESSAGES = Object.freeze({
   detecting: "Scanning the text locally for risky patterns...",
   idle: "Pick the masking scope, paste the raw prompt, and the protected output will rebuild locally.",
   masking: "Building the protected output and updating the mask controls...",
-  ready: "Protected output ready. Refine masks if needed, then copy only the protected text.",
+  ready:
+    "Protected output ready. Refine masks if needed, then copy only the protected text.",
   validating:
     "Checking generated masks against compromising-identifier safety validators...",
 });
 
 export const SCAN_TIMINGS = Object.freeze({
-  autoRefreshDebounceMs: 260,
-  minimumSpinnerMs: 520,
-  phaseSwapMs: 280,
+  autoRefreshDebounceMs: 180, // Reduced from 260ms for faster response
+  minimumSpinnerMs: 120, // Reduced from 520ms - adaptive spinner for small scans
+  phaseSwapMs: 180, // Reduced from 280ms
 });
 
 export const SESSION_STORAGE_KEYS = Object.freeze({

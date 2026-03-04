@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-llm_prompt_purify}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - feedback-db:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/LLMPromptPurify.Api/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__FeedbackDatabase: Host=db;Port=5432;Database=${POSTGRES_DB:-llm_prompt_purify};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      DeveloperEmail__EnableSsl: ${SMTP_ENABLE_SSL:-true}
+      DeveloperEmail__Host: ${SMTP_HOST:-smtp.gmail.com}
+      DeveloperEmail__Password: ${SMTP_PASSWORD:-}
+      DeveloperEmail__Port: ${SMTP_PORT:-587}
+      DeveloperEmail__RecipientEmail: ${DEVELOPER_EMAIL_TO:-aronprogramador@gmail.com}
+      DeveloperEmail__SenderEmail: ${SMTP_SENDER_EMAIL:-}
+      DeveloperEmail__Username: ${SMTP_USERNAME:-}
+    ports:
+      - "48080:8080"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "44200:80"
+
+volumes:
+  feedback-db:

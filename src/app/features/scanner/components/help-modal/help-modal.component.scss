@@ -1,3 +1,4 @@
+@use "../../../../shared/styles/design" as ui;
 @use "../../../../shared/styles/modal" as modal;
 
 .modal-backdrop {
@@ -10,9 +11,7 @@
 
 .modal__header,
 .modal__title-wrap {
-  align-items: center;
-  display: flex;
-  gap: 0.75rem;
+  @include ui.flex-bar();
 }
 
 .modal__header {
@@ -21,12 +20,9 @@
 }
 
 .modal__icon {
-  color: #0f766e;
-  display: inline-flex;
-}
+  @include ui.icon-embed();
 
-.modal__icon :is(svg) {
-  fill: currentColor;
+  color: ui.accent();
 }
 
 .modal h2,

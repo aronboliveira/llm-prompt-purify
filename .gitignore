@@ -33,7 +33,7 @@ yarn-error.log
 .sass-cache/
 /connect.lock
 /coverage
-/test-results
+/test-results6
 /libpeerconnection.log
 testem.log
 /typings
@@ -44,5 +44,10 @@ Thumbs.db
 
 .tmp/
 .tmp/**
-!.notes/
-!.notes/**
+.notes/
+.notes/project-scan/**
+!.notes/.llms/**
+
+.env.docker
+.sct/
+.sct/**

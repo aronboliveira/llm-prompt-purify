@@ -1,3 +1,5 @@
+using System.Threading.RateLimiting;
+using LLMPromptPurify.Api.Features.Auth;
 using LLMPromptPurify.Api.Features.Feedback.Abstractions;
 using LLMPromptPurify.Api.Features.Feedback.Contracts;
 using LLMPromptPurify.Api.Features.Feedback.Domain;
@@ -12,6 +14,52 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
+
+// S-011: Add Swagger/OpenAPI documentation
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new()
+    {
+        Title = "LLM Prompt Purify API",
+        Version = "v1",
+        Description = "Backend API for the LLM Prompt Purifier - privacy-first text masking service"
+    });
+});
+
+// V-003: Configure API key authentication (disabled by default in development)
+builder.Services.AddApiKeyAuthentication(builder.Configuration);
+
+// V-005: Configure CORS with explicit origin restrictions
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+    ?? ["http://localhost:4200", "http://localhost:4000"];
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// V-001: Configure rate limiting (5 requests/minute per IP for feedback)
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("feedback", httpContext =>
+        RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                SegmentsPerWindow = 2,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+});
+
 builder.Services.Configure<DeveloperEmailOptions>(
     builder.Configuration.GetSection(DeveloperEmailOptions.SectionName)
 );
@@ -39,6 +87,20 @@ builder.Services.AddSingleton<MaskSafetyValidationService>();
 var app = builder.Build();
 
 app.UseExceptionHandler();
+
+// S-011: Enable Swagger UI in development
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "LLM Prompt Purify API v1");
+    });
+}
+
+app.UseCors();
+app.UseRateLimiter();
+app.UseApiKeyAuthentication(); // V-003: API key validation
 
 using (var scope = app.Services.CreateScope())
 {
@@ -102,7 +164,7 @@ app.MapPost(
             }
         );
     }
-);
+).RequireRateLimiting("feedback");
 
 app.MapPost(
     "/api/mask-safety/validate",

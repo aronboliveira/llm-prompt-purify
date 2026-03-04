@@ -423,7 +423,7 @@ internal static class IdentifierValidationAlgorithms
                 'Z' => '2',
                 _ => '0',
             },
-            normalized.AsSpan(1, 7)
+            normalized.Substring(1, 7)
         );
 
         return normalized[8] == CalculateSpanishDocumentLetter(numericBody);

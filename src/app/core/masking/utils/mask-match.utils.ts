@@ -18,7 +18,7 @@ export function buildCandidateMatch(
   rule: DetectionRule,
   start: number,
   end: number,
-  value: string
+  value: string,
 ): CandidateMatch {
   return {
     end,
@@ -30,7 +30,7 @@ export function buildCandidateMatch(
 
 export function applyEnabledMasks(
   sourceText: string,
-  matches: readonly ScanMatch[]
+  matches: readonly ScanMatch[],
 ): string {
   const enabledMatches = [...matches]
     .filter(match => match.enabled)
@@ -51,7 +51,7 @@ export function applyEnabledMasks(
 
 export function applyGroupPreferences(
   matches: readonly ScanMatch[],
-  preferences: MaskGroupPreferenceMap
+  preferences: MaskGroupPreferenceMap,
 ): readonly ScanMatch[] {
   return matches.map(match => {
     const preference = preferences[match.groupId];
@@ -63,14 +63,19 @@ export function applyGroupPreferences(
 
 export function extractCandidateMatch(
   match: RegExpMatchArray,
-  rule: DetectionRule
+  rule: DetectionRule,
 ): CandidateMatch | null {
   if (typeof match.index !== "number") return null;
 
   if (typeof rule.valueGroup !== "number") {
     const value = sanitizeCapturedValue(match[0]);
     return value
-      ? buildCandidateMatch(rule, match.index, match.index + value.length, value)
+      ? buildCandidateMatch(
+          rule,
+          match.index,
+          match.index + value.length,
+          value,
+        )
       : null;
   }
 
@@ -81,11 +86,16 @@ export function extractCandidateMatch(
   if (relativeIndex < 0) return null;
 
   const start = match.index + relativeIndex;
-  return buildCandidateMatch(rule, start, start + capturedValue.length, capturedValue);
+  return buildCandidateMatch(
+    rule,
+    start,
+    start + capturedValue.length,
+    capturedValue,
+  );
 }
 
 export function resolveOverlaps(
-  candidates: readonly CandidateMatch[]
+  candidates: readonly CandidateMatch[],
 ): readonly CandidateMatch[] {
   if (candidates.length <= 1) return [...candidates];
 
@@ -112,17 +122,24 @@ export function resolveOverlaps(
 }
 
 export function summarizeGroupCounts(
-  matches: readonly ScanMatch[]
+  matches: readonly ScanMatch[],
 ): Readonly<Record<MaskGroupId, number>> {
-  const counts = Object.fromEntries(MASK_GROUP_ORDER.map(groupId => [groupId, 0])) as Record<
-    MaskGroupId,
-    number
-  >;
+  const counts = Object.fromEntries(
+    MASK_GROUP_ORDER.map(groupId => [groupId, 0]),
+  ) as Record<MaskGroupId, number>;
 
   for (const match of matches) counts[match.groupId] += 1;
   return Object.freeze(counts);
 }
 
+/**
+ * LG-003: Calculates a scoring value for overlap resolution.
+ * Higher score = higher precedence.
+ * Factors: priority (major), confidence (minor), value length (tiebreaker)
+ */
 function scoreCandidate(candidate: CandidateMatch): number {
-  return candidate.rule.priority * 1000 + candidate.value.length;
+  const confidenceScore = candidate.rule.confidence === "high" ? 100 : 0;
+  return (
+    candidate.rule.priority * 1000 + confidenceScore + candidate.value.length
+  );
 }

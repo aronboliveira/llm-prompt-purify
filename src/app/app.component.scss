@@ -8,8 +8,16 @@
   --muted: #49606f;
   --panel-border: rgba(11, 38, 61, 0.08);
   background:
-    radial-gradient(circle at top left, rgba(15, 118, 110, 0.18), transparent 28%),
-    radial-gradient(circle at top right, rgba(217, 119, 6, 0.12), transparent 25%),
+    radial-gradient(
+      circle at top left,
+      rgba(15, 118, 110, 0.18),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(217, 119, 6, 0.12),
+      transparent 25%
+    ),
     linear-gradient(180deg, #f7fbff, #fffaf1 58%, #f8fbfc);
   margin: 0 auto;
   max-inline-size: 1280px;
@@ -47,16 +55,13 @@
 }
 
 .hero {
+  @include ui.entrance-slide(Y, 1rem);
+
   gap: 1.25rem;
   grid-template-columns: minmax(0, 1.7fr) minmax(18rem, 0.95fr);
   margin-block-end: 1rem;
   overflow: clip;
   padding: 1.3rem;
-
-  @starting-style {
-    opacity: 0;
-    transform: translateY(1rem);
-  }
 }
 
 .hero__copy,
@@ -100,14 +105,7 @@
 
 .hero__notice-icon,
 .toolbar__icon {
-  display: inline-flex;
-}
-
-.hero__notice-icon :is(svg),
-.toolbar__icon :is(svg) {
-  fill: currentColor;
-  height: 1.1rem;
-  width: 1.1rem;
+  @include ui.icon-embed(1.1rem);
 }
 
 .hero__notice-title,
@@ -143,8 +141,9 @@
 }
 
 .hero__stat-value {
+  @include ui.mono-font;
+
   color: var(--accent);
-  font-family: "Menlo", "Consolas", monospace;
   font-size: clamp(1.4rem, 3vw, 2rem);
   line-height: 1.2;
 }
@@ -168,7 +167,11 @@
 }
 
 .snippet::before {
-  background: linear-gradient(90deg, rgba(15, 118, 110, 0.18), rgba(217, 119, 6, 0.18));
+  background: linear-gradient(
+    90deg,
+    rgba(15, 118, 110, 0.18),
+    rgba(217, 119, 6, 0.18)
+  );
   block-size: 0.22rem;
   border-radius: 999px;
   content: "";
@@ -179,11 +182,19 @@
 }
 
 .snippet[data-state="done"]::before {
-  background: linear-gradient(90deg, rgba(15, 118, 110, 0.9), rgba(15, 118, 110, 0.28));
+  background: linear-gradient(
+    90deg,
+    rgba(15, 118, 110, 0.9),
+    rgba(15, 118, 110, 0.28)
+  );
 }
 
 .snippet[data-state="active"]::before {
-  background: linear-gradient(90deg, rgba(217, 119, 6, 0.92), rgba(15, 118, 110, 0.45));
+  background: linear-gradient(
+    90deg,
+    rgba(217, 119, 6, 0.92),
+    rgba(15, 118, 110, 0.45)
+  );
 }
 
 .toolbar {
@@ -199,9 +210,7 @@
 .pane__actions,
 .status-row,
 .controls__header {
-  align-items: center;
-  display: flex;
-  gap: 0.75rem;
+  @include ui.flex-bar();
 }
 
 .toolbar__actions,
@@ -214,8 +223,7 @@
   flex-wrap: wrap;
 }
 
-.toolbar__button,
-.help-trigger {
+.toolbar__button {
   @include ui.focus-ring();
 
   border: none;
@@ -277,17 +285,8 @@
 }
 
 .toolbar__warning {
-  background: rgba(245, 158, 11, 0.14);
-  border: 1px solid rgba(180, 83, 9, 0.18);
-  border-radius: ui.panel-radius(0.2);
-  color: #92400e;
-  display: block;
-  padding: 0.65rem 0.8rem;
-
-  @starting-style {
-    opacity: 0;
-    transform: translateY(-0.4rem);
-  }
+  @include ui.warning-banner(0.65rem 0.8rem);
+  @include ui.entrance-slide(Y, -0.4rem);
 }
 
 @supports (position-anchor: --scope-trigger) {
@@ -313,16 +312,13 @@
 }
 
 .pane {
+  @include ui.entrance-slide(Y, 0.8rem);
+
   container-type: inline-size;
   gap: 0.9rem;
   min-block-size: 100%;
   padding: 1.1rem;
   position: relative;
-
-  @starting-style {
-    opacity: 0;
-    transform: translateY(0.8rem);
-  }
 }
 
 .pane--masked::before,
@@ -361,26 +357,27 @@
 
 .char-count,
 .status-pill {
-  background: #eff5f8;
-  border-radius: 999px;
-  display: inline-flex;
-  font-size: 0.82rem;
-  padding: 0.38rem 0.75rem;
+  @include ui.pill-chip();
 }
 
 .char-count {
+  @include ui.mono-font;
+
   color: var(--muted);
-  font-family: "Menlo", "Consolas", monospace;
 }
 
 .editor,
 .output {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 250, 252, 0.96));
-  border: 1px solid rgba(11, 38, 61, 0.1);
+  @include ui.mono-font;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.96),
+    rgba(246, 250, 252, 0.96)
+  );
+  border: 1px solid ui.panel-border(0.1);
   border-radius: ui.panel-radius(0.45);
   color: var(--ink);
-  font-family: "Menlo", "Consolas", monospace;
   font-size: 0.95rem;
   line-height: 1.65;
   min-block-size: 28rem;
@@ -455,10 +452,7 @@
 }
 
 .help-trigger {
-  background: #eff5f8;
-  border-radius: 999px;
-  font-weight: 700;
-  padding: 0.15rem 0.55rem;
+  @include ui.help-button;
 }
 
 .sr-only {

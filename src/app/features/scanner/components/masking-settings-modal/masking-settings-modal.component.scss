@@ -15,9 +15,7 @@
 .modal__header,
 .modal__title-wrap,
 .modal__title-row {
-  align-items: center;
-  display: flex;
-  gap: 0.75rem;
+  @include ui.flex-bar();
 }
 
 .modal__header {
@@ -29,14 +27,9 @@
 }
 
 .modal__icon {
-  color: #0f766e;
-  display: inline-flex;
-}
+  @include ui.icon-embed(1.2rem);
 
-.modal__icon :is(svg) {
-  fill: currentColor;
-  height: 1.2rem;
-  width: 1.2rem;
+  color: ui.accent();
 }
 
 .modal__body-copy,
@@ -47,8 +40,7 @@
 
 .modal__body-copy,
 .settings-card p {
-  line-height: 1.6;
-  margin: 0;
+  @include ui.body-text();
 }
 
 .modal__close {
@@ -70,7 +62,8 @@
 }
 
 .settings-toggle input {
-  accent-color: #0f766e;
+  @include ui.accent-input;
+
   margin: 0.22rem 0 0;
 }
 
@@ -93,8 +86,8 @@
 }
 
 .settings-card {
-  background: rgba(248, 251, 253, 0.92);
-  border: 1px solid rgba(11, 38, 61, 0.08);
+  background: ui.subtle-bg();
+  border: 1px solid ui.panel-border();
   border-radius: ui.panel-radius(0.35);
   display: grid;
   gap: 0.45rem;
@@ -102,16 +95,7 @@
 }
 
 .help-trigger {
-  @include ui.focus-ring();
-
-  background: #eff5f8;
-  border: none;
-  border-radius: 999px;
-  color: #0f172a;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-  padding: 0.15rem 0.55rem;
+  @include ui.help-button;
 }
 
 @media (max-width: 42rem) {
