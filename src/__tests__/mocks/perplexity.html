@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perplexity Mock</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #191a1f;
+      color: #e2e2e2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 { font-size: 1.2rem; font-weight: 600; color: #20b2aa; }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 50rem;
+      margin: 0 auto;
+      padding: 1.5rem;
+      width: 100%;
+    }
+    .messages { flex: 1; overflow-y: auto; }
+    .message { padding: 1rem; margin-bottom: 0.5rem; border-radius: 0.75rem; }
+    .message.answer { background: rgba(255,255,255,0.05); }
+    .input-container {
+      background: rgba(255,255,255,0.08);
+      border-radius: 1.5rem;
+      padding: 1rem;
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+    /*
+      Content script selectors for Perplexity:
+        textarea[placeholder*="Ask anything"]
+        textarea[placeholder*="ask anything"]
+    */
+    .prompt-input {
+      flex: 1;
+      min-height: 48px;
+      background: transparent;
+      border: none;
+      color: #e2e2e2;
+      font-size: 1rem;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+    }
+    .prompt-input::placeholder { color: rgba(255,255,255,0.4); }
+    .send-btn {
+      background: #20b2aa;
+      color: #fff;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .send-btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Perplexity Mock</h1>
+    <span>Test Environment</span>
+  </header>
+
+  <main class="main">
+    <div class="messages">
+      <div class="message answer">
+        <p>Ask me anything — I'll search the web for you.</p>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <!--
+        Matches content.js INPUT_SELECTORS:
+          textarea[placeholder*="Ask anything"]
+          textarea[placeholder*="ask anything"]
+      -->
+      <textarea
+        class="prompt-input"
+        placeholder="Ask anything..."
+        aria-label="Ask anything"
+        rows="2"
+      ></textarea>
+      <button class="send-btn" type="button" aria-label="Submit">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  </main>
+
+  <script>
+    const input = document.querySelector('textarea[placeholder*="Ask anything"]');
+
+    const testPrompts = [
+      'What is the routing number for account 021000021 at JPMorgan?',
+      'My Stripe secret key is sk_live_abc123def456\x67hi789jkl012mno',
+      'Patient ID: 123-45-6789, diagnosed on 2024-01-15 with condition X',
+      'Connect to redis://default:p4ssw0rd@redis-12345.us-east.aws:6379',
+      'My drivers license number is D123-4567-8901 from California',
+    ];
+
+    window.testPrompts = testPrompts;
+    window.setPromptText = function(text) {
+      input.value = text;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    window.getPromptText = function() {
+      return input.value;
+    };
+  </script>
+</body>
+</html>

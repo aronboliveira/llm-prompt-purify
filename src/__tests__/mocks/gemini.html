@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Mock</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #1e1e2e;
+      color: #e2e2e2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 { font-size: 1.2rem; font-weight: 600; color: #4285f4; }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 50rem;
+      margin: 0 auto;
+      padding: 1.5rem;
+      width: 100%;
+    }
+    .messages { flex: 1; overflow-y: auto; }
+    .message { padding: 1rem; margin-bottom: 0.5rem; border-radius: 0.75rem; }
+    .message.model { background: rgba(255,255,255,0.05); }
+    .input-container {
+      background: rgba(255,255,255,0.08);
+      border-radius: 1.5rem;
+      padding: 1rem;
+    }
+    /* Gemini uses a custom rich-textarea element wrapping a native textarea */
+    rich-textarea {
+      display: block;
+      width: 100%;
+    }
+    .prompt-area {
+      width: 100%;
+      min-height: 56px;
+      background: transparent;
+      border: none;
+      color: #e2e2e2;
+      font-size: 1rem;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+    }
+    .prompt-area::placeholder { color: rgba(255,255,255,0.4); }
+    .send-btn {
+      background: #4285f4;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 1.5rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .send-btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Gemini Mock</h1>
+    <span>Test Environment</span>
+  </header>
+
+  <main class="main">
+    <div class="messages">
+      <div class="message model">
+        <p>Hello! How can I help you today?</p>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <!--
+        Content script selectors for Gemini / Bard:
+          rich-textarea[aria-label*="Enter a prompt"]
+          [aria-label*="Enter a prompt"] textarea
+          textarea[aria-label*="prompt"]
+      -->
+      <rich-textarea aria-label="Enter a prompt here">
+        <textarea
+          class="prompt-area"
+          placeholder="Enter a prompt here"
+          aria-label="Enter a prompt here"
+          rows="2"
+        ></textarea>
+      </rich-textarea>
+      <button class="send-btn" type="button" aria-label="Send message">Send</button>
+    </div>
+  </main>
+
+  <script>
+    const input = document.querySelector('rich-textarea textarea');
+
+    const testPrompts = [
+      'My Google API key is AIzaSyD-example_key_1234567890abcde',
+      'Database URL: mongodb://admin:dbpass789@cluster0.mongodb.net/production',
+      'My home address is 456 Oak Avenue, San Francisco, CA 94102',
+      'Firebase token: ya29.a0ARrdaM_example-firebase-auth-token',
+      'Contact: maria.garcia@company.org, backup phone: +1 (650) 555-0123',
+    ];
+
+    window.testPrompts = testPrompts;
+    window.setPromptText = function(text) {
+      input.value = text;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    window.getPromptText = function() {
+      return input.value;
+    };
+  </script>
+</body>
+</html>

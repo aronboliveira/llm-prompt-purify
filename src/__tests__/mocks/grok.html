@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grok Mock</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #15202b;
+      color: #e7e9ea;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 { font-size: 1.2rem; font-weight: 600; color: #1d9bf0; }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 50rem;
+      margin: 0 auto;
+      padding: 1.5rem;
+      width: 100%;
+    }
+    .messages { flex: 1; overflow-y: auto; }
+    .message { padding: 1rem; margin-bottom: 0.5rem; border-radius: 0.75rem; }
+    .message.grok { background: rgba(255,255,255,0.05); }
+    .input-container {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 1.5rem;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+    /*
+      Content script selectors for Grok / x.AI:
+        textarea[placeholder*="Ask anything"]
+        [data-testid="tweetTextarea_0"]
+    */
+    .grok-input {
+      flex: 1;
+      min-height: 44px;
+      background: transparent;
+      border: none;
+      color: #e7e9ea;
+      font-size: 1rem;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+    }
+    .grok-input::placeholder { color: rgba(255,255,255,0.4); }
+    .send-btn {
+      background: #1d9bf0;
+      color: #fff;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .send-btn:hover { opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Grok Mock</h1>
+    <span>Test Environment</span>
+  </header>
+
+  <main class="main">
+    <div class="messages">
+      <div class="message grok">
+        <p>Hey there! I'm Grok. Ask me anything.</p>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <textarea
+        class="grok-input"
+        placeholder="Ask anything..."
+        data-testid="tweetTextarea_0"
+        aria-label="Ask anything"
+        rows="2"
+      ></textarea>
+      <button class="send-btn" type="button" aria-label="Send">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+      </button>
+    </div>
+  </main>
+
+  <script>
+    const input = document.querySelector('textarea[placeholder*="Ask anything"]');
+
+    const testPrompts = [
+      'My Bitcoin wallet: 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
+      'Terraform state has aws_access_key_id = AKIAIOSFODNN7EXAMPLE',
+      'Call our office at (212) 555-0198, ext. 432, ask for John Doe',
+      'OpenAI API key: sk-proj-abc123def456ghi789jkl012mno345pqr678stu901',
+      'My UK NI number is AB 12 34 56 C and NHS number is 943 476 5919',
+    ];
+
+    window.testPrompts = testPrompts;
+    window.setPromptText = function(text) {
+      input.value = text;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    window.getPromptText = function() {
+      return input.value;
+    };
+  </script>
+</body>
+</html>

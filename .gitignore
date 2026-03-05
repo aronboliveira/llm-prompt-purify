@@ -43,3 +43,11 @@ playwright/.cache/
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# .NET build artifacts
+bin/
+obj/
+
+# Internal notes
+.notes/
+mobile/

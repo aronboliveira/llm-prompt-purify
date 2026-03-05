@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Copilot Mock</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #1b1a1f;
+      color: #e2e2e2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 { font-size: 1.2rem; font-weight: 600; color: #0078d4; }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 50rem;
+      margin: 0 auto;
+      padding: 1.5rem;
+      width: 100%;
+    }
+    .messages { flex: 1; overflow-y: auto; }
+    .message { padding: 1rem; margin-bottom: 0.5rem; border-radius: 0.75rem; }
+    .message.copilot { background: rgba(255,255,255,0.05); }
+    .input-container {
+      background: rgba(255,255,255,0.08);
+      border-radius: 1.5rem;
+      padding: 1rem;
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+    /*
+      Content script selectors for Copilot / Bing:
+        #searchbox
+        textarea[id*="copilot"]
+        cib-serp textarea
+      Live page (copilot.microsoft.com) real element:
+        textarea#userInput[data-testid="composer-input"][placeholder="Message Copilot"]
+      We include both to maximize test fidelity.
+    */
+    #searchbox {
+      flex: 1;
+      min-height: 48px;
+      background: transparent;
+      border: none;
+      color: #e2e2e2;
+      font-size: 1rem;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+    }
+    #searchbox::placeholder { color: rgba(255,255,255,0.4); }
+    .send-btn {
+      background: #0078d4;
+      color: #fff;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .send-btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Copilot Mock</h1>
+    <span>Test Environment</span>
+  </header>
+
+  <main class="main">
+    <div class="messages">
+      <div class="message copilot">
+        <p>Hi! I'm Copilot. How can I help you today?</p>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <!--
+        Matches content.js INPUT_SELECTORS:
+          #searchbox
+          textarea[id*="copilot"] (id contains "copilot" — we use "searchbox" as primary)
+        Also mirrors live page:
+          data-testid="composer-input"
+          placeholder="Message Copilot"
+      -->
+      <textarea
+        id="searchbox"
+        placeholder="Message Copilot"
+        data-testid="composer-input"
+        role="textbox"
+        aria-label="Message Copilot"
+        rows="2"
+      ></textarea>
+      <button class="send-btn" type="button" aria-label="Send message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+      </button>
+    </div>
+  </main>
+
+  <script>
+    const input = document.getElementById('searchbox');
+
+    const testPrompts = [
+      'My Azure subscription key is a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      'SSH private key: -----BEGIN OPENSSH PRIVATE KEY-----\\nb3Blbn...',
+      'Send invoice to 789 Pine Street, Apt 4B, Seattle, WA 98101',
+      'GitHub token: ghp_ABCdef1234567890abcdef1234567890ABCD',
+      'My passport number is AB1234567 and DOB is 03/15/1985',
+    ];
+
+    window.testPrompts = testPrompts;
+    window.setPromptText = function(text) {
+      input.value = text;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    window.getPromptText = function() {
+      return input.value;
+    };
+  </script>
+</body>
+</html>
