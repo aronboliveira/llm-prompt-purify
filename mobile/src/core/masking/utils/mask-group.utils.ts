@@ -1,5 +1,8 @@
 /** Ported from Angular app. */
-import { DEFAULT_GROUP_PREFERENCES, MASK_GROUP_ORDER } from "../constants/masking.constants";
+import {
+  DEFAULT_GROUP_PREFERENCES,
+  MASK_GROUP_ORDER,
+} from "../constants/masking.constants";
 import type {
   MaskGroupId,
   MaskGroupPreference,
@@ -7,7 +10,7 @@ import type {
 } from "../declarations/masking.types";
 
 export function createGroupPreferenceMap(
-  overrides: Partial<Record<MaskGroupId, Partial<MaskGroupPreference>>> = {}
+  overrides: Partial<Record<MaskGroupId, Partial<MaskGroupPreference>>> = {},
 ): MaskGroupPreferenceMap {
   const entries = MASK_GROUP_ORDER.map(groupId => {
     const defaultPreference = DEFAULT_GROUP_PREFERENCES[groupId],
@@ -22,5 +25,7 @@ export function createGroupPreferenceMap(
     ] as const;
   });
 
-  return Object.freeze(Object.fromEntries(entries) as Record<MaskGroupId, MaskGroupPreference>);
+  return Object.freeze(
+    Object.fromEntries(entries) as Record<MaskGroupId, MaskGroupPreference>,
+  );
 }

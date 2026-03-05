@@ -20,8 +20,12 @@ export interface ThemeColors {
   textSecondary: string;
 }
 
-export function useTheme(): { isDark: boolean; resolved: ResolvedTheme; colors: ThemeColors } {
-  const mode = useThemeStore((s) => s.mode);
+export function useTheme(): {
+  isDark: boolean;
+  resolved: ResolvedTheme;
+  colors: ThemeColors;
+} {
+  const mode = useThemeStore(s => s.mode);
   const systemScheme = useColorScheme();
 
   const resolved: ResolvedTheme =

@@ -50,18 +50,16 @@ export default function ScannerScreen() {
 
   // ── Zustand store selectors ──────────────────────────────────
   const vm = useScanSessionStore(selectViewModel);
-  const clear = useScanSessionStore((s) => s.clear);
-  const updateSourceText = useScanSessionStore((s) => s.updateSourceText);
-  const regenerateAllMasks = useScanSessionStore((s) => s.regenerateAllMasks);
-  const regenerateMatch = useScanSessionStore((s) => s.regenerateMatch);
-  const toggleGroupAlwaysOn = useScanSessionStore(
-    (s) => s.toggleGroupAlwaysOn,
-  );
-  const toggleGroupEnabled = useScanSessionStore((s) => s.toggleGroupEnabled);
-  const toggleMatch = useScanSessionStore((s) => s.toggleMatch);
-  const setCountryProfiles = useScanSessionStore((s) => s.setCountryProfiles);
-  const setDetectionMode = useScanSessionStore((s) => s.setDetectionMode);
-  const scheduleRefresh = useScanSessionStore((s) => s.scheduleRefresh);
+  const clear = useScanSessionStore(s => s.clear);
+  const updateSourceText = useScanSessionStore(s => s.updateSourceText);
+  const regenerateAllMasks = useScanSessionStore(s => s.regenerateAllMasks);
+  const regenerateMatch = useScanSessionStore(s => s.regenerateMatch);
+  const toggleGroupAlwaysOn = useScanSessionStore(s => s.toggleGroupAlwaysOn);
+  const toggleGroupEnabled = useScanSessionStore(s => s.toggleGroupEnabled);
+  const toggleMatch = useScanSessionStore(s => s.toggleMatch);
+  const setCountryProfiles = useScanSessionStore(s => s.setCountryProfiles);
+  const setDetectionMode = useScanSessionStore(s => s.setDetectionMode);
+  const scheduleRefresh = useScanSessionStore(s => s.scheduleRefresh);
 
   // ── Local UI state (modals, help) ───────────────────────────
   const [isCountryModalOpen, setCountryModalOpen] = useState(false);
@@ -206,7 +204,12 @@ export default function ScannerScreen() {
         );
       }
     },
-    [vm.selectedCountryProfiles, vm.detectionMode, setCountryProfiles, pushToast],
+    [
+      vm.selectedCountryProfiles,
+      vm.detectionMode,
+      setCountryProfiles,
+      pushToast,
+    ],
   );
 
   const handleToggleGroupAlwaysOn = useCallback(
@@ -297,9 +300,7 @@ export default function ScannerScreen() {
           scopeDescription={scopeDescription}
           settingsIconSvg={icons.settings}
           warning={copy.languageWarning}
-          showWarning={
-            mixedLanguage && vm.detectionMode !== "global-only"
-          }
+          showWarning={mixedLanguage && vm.detectionMode !== "global-only"}
           onCountryModalRequested={() => setCountryModalOpen(true)}
           onSettingsModalRequested={() => setSettingsModalOpen(true)}
         />
@@ -377,7 +378,10 @@ export default function ScannerScreen() {
         onHelpRequested={() => openHelp("controls")}
       />
 
-      <HelpModal topic={activeHelpTopic} onClosed={() => setActiveHelpTopic(null)} />
+      <HelpModal
+        topic={activeHelpTopic}
+        onClosed={() => setActiveHelpTopic(null)}
+      />
     </SafeAreaView>
   );
 }

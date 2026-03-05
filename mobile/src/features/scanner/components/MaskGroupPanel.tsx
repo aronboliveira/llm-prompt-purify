@@ -1,11 +1,5 @@
 import React, { useMemo } from "react";
-import {
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 
 import type {
@@ -46,7 +40,9 @@ export function MaskGroupPanel({
 }: MaskGroupPanelProps) {
   const { isDark } = useTheme();
   const textColor = isDark ? colors.dark.text : colors.light.text;
-  const mutedColor = isDark ? colors.dark.textSecondary : colors.light.textSecondary;
+  const mutedColor = isDark
+    ? colors.dark.textSecondary
+    : colors.light.textSecondary;
   const surfaceColor = isDark ? colors.dark.surface : colors.light.surface;
   const borderColor = isDark ? colors.dark.border : colors.light.border;
   const disabledColor = isDark ? colors.dark.disabled : colors.light.disabled;
@@ -58,7 +54,7 @@ export function MaskGroupPanel({
 
   return (
     <View style={styles.container}>
-      {sections.map((section) => {
+      {sections.map(section => {
         const { group } = section;
         const isEnabled = group.enabled;
 
@@ -92,7 +88,7 @@ export function MaskGroupPanel({
               <View style={styles.toggleItem}>
                 <Switch
                   value={isEnabled}
-                  onValueChange={(val) =>
+                  onValueChange={val =>
                     onGroupEnabledToggled({ enabled: val, groupId: group.id })
                   }
                   trackColor={{
@@ -112,7 +108,7 @@ export function MaskGroupPanel({
                   <Switch
                     value={group.alwaysOn}
                     disabled={!isEnabled}
-                    onValueChange={(val) =>
+                    onValueChange={val =>
                       onGroupAlwaysOnToggled({
                         alwaysOn: val,
                         groupId: group.id,
@@ -142,7 +138,7 @@ export function MaskGroupPanel({
             {/* Match rows */}
             {section.matches.length > 0 ? (
               <View style={styles.matchList}>
-                {section.matches.map((match) => (
+                {section.matches.map(match => (
                   <View
                     key={match.id}
                     style={[
@@ -156,7 +152,7 @@ export function MaskGroupPanel({
                     <Switch
                       value={match.enabled}
                       disabled={match.locked || !isEnabled}
-                      onValueChange={(val) =>
+                      onValueChange={val =>
                         onMatchToggled({ enabled: val, matchId: match.id })
                       }
                       trackColor={{

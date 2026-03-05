@@ -1,7 +1,8 @@
 /** Ported from Angular app — platform-agnostic constants. */
 import type { FuzzyLabelRuleSpec } from "../declarations/fuzzy-label.types";
 
-export const FUZZY_LABEL_DELIMITED_LINE_PATTERN = /^(\s*[^:=\n\r]{2,64}?)\s*[:=]\s*(.+)$/u;
+export const FUZZY_LABEL_DELIMITED_LINE_PATTERN =
+  /^(\s*[^:=\n\r]{2,64}?)\s*[:=]\s*(.+)$/u;
 
 export const FUZZY_LABEL_SPECS: readonly FuzzyLabelRuleSpec[] = Object.freeze([
   {
@@ -239,6 +240,7 @@ export const FUZZY_LABEL_SPECS: readonly FuzzyLabelRuleSpec[] = Object.freeze([
     ]),
     maxScore: 0.24,
     ruleId: "in-gstin-labeled",
-    valuePatternFactory: () => /^\d{2}[A-Z]{5}\d{4}[A-Z][A-Z0-9][Zz][A-Z0-9]$/iu,
+    valuePatternFactory: () =>
+      /^\d{2}[A-Z]{5}\d{4}[A-Z][A-Z0-9][Zz][A-Z0-9]$/iu,
   },
 ]);

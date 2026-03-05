@@ -22,7 +22,9 @@ interface HelpModalProps {
 export function HelpModal({ topic, onClosed }: HelpModalProps) {
   const { isDark } = useTheme();
   const textColor = isDark ? colors.dark.text : colors.light.text;
-  const mutedColor = isDark ? colors.dark.textSecondary : colors.light.textSecondary;
+  const mutedColor = isDark
+    ? colors.dark.textSecondary
+    : colors.light.textSecondary;
   const bgColor = isDark ? colors.dark.background : colors.light.background;
   const borderColor = isDark ? colors.dark.border : colors.light.border;
 
@@ -52,10 +54,7 @@ export function HelpModal({ topic, onClosed }: HelpModalProps) {
         {/* Body */}
         <ScrollView contentContainerStyle={styles.body}>
           {topic?.paragraphs.map((paragraph, index) => (
-            <Text
-              key={index}
-              style={[styles.paragraph, { color: mutedColor }]}
-            >
+            <Text key={index} style={[styles.paragraph, { color: mutedColor }]}>
               {paragraph}
             </Text>
           ))}

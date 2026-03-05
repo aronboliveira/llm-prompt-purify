@@ -10,10 +10,10 @@ export function applyCandidateGroupsToMatches(
   candidateGroups: readonly MaskSafetyCandidateGroup[],
 ): readonly ScanMatch[] {
   const candidateMaskByKey = new Map(
-    candidateGroups.map((cg) => [cg.key, cg.candidateMask]),
+    candidateGroups.map(cg => [cg.key, cg.candidateMask]),
   );
 
-  return matches.map((match) => {
+  return matches.map(match => {
     const candidateMask = candidateMaskByKey.get(
       createMaskSafetyGroupKey(match.ruleId, match.value),
     );
@@ -24,7 +24,7 @@ export function applyCandidateGroupsToMatches(
 export function buildValidationCandidates(
   candidateGroups: readonly MaskSafetyCandidateGroup[],
 ): readonly MaskSafetyValidationCandidate[] {
-  return candidateGroups.map((cg) => ({
+  return candidateGroups.map(cg => ({
     candidateValue: cg.candidateMask,
     ruleId: cg.ruleId,
   }));

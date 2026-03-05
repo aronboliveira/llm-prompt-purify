@@ -13,7 +13,8 @@ const storage = new MMKV({ id: "llm-prompt-purify-theme" });
 function loadPersistedTheme(): ThemeMode {
   try {
     const value = storage.getString(THEME_STORAGE_KEY);
-    if (value === "dark" || value === "light" || value === "system") return value;
+    if (value === "dark" || value === "light" || value === "system")
+      return value;
     return "system";
   } catch {
     return "system";
@@ -25,7 +26,7 @@ interface ThemeState {
   setMode(mode: ThemeMode): void;
 }
 
-export const useThemeStore = create<ThemeState>()((set) => ({
+export const useThemeStore = create<ThemeState>()(set => ({
   mode: loadPersistedTheme(),
 
   setMode(mode: ThemeMode) {

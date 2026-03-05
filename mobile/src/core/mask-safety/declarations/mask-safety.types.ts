@@ -1,4 +1,7 @@
-import type { MatchCategory, ScanMatch } from "../../masking/declarations/masking.types";
+import type {
+  MatchCategory,
+  ScanMatch,
+} from "../../masking/declarations/masking.types";
 
 export type MaskSafetyDecision = "compromising" | "safe" | "unsupported";
 

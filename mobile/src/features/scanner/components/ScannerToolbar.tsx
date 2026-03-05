@@ -26,15 +26,22 @@ export function ScannerToolbar({
 }: ScannerToolbarProps) {
   const { isDark } = useTheme();
   const textColor = isDark ? colors.dark.text : colors.light.text;
-  const mutedColor = isDark ? colors.dark.textSecondary : colors.light.textSecondary;
-  const surfaceColor = isDark ? colors.dark.surfaceAlt : colors.light.surfaceAlt;
+  const mutedColor = isDark
+    ? colors.dark.textSecondary
+    : colors.light.textSecondary;
+  const surfaceColor = isDark
+    ? colors.dark.surfaceAlt
+    : colors.light.surfaceAlt;
   const borderColor = isDark ? colors.dark.border : colors.light.border;
 
   return (
     <View style={styles.container}>
       <View style={styles.actions}>
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: surfaceColor, borderColor }]}
+          style={[
+            styles.button,
+            { backgroundColor: surfaceColor, borderColor },
+          ]}
           onPress={onCountryModalRequested}
           testID="country-modal-button"
         >
@@ -47,7 +54,10 @@ export function ScannerToolbar({
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: surfaceColor, borderColor }]}
+          style={[
+            styles.button,
+            { backgroundColor: surfaceColor, borderColor },
+          ]}
           onPress={onSettingsModalRequested}
           testID="settings-button"
         >

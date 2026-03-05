@@ -20,9 +20,19 @@ import type {
   ScanResult,
 } from "../masking/declarations/masking.types";
 import { MaskingEngine } from "../masking/masking.engine";
-import { buildScanScopeSelection, normalizeCountryProfileIds } from "../masking/utils/country-scope.utils";
-import { SCAN_PHASE_MESSAGES, SCAN_TIMINGS } from "./constants/scan-session.constants";
-import type { ScanPhase, ScanSessionState, ScanSessionViewModel } from "./declarations/scan-session.types";
+import {
+  buildScanScopeSelection,
+  normalizeCountryProfileIds,
+} from "../masking/utils/country-scope.utils";
+import {
+  SCAN_PHASE_MESSAGES,
+  SCAN_TIMINGS,
+} from "./constants/scan-session.constants";
+import type {
+  ScanPhase,
+  ScanSessionState,
+  ScanSessionViewModel,
+} from "./declarations/scan-session.types";
 import {
   applyAlwaysOnToMatches,
   applyEnabledToMatches,
@@ -60,11 +70,13 @@ import { waitFor } from "./utils/timing.utils";
 interface MaskSafetyHardener {
   hardenMatches(
     matches: readonly import("../masking/declarations/masking.types").ScanMatch[],
-  ): Promise<{ matches: readonly import("../masking/declarations/masking.types").ScanMatch[] }>;
+  ): Promise<{
+    matches: readonly import("../masking/declarations/masking.types").ScanMatch[];
+  }>;
 }
 
 const noopHardener: MaskSafetyHardener = {
-  hardenMatches: async (matches) => ({ matches }),
+  hardenMatches: async matches => ({ matches }),
 };
 
 let maskSafetyHardener: MaskSafetyHardener = noopHardener;
@@ -107,7 +119,9 @@ function hasSameCountrySelection(
 }
 
 async function hardenResult(localResult: ScanResult): Promise<ScanResult> {
-  const { matches } = await maskSafetyHardener.hardenMatches(localResult.matches);
+  const { matches } = await maskSafetyHardener.hardenMatches(
+    localResult.matches,
+  );
   return engine.rebuild(localResult.sourceText, matches, localResult.scannedAt);
 }
 
@@ -196,7 +210,10 @@ export const useScanSessionStore = create<ScanSessionStore>()((set, get) => ({
         scannedAt,
       );
 
-      set({ scanPhase: "validating", statusMessage: SCAN_PHASE_MESSAGES.validating });
+      set({
+        scanPhase: "validating",
+        statusMessage: SCAN_PHASE_MESSAGES.validating,
+      });
 
       const [result] = await Promise.all([
         hardenResult(localResult),
@@ -245,7 +262,11 @@ export const useScanSessionStore = create<ScanSessionStore>()((set, get) => ({
 
     try {
       const nextResult = await hardenResult(
-        engine.regenerateAll(result.sourceText, result.matches, result.scannedAt),
+        engine.regenerateAll(
+          result.sourceText,
+          result.matches,
+          result.scannedAt,
+        ),
       );
       set({
         isScanning: false,
@@ -279,7 +300,12 @@ export const useScanSessionStore = create<ScanSessionStore>()((set, get) => ({
 
     try {
       const nextResult = await hardenResult(
-        engine.regenerateMatch(result.sourceText, result.matches, result.scannedAt, matchId),
+        engine.regenerateMatch(
+          result.sourceText,
+          result.matches,
+          result.scannedAt,
+          matchId,
+        ),
       );
       set({
         isScanning: false,
@@ -338,7 +364,8 @@ export const useScanSessionStore = create<ScanSessionStore>()((set, get) => ({
       ? normalizeCountryProfileIds(countryProfileIds)
       : DEFAULT_COUNTRY_PROFILE_IDS;
 
-    if (hasSameCountrySelection(currentState.countryProfileIds, normalized)) return;
+    if (hasSameCountrySelection(currentState.countryProfileIds, normalized))
+      return;
 
     set({
       countryProfileIds: normalized,
@@ -370,7 +397,11 @@ export const useScanSessionStore = create<ScanSessionStore>()((set, get) => ({
     const { result, groupPreferences } = get();
     if (!result) return;
 
-    const matches = setAllEditableMatchesEnabled(result.matches, groupPreferences, enabled);
+    const matches = setAllEditableMatchesEnabled(
+      result.matches,
+      groupPreferences,
+      enabled,
+    );
     set({
       result: engine.rebuild(result.sourceText, matches, result.scannedAt),
     });
@@ -378,7 +409,11 @@ export const useScanSessionStore = create<ScanSessionStore>()((set, get) => ({
 
   toggleGroupAlwaysOn(groupId: MaskGroupId, alwaysOn: boolean) {
     const { groupPreferences, result } = get();
-    const nextPreferences = computeNextAlwaysOnPreferences(groupPreferences, groupId, alwaysOn);
+    const nextPreferences = computeNextAlwaysOnPreferences(
+      groupPreferences,
+      groupId,
+      alwaysOn,
+    );
 
     const nextResult = result
       ? engine.rebuild(
@@ -394,7 +429,11 @@ export const useScanSessionStore = create<ScanSessionStore>()((set, get) => ({
 
   toggleGroupEnabled(groupId: MaskGroupId, enabled: boolean) {
     const { groupPreferences, result } = get();
-    const nextPreferences = computeNextEnabledPreferences(groupPreferences, groupId, enabled);
+    const nextPreferences = computeNextEnabledPreferences(
+      groupPreferences,
+      groupId,
+      enabled,
+    );
 
     const nextResult = result
       ? engine.rebuild(
@@ -449,15 +488,15 @@ export const useScanSessionStore = create<ScanSessionStore>()((set, get) => ({
  */
 export function selectViewModel(state: ScanSessionStore): ScanSessionViewModel {
   const result = state.result;
-  const countryProfiles = COUNTRY_PROFILE_ORDER.map((countryProfileId) => {
+  const countryProfiles = COUNTRY_PROFILE_ORDER.map(countryProfileId => {
     const definition = COUNTRY_PROFILE_DEFINITIONS[countryProfileId];
     return {
       ...definition,
       selected: state.countryProfileIds.includes(definition.id),
     };
   });
-  const selectedCountryProfiles = countryProfiles.filter((cp) => cp.selected);
-  const groups = MASK_GROUP_ORDER.map((groupId) => {
+  const selectedCountryProfiles = countryProfiles.filter(cp => cp.selected);
+  const groups = MASK_GROUP_ORDER.map(groupId => {
     const preference = state.groupPreferences[groupId];
     const definition = MASK_GROUP_DEFINITIONS[groupId];
     return {
@@ -473,7 +512,7 @@ export function selectViewModel(state: ScanSessionStore): ScanSessionViewModel {
     canCopy: !!result && !state.isScanning,
     countryProfiles,
     detectionMode: state.detectionMode,
-    editableMatches: result?.matches.filter((m) => !m.locked).length ?? 0,
+    editableMatches: result?.matches.filter(m => !m.locked).length ?? 0,
     errorMessage: state.errorMessage,
     groups,
     hasMatches: !!result?.hasMatches,

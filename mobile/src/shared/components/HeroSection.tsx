@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 
 import { useTheme } from "@shared/hooks/useTheme";
@@ -27,7 +22,9 @@ export function HeroSection({
 }: HeroSectionProps) {
   const { isDark } = useTheme();
   const textColor = isDark ? colors.dark.text : colors.light.text;
-  const mutedColor = isDark ? colors.dark.textSecondary : colors.light.textSecondary;
+  const mutedColor = isDark
+    ? colors.dark.textSecondary
+    : colors.light.textSecondary;
   const surfaceColor = isDark ? colors.dark.surface : colors.light.surface;
   const borderColor = isDark ? colors.dark.border : colors.light.border;
 
@@ -36,10 +33,7 @@ export function HeroSection({
       <Text style={[styles.body, { color: mutedColor }]}>{body}</Text>
 
       <View
-        style={[
-          styles.notice,
-          { backgroundColor: surfaceColor, borderColor },
-        ]}
+        style={[styles.notice, { backgroundColor: surfaceColor, borderColor }]}
       >
         <SvgXml xml={noticeIconSvg} width={24} height={24} />
         <View style={styles.noticeContent}>

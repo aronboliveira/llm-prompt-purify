@@ -62,7 +62,9 @@ export function MaskedOutputPane({
 }: MaskedOutputPaneProps) {
   const { isDark } = useTheme();
   const textColor = isDark ? colors.dark.text : colors.light.text;
-  const mutedColor = isDark ? colors.dark.textSecondary : colors.light.textSecondary;
+  const mutedColor = isDark
+    ? colors.dark.textSecondary
+    : colors.light.textSecondary;
   const surfaceColor = isDark ? colors.dark.surface : colors.light.surface;
   const borderColor = isDark ? colors.dark.border : colors.light.border;
   const disabledColor = isDark ? colors.dark.disabled : colors.light.disabled;
@@ -102,10 +104,7 @@ export function MaskedOutputPane({
 
       {/* Output block */}
       <View
-        style={[
-          styles.output,
-          { backgroundColor: surfaceColor, borderColor },
-        ]}
+        style={[styles.output, { backgroundColor: surfaceColor, borderColor }]}
         testID="masked-output"
       >
         {isScanning ? (
@@ -117,10 +116,7 @@ export function MaskedOutputPane({
           </View>
         ) : (
           <ScrollView style={styles.outputScroll} nestedScrollEnabled>
-            <Text
-              style={[styles.outputText, { color: textColor }]}
-              selectable
-            >
+            <Text style={[styles.outputText, { color: textColor }]} selectable>
               {hasResult ? maskedText : emptyPlaceholder}
             </Text>
           </ScrollView>
@@ -142,10 +138,7 @@ export function MaskedOutputPane({
           </Text>
         </View>
         <View
-          style={[
-            styles.statusPill,
-            { backgroundColor: colors.info + "22" },
-          ]}
+          style={[styles.statusPill, { backgroundColor: colors.info + "22" }]}
         >
           <Text style={[styles.statusPillText, { color: colors.info }]}>
             {detectionModeLabel}
@@ -159,18 +152,16 @@ export function MaskedOutputPane({
           style={[
             styles.actionButton,
             {
-              backgroundColor: hasMatches ? colors.primary + "15" : "transparent",
+              backgroundColor: hasMatches
+                ? colors.primary + "15"
+                : "transparent",
               borderColor: hasMatches ? colors.primary : disabledColor,
             },
           ]}
           disabled={!hasMatches}
           onPress={onRegenerateRequested}
         >
-          <SvgXml
-            xml={refreshIconSvg}
-            width={16}
-            height={16}
-          />
+          <SvgXml xml={refreshIconSvg} width={16} height={16} />
           <Text
             style={[
               styles.actionButtonText,

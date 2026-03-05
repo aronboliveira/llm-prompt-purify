@@ -1,4 +1,7 @@
-export { createMaskSafetyHardener, noopHardener } from "./mask-safety-hardening";
+export {
+  createMaskSafetyHardener,
+  noopHardener,
+} from "./mask-safety-hardening";
 
 export type {
   MaskSafetyClient,
@@ -12,4 +15,7 @@ export type {
   MaskSafetyValidationResponse,
 } from "./declarations/mask-safety.types";
 
-export { MASK_SAFETY_DECISIONS, MASK_SAFETY_LIMITS } from "./constants/mask-safety.constants";
+export {
+  MASK_SAFETY_DECISIONS,
+  MASK_SAFETY_LIMITS,
+} from "./constants/mask-safety.constants";

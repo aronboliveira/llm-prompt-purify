@@ -40,13 +40,15 @@ export function CountryScopeModal({
 }: CountryScopeModalProps) {
   const { isDark } = useTheme();
   const textColor = isDark ? colors.dark.text : colors.light.text;
-  const mutedColor = isDark ? colors.dark.textSecondary : colors.light.textSecondary;
+  const mutedColor = isDark
+    ? colors.dark.textSecondary
+    : colors.light.textSecondary;
   const bgColor = isDark ? colors.dark.background : colors.light.background;
   const surfaceColor = isDark ? colors.dark.surface : colors.light.surface;
   const borderColor = isDark ? colors.dark.border : colors.light.border;
 
   const selectedCount = useMemo(
-    () => countryProfiles.filter((p) => p.selected).length,
+    () => countryProfiles.filter(p => p.selected).length,
     [countryProfiles],
   );
 
@@ -69,9 +71,7 @@ export function CountryScopeModal({
                 onPress={onHelpRequested}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <Text
-                  style={[styles.helpTrigger, { color: colors.primary }]}
-                >
+                <Text style={[styles.helpTrigger, { color: colors.primary }]}>
                   (?)
                 </Text>
               </TouchableOpacity>
@@ -103,7 +103,7 @@ export function CountryScopeModal({
           contentContainerStyle={styles.grid}
           showsVerticalScrollIndicator={false}
         >
-          {countryProfiles.map((profile) => (
+          {countryProfiles.map(profile => (
             <View
               key={profile.id}
               style={[
@@ -112,9 +112,7 @@ export function CountryScopeModal({
                   backgroundColor: profile.selected
                     ? colors.primary + "15"
                     : surfaceColor,
-                  borderColor: profile.selected
-                    ? colors.primary
-                    : borderColor,
+                  borderColor: profile.selected ? colors.primary : borderColor,
                 },
               ]}
             >
@@ -137,14 +135,16 @@ export function CountryScopeModal({
                 <Switch
                   value={profile.selected}
                   disabled={profile.selected && selectedCount === 1}
-                  onValueChange={(val) =>
+                  onValueChange={val =>
                     onCountryToggled({
                       countryProfileId: profile.id,
                       selected: val,
                     })
                   }
                   trackColor={{
-                    false: isDark ? colors.dark.disabled : colors.light.disabled,
+                    false: isDark
+                      ? colors.dark.disabled
+                      : colors.light.disabled,
                     true: colors.primary + "88",
                   }}
                   thumbColor={profile.selected ? colors.primary : "#f4f3f4"}

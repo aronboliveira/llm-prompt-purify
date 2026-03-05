@@ -41,7 +41,9 @@ export function ControlsPanel({
 }: ControlsPanelProps) {
   const { isDark } = useTheme();
   const textColor = isDark ? colors.dark.text : colors.light.text;
-  const mutedColor = isDark ? colors.dark.textSecondary : colors.light.textSecondary;
+  const mutedColor = isDark
+    ? colors.dark.textSecondary
+    : colors.light.textSecondary;
 
   return (
     <View style={styles.container}>

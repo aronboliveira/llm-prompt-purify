@@ -32,7 +32,8 @@ export function isLikelyIban(value: string): boolean {
   }
 
   let remainder = 0;
-  for (const digit of numeric) remainder = (remainder * 10 + Number(digit)) % 97;
+  for (const digit of numeric)
+    remainder = (remainder * 10 + Number(digit)) % 97;
   return remainder === 1;
 }
 
@@ -58,7 +59,7 @@ export function isValidCnpj(value: string): boolean {
   const firstDigit = calculateWeightedDigit(digits.slice(0, 12), firstWeights),
     secondDigit = calculateWeightedDigit(
       `${digits.slice(0, 12)}${firstDigit}`,
-      secondWeights
+      secondWeights,
     );
 
   return digits.endsWith(`${firstDigit}${secondDigit}`);
@@ -118,9 +119,12 @@ export function isValidChineseResidentId(value: string): boolean {
 
   const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2],
     verifiers = ["1", "0", "X", "9", "8", "7", "6", "5", "4", "3", "2"],
-    checksum = Array.from(normalized.slice(0, 17)).reduce((sum, digit, index) => {
-      return sum + Number(digit) * weights[index];
-    }, 0);
+    checksum = Array.from(normalized.slice(0, 17)).reduce(
+      (sum, digit, index) => {
+        return sum + Number(digit) * weights[index];
+      },
+      0,
+    );
 
   return normalized[17] === verifiers[checksum % 11];
 }
@@ -227,23 +231,30 @@ export function isValidPortugueseNif(value: string): boolean {
 
 export function isValidRussianInn(value: string): boolean {
   const digits = value.replace(/\D/g, "");
-  if (!/^\d{10}(\d{2})?$/u.test(digits) || /^(\d)\1+$/.test(digits)) return false;
+  if (!/^\d{10}(\d{2})?$/u.test(digits) || /^(\d)\1+$/.test(digits))
+    return false;
 
   if (digits.length === 10) {
-    const expected = calculateMod11Digit(digits.slice(0, 9), [2, 4, 10, 3, 5, 9, 4, 6, 8]);
+    const expected = calculateMod11Digit(
+      digits.slice(0, 9),
+      [2, 4, 10, 3, 5, 9, 4, 6, 8],
+    );
     return Number(digits[9]) === expected;
   }
 
   const firstExpected = calculateMod11Digit(
       digits.slice(0, 10),
-      [7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
+      [7, 2, 4, 10, 3, 5, 9, 4, 6, 8],
     ),
     secondExpected = calculateMod11Digit(
       digits.slice(0, 11),
-      [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
+      [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8],
     );
 
-  return Number(digits[10]) === firstExpected && Number(digits[11]) === secondExpected;
+  return (
+    Number(digits[10]) === firstExpected &&
+    Number(digits[11]) === secondExpected
+  );
 }
 
 export function isValidRussianSnils(value: string): boolean {
@@ -253,7 +264,8 @@ export function isValidRussianSnils(value: string): boolean {
   const total = Array.from(digits.slice(0, 9)).reduce((sum, digit, index) => {
       return sum + Number(digit) * (9 - index);
     }, 0),
-    rawVerifier = total < 100 ? total : total === 100 || total === 101 ? 0 : total % 101,
+    rawVerifier =
+      total < 100 ? total : total === 100 || total === 101 ? 0 : total % 101,
     verifier = rawVerifier === 100 ? 0 : rawVerifier;
 
   return Number(digits.slice(9)) === verifier;
@@ -263,7 +275,9 @@ export function isValidSpanishDni(value: string): boolean {
   const normalized = value.replace(/\s+/g, "").toUpperCase();
   if (!/^\d{8}[A-Z]$/u.test(normalized)) return false;
 
-  return normalized[8] === calculateSpanishDocumentLetter(normalized.slice(0, 8));
+  return (
+    normalized[8] === calculateSpanishDocumentLetter(normalized.slice(0, 8))
+  );
 }
 
 export function isValidSpanishNie(value: string): boolean {
@@ -279,10 +293,12 @@ export function isValidSpanishNie(value: string): boolean {
 export function looksLikeStructuredAddress(value: string): boolean {
   const normalized = sanitizeCapturedValue(value);
   if (normalized.length < 8 || normalized.length > 120) return false;
-  return /[\d,#-]/.test(normalized) ||
+  return (
+    /[\d,#-]/.test(normalized) ||
     /\b(?:apto|avenida|bairro|bloco|calle|casa|city|drive|estrada|road|rua|st|street)\b/iu.test(
-      normalized
-    );
+      normalized,
+    )
+  );
 }
 
 export function looksLikeStructuredName(value: string): boolean {
@@ -290,8 +306,10 @@ export function looksLikeStructuredName(value: string): boolean {
   if (normalized.length < 5 || normalized.length > 80) return false;
 
   const parts = normalized.split(" ");
-  return parts.length >= 2 &&
-    parts.every(part => /^[\p{L}][\p{L}'-]{0,30}$/u.test(part));
+  return (
+    parts.length >= 2 &&
+    parts.every(part => /^[\p{L}][\p{L}'-]{0,30}$/u.test(part))
+  );
 }
 
 export function looksSecretLike(value: string): boolean {
@@ -321,7 +339,10 @@ export function looksLikeLatamTaxId(value: string): boolean {
   return /^\d{11,13}$/u.test(digits) && !/^(\d)\1+$/u.test(digits);
 }
 
-function calculateMod11Digit(value: string, weights: readonly number[]): number {
+function calculateMod11Digit(
+  value: string,
+  weights: readonly number[],
+): number {
   const total = Array.from(value).reduce((sum, digit, index) => {
     return sum + Number(digit) * weights[index];
   }, 0);
@@ -338,7 +359,10 @@ function calculateCpfDigit(value: string, factor: number): number {
   return remainder === 10 ? 0 : remainder;
 }
 
-function calculateWeightedDigit(value: string, weights: readonly number[]): number {
+function calculateWeightedDigit(
+  value: string,
+  weights: readonly number[],
+): number {
   const total = Array.from(value).reduce((sum, digit, index) => {
     return sum + Number(digit) * weights[index];
   }, 0);

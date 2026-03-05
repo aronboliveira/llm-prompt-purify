@@ -32,7 +32,9 @@ export function MaskingSettingsModal({
 }: MaskingSettingsModalProps) {
   const { isDark } = useTheme();
   const textColor = isDark ? colors.dark.text : colors.light.text;
-  const mutedColor = isDark ? colors.dark.textSecondary : colors.light.textSecondary;
+  const mutedColor = isDark
+    ? colors.dark.textSecondary
+    : colors.light.textSecondary;
   const bgColor = isDark ? colors.dark.background : colors.light.background;
   const surfaceColor = isDark ? colors.dark.surface : colors.light.surface;
   const borderColor = isDark ? colors.dark.border : colors.light.border;
@@ -52,11 +54,7 @@ export function MaskingSettingsModal({
         <View style={[styles.header, { borderBottomColor: borderColor }]}>
           <View style={styles.titleRow}>
             <View style={styles.titleWrap}>
-              <SvgXml
-                xml={MATERIAL_ICONS.settings}
-                width={22}
-                height={22}
-              />
+              <SvgXml xml={MATERIAL_ICONS.settings} width={22} height={22} />
               <View style={styles.titleText}>
                 <View style={styles.titleInner}>
                   <Text style={[styles.title, { color: textColor }]}>
@@ -67,18 +65,15 @@ export function MaskingSettingsModal({
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
                     <Text
-                      style={[
-                        styles.helpTrigger,
-                        { color: colors.primary },
-                      ]}
+                      style={[styles.helpTrigger, { color: colors.primary }]}
                     >
                       (?)
                     </Text>
                   </TouchableOpacity>
                 </View>
                 <Text style={[styles.bodyCopy, { color: mutedColor }]}>
-                  These settings change how the local detector scopes the
-                  prompt before you copy the protected output.
+                  These settings change how the local detector scopes the prompt
+                  before you copy the protected output.
                 </Text>
               </View>
             </View>
@@ -100,7 +95,7 @@ export function MaskingSettingsModal({
           >
             <Switch
               value={isGlobalOnly}
-              onValueChange={(val) =>
+              onValueChange={val =>
                 onDetectionModeChanged(
                   val ? "global-only" : "selected-plus-global",
                 )
@@ -117,9 +112,9 @@ export function MaskingSettingsModal({
                 Track only global identifiers
               </Text>
               <Text style={[styles.toggleBody, { color: mutedColor }]}>
-                Keep shared rules such as API keys, credentials, emails,
-                payment strings, and labeled contact fields, but skip
-                country-specific document patterns.
+                Keep shared rules such as API keys, credentials, emails, payment
+                strings, and labeled contact fields, but skip country-specific
+                document patterns.
               </Text>
             </View>
           </View>
@@ -136,9 +131,9 @@ export function MaskingSettingsModal({
                 Client-side only
               </Text>
               <Text style={[styles.cardBody, { color: mutedColor }]}>
-                The raw prompt, the detected matches, and the regenerated
-                masks stay in this local session unless you copy the protected
-                output yourself.
+                The raw prompt, the detected matches, and the regenerated masks
+                stay in this local session unless you copy the protected output
+                yourself.
               </Text>
             </View>
 

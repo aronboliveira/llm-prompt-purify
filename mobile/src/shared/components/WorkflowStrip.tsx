@@ -1,7 +1,10 @@
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import type { WorkflowSnippet, WorkflowState } from "@shared/constants/workflow-strip.types";
+import type {
+  WorkflowSnippet,
+  WorkflowState,
+} from "@shared/constants/workflow-strip.types";
 import { useTheme } from "@shared/hooks/useTheme";
 import { borderRadius, colors, fontSize, spacing } from "@shared/styles/tokens";
 
@@ -13,7 +16,10 @@ interface WorkflowStripProps {
 
 const STATE_BG: Record<WorkflowState, { light: string; dark: string }> = {
   idle: { light: colors.light.surfaceAlt, dark: colors.dark.surfaceAlt },
-  active: { light: colors.primaryLight + "22", dark: colors.primaryDark + "33" },
+  active: {
+    light: colors.primaryLight + "22",
+    dark: colors.primaryDark + "33",
+  },
   done: { light: colors.success + "22", dark: colors.success + "33" },
 };
 
@@ -38,7 +44,7 @@ export function WorkflowStrip({
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.container}
     >
-      {snippets.map((snippet) => {
+      {snippets.map(snippet => {
         const state = stateResolver(snippet.id);
         const bg = isDark ? STATE_BG[state].dark : STATE_BG[state].light;
 

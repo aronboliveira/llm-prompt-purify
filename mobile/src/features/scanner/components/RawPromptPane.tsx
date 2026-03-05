@@ -29,7 +29,9 @@ export function RawPromptPane({
 }: RawPromptPaneProps) {
   const { isDark } = useTheme();
   const textColor = isDark ? colors.dark.text : colors.light.text;
-  const mutedColor = isDark ? colors.dark.textSecondary : colors.light.textSecondary;
+  const mutedColor = isDark
+    ? colors.dark.textSecondary
+    : colors.light.textSecondary;
   const surfaceColor = isDark ? colors.dark.surface : colors.light.surface;
   const borderColor = isDark ? colors.dark.border : colors.light.border;
 
@@ -66,7 +68,9 @@ export function RawPromptPane({
         value={sourceText}
         onChangeText={onSourceTextChanged}
         placeholder={placeholder}
-        placeholderTextColor={isDark ? colors.dark.textMuted : colors.light.textMuted}
+        placeholderTextColor={
+          isDark ? colors.dark.textMuted : colors.light.textMuted
+        }
         multiline
         textAlignVertical="top"
         spellCheck={false}
