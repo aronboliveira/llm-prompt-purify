@@ -26,15 +26,20 @@
 }
 
 .mask-fieldset__legend {
+  color: var(--ink, #1e293b);
   flex-wrap: wrap;
   font-weight: 700;
   padding: 0 0.25rem;
 }
 
-.mask-fieldset__legend small,
+.mask-fieldset__legend small {
+  color: var(--accent, #0f766e);
+  font-weight: 600;
+}
+
 .mask-fieldset__description,
 .mask-fieldset__empty {
-  color: #526273;
+  color: var(--muted, #475569);
 }
 
 .mask-fieldset__description,
@@ -51,13 +56,15 @@
   @include ui.focus-ring();
 
   align-items: center;
+  color: var(--ink, #1e293b);
   cursor: pointer;
   display: inline-flex;
   gap: 0.55rem;
+  font-weight: 500;
 }
 
 .mask-toggle--subtle {
-  color: #445566;
+  color: var(--muted, #475569);
 }
 
 .mask-toggle input,
