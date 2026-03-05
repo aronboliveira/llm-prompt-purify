@@ -505,7 +505,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "Russian INN",
     locale: "ru-RU",
     patternFactory: () =>
-      createDelimitedLabelValuePattern(RU_INN_LABEL_FLAGS, String.raw`\d{10}|\d{12}`),
+      createDelimitedLabelValuePattern(RU_INN_LABEL_FLAGS, String.raw`\d{12}|\d{10}`),
     priority: 112,
     validator: isValidRussianInn,
     valueGroup: 1,
