@@ -1,0 +1,10 @@
+node_modules/
+.expo/
+dist/
+*.tsbuildinfo
+package-lock.json
+ios/
+android/
+web-build/
+.env
+.env.local
