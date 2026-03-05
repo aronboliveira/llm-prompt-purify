@@ -37,3 +37,9 @@ cypress/downloads/
 test-results/
 playwright-report/
 playwright/.cache/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
