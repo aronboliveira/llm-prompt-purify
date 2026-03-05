@@ -3,8 +3,8 @@ node_modules/
 dist/
 *.tsbuildinfo
 package-lock.json
-ios/
-android/
+/ios/
+/android/
 web-build/
 .env
 .env.local
