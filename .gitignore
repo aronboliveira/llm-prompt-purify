@@ -51,3 +51,9 @@ Thumbs.db
 .env.docker
 .sct/
 .sct/**
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
