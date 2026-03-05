@@ -10,7 +10,6 @@ module.exports = {
     "^@shared/(.*)$": "<rootDir>/src/shared/$1",
     "^@testing/(.*)$": "<rootDir>/src/testing/$1",
   },
-  setupFilesAfterSetup: ["@testing-library/jest-native/extend-expect"],
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
     "!src/**/*.d.ts",
