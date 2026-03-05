@@ -202,6 +202,111 @@ export const PATTERNS: Readonly<Record<string, PatternDefinition>> =
       label: "Password",
       mask: "[PASSWORD]",
     },
+
+    // Bearer tokens (non-JWT)
+    BEARER_TOKEN: {
+      regex: /\bBearer\s+([A-Za-z0-9\-._~+/]+=*)\b/g,
+      label: "Bearer Token",
+      mask: "[BEARER]",
+    },
+
+    // ─── Brazil (extended) ────────────────────────────────────────────
+    BR_PHONE: {
+      regex:
+        /\b(?:\+55\s?)?(?:\(?\d{2}\)?\s?)?9?\d{4}-?\d{4}\b/g,
+      label: "BR Phone",
+      mask: "[BR_PHONE]",
+    },
+    PIS_PASEP: {
+      regex: /\b\d{3}\.?\d{5}\.?\d{2}-?\d\b/g,
+      label: "PIS/PASEP",
+      mask: "[PIS]",
+    },
+    RG: {
+      regex: /\b\d{2}\.?\d{3}\.?\d{3}-?[\dXx]\b/g,
+      label: "RG",
+      mask: "[RG]",
+    },
+    TITULO_ELEITOR: {
+      regex: /\b\d{4}\s?\d{4}\s?\d{4}\b/g,
+      label: "Titulo de Eleitor",
+      mask: "[TITULO_ELEITOR]",
+    },
+
+    // ─── Latin America ────────────────────────────────────────────────
+    CUIT: {
+      regex: /\b(?:20|23|24|27|30|33|34)-?\d{8}-?\d\b/g,
+      label: "CUIT",
+      mask: "[CUIT]",
+    },
+    RUT_CL: {
+      regex: /\b\d{1,2}\.?\d{3}\.?\d{3}-?[\dkK]\b/g,
+      label: "RUT",
+      mask: "[RUT]",
+    },
+    NIT_CO: {
+      regex: /\b\d{9,10}-?\d\b/g,
+      label: "NIT",
+      mask: "[NIT]",
+    },
+    RUC_PE: {
+      regex: /\b(?:10|15|17|20)\d{9}\b/g,
+      label: "RUC",
+      mask: "[RUC]",
+    },
+
+    // ─── Portugal ─────────────────────────────────────────────────────
+    PT_NIF: {
+      regex: /\b[1-3]\d{8}\b/g,
+      label: "NIF",
+      mask: "[NIF]",
+    },
+    PT_NISS: {
+      regex: /\b[12]\d{10}\b/g,
+      label: "NISS",
+      mask: "[NISS]",
+    },
+
+    // ─── China ────────────────────────────────────────────────────────
+    CN_RESIDENT_ID: {
+      regex: /\b\d{17}[\dXx]\b/g,
+      label: "CN Resident ID",
+      mask: "[CN_ID]",
+    },
+    CN_PHONE: {
+      regex: /\b(?:\+?86[\s-]?)?1[3-9]\d[\s-]?\d{4}[\s-]?\d{4}\b/g,
+      label: "CN Phone",
+      mask: "[CN_PHONE]",
+    },
+
+    // ─── Russia ───────────────────────────────────────────────────────
+    RU_INN: {
+      regex: /\b\d{12}\b|\b\d{10}\b/g,
+      label: "INN",
+      mask: "[INN]",
+    },
+    RU_SNILS: {
+      regex: /\b\d{3}-\d{3}-\d{3}\s?\d{2}\b/g,
+      label: "SNILS",
+      mask: "[SNILS]",
+    },
+
+    // ─── India ────────────────────────────────────────────────────────
+    IN_AADHAAR: {
+      regex: /\b[2-9]\d{3}\s?\d{4}\s?\d{4}\b/g,
+      label: "Aadhaar",
+      mask: "[AADHAAR]",
+    },
+    IN_PAN: {
+      regex: /\b[A-Z]{5}\d{4}[A-Z]\b/g,
+      label: "PAN",
+      mask: "[PAN]",
+    },
+    IN_GSTIN: {
+      regex: /\b\d{2}[A-Z]{5}\d{4}[A-Z][A-Z0-9][Zz][A-Z0-9]\b/g,
+      label: "GSTIN",
+      mask: "[GSTIN]",
+    },
   });
 
 export const INPUT_SELECTORS: readonly string[] = Object.freeze([

@@ -19,7 +19,7 @@ export const detectSensitiveData = (text: string): Detection[] => {
 
     while ((match = regex.exec(text)) !== null) {
       const value = match[0];
-      const posKey = `${match.index}:${value}`;
+      const posKey = `${key}:${match.index}:${value}`;
 
       if (!seen.has(posKey)) {
         seen.add(posKey);
@@ -51,7 +51,9 @@ export const generateMasks = (detection: Detection): string[] => {
       }
       break;
     }
-    case "PHONE": {
+    case "PHONE":
+    case "BR_PHONE":
+    case "CN_PHONE": {
       const digits = value.replace(/\D/g, "");
       if (digits.length >= 4) {
         suggestions.push(`[PHONE:XXX-XXX-${digits.slice(-4)}]`);
@@ -64,6 +66,13 @@ export const generateMasks = (detection: Detection): string[] => {
     case "CPF":
     case "DNI":
     case "SSN":
+    case "CUIT":
+    case "NIT_CO":
+    case "RUT_CL":
+    case "RUC_PE":
+    case "PT_NIF":
+    case "RU_INN":
+    case "IN_AADHAAR":
       suggestions.push(`[${type}:***${value.slice(-3)}]`);
       break;
     case "IPV4":
