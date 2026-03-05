@@ -16,10 +16,10 @@ check() {
   local label="$1" expected="$2" actual="$3"
   if [[ "$actual" == "$expected" ]]; then
     echo "  ✓ $label"
-    ((PASS++))
+    ((PASS++)) || true
   else
     echo "  ✗ $label  (expected $expected, got $actual)"
-    ((FAIL++))
+    ((FAIL++)) || true
   fi
 }
 

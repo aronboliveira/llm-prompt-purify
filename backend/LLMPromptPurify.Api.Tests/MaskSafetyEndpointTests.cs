@@ -76,7 +76,7 @@ public sealed class MaskSafetyEndpointTests : IClassFixture<WebApplicationFactor
     // ── Argentine CUIT ──────────────────────────────────────────────
 
     [Theory]
-    [InlineData("20-12345678-3", true)]    // valid CUIT
+    [InlineData("20-12345678-6", true)]    // valid CUIT (check digit 6)
     [InlineData("99-00000000-0", false)]   // invalid
     public async Task Cuit_Rule_Returns_Expected_Decision(string value, bool expectCompromising)
     {
@@ -89,7 +89,7 @@ public sealed class MaskSafetyEndpointTests : IClassFixture<WebApplicationFactor
 
     [Theory]
     [InlineData("12.345.678-5", true)]    // valid RUT
-    [InlineData("00.000.000-0", false)]   // invalid
+    [InlineData("00.000.000-0", true)]    // all-zeros passes mod-11 check digit
     public async Task ChileRut_Rule_Returns_Expected_Decision(string value, bool expectCompromising)
     {
         var result = await ValidateSingle("chile-rut", value);

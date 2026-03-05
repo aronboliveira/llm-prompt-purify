@@ -18,8 +18,18 @@ public static class TestServiceOverrides
         // Remove real Npgsql data source (requires running PostgreSQL)
         services.RemoveAll<NpgsqlDataSource>();
 
-        // Remove database initializer (it would try to open a Npgsql connection)
+        // Replace database initializer with a no-op stub so GetRequiredService
+        // in Program.cs succeeds without needing a real NpgsqlDataSource.
         services.RemoveAll<FeedbackDatabaseInitializer>();
+        services.AddSingleton<FeedbackDatabaseInitializer>(sp =>
+        {
+            // Use the parameterless-style trick: create via
+            // System.Runtime.CompilerServices.RuntimeHelpers (uninitialized)
+            // — but simpler: pass a null NpgsqlDataSource since
+            // InitializeAsync will never be reached (caught by try/catch).
+            return (FeedbackDatabaseInitializer)System.Runtime.CompilerServices
+                .RuntimeHelpers.GetUninitializedObject(typeof(FeedbackDatabaseInitializer));
+        });
 
         // Replace repository with in-memory fake
         services.RemoveAll<IFeedbackRepository>();
@@ -33,7 +43,7 @@ public static class TestServiceOverrides
     private sealed class InMemoryFeedbackRepository : IFeedbackRepository
     {
         private readonly List<FeedbackEntry> _entries = [];
-        private readonly Lock _lock = new();
+        private readonly object _lock = new();
 
         public Task CreateAsync(FeedbackEntry entry, CancellationToken cancellationToken)
         {

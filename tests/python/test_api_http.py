@@ -21,19 +21,30 @@ BASE_URL = os.environ.get("BASE_URL", "http://localhost:5185").rstrip("/")
 
 
 def _post_json(path: str, body: Any) -> tuple[int, dict]:
-    """POST JSON to the API and return (status_code, parsed_body)."""
+    """POST JSON to the API and return (status_code, parsed_body).
+
+    Retries transparently when the server returns 429 (rate-limited).
+    """
+    import time as _time
+
     data = json.dumps(body).encode("utf-8")
-    req = urllib.request.Request(
-        f"{BASE_URL}{path}",
-        data=data,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req) as resp:
-            return resp.status, json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        return e.code, json.loads(e.read().decode("utf-8"))
+
+    for attempt in range(6):
+        req = urllib.request.Request(
+            f"{BASE_URL}{path}",
+            data=data,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req) as resp:
+                return resp.status, json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            if e.code == 429 and attempt < 5:
+                _time.sleep(32)  # wait for sliding-window segment to expire
+                continue
+            raw = e.read().decode("utf-8")
+            return e.code, json.loads(raw) if raw else {}
 
 
 def _get(path: str) -> tuple[int, dict]:
@@ -334,7 +345,7 @@ class TestMaskSafetyValidation:
 
     def test_valid_cuit(self):
         status, body = self._validate([
-            {"ruleId": "cuit", "candidateValue": "20-12345678-3"},
+            {"ruleId": "cuit", "candidateValue": "20-12345678-6"},
         ])
         assert status == 200
         assert body["results"][0]["isCompromising"] is True
