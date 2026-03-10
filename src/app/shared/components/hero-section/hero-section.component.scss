@@ -1,53 +1,86 @@
-@use "../../../shared/styles/design" as ui;
+@use "../../styles/design" as ui;
 
-.hero {
-  @include ui.entrance-slide(Y, 1rem);
-  @include ui.surface-card();
+@scope (.hero) {
+  :scope {
+    @include ui.entrance-slide(Y, 1rem);
+    @include ui.surface-card();
 
-  border: 1px solid var(--panel-border);
-  display: grid;
-  gap: 1rem;
-  margin-block-end: 1rem;
-  overflow: clip;
-  padding: 1.3rem;
-}
+    border: 1px solid var(--panel-border);
+    display: grid;
+    gap: 1rem;
+    margin-block-end: 1rem;
+    overflow: clip;
+    padding: 1.3rem;
+  }
 
-.hero__body {
-  color: var(--muted);
-  line-height: 1.7;
-  margin: 0;
-}
+  :scope .hero__body {
+    color: ui.muted();
+    line-height: 1.7;
+    margin: 0;
+  }
 
-.hero__notice {
-  align-items: center;
-  background: rgba(248, 255, 254, 0.94);
-  border: 1px solid rgba(15, 118, 110, 0.12);
-  border-radius: ui.panel-radius(0.35);
-  display: grid;
-  gap: 0.9rem;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  padding: 0.95rem 1rem;
-}
+  :scope .hero__notice {
+    background: var(--surface-subtle-strong, rgba(248, 255, 254, 0.94));
+    border: 1px solid var(--surface-accent-border, rgba(15, 118, 110, 0.12));
+    border-radius: ui.panel-radius(0.35);
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.95rem 1rem;
+  }
 
-.hero__notice-icon {
-  @include ui.icon-embed(1.1rem);
-}
+  :scope .hero__notice-summary {
+    align-items: center;
+    cursor: pointer;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    list-style: none;
+  }
 
-.hero__notice-title,
-.hero__notice-body {
-  margin: 0;
-}
+  :scope .hero__notice-summary::after {
+    color: ui.muted();
+    content: "+";
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+  }
 
-.hero__notice-title {
-  color: var(--ink);
-  font-weight: 700;
-}
+  :scope .hero__notice[open] .hero__notice-summary::after {
+    content: "−";
+  }
 
-.hero__notice-body {
-  color: var(--muted);
-  line-height: 1.7;
-}
+  :scope .hero__notice-summary::-webkit-details-marker {
+    display: none;
+  }
 
-.help-trigger {
-  @include ui.help-button;
+  :scope .hero__notice-content {
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  :scope .hero__notice-icon {
+    @include ui.icon-embed(1.1rem);
+  }
+
+  :scope .hero__notice-title,
+  :scope .hero__notice-body {
+    margin: 0;
+  }
+
+  :scope .hero__notice-title {
+    color: ui.ink();
+    display: block;
+    font-weight: 700;
+  }
+
+  :scope .hero__notice-body {
+    color: ui.muted();
+    line-height: 1.7;
+  }
+
+  :scope .help-trigger {
+    @include ui.help-button;
+
+    justify-self: end;
+  }
 }

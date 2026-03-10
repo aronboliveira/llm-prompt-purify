@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { type ComponentFixture, TestBed } from "@angular/core/testing";
 import { ScannerToolbarComponent } from "./scanner-toolbar.component";
 import { DomSanitizer } from "@angular/platform-browser";
 
@@ -69,8 +69,11 @@ describe("ScannerToolbarComponent", () => {
     fixture.componentRef.setInput("showWarning", true);
     fixture.detectChanges();
 
-    const warningEl = element.querySelector(".scanner-toolbar__warning");
+    const warningEl = element.querySelector(
+      ".scanner-toolbar__warning",
+    ) as HTMLDetailsElement;
     expect(warningEl).toBeTruthy();
+    expect(warningEl.open).toBe(false);
     expect(warningEl?.textContent).toContain("Please select a country");
   });
 

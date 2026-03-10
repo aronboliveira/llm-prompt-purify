@@ -28,6 +28,12 @@
   <p class="scanner-toolbar__summary">{{ scopeDescription() }}</p>
 
   @if (showWarning() && warning()) {
-    <small class="scanner-toolbar__warning">{{ warning() }}</small>
+    <details class="scanner-toolbar__warning">
+      <summary class="scanner-toolbar__warning-summary">
+        <span aria-hidden="true">⚠️</span>
+        <span>Language scope warning</span>
+      </summary>
+      <p class="scanner-toolbar__warning-body">{{ warning() }}</p>
+    </details>
   }
 </section>

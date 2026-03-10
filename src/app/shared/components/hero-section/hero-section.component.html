@@ -1,18 +1,30 @@
 <section class="hero">
   <p class="hero__body">{{ body() }}</p>
 
-  <div class="hero__notice">
-    <span
-      aria-hidden="true"
-      class="hero__notice-icon"
-      [innerHTML]="noticeIcon()"
-    ></span>
-    <div>
-      <p class="hero__notice-title">{{ noticeTitle() }}</p>
+  <details class="hero__notice">
+    <summary class="hero__notice-summary">
+      <span
+        aria-hidden="true"
+        class="hero__notice-icon"
+        [innerHTML]="noticeIcon()"
+      ></span>
+      <span class="hero__notice-title">{{ noticeTitle() }}</span>
+    </summary>
+
+    <div class="hero__notice-content">
       <p class="hero__notice-body">{{ noticeBody() }}</p>
+      <button
+        aria-label="Help"
+        class="help-trigger"
+        type="button"
+        (click)="requestHelp()"
+      >
+        <span
+          aria-hidden="true"
+          class="help-trigger__icon"
+          [innerHTML]="icons.help"
+        ></span>
+      </button>
     </div>
-    <button class="help-trigger" type="button" (click)="requestHelp()">
-      (?)
-    </button>
-  </div>
+  </details>
 </section>

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { type ComponentFixture, TestBed } from "@angular/core/testing";
 import { HeroSectionComponent } from "./hero-section.component";
 import { DomSanitizer } from "@angular/platform-browser";
 
@@ -46,9 +46,11 @@ describe("HeroSectionComponent", () => {
     fixture.componentRef.setInput("noticeBody", "Your data stays local");
     fixture.detectChanges();
 
+    const notice = element.querySelector(".hero__notice") as HTMLDetailsElement;
     const titleEl = element.querySelector(".hero__notice-title");
     const bodyEl = element.querySelector(".hero__notice-body");
 
+    expect(notice.open).toBe(false);
     expect(titleEl?.textContent).toBe("Privacy Notice");
     expect(bodyEl?.textContent).toBe("Your data stays local");
   });
