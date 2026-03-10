@@ -1,0 +1,364 @@
+@use "../../design" as ui;
+@use "./transient-tools" as transient;
+
+@position-try --feedback-trigger-fallback {
+  inset-area: top right;
+  margin: 1rem;
+}
+
+@position-try --feedback-sheet-fallback {
+  inset-area: center right;
+  margin: 1rem;
+}
+
+.feedback-trigger {
+  @include ui.focus-ring();
+  @include ui.surface-card(0.7, 0.12);
+  @include transient.interactive-lift(1px);
+  @include transient.reduced-motion;
+
+  align-items: center;
+  border: 1px solid rgba(11, 38, 61, 0.08);
+  color: #0f172a;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 0.55rem;
+  inset-block-start: 1.15rem;
+  inset-inline-end: 1.15rem;
+  padding: 0.72rem 0.95rem;
+  position: fixed;
+  position-try-options: --feedback-trigger-fallback;
+  z-index: transient.overlay-z(5);
+}
+
+.feedback-trigger__icon {
+  @include ui.icon-embed(1.05rem);
+
+  display: inline-flex;
+}
+
+.feedback-backdrop {
+  background: rgba(7, 22, 38, 0.42);
+  inset: 0;
+  position: fixed;
+  z-index: transient.overlay-z(15);
+}
+
+@scope (.feedback-backdrop) {
+  :scope .feedback-sheet {
+    @include ui.surface-card(1, 0.16);
+    @include ui.entrance-slide(X, 1rem);
+    @include transient.reduced-motion;
+
+    block-size: min(100vh - 2rem, 52rem);
+    container-type: inline-size;
+    display: grid;
+    gap: 1rem;
+    inset-block-start: 1rem;
+    inset-inline-end: 1rem;
+    max-inline-size: 31rem;
+    overflow: auto;
+    padding: 1.2rem;
+    position: absolute;
+    position-try-options: --feedback-sheet-fallback;
+    width: min(calc(100vw - 2rem), 31rem);
+  }
+
+  :scope .feedback-sheet__header,
+  :scope .feedback-sheet__title-wrap,
+  :scope .feedback-form__actions,
+  :scope .feedback-form__split,
+  :scope .feedback-field__meta,
+  :scope .feedback-rating__options,
+  :scope .feedback-toggle {
+    @include ui.flex-bar(0.8rem);
+  }
+
+  :scope .feedback-sheet__header {
+    align-items: start;
+    justify-content: space-between;
+  }
+
+  :scope .feedback-sheet__title-wrap {
+    align-items: start;
+  }
+
+  :scope .feedback-sheet__icon {
+    @include ui.icon-embed(1.05rem);
+
+    background: #edf9f6;
+    border-radius: 999px;
+    color: ui.accent();
+    padding: 0.7rem;
+  }
+
+  :scope .feedback-sheet__eyebrow,
+  :scope .feedback-sheet__body,
+  :scope .feedback-field__hint,
+  :scope .feedback-field__meta,
+  :scope .feedback-toggle__body {
+    color: #425466;
+    margin: 0;
+  }
+
+  :scope .feedback-sheet__eyebrow {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  :scope .feedback-sheet h2 {
+    color: #0f172a;
+    margin: 0.2rem 0 0;
+  }
+
+  :scope .feedback-sheet__body {
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  :scope .feedback-sheet__notice {
+    @include ui.warning-banner(0.65rem 0.8rem);
+
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
+  }
+
+  :scope .feedback-sheet__notice-summary {
+    align-items: center;
+    cursor: pointer;
+    display: inline-flex;
+    font-weight: 700;
+    gap: 0.45rem;
+    list-style: none;
+  }
+
+  :scope .feedback-sheet__notice-summary::after {
+    color: inherit;
+    content: "+";
+    font-size: 1rem;
+    line-height: 1;
+    margin-inline-start: 0.1rem;
+  }
+
+  :scope .feedback-sheet__notice[open] .feedback-sheet__notice-summary::after {
+    content: "−";
+  }
+
+  :scope .feedback-sheet__notice-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  :scope .feedback-sheet__close,
+  :scope .feedback-button,
+  :scope .feedback-rating__option {
+    @include ui.focus-ring();
+
+    appearance: none;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+  }
+
+  :scope .feedback-sheet__close,
+  :scope .feedback-button,
+  :scope .feedback-rating__option {
+    @include transient.interactive-lift(1px);
+    @include transient.reduced-motion;
+  }
+
+  :scope .feedback-sheet__close {
+    @include ui.close-button(0.65rem);
+  }
+
+  :scope .feedback-sheet__close :is(svg) {
+    display: inline-flex;
+  }
+
+  :scope .feedback-form,
+  :scope .feedback-field,
+  :scope .feedback-rating {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  :scope .feedback-form {
+    gap: transient.fluid-gap(0.85rem, 1.1rem, 1.1vw);
+  }
+
+  :scope .feedback-form__split {
+    align-items: start;
+  }
+
+  :scope .feedback-form__split > * {
+    flex: 1 1 0;
+  }
+
+  :scope .feedback-field__label,
+  :scope .feedback-rating legend,
+  :scope .feedback-toggle__title {
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  :scope .feedback-field__required {
+    color: #0f766e;
+    font-size: 0.82rem;
+    margin-inline-start: 0.35rem;
+  }
+
+  :scope .feedback-field__control {
+    @include ui.focus-ring();
+
+    appearance: none;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid ui.panel-border(0.12);
+    border-radius: ui.panel-radius(0.45);
+    color: ui.ink();
+    font: inherit;
+    padding: 0.85rem 0.95rem;
+  }
+
+  :scope .feedback-field__control--textarea {
+    min-block-size: 11rem;
+    resize: vertical;
+  }
+
+  :scope .feedback-field__hint,
+  :scope .feedback-field__meta,
+  :scope .feedback-toggle__body {
+    font-size: 0.86rem;
+    line-height: 1.55;
+  }
+
+  :scope .feedback-field__meta {
+    justify-content: space-between;
+  }
+
+  :scope .feedback-field__error {
+    color: #b42318;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  :scope .feedback-rating {
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  :scope .feedback-rating__options {
+    flex-wrap: wrap;
+  }
+
+  :scope .feedback-rating__option {
+    background: #eff5f8;
+    color: #425466;
+    min-inline-size: 2.5rem;
+    padding: 0.62rem 0.8rem;
+  }
+
+  :scope .feedback-rating__option[data-state="active"] {
+    background: linear-gradient(135deg, #0f766e, #115e59);
+    color: #f8fffe;
+  }
+
+  :scope .feedback-toggle {
+    @include ui.focus-ring();
+
+    align-items: start;
+    background: rgba(245, 249, 251, 0.96);
+    border: 1px solid ui.panel-border();
+    border-radius: ui.panel-radius(0.45);
+    padding: 0.95rem 1rem;
+  }
+
+  :scope .feedback-toggle input {
+    @include ui.accent-input;
+
+    margin: 0.2rem 0 0;
+  }
+
+  :scope .feedback-form__actions {
+    justify-content: flex-end;
+    margin-block-start: 0.25rem;
+  }
+
+  :scope .feedback-button {
+    padding: 0.78rem 1.05rem;
+  }
+
+  :scope .feedback-button:disabled,
+  :scope .feedback-sheet__close:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+    transform: none;
+  }
+
+  :scope .feedback-button--primary {
+    background: linear-gradient(135deg, #0f766e, #115e59);
+    color: #f8fffe;
+  }
+
+  :scope .feedback-button--secondary {
+    background: #eff5f8;
+    color: #0f172a;
+  }
+}
+
+@container (max-width: 28rem) {
+  .feedback-form__split,
+  .feedback-form__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .feedback-button {
+    justify-content: center;
+  }
+}
+
+@media (pointer: coarse) {
+  .feedback-trigger,
+  .feedback-button,
+  .feedback-sheet__close,
+  .feedback-rating__option {
+    min-block-size: 2.75rem;
+  }
+
+  .feedback-sheet {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .feedback-sheet__icon {
+      background: rgba(45, 212, 191, 0.12);
+    }
+
+    .feedback-field__error {
+      color: #fca5a5;
+    }
+  }
+}
+
+@media (max-width: 56rem) {
+  .feedback-trigger {
+    inset-block-start: 0.8rem;
+    inset-inline-end: 0.8rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .feedback-sheet {
+    block-size: calc(100vh - 1rem);
+    inset-block-start: 0.5rem;
+    inset-inline-end: 0.5rem;
+    width: calc(100vw - 1rem);
+  }
+}

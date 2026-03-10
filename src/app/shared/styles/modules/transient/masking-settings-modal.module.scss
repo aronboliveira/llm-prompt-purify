@@ -1,0 +1,498 @@
+@use "../../design" as ui;
+@use "../../modal" as modal;
+@use "./transient-tools" as transient;
+
+.settings-modal-backdrop {
+  @include modal.modal-backdrop;
+
+  z-index: transient.overlay-z(6);
+}
+
+@scope (.settings-modal-backdrop) {
+  :scope .settings-modal {
+    @include modal.modal-shell(48rem);
+    @include transient.contained-shell(1.5rem, 85vh);
+
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  :scope .settings-modal__header,
+  :scope .settings-modal__title-wrap,
+  :scope .settings-modal__title-row {
+    @include ui.flex-bar();
+  }
+
+  :scope .settings-modal__header {
+    border-block-end: 1px solid var(--panel-border, rgba(11, 38, 61, 0.08));
+    justify-content: space-between;
+    padding-block-end: 0.75rem;
+  }
+
+  :scope .settings-modal__title-row {
+    align-items: center;
+  }
+
+  :scope .settings-modal__icon {
+    @include ui.icon-embed(1.4rem);
+
+    color: ui.accent();
+    flex-shrink: 0;
+  }
+
+  :scope .settings-modal__body-copy,
+  :scope .settings-toggle__body,
+  :scope .settings-card p,
+  :scope .settings-fieldset__description,
+  :scope .mask-group-toggle__body {
+    color: var(--text-muted, #546475);
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  :scope .settings-modal__body-copy,
+  :scope .settings-card p {
+    @include ui.body-text();
+  }
+
+  :scope .settings-modal__close {
+    @include modal.modal-close-button;
+    @include transient.interactive-lift(1px);
+    @include transient.reduced-motion;
+
+    background: var(
+      --btn-secondary-bg,
+      linear-gradient(180deg, #f0f7f9 0%, #e8f4f6 100%)
+    );
+    border: 1px solid var(--btn-secondary-border, rgba(15, 118, 110, 0.15));
+    border-radius: 0.5rem;
+    color: var(--btn-secondary-text, #1e293b);
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+  }
+
+  :scope .settings-fieldset {
+    border: 1px solid var(--surface-accent-border, rgba(15, 118, 110, 0.12));
+    border-radius: ui.panel-radius(0.35);
+    display: grid;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 1rem;
+  }
+
+  :scope .settings-fieldset__legend {
+    color: ui.accent();
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 0 0.5rem;
+    text-transform: uppercase;
+  }
+
+  :scope .settings-fieldset__description {
+    margin: 0;
+  }
+
+  :scope .settings-toggle {
+    @include ui.focus-ring();
+    @include transient.reduced-motion;
+
+    align-items: start;
+    background: var(
+      --surface-field,
+      linear-gradient(180deg, rgba(248, 252, 251, 0.98), rgba(243, 250, 249, 0.96))
+    );
+    border: 1px solid var(--surface-accent-border, rgba(15, 118, 110, 0.14));
+    border-radius: ui.panel-radius(0.35);
+    cursor: pointer;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 0.875rem 1rem;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease;
+  }
+
+  :scope .settings-toggle:hover {
+    background: var(
+      --surface-accent-hover,
+      linear-gradient(180deg, rgba(240, 248, 246, 0.98), rgba(235, 245, 243, 0.96))
+    );
+    border-color: var(--surface-accent-border, rgba(15, 118, 110, 0.22));
+  }
+
+  :scope .settings-toggle input {
+    @include ui.accent-input;
+
+    block-size: 1.125rem;
+    inline-size: 1.125rem;
+    margin: 0.125rem 0 0;
+  }
+
+  :scope .settings-toggle__copy {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  :scope .settings-toggle__title,
+  :scope .settings-card__summary,
+  :scope .settings-risk-note__summary,
+  :scope .mask-group-toggle__title {
+    color: ui.ink();
+    font-size: 0.9375rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  :scope .mask-group-grid {
+    display: grid;
+    gap: 0.625rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  :scope .mask-group-toggle {
+    @include ui.focus-ring();
+    @include transient.reduced-motion;
+
+    align-items: start;
+    background: var(--surface-bg, #fff);
+    border: 1px solid var(--panel-border, rgba(11, 38, 61, 0.1));
+    border-radius: ui.panel-radius(0.3);
+    cursor: pointer;
+    display: grid;
+    gap: 0.625rem;
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 0.75rem;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  :scope .mask-group-toggle:hover {
+    background: var(--surface-accent-hover, rgba(248, 252, 251, 0.95));
+    border-color: var(--surface-accent-border, rgba(15, 118, 110, 0.2));
+    box-shadow: 0 2px 8px rgba(15, 118, 110, 0.06);
+  }
+
+  :scope .mask-group-toggle:has(input:checked) {
+    background: var(--surface-selected, rgba(240, 253, 250, 0.95));
+    border-color: var(--surface-selected-border, rgba(15, 118, 110, 0.28));
+  }
+
+  :scope .mask-group-toggle input {
+    @include ui.accent-input;
+
+    block-size: 1rem;
+    inline-size: 1rem;
+    margin: 0.125rem 0 0;
+  }
+
+  :scope .mask-group-toggle__content {
+    display: grid;
+    gap: 0.375rem;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  :scope .mask-group-toggle__icon {
+    @include ui.icon-embed(1.1rem);
+
+    color: ui.accent();
+    margin-block-start: 0.0625rem;
+  }
+
+  :scope .mask-group-toggle__text {
+    display: grid;
+    gap: 0.125rem;
+  }
+
+  :scope .mask-group-toggle__body {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+
+  :scope .settings-risk-note {
+    @include ui.warning-banner(0.65rem 0.8rem);
+
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
+  }
+
+  :scope .settings-risk-note__summary {
+    align-items: center;
+    color: var(--warning-text, #92400e);
+    cursor: pointer;
+    display: inline-flex;
+    gap: 0.45rem;
+    list-style: none;
+  }
+
+  :scope .settings-risk-note__summary::after {
+    color: inherit;
+    content: "+";
+    font-size: 1rem;
+    line-height: 1;
+    margin-inline-start: 0.1rem;
+  }
+
+  :scope .settings-risk-note[open] .settings-risk-note__summary::after {
+    content: "−";
+  }
+
+  :scope .settings-risk-note__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  :scope .settings-risk-note .settings-fieldset__description {
+    color: var(--warning-text, #92400e);
+    margin: 0;
+  }
+
+  :scope .settings-card-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :scope .settings-card {
+    background: var(
+      --surface-field,
+      linear-gradient(180deg, #f8fbfc 0%, #f3f8fa 100%)
+    );
+    border: 1px solid var(--panel-border, rgba(11, 38, 61, 0.08));
+    border-radius: ui.panel-radius(0.3);
+    display: grid;
+    gap: 0.375rem;
+    padding: 0.875rem;
+  }
+
+  :scope .settings-card--warning {
+    background: var(--warning-bg-opaque, rgba(245, 158, 11, 0.22));
+    border-color: var(--warning-border, rgba(180, 83, 9, 0.26));
+  }
+
+  :scope .settings-card__summary {
+    align-items: center;
+    cursor: pointer;
+    display: inline-flex;
+    gap: 0.45rem;
+    list-style: none;
+    margin: 0;
+  }
+
+  :scope .settings-card__summary::after {
+    color: var(--text-muted, #546475);
+    content: "+";
+    font-size: 1rem;
+    line-height: 1;
+    margin-inline-start: 0.15rem;
+  }
+
+  :scope .settings-card[open] .settings-card__summary::after {
+    content: "−";
+  }
+
+  :scope .settings-card__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  :scope .settings-card__content {
+    display: grid;
+    gap: 0.375rem;
+  }
+
+  :scope .settings-card--warning .settings-card__summary,
+  :scope .settings-card--warning p {
+    color: var(--warning-text, #92400e);
+  }
+
+  :scope .settings-card__summary {
+    font-size: 0.875rem;
+  }
+
+  :scope .settings-card__content p {
+    font-size: 0.8125rem;
+    margin: 0;
+  }
+
+  :scope .help-trigger {
+    @include ui.help-button;
+
+    font-size: 0.8125rem;
+  }
+
+  /* ── Masking strategy radio grid ────────────────────────── */
+
+  :scope .strategy-radio-grid {
+    display: grid;
+    gap: 0.625rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  :scope .strategy-radio {
+    @include ui.focus-ring();
+    @include transient.reduced-motion;
+
+    align-items: start;
+    background: var(--surface-bg, #fff);
+    border: 1px solid var(--panel-border, rgba(11, 38, 61, 0.1));
+    border-radius: ui.panel-radius(0.3);
+    cursor: pointer;
+    display: grid;
+    gap: 0.625rem;
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 0.75rem;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  :scope .strategy-radio:hover {
+    background: var(--surface-accent-hover, rgba(248, 252, 251, 0.95));
+    border-color: var(--surface-accent-border, rgba(15, 118, 110, 0.2));
+    box-shadow: 0 2px 8px rgba(15, 118, 110, 0.06);
+  }
+
+  :scope .strategy-radio--selected,
+  :scope .strategy-radio:has(input:checked) {
+    background: var(--surface-selected, rgba(240, 253, 250, 0.95));
+    border-color: var(--surface-selected-border, rgba(15, 118, 110, 0.28));
+  }
+
+  :scope .strategy-radio input[type="radio"] {
+    @include ui.accent-input;
+
+    block-size: 1rem;
+    inline-size: 1rem;
+    margin: 0.125rem 0 0;
+  }
+
+  :scope .strategy-radio__content {
+    display: grid;
+    gap: 0.125rem;
+  }
+
+  :scope .strategy-radio__title {
+    color: ui.ink();
+    font-size: 0.9375rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  :scope .strategy-radio__body {
+    color: var(--text-muted, #546475);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+
+  /* ── Textareas (blocklist / ignore list) ────────────────── */
+
+  :scope .settings-textarea {
+    background: var(--surface-bg, #fff);
+    border: 1px solid var(--surface-accent-border, rgba(15, 118, 110, 0.18));
+    border-radius: ui.panel-radius(0.25);
+    color: var(--text-strong, #0f172a);
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    min-block-size: 4.5rem;
+    padding: 0.625rem 0.75rem;
+    resize: vertical;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+    width: 100%;
+  }
+
+  :scope .settings-textarea:focus {
+    border-color: rgba(15, 118, 110, 0.45);
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.08);
+    outline: none;
+  }
+
+  :scope .settings-textarea::placeholder {
+    color: var(--text-placeholder, #94a3b8);
+  }
+
+  /* ── XML tag picker ─────────────────────────────────────── */
+
+  :scope .xml-tag-picker {
+    align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    padding-block-start: 0.25rem;
+  }
+
+  :scope .xml-tag-picker__label {
+    color: ui.ink();
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  :scope .xml-tag-picker__select {
+    appearance: none;
+    background: var(--surface-bg, #fff)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23546475' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      no-repeat right 0.75rem center;
+    border: 1px solid var(--surface-accent-border, rgba(15, 118, 110, 0.18));
+    border-radius: ui.panel-radius(0.25);
+    color: var(--text-strong, #0f172a);
+    cursor: pointer;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+    font-size: 0.8125rem;
+    max-width: 18rem;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+    width: 100%;
+  }
+
+  :scope .xml-tag-picker__select:focus {
+    border-color: rgba(15, 118, 110, 0.45);
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.08);
+    outline: none;
+  }
+}
+
+@container (max-width: 42rem) {
+  .settings-card-grid,
+  .mask-group-grid,
+  .strategy-radio-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-modal__header {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .settings-modal__close {
+    align-self: end;
+  }
+}
+
+@media (pointer: coarse) {
+  .settings-toggle,
+  .mask-group-toggle {
+    padding: 0.95rem 1rem;
+  }
+
+  .settings-modal__close {
+    min-block-size: 2.75rem;
+  }
+}
+
+@media (max-width: 42rem) {
+  .settings-modal-backdrop {
+    padding: 1rem;
+  }
+
+  .settings-modal {
+    padding: 1rem;
+  }
+}

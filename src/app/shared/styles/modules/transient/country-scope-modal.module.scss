@@ -1,0 +1,203 @@
+@use "../../design" as ui;
+@use "../../modal" as modal;
+@use "./transient-tools" as transient;
+
+.country-modal-backdrop {
+  @include modal.modal-backdrop;
+
+  z-index: transient.overlay-z(4);
+}
+
+@scope (.country-modal-backdrop) {
+  :scope .country-modal {
+    @include modal.modal-shell(56rem);
+    @include transient.contained-shell(1.5rem, 85vh);
+
+    display: grid;
+    gap: 1rem;
+  }
+
+  :scope .country-modal__header,
+  :scope .country-modal__title-row {
+    @include ui.flex-bar();
+  }
+
+  :scope .country-modal__header {
+    justify-content: space-between;
+  }
+
+  :scope .country-modal__title-row {
+    align-items: center;
+  }
+
+  :scope .country-modal__body-copy,
+  :scope .country-card__description,
+  :scope .country-card__meta {
+    color: var(--text-muted, #556576);
+  }
+
+  :scope .country-modal__body-copy,
+  :scope .country-card__description {
+    @include ui.body-text();
+  }
+
+  :scope .country-modal__warning {
+    @include ui.warning-banner();
+
+    display: grid;
+    flex-shrink: 0;
+    gap: 0.45rem;
+    margin-block-end: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  :scope .country-modal__warning-summary {
+    align-items: center;
+    cursor: pointer;
+    display: inline-flex;
+    font-weight: 700;
+    gap: 0.45rem;
+    list-style: none;
+  }
+
+  :scope .country-modal__warning-summary::after {
+    content: "+";
+    font-size: 1rem;
+    line-height: 1;
+    margin-inline-start: 0.1rem;
+  }
+
+  :scope .country-modal__warning[open] .country-modal__warning-summary::after {
+    content: "−";
+  }
+
+  :scope .country-modal__warning-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  :scope .country-modal__warning-body {
+    margin: 0;
+  }
+
+  :scope .country-modal__close {
+    @include modal.modal-close-button;
+    @include transient.interactive-lift(1px);
+    @include transient.reduced-motion;
+  }
+
+  :scope .country-grid {
+    display: grid;
+    gap: 0.85rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :scope .country-card {
+    @include ui.focus-ring();
+    @include transient.reduced-motion;
+
+    background: var(--surface-subtle-strong, rgba(248, 251, 253, 0.92));
+    border: 1px solid var(--panel-border, rgba(11, 38, 61, 0.08));
+    border-radius: ui.panel-radius(0.45);
+    cursor: pointer;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    padding: 0.95rem 1rem;
+    position: relative;
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  :scope .country-card[data-selected="true"] {
+    background: var(--surface-selected, rgba(236, 253, 250, 0.94));
+    border-color: var(--surface-selected-border, rgba(15, 118, 110, 0.24));
+  }
+
+  :scope .country-card::after {
+    background: linear-gradient(
+      90deg,
+      rgba(15, 118, 110, 0.92),
+      rgba(217, 119, 6, 0.24)
+    );
+    block-size: 0.18rem;
+    border-radius: 999px;
+    content: "";
+    inline-size: 0;
+    inset-block-end: 0;
+    inset-inline-start: 1rem;
+    position: absolute;
+    transition: inline-size 160ms ease;
+  }
+
+  :scope .country-card[data-selected="true"]::after {
+    inline-size: calc(100% - 2rem);
+  }
+
+  :scope .country-card input {
+    @include ui.accent-input;
+
+    margin: 0.22rem 0 0;
+  }
+
+  :scope .country-card__flag {
+    font-size: 1.4rem;
+  }
+
+  :scope .country-card__copy {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  :scope .country-card__title {
+    color: ui.ink();
+    font-weight: 700;
+  }
+
+  :scope .country-card__meta {
+    font-size: 0.82rem;
+  }
+
+  :scope .help-trigger {
+    @include ui.help-button;
+  }
+}
+
+@container (max-width: 42rem) {
+  .country-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .country-modal__header {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+
+@media (pointer: coarse) {
+  .country-card {
+    padding: 1rem 1.1rem;
+  }
+
+  .country-card input {
+    block-size: 1.2rem;
+    inline-size: 1.2rem;
+  }
+
+  .country-modal__close {
+    min-block-size: 2.75rem;
+    padding: 0.8rem 1.1rem;
+  }
+}
+
+@media (max-width: 42rem) {
+  .country-modal-backdrop {
+    padding: 1rem;
+  }
+
+  .country-modal {
+    padding: 1rem;
+  }
+}

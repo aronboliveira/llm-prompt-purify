@@ -1,0 +1,40 @@
+@function overlay-z($layer: 0, $base: 40) {
+  @return $base + $layer;
+}
+
+@function fluid-gap($min: 0.55rem, $max: 1rem, $factor: 1.2vw) {
+  @return clamp($min, $factor, $max);
+}
+
+@mixin interactive-lift($distance: 1px, $transition: 180ms) {
+  transition:
+    background-color $transition ease,
+    border-color $transition ease,
+    opacity $transition ease,
+    transform $transition ease;
+
+  &:hover {
+    transform: translateY(-$distance);
+  }
+}
+
+@mixin contained-shell($padding: 1.25rem, $max-height: 85vh) {
+  container-type: inline-size;
+  max-block-size: $max-height;
+  overflow-y: auto;
+  padding: $padding;
+}
+
+@mixin coarse-target($padding: 0.75rem 1rem, $min-height: 2.75rem) {
+  @media (pointer: coarse) {
+    min-block-size: $min-height;
+    padding: $padding;
+  }
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}

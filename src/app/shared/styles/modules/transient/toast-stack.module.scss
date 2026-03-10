@@ -1,0 +1,118 @@
+@use "../../design" as ui;
+@use "./transient-tools" as transient;
+
+@position-try --toast-fallback {
+  inset-area: bottom right;
+  margin: 1rem;
+}
+
+@position-try --toast-fallback-compact {
+  inset-area: bottom center;
+  margin: 0.75rem;
+}
+
+.toast-stack {
+  container-type: inline-size;
+  display: grid;
+  gap: transient.fluid-gap();
+  inset-block-end: 1rem;
+  inset-inline-end: 1rem;
+  pointer-events: none;
+  position: fixed;
+  position-try-options: --toast-fallback, --toast-fallback-compact;
+  width: min(24rem, calc(100vw - 2rem));
+  z-index: transient.overlay-z(12);
+}
+
+@scope (.toast-stack) {
+  :scope .toast {
+    @include ui.surface-card(0.72, 0.14);
+    @include ui.entrance-slide(Y, 0.75rem);
+    @include transient.reduced-motion;
+
+    align-items: start;
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 0.95rem 1rem;
+    pointer-events: auto;
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease;
+  }
+
+  :scope .toast[data-tone="success"] {
+    border-color: rgba(15, 118, 110, 0.18);
+  }
+
+  :scope .toast[data-tone="error"] {
+    border-color: rgba(180, 35, 24, 0.2);
+  }
+
+  :scope .toast[data-tone="info"] {
+    border-color: rgba(11, 38, 61, 0.16);
+  }
+
+  :scope .toast__title,
+  :scope .toast__body {
+    margin: 0;
+  }
+
+  :scope .toast__title {
+    font-weight: 700;
+    margin-block-end: 0.2rem;
+  }
+
+  :scope .toast__body {
+    color: var(--text-muted, #425466);
+    line-height: 1.45;
+  }
+
+  :scope .toast__close {
+    @include ui.close-button(0.55rem 0.8rem);
+    @include transient.interactive-lift(1px);
+    @include transient.reduced-motion;
+  }
+}
+
+@container (max-width: 22rem) {
+  .toast {
+    gap: 0.6rem;
+    padding: 0.82rem;
+  }
+
+  .toast__close {
+    justify-self: start;
+  }
+}
+
+@media (pointer: coarse) {
+  .toast {
+    padding: 1rem;
+  }
+
+  .toast__close {
+    min-block-size: 2.65rem;
+    padding-inline: 0.9rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .toast[data-tone="error"] {
+      border-color: rgba(252, 165, 165, 0.35);
+    }
+
+    .toast[data-tone="info"] {
+      border-color: rgba(148, 163, 184, 0.35);
+    }
+  }
+}
+
+@media (max-width: 40rem) {
+  .toast-stack {
+    inset-block-end: 0.7rem;
+    inset-inline-end: 0.7rem;
+    width: min(22rem, calc(100vw - 1.4rem));
+  }
+}

@@ -1,0 +1,82 @@
+@use "../../design" as ui;
+@use "../../modal" as modal;
+@use "./transient-tools" as transient;
+
+.help-modal-backdrop {
+  @include modal.modal-backdrop;
+
+  z-index: transient.overlay-z(2);
+}
+
+@scope (.help-modal-backdrop) {
+  :scope .help-modal {
+    @include modal.modal-shell(42rem);
+    @include transient.contained-shell(1.25rem, 82vh);
+
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  :scope .help-modal__header,
+  :scope .help-modal__title-wrap {
+    @include ui.flex-bar();
+  }
+
+  :scope .help-modal__header {
+    justify-content: space-between;
+  }
+
+  :scope .help-modal__icon {
+    @include ui.icon-embed();
+
+    background: var(--accent-soft, rgba(15, 118, 110, 0.1));
+    border-radius: 999px;
+    color: ui.accent();
+    padding: 0.55rem;
+  }
+
+  :scope .help-modal__body {
+    display: grid;
+    gap: 0.9rem;
+    line-height: 1.7;
+  }
+
+  :scope .help-modal__close {
+    @include modal.modal-close-button;
+    @include transient.interactive-lift(1px);
+    @include transient.reduced-motion;
+  }
+
+  :scope .help-modal h2,
+  :scope .help-modal p {
+    margin: 0;
+  }
+}
+
+@container (max-width: 30rem) {
+  .help-modal__header {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .help-modal__close {
+    align-self: end;
+  }
+}
+
+@media (pointer: coarse) {
+  .help-modal__close {
+    min-block-size: 2.75rem;
+    padding: 0.78rem 1.1rem;
+  }
+}
+
+@media (max-width: 42rem) {
+  .help-modal-backdrop {
+    padding: 1rem;
+  }
+
+  .help-modal {
+    padding: 1rem;
+  }
+}
