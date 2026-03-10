@@ -19,7 +19,13 @@ describe("MaskingSettingsModalComponent", () => {
     fixture.componentRef.setInput("isOpen", true);
     fixture.detectChanges();
 
+    const disclosureCards = fixture.nativeElement.querySelectorAll(
+      "details.settings-card"
+    ) as NodeListOf<HTMLDetailsElement>;
+
     expect(fixture.nativeElement.querySelector("[data-testid='global-only-toggle']")).toBeTruthy();
+    expect(disclosureCards.length).toBe(3);
+    expect(disclosureCards[0]?.open).toBe(false);
     expect(fixture.nativeElement.textContent).toContain("Track only global identifiers");
     expect(fixture.nativeElement.textContent).toContain("Faker data caution");
     expect(fixture.nativeElement.textContent).toContain("Global-only mode can miss");

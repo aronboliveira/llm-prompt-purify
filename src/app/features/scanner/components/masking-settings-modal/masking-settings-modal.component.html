@@ -87,25 +87,24 @@
         </div>
       </fieldset>
 
-      <article
-        class="settings-card"
-        role="note"
-        style="
-          --surface-field: rgba(245, 158, 11, 0.22);
-          --panel-border: rgba(180, 83, 9, 0.26);
-        "
-      >
-        <h3>⚠️ Faker data caution</h3>
-        <p>
-          Faker-style replacement can still resemble real people or identifiers,
-          especially for purely numeric IDs and natural-language names.
-        </p>
-        <p>
-          We run as many API safety checks as possible, but privacy and
-          compliance accountability remains with you. Use faker data at your own
-          discretion and risk.
-        </p>
-      </article>
+      <details class="settings-card settings-card--warning" role="note">
+        <summary class="settings-card__summary">
+          <span aria-hidden="true">⚠️</span>
+          <span>Faker data caution</span>
+        </summary>
+        <div class="settings-card__content">
+          <p>
+            Faker-style replacement can still resemble real people or
+            identifiers, especially for purely numeric IDs and natural-language
+            names.
+          </p>
+          <p>
+            We run as many API safety checks as possible, but privacy and
+            compliance accountability remains with you. Use faker data at your
+            own discretion and risk.
+          </p>
+        </div>
+      </details>
 
       <!-- ── Detection scope ──────────────────────────────── -->
 
@@ -129,10 +128,16 @@
             </span>
           </span>
         </label>
-        <p class="settings-fieldset__description">
-          ⚠️ Risk: Global-only mode can miss country-specific names and
-          document identifiers.
-        </p>
+        <details class="settings-risk-note">
+          <summary class="settings-risk-note__summary">
+            <span aria-hidden="true">⚠️</span>
+            <span>Global-only scope risk</span>
+          </summary>
+          <p class="settings-fieldset__description">
+            Global-only mode can miss country-specific names and document
+            identifiers.
+          </p>
+        </details>
       </fieldset>
 
       <!-- ── Mask categories ──────────────────────────────── -->
@@ -208,10 +213,16 @@
           [value]="advancedPreferences().globalIgnoreList.join('\n')"
           (input)="onIgnoreListInput($event)"
         ></textarea>
-        <p class="settings-fieldset__description">
-          ⚠️ Risk: Terms listed here bypass masking entirely and can expose
-          sensitive data in the final output.
-        </p>
+        <details class="settings-risk-note">
+          <summary class="settings-risk-note__summary">
+            <span aria-hidden="true">⚠️</span>
+            <span>Ignore-list bypass risk</span>
+          </summary>
+          <p class="settings-fieldset__description">
+            Terms listed here bypass masking entirely and can expose sensitive
+            data in the final output.
+          </p>
+        </details>
       </fieldset>
 
       <!-- ── XML tag wrapping ─────────────────────────────── -->
@@ -262,22 +273,32 @@
       <!-- ── Info cards ───────────────────────────────────── -->
 
       <div class="settings-card-grid">
-        <article class="settings-card">
-          <h3>Client-side only</h3>
-          <p>
-            The raw prompt, the detected matches, and the regenerated masks stay
-            in this browser session unless you copy the protected output
-            yourself.
-          </p>
-        </article>
+        <details class="settings-card">
+          <summary class="settings-card__summary">
+            <span aria-hidden="true">ℹ️</span>
+            <span>Client-side only</span>
+          </summary>
+          <div class="settings-card__content">
+            <p>
+              The raw prompt, the detected matches, and the regenerated masks
+              stay in this browser session unless you copy the protected output
+              yourself.
+            </p>
+          </div>
+        </details>
 
-        <article class="settings-card">
-          <h3>Live refresh</h3>
-          <p>
-            Text and masking controls rebuild the output automatically. There is
-            no submit step in this layout.
-          </p>
-        </article>
+        <details class="settings-card">
+          <summary class="settings-card__summary">
+            <span aria-hidden="true">ℹ️</span>
+            <span>Live refresh</span>
+          </summary>
+          <div class="settings-card__content">
+            <p>
+              Text and masking controls rebuild the output automatically. There
+              is no submit step in this layout.
+            </p>
+          </div>
+        </details>
       </div>
     </section>
   </div>

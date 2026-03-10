@@ -31,10 +31,17 @@
         </button>
       </header>
 
-      <p class="feedback-sheet__body">
-        This note is stored by the backend and, when SMTP is configured, forwarded to the
-        developers. Keep raw secrets out of the message even here.
-      </p>
+      <details class="feedback-sheet__notice">
+        <summary class="feedback-sheet__notice-summary">
+          <span aria-hidden="true">ℹ️</span>
+          <span>Storage and privacy note</span>
+        </summary>
+        <p class="feedback-sheet__body">
+          This note is stored by the backend and, when SMTP is configured,
+          forwarded to the developers. Keep raw secrets out of the message even
+          here.
+        </p>
+      </details>
 
       <form class="feedback-form" novalidate (ngSubmit)="submit()">
         <label class="feedback-field">
