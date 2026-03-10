@@ -1,55 +1,281 @@
 @if (isOpen()) {
-  <div class="modal-backdrop" role="presentation" (click)="closeOnBackdrop($event)">
-    <section aria-labelledby="masking-settings-title" aria-modal="true" class="modal" role="dialog">
-      <header class="modal__header">
-        <div class="modal__title-wrap">
-          <span aria-hidden="true" class="modal__icon" [innerHTML]="icons.settings"></span>
+  <div
+    class="settings-modal-backdrop"
+    role="presentation"
+    (click)="closeOnBackdrop($event)"
+  >
+    <section
+      aria-labelledby="masking-settings-title"
+      aria-modal="true"
+      class="settings-modal"
+      role="dialog"
+    >
+      <header class="settings-modal__header">
+        <div class="settings-modal__title-wrap">
+          <span
+            aria-hidden="true"
+            class="settings-modal__icon"
+            [innerHTML]="icons.settings"
+          ></span>
           <div>
-            <div class="modal__title-row">
+            <div class="settings-modal__title-row">
               <h2 id="masking-settings-title">Masking settings</h2>
-              <button class="help-trigger" type="button" (click)="openHelp()">(?)</button>
+              <button
+                aria-label="Help"
+                class="help-trigger"
+                type="button"
+                (click)="openHelp()"
+              >
+                <span
+                  aria-hidden="true"
+                  class="help-trigger__icon"
+                  [innerHTML]="icons.help"
+                ></span>
+              </button>
             </div>
-            <p class="modal__body-copy">
-              These settings change how the local detector scopes the prompt before you copy the
-              protected output.
+            <p class="settings-modal__body-copy">
+              These settings change how the local detector scopes the prompt
+              before you copy the protected output.
             </p>
           </div>
         </div>
-        <button aria-label="Close settings" class="modal__close" type="button" (click)="close()">
+        <button
+          aria-label="Close settings"
+          class="settings-modal__close"
+          type="button"
+          (click)="close()"
+        >
           Close
         </button>
       </header>
 
-      <label class="settings-toggle">
-        <input
-          type="checkbox"
-          data-testid="global-only-toggle"
-          [checked]="detectionMode() === 'global-only'"
-          (change)="onGlobalOnlyChange($event)"
-        />
-        <span class="settings-toggle__copy">
-          <span class="settings-toggle__title">Track only global identifiers</span>
-          <span class="settings-toggle__body">
-            Keep shared rules such as API keys, credentials, emails, payment strings, and labeled
-            contact fields, but skip country-specific document patterns.
+      <!-- ── Masking strategy ─────────────────────────────── -->
+
+      <fieldset class="settings-fieldset">
+        <legend class="settings-fieldset__legend">Masking strategy</legend>
+        <p class="settings-fieldset__description">
+          Choose how detected sensitive values are replaced in the protected
+          output.
+        </p>
+        <div class="strategy-radio-grid">
+          @for (strategy of strategyOrder; track strategy) {
+            <label
+              class="strategy-radio"
+              [attr.data-strategy]="strategy"
+              [class.strategy-radio--selected]="
+                advancedPreferences().maskingStrategy === strategy
+              "
+            >
+              <input
+                type="radio"
+                name="masking-strategy"
+                [attr.data-testid]="'strategy-' + strategy"
+                [value]="strategy"
+                [checked]="advancedPreferences().maskingStrategy === strategy"
+                (change)="onMaskingStrategyChange(strategy)"
+              />
+              <span class="strategy-radio__content">
+                <span class="strategy-radio__title">{{
+                  strategyLabels[strategy]
+                }}</span>
+                <span class="strategy-radio__body">{{
+                  strategyDescriptions[strategy]
+                }}</span>
+              </span>
+            </label>
+          }
+        </div>
+      </fieldset>
+
+      <article
+        class="settings-card"
+        role="note"
+        style="
+          --surface-field: rgba(245, 158, 11, 0.22);
+          --panel-border: rgba(180, 83, 9, 0.26);
+        "
+      >
+        <h3>⚠️ Faker data caution</h3>
+        <p>
+          Faker-style replacement can still resemble real people or identifiers,
+          especially for purely numeric IDs and natural-language names.
+        </p>
+        <p>
+          We run as many API safety checks as possible, but privacy and
+          compliance accountability remains with you. Use faker data at your own
+          discretion and risk.
+        </p>
+      </article>
+
+      <!-- ── Detection scope ──────────────────────────────── -->
+
+      <fieldset class="settings-fieldset">
+        <legend class="settings-fieldset__legend">Detection scope</legend>
+        <label class="settings-toggle">
+          <input
+            type="checkbox"
+            data-testid="global-only-toggle"
+            [checked]="detectionMode() === 'global-only'"
+            (change)="onGlobalOnlyChange($event)"
+          />
+          <span class="settings-toggle__copy">
+            <span class="settings-toggle__title"
+              >Track only global identifiers</span
+            >
+            <span class="settings-toggle__body">
+              Keep shared rules such as API keys, credentials, emails, payment
+              strings, and labeled contact fields, but skip country-specific
+              document patterns.
+            </span>
           </span>
-        </span>
-      </label>
+        </label>
+        <p class="settings-fieldset__description">
+          ⚠️ Risk: Global-only mode can miss country-specific names and
+          document identifiers.
+        </p>
+      </fieldset>
+
+      <!-- ── Mask categories ──────────────────────────────── -->
+
+      <fieldset class="settings-fieldset">
+        <legend class="settings-fieldset__legend">Mask categories</legend>
+        <p class="settings-fieldset__description">
+          Select which types of sensitive data should be automatically masked.
+          All categories are enabled by default.
+        </p>
+        <div class="mask-group-grid">
+          @for (group of maskGroupDefinitions; track group.id) {
+            <label class="mask-group-toggle" [attr.data-group]="group.id">
+              <input
+                type="checkbox"
+                [attr.name]="'mask-group-' + group.id"
+                [attr.data-testid]="'mask-group-toggle-' + group.id"
+                [checked]="groupPreferences()[group.id].enabled"
+                (change)="onMaskGroupChange($event, group.id)"
+              />
+              <span class="mask-group-toggle__content">
+                <span
+                  class="mask-group-toggle__icon"
+                  [innerHTML]="getMaskGroupIcon(group.id)"
+                ></span>
+                <span class="mask-group-toggle__text">
+                  <span class="mask-group-toggle__title">{{
+                    group.label
+                  }}</span>
+                  <span class="mask-group-toggle__body">{{
+                    group.description
+                  }}</span>
+                </span>
+              </span>
+            </label>
+          }
+        </div>
+      </fieldset>
+
+      <!-- ── Keyword blocklist ────────────────────────────── -->
+
+      <fieldset class="settings-fieldset">
+        <legend class="settings-fieldset__legend">Keyword blocklist</legend>
+        <p class="settings-fieldset__description">
+          Words or phrases entered here will always be masked, even if no
+          detection rule catches them. One entry per line, case-insensitive.
+        </p>
+        <textarea
+          class="settings-textarea"
+          data-testid="keyword-blocklist"
+          placeholder="company-name&#10;project-codename&#10;internal-hostname"
+          rows="4"
+          spellcheck="false"
+          [value]="advancedPreferences().keywordBlocklist.join('\n')"
+          (input)="onBlocklistInput($event)"
+        ></textarea>
+      </fieldset>
+
+      <!-- ── Global ignore list ───────────────────────────── -->
+
+      <fieldset class="settings-fieldset">
+        <legend class="settings-fieldset__legend">Global ignore list</legend>
+        <p class="settings-fieldset__description">
+          Words or phrases entered here will never be masked, even if a rule
+          flags them. One entry per line, case-insensitive.
+        </p>
+        <textarea
+          class="settings-textarea"
+          data-testid="global-ignore-list"
+          placeholder="example.com&#10;test@test.com&#10;127.0.0.1"
+          rows="4"
+          spellcheck="false"
+          [value]="advancedPreferences().globalIgnoreList.join('\n')"
+          (input)="onIgnoreListInput($event)"
+        ></textarea>
+        <p class="settings-fieldset__description">
+          ⚠️ Risk: Terms listed here bypass masking entirely and can expose
+          sensitive data in the final output.
+        </p>
+      </fieldset>
+
+      <!-- ── XML tag wrapping ─────────────────────────────── -->
+
+      <fieldset class="settings-fieldset">
+        <legend class="settings-fieldset__legend">XML tag wrapping</legend>
+        <label class="settings-toggle">
+          <input
+            type="checkbox"
+            data-testid="xml-wrap-toggle"
+            [checked]="advancedPreferences().xmlWrapEnabled"
+            (change)="onXmlWrapToggle($event)"
+          />
+          <span class="settings-toggle__copy">
+            <span class="settings-toggle__title">Wrap output in XML tags</span>
+            <span class="settings-toggle__body">
+              Surrounds the entire masked output with an XML tag pair that gives
+              LLMs a clear boundary for the sanitized content.
+            </span>
+          </span>
+        </label>
+
+        @if (advancedPreferences().xmlWrapEnabled) {
+          <div class="xml-tag-picker">
+            <label class="xml-tag-picker__label" for="xml-tag-select">
+              Tag name
+            </label>
+            <select
+              class="xml-tag-picker__select"
+              data-testid="xml-tag-select"
+              id="xml-tag-select"
+              [value]="advancedPreferences().xmlWrapTag"
+              (change)="onXmlWrapTagChange($event)"
+            >
+              @for (tag of xmlTagOrder; track tag) {
+                <option
+                  [value]="tag"
+                  [selected]="advancedPreferences().xmlWrapTag === tag"
+                >
+                  {{ xmlTagLabels[tag] }}
+                </option>
+              }
+            </select>
+          </div>
+        }
+      </fieldset>
+
+      <!-- ── Info cards ───────────────────────────────────── -->
 
       <div class="settings-card-grid">
         <article class="settings-card">
           <h3>Client-side only</h3>
           <p>
-            The raw prompt, the detected matches, and the regenerated masks stay in this browser
-            session unless you copy the protected output yourself.
+            The raw prompt, the detected matches, and the regenerated masks stay
+            in this browser session unless you copy the protected output
+            yourself.
           </p>
         </article>
 
         <article class="settings-card">
           <h3>Live refresh</h3>
           <p>
-            Text and masking controls rebuild the output automatically. There is no submit step in
-            this layout.
+            Text and masking controls rebuild the output automatically. There is
+            no submit step in this layout.
           </p>
         </article>
       </div>

@@ -21,6 +21,9 @@ describe("MaskingSettingsModalComponent", () => {
 
     expect(fixture.nativeElement.querySelector("[data-testid='global-only-toggle']")).toBeTruthy();
     expect(fixture.nativeElement.textContent).toContain("Track only global identifiers");
+    expect(fixture.nativeElement.textContent).toContain("Faker data caution");
+    expect(fixture.nativeElement.textContent).toContain("Global-only mode can miss");
+    expect(fixture.nativeElement.textContent).toContain("bypass masking entirely");
   });
 
   it("emits detection mode, help, and close events", () => {
@@ -43,7 +46,7 @@ describe("MaskingSettingsModalComponent", () => {
       .querySelector(".help-trigger")
       .dispatchEvent(new MouseEvent("click", { bubbles: true }));
     fixture.nativeElement
-      .querySelector(".modal__close")
+      .querySelector(".settings-modal__close")
       .dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
     expect(modeSpy).toHaveBeenCalledWith("global-only");
