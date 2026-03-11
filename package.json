@@ -66,5 +66,8 @@
     "jest-preset-angular": "^14.5.3",
     "ts-jest": "^29.2.5",
     "typescript": "~5.5.2"
+  },
+  "overrides": {
+    "immutable": "^5.1.1"
   }
 }
