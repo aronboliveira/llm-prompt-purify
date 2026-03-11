@@ -12,6 +12,13 @@ const COPY_BTN = '[data-testid="copy-button"]';
 
 test.describe("extreme I/O: textarea → masked output", () => {
   test.beforeEach(async ({ page }) => {
+    await page.route("**/api/mask-safety/validate", async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ isSafe: true, findings: [] }),
+      });
+    });
     await page.goto("/");
   });
 
