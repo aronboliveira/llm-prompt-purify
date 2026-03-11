@@ -13,13 +13,11 @@ import { DomSanitizer } from "@angular/platform-browser";
 import {
   DEFAULT_FEEDBACK_DRAFT,
   EMAIL_PATTERN,
-  FEEDBACK_CATEGORY_IDS,
   FEEDBACK_CATEGORY_OPTIONS,
   FEEDBACK_MESSAGE_MAX,
   FEEDBACK_RATING_OPTIONS,
 } from "@core/feedback/constants/feedback.constants";
 import type {
-  FeedbackCategoryId,
   FeedbackDraft,
   FeedbackFieldErrorMap,
   FeedbackFieldId,
@@ -39,7 +37,6 @@ import { createTrustedHtmlMap } from "@shared/utils/trusted-html.utils";
   imports: [CommonModule, FormsModule],
   selector: "app-feedback-sheet",
   standalone: true,
-  styleUrl: "./feedback-sheet.component.scss",
   templateUrl: "./feedback-sheet.component.html",
 })
 export class FeedbackSheetComponent {
