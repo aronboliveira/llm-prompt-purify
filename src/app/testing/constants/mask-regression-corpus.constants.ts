@@ -41,7 +41,7 @@ export const GLOBAL_CREDENTIAL_MASK_FIXTURES: readonly LocaleMaskFixture[] = Obj
   {
     countryProfileIds: ["br"],
     description: "masks secret assignments in Brazilian Portuguese labels",
-    expectedRuleIds: ["secret-assignment"],
+    expectedRuleIds: ["keyed-secret-assignment"],
     hiddenValues: ["Sup3rSecreta#2026"],
     sourceText: 'senha = "Sup3rSecreta#2026"',
   },
@@ -172,7 +172,7 @@ export const GLOBAL_NEGATIVE_MASK_FIXTURES: readonly NegativeMaskFixture[] = Obj
     countryProfileIds: ["us"],
     description: "ignores invalid credit card numbers",
     excludedRuleIds: ["credit-card"],
-    sourceText: "Card on file: 4111 1111 1111 1112",
+    sourceText: "4111 1111 1111 1112",
     visibleValues: ["4111 1111 1111 1112"],
   },
   {

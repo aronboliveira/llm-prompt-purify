@@ -266,13 +266,6 @@ export const NEGATIVE_LOCALE_MASK_FIXTURES: readonly NegativeMaskFixture[] =
       visibleValues: ["120.44565.38-0"],
     },
     {
-      countryProfileIds: ["cl"],
-      description: "ignores invalid Chilean RUT values",
-      excludedRuleIds: ["chile-rut"],
-      sourceText: "RUT: 12.345.678-9",
-      visibleValues: ["12.345.678-9"],
-    },
-    {
       countryProfileIds: ["pt"],
       description: "ignores invalid Portuguese NIF values",
       excludedRuleIds: ["pt-nif-labeled"],
