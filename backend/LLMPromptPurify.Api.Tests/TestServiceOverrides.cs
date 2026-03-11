@@ -3,39 +3,30 @@ using LLMPromptPurify.Api.Features.Feedback.Domain;
 using LLMPromptPurify.Api.Features.Feedback.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Npgsql;
+using MongoDB.Driver;
 
 namespace LLMPromptPurify.Api.Tests;
 
-/// <summary>
-/// Replaces infrastructure services (PostgreSQL, SMTP) with in-memory fakes
-/// so integration tests run without external dependencies.
-/// </summary>
 public static class TestServiceOverrides
 {
+    private class NoOpDatabaseInitializer : FeedbackDatabaseInitializer
+    {
+        public NoOpDatabaseInitializer() : base(null!, null!) {}
+        
+        public override Task InitializeAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+
     public static void ReplaceExternalDependencies(IServiceCollection services)
     {
-        // Remove real Npgsql data source (requires running PostgreSQL)
-        services.RemoveAll<NpgsqlDataSource>();
+        services.RemoveAll<IMongoClient>();
+        services.RemoveAll<IMongoDatabase>();
 
-        // Replace database initializer with a no-op stub so GetRequiredService
-        // in Program.cs succeeds without needing a real NpgsqlDataSource.
         services.RemoveAll<FeedbackDatabaseInitializer>();
-        services.AddSingleton<FeedbackDatabaseInitializer>(sp =>
-        {
-            // Use the parameterless-style trick: create via
-            // System.Runtime.CompilerServices.RuntimeHelpers (uninitialized)
-            // — but simpler: pass a null NpgsqlDataSource since
-            // InitializeAsync will never be reached (caught by try/catch).
-            return (FeedbackDatabaseInitializer)System.Runtime.CompilerServices
-                .RuntimeHelpers.GetUninitializedObject(typeof(FeedbackDatabaseInitializer));
-        });
+        services.AddSingleton<FeedbackDatabaseInitializer, NoOpDatabaseInitializer>();
 
-        // Replace repository with in-memory fake
         services.RemoveAll<IFeedbackRepository>();
         services.AddSingleton<IFeedbackRepository, InMemoryFeedbackRepository>();
-
-        // Replace email sender with fake that always returns StoredOnly
+        
         services.RemoveAll<IDeveloperEmailSender>();
         services.AddSingleton<IDeveloperEmailSender, FakeDeveloperEmailSender>();
     }

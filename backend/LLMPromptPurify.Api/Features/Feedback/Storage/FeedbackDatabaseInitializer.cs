@@ -1,48 +1,31 @@
-using Npgsql;
+using LLMPromptPurify.Api.Features.Feedback.Domain;
+using MongoDB.Driver;
 
 namespace LLMPromptPurify.Api.Features.Feedback.Storage;
 
-public sealed class FeedbackDatabaseInitializer
+public class FeedbackDatabaseInitializer
 {
     private readonly ILogger<FeedbackDatabaseInitializer> _logger;
-    private readonly NpgsqlDataSource _dataSource;
+    private readonly IMongoDatabase _database;
 
     public FeedbackDatabaseInitializer(
-        NpgsqlDataSource dataSource,
+        IMongoDatabase database,
         ILogger<FeedbackDatabaseInitializer> logger
     )
     {
-        _dataSource = dataSource;
+        _database = database;
         _logger = logger;
     }
 
-    public async Task InitializeAsync(CancellationToken cancellationToken)
+    public virtual async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        const string commandText =
-            """
-            create table if not exists feedback_submissions (
-                id uuid primary key,
-                category text not null,
-                email varchar(160),
-                message text not null,
-                name varchar(80),
-                rating smallint,
-                source text not null,
-                subject varchar(160),
-                wants_reply boolean not null,
-                created_at_utc timestamptz not null,
-                delivery_status text not null,
-                delivery_error text
-            );
+        var collection = _database.GetCollection<FeedbackEntry>("feedback_submissions");
 
-            create index if not exists ix_feedback_submissions_created_at_utc
-                on feedback_submissions (created_at_utc desc);
-            """;
+        var indexKeysDefinition = Builders<FeedbackEntry>.IndexKeys.Descending(x => x.CreatedAtUtc);
+        var indexModel = new CreateIndexModel<FeedbackEntry>(indexKeysDefinition);
 
-        await using var connection = await _dataSource.OpenConnectionAsync(cancellationToken);
-        await using var command = new NpgsqlCommand(commandText, connection);
-        await command.ExecuteNonQueryAsync(cancellationToken);
+        await collection.Indexes.CreateOneAsync(indexModel, cancellationToken: cancellationToken);
 
-        _logger.LogInformation("Feedback database schema is ready.");
+        _logger.LogInformation("Feedback database (MongoDB) schema and indexes are ready.");
     }
 }

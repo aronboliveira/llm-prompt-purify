@@ -8,7 +8,7 @@ using LLMPromptPurify.Api.Features.Feedback.Services;
 using LLMPromptPurify.Api.Features.Feedback.Storage;
 using LLMPromptPurify.Api.Features.MaskSafety.Contracts;
 using LLMPromptPurify.Api.Features.MaskSafety.Services;
-using Npgsql;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,23 +63,24 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.Configure<DeveloperEmailOptions>(
     builder.Configuration.GetSection(DeveloperEmailOptions.SectionName)
 );
-builder.Services.AddSingleton(
+builder.Services.AddSingleton<IMongoClient>(
     _ =>
     {
-        var connectionString = builder.Configuration.GetConnectionString("FeedbackDatabase");
-        if (string.IsNullOrWhiteSpace(connectionString))
-        {
-            throw new InvalidOperationException(
-                "The FeedbackDatabase connection string is required."
-            );
-        }
-
-        return NpgsqlDataSource.Create(connectionString);
+        var connectionString = builder.Configuration.GetConnectionString("FeedbackDatabase") 
+            ?? "mongodb://localhost:27017";
+        return new MongoClient(connectionString);
+    }
+);
+builder.Services.AddSingleton<IMongoDatabase>(
+    sp =>
+    {
+        var client = sp.GetRequiredService<IMongoClient>();
+        return client.GetDatabase("llm_prompt_purify");
     }
 );
 builder.Services.AddSingleton<FeedbackDatabaseInitializer>();
 builder.Services.AddSingleton<FeedbackRequestValidator>();
-builder.Services.AddSingleton<IFeedbackRepository, PostgresFeedbackRepository>();
+builder.Services.AddSingleton<IFeedbackRepository, MongoFeedbackRepository>();
 builder.Services.AddSingleton<IDeveloperEmailSender, SmtpDeveloperEmailSender>();
 builder.Services.AddSingleton<FeedbackSubmissionService>();
 builder.Services.AddSingleton<MaskSafetyValidationService>();
