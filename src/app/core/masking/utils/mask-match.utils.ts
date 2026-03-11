@@ -33,10 +33,12 @@ export function applyEnabledMasks(
   if (!enabledMatches.length) return sourceText;
 
   let cursor = 0,
-    maskedText = "";
+    maskedText = "",
+    maskCounter = 0;
   for (const match of enabledMatches) {
+    maskCounter++;
     maskedText += sourceText.slice(cursor, match.start);
-    maskedText += match.mask;
+    maskedText += `[MASK-${maskCounter}]${match.mask}`;
     cursor = match.end;
   }
   maskedText += sourceText.slice(cursor);

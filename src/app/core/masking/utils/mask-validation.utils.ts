@@ -18,6 +18,11 @@ export function isLikelyCreditCard(value: string): boolean {
   return checksum % 10 === 0;
 }
 
+export function looksLikeCardNumberSequence(value: string): boolean {
+  const digitsOnly = value.replace(/\D/g, "");
+  return digitsOnly.length >= 13 && digitsOnly.length <= 19;
+}
+
 export function isLikelyIban(value: string): boolean {
   const normalized = value.replace(/\s+/g, "").toUpperCase();
   if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(normalized)) return false;
@@ -318,6 +323,11 @@ export function looksLikeLatamNationalId(value: string): boolean {
 export function looksLikeLatamTaxId(value: string): boolean {
   const digits = value.replace(/\D/g, "");
   return /^\d{11,13}$/u.test(digits) && !/^(\d)\1+$/u.test(digits);
+}
+
+export function looksLikeCnpjLikeId(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  return /^\d{14}$/u.test(digits) && !/^(\d)\1+$/u.test(digits);
 }
 
 function calculateMod11Digit(value: string, weights: readonly number[]): number {

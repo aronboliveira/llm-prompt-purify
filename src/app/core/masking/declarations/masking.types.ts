@@ -135,3 +135,56 @@ export interface ScanScopeSelection {
   countryProfileIds: readonly CountryProfileId[];
   detectionMode: DetectionMode;
 }
+
+// ─── Masking Strategy ────────────────────────────────────────────────────────
+
+/**
+ * Controls *how* detected sensitive values are replaced in the output.
+ *
+ * - `random`    – character-class-preserving random remapping (current default)
+ * - `tags`      – semantic categorical tags like `<EMAIL>`, `<API_KEY>`
+ * - `faker`     – realistic synthetic data (fake names, emails, etc.)
+ * - `redacted`  – hard redaction with `█` blocks
+ */
+export type MaskingStrategy = "random" | "tags" | "faker" | "redacted";
+
+/**
+ * Predefined XML wrapper tag names the user can choose from when
+ * enabling the "Wrap output in XML" setting.
+ */
+export type XmlWrapTag =
+  | "context"
+  | "document"
+  | "input"
+  | "prompt"
+  | "redacted-input"
+  | "text"
+  | "user-input";
+
+/**
+ * Persisted user preferences that augment the core scan pipeline.
+ */
+export interface AdvancedMaskingPreferences {
+  /** How detected values are replaced. */
+  maskingStrategy: MaskingStrategy;
+
+  /** Whether to wrap the final masked output in an XML tag pair. */
+  xmlWrapEnabled: boolean;
+
+  /** Which XML tag name to use when wrapping is enabled. */
+  xmlWrapTag: XmlWrapTag;
+
+  /**
+   * Words / patterns the user wants **always** masked regardless of
+   * whether any detection rule catches them.
+   * Stored lower-cased; matching is case-insensitive.
+   */
+  keywordBlocklist: readonly string[];
+
+  /**
+   * Words / patterns the user wants **never** masked, even if a
+   * detection rule flags them.
+   * Stored as-is; matching is case-insensitive.
+   */
+  globalIgnoreList: readonly string[];
+}

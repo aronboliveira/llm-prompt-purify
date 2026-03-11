@@ -1,4 +1,5 @@
 import type {
+  AdvancedMaskingPreferences,
   CountryLanguageFamily,
   CountryProfileDefinition,
   CountryProfileId,
@@ -6,8 +7,10 @@ import type {
   MaskGroupDefinition,
   MaskGroupId,
   MaskGroupPreferenceMap,
+  MaskingStrategy,
   MatchCategory,
   SupportedLocale,
+  XmlWrapTag,
 } from "../declarations/masking.types";
 
 export const MAX_MASK_RETRIES = 8;
@@ -275,3 +278,156 @@ export const DEFAULT_GROUP_PREFERENCES: MaskGroupPreferenceMap = Object.freeze({
   location: Object.freeze({ alwaysOn: false, enabled: true }),
   personal: Object.freeze({ alwaysOn: false, enabled: true }),
 });
+
+// ─── Masking Strategy ────────────────────────────────────────────────────────
+
+export const MASKING_STRATEGY_LABELS: Readonly<
+  Record<MaskingStrategy, string>
+> = Object.freeze({
+  random: "Random mask",
+  tags: "Categorical tags",
+  faker: "Labeled placeholders",
+  redacted: "Hard redaction",
+});
+
+export const MASKING_STRATEGY_DESCRIPTIONS: Readonly<
+  Record<MaskingStrategy, string>
+> = Object.freeze({
+  random:
+    "Each character is replaced with a random character of the same class (digit → digit, letter → letter). Numeric financial and identifier values still follow mandatory compliance redaction into clearly non-real placeholders (for example ####-####).",
+  tags:
+    "Replaces values with semantic labels like <EMAIL>, <API_KEY>, or <CPF> based on the detection rule. Numeric financial and identifier values still follow mandatory compliance redaction into clearly non-real placeholders.",
+  faker:
+    "Uses privacy-safe placeholders like {CPF1}, {TELEFONE2}, {NOME3} that can never match real data. Emails use RFC 2606 reserved domains. Numeric financial and identifier values still follow mandatory compliance redaction into clearly non-real placeholders.",
+  redacted:
+    "Replaces values with solid redaction blocks (█████) for maximum visual obscurity. Numeric financial and identifier values also remain in mandatory compliance redaction mode.",
+});
+
+export const MASKING_STRATEGY_ORDER: readonly MaskingStrategy[] = Object.freeze(
+  ["random", "tags", "faker", "redacted"],
+);
+
+// ─── Categorical Tag Map ─────────────────────────────────────────────────────
+
+/**
+ * Maps detection rule IDs to their categorical tag labels.
+ * Falls back to MASK_CATEGORY_LABELS[category] when a rule is not listed.
+ */
+export const RULE_TAG_MAP: Readonly<Record<string, string>> = Object.freeze({
+  /* credentials */
+  "glob-api-key": "API_KEY",
+  "glob-bearer": "BEARER_TOKEN",
+  "glob-jwt": "JWT_TOKEN",
+  "glob-private-key": "PRIVATE_KEY",
+  "glob-password": "PASSWORD",
+  "glob-secret": "SECRET",
+  "glob-oauth": "OAUTH_TOKEN",
+  "glob-aws-access-key": "AWS_KEY",
+  "glob-aws-secret-key": "AWS_SECRET",
+  "glob-gcp-key": "GCP_KEY",
+  "glob-azure-key": "AZURE_KEY",
+  "glob-firebase-key": "FIREBASE_KEY",
+  "glob-stripe-key": "STRIPE_KEY",
+  "glob-twilio-key": "TWILIO_KEY",
+  "glob-sendgrid-key": "SENDGRID_KEY",
+  "glob-slack-token": "SLACK_TOKEN",
+  "glob-github-token": "GITHUB_TOKEN",
+  "glob-npm-token": "NPM_TOKEN",
+  "glob-database-url": "DATABASE_URL",
+  "glob-connection-string": "CONNECTION_STRING",
+  "glob-webhook-url": "WEBHOOK_URL",
+  "glob-basic-auth": "BASIC_AUTH",
+  "glob-smtp-password": "SMTP_PASSWORD",
+
+  /* personal / contact */
+  "glob-email": "EMAIL",
+  "glob-phone": "PHONE",
+  "glob-url": "URL",
+  "glob-ip": "IP_ADDRESS",
+  "glob-mac": "MAC_ADDRESS",
+  "glob-uuid": "UUID",
+  "glob-ssn": "SSN",
+
+  /* financial */
+  "glob-credit-card": "CREDIT_CARD",
+  "labeled-card-number": "CREDIT_CARD",
+  "glob-iban": "IBAN",
+  "glob-swift": "SWIFT_CODE",
+
+  /* identifiers (country-specific examples) */
+  "br-cpf": "CPF",
+  "cpf-labeled-loose": "CPF",
+  "br-cnpj": "CNPJ",
+  "br-rg": "RG",
+  "br-cep": "CEP",
+  "br-pis": "PIS_PASEP",
+  "us-ssn": "SSN",
+  "us-ein": "EIN",
+  "us-drivers-license": "DRIVERS_LICENSE",
+  "es-dni": "DNI",
+  "es-nie": "NIE",
+  "pt-nif": "NIF",
+  "ar-cuit": "CUIT",
+  "ar-dni": "DNI_AR",
+  "cl-rut": "RUT",
+  "chile-rut-labeled": "RUT",
+  "co-nit": "NIT",
+  "pe-ruc": "RUC",
+  "mx-curp": "CURP",
+  "mx-rfc": "RFC",
+  "cn-resident-id": "CN_RESIDENT_ID",
+  "in-aadhaar": "AADHAAR",
+  "in-pan": "PAN",
+  "ru-inn": "INN",
+  "ru-snils": "SNILS",
+
+  /* location */
+  "glob-address": "ADDRESS",
+  "glob-zip-code": "ZIP_CODE",
+});
+
+/**
+ * Fallback category-level tags when a specific rule is not in RULE_TAG_MAP.
+ */
+export const CATEGORY_TAG_LABELS: Readonly<Record<MatchCategory, string>> =
+  Object.freeze({
+    credential: "CREDENTIAL",
+    financial: "FINANCIAL",
+    identifier: "ID",
+    location: "LOCATION",
+    personal: "PII",
+  });
+
+// ─── XML Wrapper Tags ────────────────────────────────────────────────────────
+
+export const XML_WRAP_TAG_ORDER: readonly XmlWrapTag[] = Object.freeze([
+  "document",
+  "input",
+  "user-input",
+  "prompt",
+  "context",
+  "text",
+  "redacted-input",
+]);
+
+export const XML_WRAP_TAG_LABELS: Readonly<Record<XmlWrapTag, string>> =
+  Object.freeze({
+    context: "<context>…</context>",
+    document: "<document>…</document>",
+    input: "<input>…</input>",
+    prompt: "<prompt>…</prompt>",
+    "redacted-input": "<redacted-input>…</redacted-input>",
+    text: "<text>…</text>",
+    "user-input": "<user-input>…</user-input>",
+  });
+
+// ─── Advanced Preferences Defaults ───────────────────────────────────────────
+
+export const DEFAULT_ADVANCED_PREFERENCES: Readonly<AdvancedMaskingPreferences> =
+  Object.freeze({
+    maskingStrategy: "random",
+    xmlWrapEnabled: false,
+    xmlWrapTag: "document",
+    keywordBlocklist: Object.freeze([]),
+    globalIgnoreList: Object.freeze([]),
+  });
