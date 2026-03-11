@@ -5,6 +5,7 @@ import {
   computed,
   inject,
   signal,
+  ViewEncapsulation,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { DomSanitizer } from "@angular/platform-browser";
@@ -15,6 +16,8 @@ import type {
   CountryProfileId,
   DetectionMode,
   MaskGroupId,
+  MaskingStrategy,
+  XmlWrapTag,
 } from "./core/masking/declarations/masking.types";
 import {
   hasMixedLanguageSelection,
@@ -67,6 +70,7 @@ import { createTrustedHtmlMap } from "./shared/utils/trusted-html.utils";
   standalone: true,
   styleUrl: "./app.component.scss",
   templateUrl: "./app.component.html",
+  encapsulation: ViewEncapsulation.None,
 })
 export class AppComponent {
   readonly #activeHelpTopic = signal<HelpTopic | null>(null);
@@ -292,8 +296,40 @@ export class AppComponent {
     );
   }
 
+  protected updateGlobalIgnoreList(terms: readonly string[]): void {
+    this.#scanSession.updateGlobalIgnoreList(terms);
+  }
+
+  protected updateKeywordBlocklist(keywords: readonly string[]): void {
+    this.#scanSession.updateKeywordBlocklist(keywords);
+  }
+
+  protected updateMaskingStrategy(strategy: MaskingStrategy): void {
+    this.#scanSession.setMaskingStrategy(strategy);
+    this.#toastCenter.push(
+      `Masking strategy changed. All detected values will now use the "${strategy}" replacement method.`,
+      "Strategy updated",
+      "info",
+    );
+  }
+
   protected updateSourceText(value: string): void {
     this.#scanSession.updateSourceText(value);
+  }
+
+  protected updateXmlWrapEnabled(enabled: boolean): void {
+    this.#scanSession.setXmlWrapEnabled(enabled);
+    this.#toastCenter.push(
+      enabled
+        ? "The protected output will be wrapped in an XML tag pair."
+        : "XML wrapping has been removed from the output.",
+      enabled ? "XML wrapping enabled" : "XML wrapping disabled",
+      "info",
+    );
+  }
+
+  protected updateXmlWrapTag(tag: XmlWrapTag): void {
+    this.#scanSession.setXmlWrapTag(tag);
   }
 
   protected scopeCopy(): string {

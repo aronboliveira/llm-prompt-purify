@@ -5,19 +5,72 @@
 
   /* S-005: Light mode tokens (default) */
   --page-text: #0f172a;
+  --text-strong: #0f172a;
+  --text-body: #2b4356;
+  --text-muted: #3c5669;
+  --text-subtle: #4a6577;
+  --text-placeholder: #637b8f;
   --page-bg: #eef4f6;
   --surface-bg: #ffffff;
   --surface-border: #d1d5db;
+  --surface-elevated: rgba(255, 255, 255, 0.92);
+  --surface-elevated-border: rgba(11, 38, 61, 0.08);
   --surface-subtle: #eff5f8;
+  --surface-subtle-strong: #f6fafc;
+  --surface-field: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(248, 252, 254, 0.98)
+  );
+  --surface-overlay: rgba(247, 251, 252, 0.86);
+  --surface-accent: rgba(237, 249, 246, 0.96);
+  --surface-accent-hover: rgba(224, 242, 239, 0.98);
+  --surface-accent-border: rgba(15, 118, 110, 0.14);
+  --surface-selected: rgba(236, 253, 250, 0.94);
+  --surface-selected-border: rgba(15, 118, 110, 0.24);
   --accent-primary: #0f766e;
   --accent-secondary: #f59e0b;
+  --accent-soft: rgba(15, 118, 110, 0.14);
   --mask-highlight: rgba(15, 118, 110, 0.18);
   --gradient-top: rgba(15, 118, 110, 0.12);
   --gradient-bottom: rgba(245, 158, 11, 0.12);
+  --shell-glow-start: rgba(15, 118, 110, 0.18);
+  --shell-glow-end: rgba(217, 119, 6, 0.12);
+  --shell-base-start: #f7fbff;
+  --shell-base-mid: #fffaf1;
+  --shell-base-end: #f8fbfc;
 
-  /* Muted text colors */
-  --text-muted: #49606f;
-  --text-subtle: #526273;
+  /* Help trigger / icon sizing */
+  --help-trigger-size: 23px;
+  --help-trigger-icon-size: 1rem;
+  --help-trigger-bg: #eef6f8;
+  --help-trigger-bg-hover: #e0f2ef;
+  --help-trigger-border: rgba(15, 118, 110, 0.15);
+  --help-trigger-color: #1e293b;
+
+  /* Modal + warning surfaces */
+  --modal-backdrop: rgba(7, 22, 38, 0.56);
+  --warning-bg: rgba(245, 158, 11, 0.16);
+  --warning-border: rgba(180, 83, 9, 0.2);
+  --warning-text: #92400e;
+
+  /* Scanner/editor surfaces */
+  --scanner-pane-edge: rgba(11, 38, 61, 0.06);
+
+  /* Button tokens - Light mode */
+  --btn-secondary-bg: linear-gradient(180deg, #f0f7f9 0%, #e8f4f6 100%);
+  --btn-secondary-bg-hover: linear-gradient(180deg, #e5f3f0 0%, #d8eeeb 100%);
+  --btn-secondary-border: rgba(15, 118, 110, 0.18);
+  --btn-secondary-border-hover: rgba(15, 118, 110, 0.28);
+  --btn-secondary-text: #1e293b;
+  --btn-disabled-bg: #f3f6f8;
+  --btn-disabled-border: rgba(11, 38, 61, 0.06);
+  --btn-disabled-text: #94a3b8;
+  --btn-ghost-border: rgba(11, 38, 61, 0.12);
+  --btn-ghost-border-hover: rgba(11, 38, 61, 0.18);
+  --btn-ghost-bg-hover: rgba(248, 250, 252, 0.9);
+  --btn-ghost-text: #64748b;
+  --btn-ghost-text-hover: #475569;
 
   /* Spacing scale */
   --space-xs: 0.55rem;
@@ -41,38 +94,132 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --page-text: #e2e8f0;
+    --text-strong: #e2e8f0;
+    --text-body: #d7e2f1;
+    --text-muted: #b2c0d2;
+    --text-subtle: #9eb0c5;
+    --text-placeholder: #8ea2b8;
     --page-bg: #0f172a;
     --surface-bg: #1e293b;
     --surface-border: #475569;
-    --surface-subtle: #334155;
+    --surface-elevated: rgba(20, 32, 47, 0.94);
+    --surface-elevated-border: rgba(148, 163, 184, 0.25);
+    --surface-subtle: #26394f;
+    --surface-subtle-strong: #1f3044;
+    --surface-field: linear-gradient(
+      180deg,
+      rgba(28, 42, 61, 0.96),
+      rgba(23, 36, 54, 0.96)
+    );
+    --surface-overlay: rgba(10, 19, 32, 0.78);
+    --surface-accent: rgba(20, 58, 63, 0.9);
+    --surface-accent-hover: rgba(24, 72, 78, 0.92);
+    --surface-accent-border: rgba(45, 212, 191, 0.35);
+    --surface-selected: rgba(22, 70, 70, 0.82);
+    --surface-selected-border: rgba(45, 212, 191, 0.45);
     --accent-primary: #2dd4bf;
     --accent-secondary: #fbbf24;
+    --accent-soft: rgba(45, 212, 191, 0.2);
     --mask-highlight: rgba(45, 212, 191, 0.22);
     --gradient-top: rgba(45, 212, 191, 0.1);
     --gradient-bottom: rgba(251, 191, 36, 0.1);
-    --text-muted: #94a3b8;
-    --text-subtle: #cbd5e1;
+    --shell-glow-start: rgba(45, 212, 191, 0.15);
+    --shell-glow-end: rgba(251, 191, 36, 0.13);
+    --shell-base-start: #0f1b2d;
+    --shell-base-mid: #101a2a;
+    --shell-base-end: #0d1726;
+    --help-trigger-bg: #23374d;
+    --help-trigger-bg-hover: #2a415a;
+    --help-trigger-border: rgba(148, 163, 184, 0.36);
+    --help-trigger-color: #d6e4f6;
+    --modal-backdrop: rgba(2, 8, 18, 0.74);
+    --warning-bg: rgba(120, 53, 15, 0.34);
+    --warning-border: rgba(251, 191, 36, 0.42);
+    --warning-text: #facc15;
+    --scanner-pane-edge: rgba(148, 163, 184, 0.24);
     --panel-border: rgba(255, 255, 255, 0.08);
     --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+
+    /* Button tokens - Dark mode */
+    --btn-secondary-bg: linear-gradient(180deg, #334155 0%, #2d3b4d 100%);
+    --btn-secondary-bg-hover: linear-gradient(180deg, #3d4f66 0%, #374a5e 100%);
+    --btn-secondary-border: rgba(45, 212, 191, 0.22);
+    --btn-secondary-border-hover: rgba(45, 212, 191, 0.35);
+    --btn-secondary-text: #e2e8f0;
+    --btn-disabled-bg: #1e293b;
+    --btn-disabled-border: rgba(255, 255, 255, 0.06);
+    --btn-disabled-text: #64748b;
+    --btn-ghost-border: rgba(255, 255, 255, 0.12);
+    --btn-ghost-border-hover: rgba(255, 255, 255, 0.2);
+    --btn-ghost-bg-hover: rgba(51, 65, 85, 0.6);
+    --btn-ghost-text: #94a3b8;
+    --btn-ghost-text-hover: #cbd5e1;
   }
 }
 
 /* S-005: Manual dark mode override */
 :root[data-theme="dark"] {
   --page-text: #e2e8f0;
+  --text-strong: #e2e8f0;
+  --text-body: #d7e2f1;
+  --text-muted: #b2c0d2;
+  --text-subtle: #9eb0c5;
+  --text-placeholder: #8ea2b8;
   --page-bg: #0f172a;
   --surface-bg: #1e293b;
   --surface-border: #475569;
-  --surface-subtle: #334155;
+  --surface-elevated: rgba(20, 32, 47, 0.94);
+  --surface-elevated-border: rgba(148, 163, 184, 0.25);
+  --surface-subtle: #26394f;
+  --surface-subtle-strong: #1f3044;
+  --surface-field: linear-gradient(
+    180deg,
+    rgba(28, 42, 61, 0.96),
+    rgba(23, 36, 54, 0.96)
+  );
+  --surface-overlay: rgba(10, 19, 32, 0.78);
+  --surface-accent: rgba(20, 58, 63, 0.9);
+  --surface-accent-hover: rgba(24, 72, 78, 0.92);
+  --surface-accent-border: rgba(45, 212, 191, 0.35);
+  --surface-selected: rgba(22, 70, 70, 0.82);
+  --surface-selected-border: rgba(45, 212, 191, 0.45);
   --accent-primary: #2dd4bf;
   --accent-secondary: #fbbf24;
+  --accent-soft: rgba(45, 212, 191, 0.2);
   --mask-highlight: rgba(45, 212, 191, 0.22);
   --gradient-top: rgba(45, 212, 191, 0.1);
   --gradient-bottom: rgba(251, 191, 36, 0.1);
-  --text-muted: #94a3b8;
-  --text-subtle: #cbd5e1;
+  --shell-glow-start: rgba(45, 212, 191, 0.15);
+  --shell-glow-end: rgba(251, 191, 36, 0.13);
+  --shell-base-start: #0f1b2d;
+  --shell-base-mid: #101a2a;
+  --shell-base-end: #0d1726;
+  --help-trigger-bg: #23374d;
+  --help-trigger-bg-hover: #2a415a;
+  --help-trigger-border: rgba(148, 163, 184, 0.36);
+  --help-trigger-color: #d6e4f6;
+  --modal-backdrop: rgba(2, 8, 18, 0.74);
+  --warning-bg: rgba(120, 53, 15, 0.34);
+  --warning-border: rgba(251, 191, 36, 0.42);
+  --warning-text: #facc15;
+  --scanner-pane-edge: rgba(148, 163, 184, 0.24);
   --panel-border: rgba(255, 255, 255, 0.08);
   --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+
+  /* Button tokens - Dark mode */
+  --btn-secondary-bg: linear-gradient(180deg, #334155 0%, #2d3b4d 100%);
+  --btn-secondary-bg-hover: linear-gradient(180deg, #3d4f66 0%, #374a5e 100%);
+  --btn-secondary-border: rgba(45, 212, 191, 0.22);
+  --btn-secondary-border-hover: rgba(45, 212, 191, 0.35);
+  --btn-secondary-text: #e2e8f0;
+  --btn-disabled-bg: #1e293b;
+  --btn-disabled-border: rgba(255, 255, 255, 0.06);
+  --btn-disabled-text: #64748b;
+  --btn-ghost-border: rgba(255, 255, 255, 0.12);
+  --btn-ghost-border-hover: rgba(255, 255, 255, 0.2);
+  --btn-ghost-bg-hover: rgba(51, 65, 85, 0.6);
+  --btn-ghost-text: #94a3b8;
+  --btn-ghost-text-hover: #cbd5e1;
 }
 
 * {
@@ -113,8 +260,8 @@ textarea {
 /* ─── Popup/Overlay Module Styles ───────────────────────────────────────────── */
 /* These styles are imported globally for dynamically mounted elements */
 
-@import "./app/features/feedback/components/feedback-sheet/feedback-sheet.module";
-@import "./app/features/scanner/components/help-modal/help-modal.module";
-@import "./app/features/scanner/components/country-scope-modal/country-scope-modal.module";
-@import "./app/features/scanner/components/masking-settings-modal/masking-settings-modal.module";
-@import "./app/features/scanner/components/toast-stack/toast-stack.module";
+@import "./app/shared/styles/modules/transient/feedback-sheet.module";
+@import "./app/shared/styles/modules/transient/help-modal.module";
+@import "./app/shared/styles/modules/transient/country-scope-modal.module";
+@import "./app/shared/styles/modules/transient/masking-settings-modal.module";
+@import "./app/shared/styles/modules/transient/toast-stack.module";
