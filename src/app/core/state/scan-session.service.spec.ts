@@ -128,6 +128,7 @@ describe("ScanSessionService", () => {
     service.clear();
 
     expect(service.state()).toEqual({
+      advancedPreferences: service.state().advancedPreferences,
       countryProfileIds: initialCountryProfileIds,
       detectionMode: "selected-plus-global",
       errorMessage: null,

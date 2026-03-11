@@ -15,6 +15,7 @@ export const SCAN_TIMINGS = Object.freeze({
 });
 
 export const SESSION_STORAGE_KEYS = Object.freeze({
+  advancedPreferences: "llm-prompt-purify:advanced-preferences:v1",
   countryProfileId: "llm-prompt-purify:country-profile:v1",
   countryProfileIds: "llm-prompt-purify:country-profiles:v2",
   detectionMode: "llm-prompt-purify:detection-mode:v1",

@@ -5,15 +5,19 @@ import { MaskSafetyHardeningService } from "../mask-safety/mask-safety-hardening
 import {
   COUNTRY_PROFILE_DEFINITIONS,
   COUNTRY_PROFILE_ORDER,
+  DEFAULT_ADVANCED_PREFERENCES,
   DEFAULT_COUNTRY_PROFILE_IDS,
   MASK_GROUP_DEFINITIONS,
   MASK_GROUP_ORDER,
 } from "../masking/constants/masking.constants";
 import type {
+  AdvancedMaskingPreferences,
   CountryProfileId,
   DetectionMode,
   MaskGroupId,
+  MaskingStrategy,
   ScanResult,
+  XmlWrapTag,
 } from "../masking/declarations/masking.types";
 import { MaskingEngine } from "../masking/masking.engine";
 import {
@@ -40,10 +44,12 @@ import {
   toggleMatchEnabled,
 } from "./utils/match-control.utils";
 import {
+  loadPersistedAdvancedPreferences,
   loadPersistedCountryProfileIds,
   loadPersistedDetectionMode,
   loadPersistedGroupPreferences,
   loadPersistedSourceText,
+  persistAdvancedPreferences,
   persistCountryProfileIds,
   persistDetectionMode,
   persistGroupPreferences,
@@ -58,6 +64,7 @@ export class ScanSessionService {
   #queuedRefreshTimer: ReturnType<typeof setTimeout> | null = null;
   #refreshRequestId = 0;
   readonly #state = signal<ScanSessionState>({
+    advancedPreferences: loadPersistedAdvancedPreferences(),
     countryProfileIds: loadPersistedCountryProfileIds(),
     detectionMode: loadPersistedDetectionMode(),
     errorMessage: null,
@@ -106,12 +113,14 @@ export class ScanSessionService {
 
     return {
       activeMatches: result?.enabledMatches ?? 0,
+      advancedPreferences: state.advancedPreferences,
       canCopy: !!result && !state.isScanning,
       countryProfiles,
       detectionMode: state.detectionMode,
       editableMatches:
         result?.matches.filter(match => !match.locked).length ?? 0,
       errorMessage: state.errorMessage,
+      groupPreferences: state.groupPreferences,
       groups,
       hasMatches: !!result?.hasMatches,
       hasResult: !!result,
@@ -131,6 +140,7 @@ export class ScanSessionService {
   public clear(): void {
     this.#cancelRefreshes();
     this.#state.set({
+      advancedPreferences: this.#state().advancedPreferences,
       countryProfileIds: this.#state().countryProfileIds,
       detectionMode: this.#state().detectionMode,
       errorMessage: null,
@@ -177,6 +187,7 @@ export class ScanSessionService {
           this.#state().detectionMode,
         ),
         scannedAt,
+        this.#state().advancedPreferences,
       );
       this.#setPhase("validating");
 
@@ -236,6 +247,8 @@ export class ScanSessionService {
           result.sourceText,
           result.matches,
           result.scannedAt,
+          this.#state().advancedPreferences.maskingStrategy,
+          this.#state().advancedPreferences,
         ),
       );
 
@@ -279,6 +292,8 @@ export class ScanSessionService {
           result.matches,
           result.scannedAt,
           matchId,
+          this.#state().advancedPreferences.maskingStrategy,
+          this.#state().advancedPreferences,
         ),
       );
 
@@ -400,6 +415,7 @@ export class ScanSessionService {
         result.sourceText,
         matches,
         result.scannedAt,
+        state.advancedPreferences,
       ),
     }));
   }
@@ -418,6 +434,7 @@ export class ScanSessionService {
               currentResult.sourceText,
               applyAlwaysOnToMatches(currentResult.matches, groupId, alwaysOn),
               currentResult.scannedAt,
+              state.advancedPreferences,
             )
           : null;
 
@@ -451,6 +468,7 @@ export class ScanSessionService {
                 nextPreferences[groupId].alwaysOn,
               ),
               currentResult.scannedAt,
+              state.advancedPreferences,
             )
           : null;
 
@@ -476,6 +494,7 @@ export class ScanSessionService {
         result.sourceText,
         matches,
         result.scannedAt,
+        state.advancedPreferences,
       ),
     }));
   }
@@ -484,6 +503,7 @@ export class ScanSessionService {
     const currentState = this.#state();
 
     this.#state.set({
+      advancedPreferences: currentState.advancedPreferences,
       countryProfileIds: currentState.countryProfileIds,
       detectionMode: currentState.detectionMode,
       errorMessage: null,
@@ -498,6 +518,58 @@ export class ScanSessionService {
 
     if (sourceText.trim()) this.scheduleRefresh();
     else this.#cancelRefreshes();
+  }
+
+  public setAdvancedPreferences(
+    prefs: Partial<AdvancedMaskingPreferences>,
+  ): void {
+    const merged: AdvancedMaskingPreferences = {
+      ...this.#state().advancedPreferences,
+      ...prefs,
+    };
+
+    this.#state.update(state => {
+      const nextResult = state.result
+        ? this.#engine.rebuild(
+            state.result.sourceText,
+            state.result.matches,
+            state.result.scannedAt,
+            merged,
+          )
+        : null;
+
+      return { ...state, advancedPreferences: merged, result: nextResult };
+    });
+
+    persistAdvancedPreferences(merged);
+
+    if (
+      prefs.keywordBlocklist !== undefined ||
+      prefs.globalIgnoreList !== undefined ||
+      prefs.maskingStrategy !== undefined
+    ) {
+      this.scheduleRefresh();
+    }
+  }
+
+  public setMaskingStrategy(strategy: MaskingStrategy): void {
+    this.setAdvancedPreferences({ maskingStrategy: strategy });
+  }
+
+  public setXmlWrapEnabled(enabled: boolean): void {
+    this.setAdvancedPreferences({ xmlWrapEnabled: enabled });
+  }
+
+  public setXmlWrapTag(tag: XmlWrapTag): void {
+    this.setAdvancedPreferences({ xmlWrapTag: tag });
+  }
+
+  public updateKeywordBlocklist(keywords: readonly string[]): void {
+    this.setAdvancedPreferences({ keywordBlocklist: [...keywords] });
+  }
+
+  public updateGlobalIgnoreList(terms: readonly string[]): void {
+    this.setAdvancedPreferences({ globalIgnoreList: [...terms] });
   }
 
   #setPhase(phase: ScanPhase): void {
@@ -517,6 +589,7 @@ export class ScanSessionService {
       localResult.sourceText,
       hardeningResult.matches,
       localResult.scannedAt,
+      this.#state().advancedPreferences,
     );
   }
 

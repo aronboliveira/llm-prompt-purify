@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable, inject, signal } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
 import { KeyboardShortcutsService } from "./keyboard-shortcuts.service";
 
 /**

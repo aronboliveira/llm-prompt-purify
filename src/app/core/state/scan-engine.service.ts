@@ -1,9 +1,6 @@
 import { Injectable } from "@angular/core";
 
 import type {
-  CountryProfileId,
-  DetectionMode,
-  MaskGroupPreferenceMap,
   ScanMatch,
   ScanResult,
 } from "../masking/declarations/masking.types";

@@ -1,16 +1,25 @@
 import type {
+  AdvancedMaskingPreferences,
   CountryProfileId,
   CountryProfileSummary,
   DetectionMode,
   MaskGroupPreferenceMap,
   MaskGroupSummary,
+  MaskingStrategy,
   ScanMatch,
   ScanResult,
+  XmlWrapTag,
 } from "../../masking/declarations/masking.types";
 
-export type ScanPhase = "detecting" | "idle" | "masking" | "ready" | "validating";
+export type ScanPhase =
+  | "detecting"
+  | "idle"
+  | "masking"
+  | "ready"
+  | "validating";
 
 export interface ScanSessionState {
+  advancedPreferences: AdvancedMaskingPreferences;
   countryProfileIds: readonly CountryProfileId[];
   detectionMode: DetectionMode;
   errorMessage: string | null;
@@ -24,11 +33,13 @@ export interface ScanSessionState {
 
 export interface ScanSessionViewModel {
   activeMatches: number;
+  advancedPreferences: AdvancedMaskingPreferences;
   canCopy: boolean;
   countryProfiles: readonly CountryProfileSummary[];
   detectionMode: DetectionMode;
   editableMatches: number;
   errorMessage: string | null;
+  groupPreferences: MaskGroupPreferenceMap;
   groups: readonly MaskGroupSummary[];
   hasMatches: boolean;
   hasResult: boolean;
