@@ -1,132 +1,28 @@
 /**
  * Masking Strategy Pattern Implementation
  *
- * This module implements the Strategy Design Pattern for the masking system,
- * following SOLID principles:
- *
- * - Single Responsibility: Each strategy handles only one masking approach
- * - Open/Closed: New strategies can be added without modifying existing code
- * - Liskov Substitution: All strategies are interchangeable via the interface
- * - Interface Segregation: Strategies only implement what they need
- * - Dependency Inversion: High-level modules depend on abstractions
+ * Abstract base class for masking strategies following SOLID principles.
+ * Interfaces are isolated in declarations/strategy.types.ts per coding guidelines.
  *
  * @module MaskingStrategy
  */
 
-import type { MatchCategory } from "../declarations/masking.types";
+import type {
+  CounterState,
+  IMaskingStrategy,
+  MaskingContext,
+  MaskingResult,
+} from "../declarations/strategy.types";
 
-/**
- * Context passed to strategy methods containing all information
- * needed to generate an appropriate mask.
- */
-export interface MaskingContext {
-  /** The original sensitive value to be masked */
-  readonly value: string;
-
-  /** The detection rule ID that matched this value */
-  readonly ruleId: string;
-
-  /** The category of the match (personal, financial, etc.) */
-  readonly category: MatchCategory;
-
-  /** Optional: the previous mask for this value (for regeneration) */
-  readonly previousMask?: string;
-
-  /** Optional: counter state for numbered placeholders */
-  readonly counterState?: CounterState;
-
-  /** Optional: detected format context (json, yaml, plaintext, etc.) */
-  readonly formatContext?: FormatContext;
-}
-
-/**
- * Counter state for tracking sequential numbering across a scan session.
- */
-export interface CounterState {
-  readonly counters: Map<string, number>;
-  getNext(label: string): number;
-}
-
-/**
- * Format context providing information about the detected document format.
- */
-export interface FormatContext {
-  readonly type: "json" | "yaml" | "toml" | "xml" | "plaintext" | "unknown";
-  readonly isStructuredKey?: boolean;
-  readonly keyName?: string;
-  readonly depth?: number;
-}
-
-/**
- * Result of a masking operation.
- */
-export interface MaskingResult {
-  /** The generated mask string */
-  readonly mask: string;
-
-  /** Whether compliance rules were applied */
-  readonly complianceApplied: boolean;
-
-  /** Strategy that generated this mask */
-  readonly strategyId: string;
-
-  /** Optional metadata about the masking operation */
-  readonly metadata?: Record<string, unknown>;
-}
-
-/**
- * Strategy interface for masking operations.
- *
- * Each implementation provides a specific masking approach:
- * - RandomStrategy: Generates random but compliant replacements
- * - FakerStrategy: Uses numbered placeholders like {EMAIL1}, {SSN2}
- * - TagStrategy: Uses semantic XML-like tags like <EMAIL>, <SSN>
- * - RedactedStrategy: Replaces with solid blocks █████
- *
- * @example
- * ```typescript
- * const strategy: IMaskingStrategy = new FakerStrategy();
- * const result = strategy.mask({
- *   value: "john.doe@example.com",
- *   ruleId: "email-address",
- *   category: "personal"
- * });
- * // result.mask === "{EMAIL1}"
- * ```
- */
-export interface IMaskingStrategy {
-  /** Unique identifier for this strategy */
-  readonly id: string;
-
-  /** Human-readable name */
-  readonly name: string;
-
-  /** Description of what this strategy does */
-  readonly description: string;
-
-  /**
-   * Generates a mask for the given context.
-   *
-   * @param context - The masking context containing value and metadata
-   * @returns The masking result with the generated mask
-   */
-  mask(context: MaskingContext): MaskingResult;
-
-  /**
-   * Determines if this strategy can handle the given context.
-   * Used for strategy selection in complex scenarios.
-   *
-   * @param context - The masking context to evaluate
-   * @returns true if this strategy can handle the context
-   */
-  canHandle(context: MaskingContext): boolean;
-
-  /**
-   * Returns the priority of this strategy for conflict resolution.
-   * Higher priority strategies are preferred when multiple match.
-   */
-  readonly priority: number;
-}
+// Re-export types for backward compatibility
+export type {
+  CounterState,
+  CounterStateFactory,
+  FormatContext,
+  IMaskingStrategy,
+  MaskingContext,
+  MaskingResult,
+} from "../declarations/strategy.types";
 
 /**
  * Abstract base class providing common functionality for masking strategies.
@@ -223,19 +119,14 @@ export abstract class AbstractMaskingStrategy implements IMaskingStrategy {
 }
 
 /**
- * Factory function type for creating counter state.
- */
-export type CounterStateFactory = () => CounterState;
-
-/**
  * Default implementation of CounterState.
  */
 export class DefaultCounterState implements CounterState {
   readonly counters = new Map<string, number>();
 
   getNext(label: string): number {
-    const current = this.counters.get(label) ?? 0;
-    const next = current + 1;
+    const current = this.counters.get(label) ?? 0,
+      next = current + 1;
     this.counters.set(label, next);
     return next;
   }

@@ -12,6 +12,7 @@ import {
   type MaskingContext,
   type MaskingResult,
 } from "./masking-strategy.interface";
+import { FAKE_DOMAINS, randomInt } from "../utils/mask-strategy.utils";
 
 /**
  * Maps rule IDs and categories to human-readable labels.
@@ -132,8 +133,8 @@ export class FakerMaskingStrategy extends AbstractMaskingStrategy {
     }
 
     // Generate numbered placeholder
-    const label = this.getLabel(context.ruleId, context.category);
-    const counter = context.counterState?.getNext(label) ?? 1;
+    const label = this.getLabel(context.ruleId, context.category),
+      counter = context.counterState?.getNext(label) ?? 1;
 
     return {
       mask: `{${label}${counter}}`,
@@ -164,14 +165,9 @@ export class FakerMaskingStrategy extends AbstractMaskingStrategy {
   }
 
   private maskEmail(context: MaskingContext): MaskingResult {
-    const counter = context.counterState?.getNext("EMAIL") ?? 1;
-    const hex = this.randomHex(4);
-    const domains = [
-      "INVALID-DOMAIN.example",
-      "NOT-REAL-ADDR.example",
-      "FAKE-MAILBOX.test.example",
-    ];
-    const domain = domains[this.randomInt(domains.length)];
+    const counter = context.counterState?.getNext("EMAIL") ?? 1,
+      hex = randomInt(0xffff).toString(16).padStart(4, "0").toUpperCase(),
+      domain = FAKE_DOMAINS[randomInt(FAKE_DOMAINS.length)];
 
     return {
       mask: `xXx_user${counter}_${hex}@${domain}`,
@@ -209,22 +205,5 @@ export class FakerMaskingStrategy extends AbstractMaskingStrategy {
       strategyId: this.id,
       metadata: { type: "bearer", counter: n },
     };
-  }
-
-  private randomHex(length: number): string {
-    return this.randomInt(0xffff)
-      .toString(16)
-      .padStart(length, "0")
-      .toUpperCase();
-  }
-
-  private randomInt(max: number): number {
-    if (
-      typeof crypto !== "undefined" &&
-      typeof crypto.getRandomValues === "function"
-    ) {
-      return crypto.getRandomValues(new Uint32Array(1))[0] % max;
-    }
-    return Math.floor(Math.random() * max);
   }
 }

@@ -126,8 +126,8 @@ export function createFakerCounterState(): FakerCounterState {
  * Gets the next counter value for a category label and increments it.
  */
 function getNextCounter(state: FakerCounterState, label: string): number {
-  const current = state.counters.get(label) ?? 0;
-  const next = current + 1;
+  const current = state.counters.get(label) ?? 0,
+    next = current + 1;
   state.counters.set(label, next);
   return next;
 }
@@ -171,8 +171,8 @@ export function createFakerMask(
   }
 
   // All other categories use the safe {LABEL}{N} format
-  const label = getFakerLabel(ruleId, category);
-  const counter = counterState ? getNextCounter(counterState, label) : 1;
+  const label = getFakerLabel(ruleId, category),
+    counter = counterState ? getNextCounter(counterState, label) : 1;
   return `{${label}${counter}}`;
 }
 
@@ -374,18 +374,18 @@ export interface BlocklistHit {
  * Using these ensures the generated email can never match a real address.
  * The domain names are intentionally long and conspicuous.
  */
-const FAKE_DOMAINS = [
+export const FAKE_DOMAINS = [
   "INVALID-DOMAIN.example",
   "NOT-REAL-ADDR.example",
   "FAKE-MAILBOX.test.example",
   "REDACTED-EMAIL.example.net",
 ] as const;
 
-function pick<T>(arr: readonly T[]): T {
+export function pick<T>(arr: readonly T[]): T {
   return arr[randomInt(arr.length)];
 }
 
-function randomInt(max: number): number {
+export function randomInt(max: number): number {
   if (
     typeof crypto !== "undefined" &&
     typeof crypto.getRandomValues === "function"
@@ -433,9 +433,9 @@ function createLowEntropyBearerMask(counterState?: FakerCounterState): string {
  * The 4-char hex hash ensures regeneration always produces a distinct value.
  */
 function fakeEmail(counterState?: FakerCounterState): string {
-  const counter = counterState ? getNextCounter(counterState, "EMAIL") : 1;
-  const domain = pick(FAKE_DOMAINS);
-  const hex = randomInt(0xffff).toString(16).padStart(4, "0").toUpperCase();
+  const counter = counterState ? getNextCounter(counterState, "EMAIL") : 1,
+    domain = pick(FAKE_DOMAINS),
+    hex = randomInt(0xffff).toString(16).padStart(4, "0").toUpperCase();
   return `xXx_user${counter}_${hex}@${domain}`;
 }
 
@@ -484,27 +484,27 @@ export function expandCredentialPrefixes(
     if (!CREDENTIAL_PREFIX_RULE_IDS.has(match.ruleId)) continue;
 
     // Look backward from the match start to find `label[:=]` with optional whitespace/quotes
-    const searchStart = Math.max(0, match.start - 120);
-    const preceding = sourceText.slice(searchStart, match.start);
+    const searchStart = Math.max(0, match.start - 120),
+      preceding = sourceText.slice(searchStart, match.start);
 
     // Match: <label> <delimiter> <optional quote/space>
-    const labelRe = /(\S+)\s*[:=]\s*["']?\s*$/;
-    const labelHit = labelRe.exec(preceding);
+    const labelRe = /(\S+)\s*[:=]\s*["']?\s*$/,
+      labelHit = labelRe.exec(preceding);
     if (!labelHit || !labelHit[1]) continue;
 
-    const label = labelHit[1];
-    const fullMatchText = labelHit[0];
-    const labelStart = searchStart + (labelHit.index ?? 0);
-    const labelEnd = labelStart + fullMatchText.length;
+    const label = labelHit[1],
+      fullMatchText = labelHit[0],
+      labelStart = searchStart + (labelHit.index ?? 0),
+      labelEnd = labelStart + fullMatchText.length;
 
     // Avoid overlapping with the value match or duplicating
     if (labelEnd > match.start) continue;
     if (prefixMatches.some(pm => pm.start === labelStart)) continue;
 
-    const mangledLabel = mangleCredentialPrefix(label);
-    // Mangle everything including delimiter and quotes
-    const delimPart = fullMatchText.slice(label.length);
-    const mangledFull = mangledLabel + delimPart;
+    const mangledLabel = mangleCredentialPrefix(label),
+      // Mangle everything including delimiter and quotes
+      delimPart = fullMatchText.slice(label.length),
+      mangledFull = mangledLabel + delimPart;
 
     prefixMatches.push({
       category: "credential",

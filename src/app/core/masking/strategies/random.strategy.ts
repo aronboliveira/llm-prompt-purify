@@ -8,6 +8,7 @@
  */
 
 import { createDistinctMask } from "../utils/mask-format.utils";
+import { FAKE_DOMAINS, randomInt } from "../utils/mask-strategy.utils";
 import {
   AbstractMaskingStrategy,
   type MaskingContext,
@@ -52,9 +53,9 @@ export class RandomMaskingStrategy extends AbstractMaskingStrategy {
   }
 
   private maskEmail(context: MaskingContext): MaskingResult {
-    const counter = context.counterState?.getNext("EMAIL") ?? 1;
-    const hex = this.randomHex(4);
-    const domain = this.pickFakeDomain();
+    const counter = context.counterState?.getNext("EMAIL") ?? 1,
+      hex = randomInt(0xffff).toString(16).padStart(4, "0").toUpperCase(),
+      domain = FAKE_DOMAINS[randomInt(FAKE_DOMAINS.length)];
 
     return {
       mask: `xXx_user${counter}_${hex}@${domain}`,
@@ -62,32 +63,5 @@ export class RandomMaskingStrategy extends AbstractMaskingStrategy {
       strategyId: this.id,
       metadata: { emailCounter: counter },
     };
-  }
-
-  private pickFakeDomain(): string {
-    const domains = [
-      "INVALID-DOMAIN.example",
-      "NOT-REAL-ADDR.example",
-      "FAKE-MAILBOX.test.example",
-      "REDACTED-EMAIL.example.net",
-    ];
-    return domains[this.randomInt(domains.length)];
-  }
-
-  private randomHex(length: number): string {
-    return this.randomInt(0xffff)
-      .toString(16)
-      .padStart(length, "0")
-      .toUpperCase();
-  }
-
-  private randomInt(max: number): number {
-    if (
-      typeof crypto !== "undefined" &&
-      typeof crypto.getRandomValues === "function"
-    ) {
-      return crypto.getRandomValues(new Uint32Array(1))[0] % max;
-    }
-    return Math.floor(Math.random() * max);
   }
 }
