@@ -4,8 +4,9 @@ import {
   Component,
   input,
   output,
+  ViewEncapsulation
 } from "@angular/core";
-import { SafeHtml } from "@angular/platform-browser";
+import { type SafeHtml } from "@angular/platform-browser";
 
 import type { StatusTone } from "../../declarations/mask-control.types";
 
@@ -16,6 +17,7 @@ import type { StatusTone } from "../../declarations/mask-control.types";
   standalone: true,
   styleUrl: "./masked-output-pane.component.scss",
   templateUrl: "./masked-output-pane.component.html",
+  encapsulation: ViewEncapsulation.None
 })
 export class MaskedOutputPaneComponent {
   readonly title = input.required<string>();
@@ -26,6 +28,7 @@ export class MaskedOutputPaneComponent {
   readonly detectionModeLabel = input.required<string>();
   readonly statusTone = input.required<StatusTone>();
   readonly copyIcon = input.required<SafeHtml>();
+  readonly helpIcon = input.required<SafeHtml>();
   readonly refreshIcon = input.required<SafeHtml>();
   readonly isScanning = input.required<boolean>();
   readonly hasResult = input.required<boolean>();

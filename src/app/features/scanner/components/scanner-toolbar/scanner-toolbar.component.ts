@@ -1,11 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  inject,
   input,
   output,
+  ViewEncapsulation
 } from "@angular/core";
-import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
+import type { SafeHtml } from "@angular/platform-browser";
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,6 +13,7 @@ import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
   standalone: true,
   styleUrl: "./scanner-toolbar.component.scss",
   templateUrl: "./scanner-toolbar.component.html",
+  encapsulation: ViewEncapsulation.None
 })
 export class ScannerToolbarComponent {
   readonly countrySummary = input.required<string>();

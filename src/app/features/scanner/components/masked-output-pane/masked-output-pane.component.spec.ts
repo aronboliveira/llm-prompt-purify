@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { type ComponentFixture, TestBed } from "@angular/core/testing";
 import { MaskedOutputPaneComponent } from "./masked-output-pane.component";
 import { DomSanitizer } from "@angular/platform-browser";
 
@@ -28,6 +28,10 @@ describe("MaskedOutputPaneComponent", () => {
     fixture.componentRef.setInput("statusTone", "info");
     fixture.componentRef.setInput(
       "copyIcon",
+      sanitizer.bypassSecurityTrustHtml("<svg></svg>"),
+    );
+    fixture.componentRef.setInput(
+      "helpIcon",
       sanitizer.bypassSecurityTrustHtml("<svg></svg>"),
     );
     fixture.componentRef.setInput(

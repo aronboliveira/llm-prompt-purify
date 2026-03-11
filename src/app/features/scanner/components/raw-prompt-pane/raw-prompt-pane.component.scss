@@ -1,108 +1,113 @@
 @use "../../../../shared/styles/design" as ui;
 
-.pane {
-  @include ui.surface-card();
-  @include ui.entrance-slide(Y, 0.8rem);
+@scope (.pane) {
+  :scope {
+    @include ui.surface-card();
+    @include ui.entrance-slide(Y, 0.8rem);
 
-  border: 1px solid var(--panel-border);
-  container-type: inline-size;
-  display: grid;
-  gap: 0.75rem;
-  grid-template-rows: auto auto 1fr;
-  min-block-size: 100%;
-  padding: 1rem 1.1rem;
-  position: relative;
-}
-
-.pane--raw::before {
-  background: linear-gradient(90deg, rgba(15, 118, 110, 0.08), transparent);
-  block-size: 0.24rem;
-  border-radius: 999px;
-  content: "";
-  inline-size: 100%;
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  position: absolute;
-}
-
-.pane__header {
-  @include ui.flex-bar();
-
-  justify-content: space-between;
-}
-
-.pane__title-wrap {
-  @include ui.flex-bar();
-
-  align-items: baseline;
-}
-
-.pane__title-wrap h2 {
-  color: var(--ink);
-  font-weight: 700;
-  margin: 0;
-}
-
-.pane__body {
-  color: var(--muted);
-  line-height: 1.7;
-  margin: 0;
-}
-
-.char-count {
-  @include ui.pill-chip();
-  @include ui.mono-font;
-
-  color: var(--muted);
-}
-
-.editor {
-  @include ui.mono-font;
-  @include ui.focus-ring();
-
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.98),
-    rgba(248, 252, 254, 0.98)
-  );
-  border: 1px solid ui.panel-border(0.12);
-  border-radius: ui.panel-radius(0.45);
-  color: var(--ink, #1e293b);
-  font-size: 0.92rem;
-  line-height: 1.7;
-  min-block-size: 24rem;
-  padding: 0.9rem 1rem;
-  resize: vertical;
-  width: 100%;
-}
-
-.editor::placeholder {
-  color: #6b7a88;
-  opacity: 0.85;
-}
-
-.help-trigger {
-  @include ui.help-button;
-}
-
-.sr-only {
-  block-size: 1px;
-  clip: rect(0 0 0 0);
-  inline-size: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-}
-
-@container (max-width: 34rem) {
-  .pane__header {
-    align-items: start;
-    flex-direction: column;
+    border: 1px solid var(--panel-border);
+    container-type: inline-size;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-rows: auto auto 1fr;
+    min-block-size: 100%;
+    padding: 1rem 1.1rem;
+    position: relative;
   }
 
-  .pane__title-wrap {
+  :scope.pane--raw::before {
+    background: linear-gradient(
+      90deg,
+      var(--accent-soft, rgba(15, 118, 110, 0.14)),
+      transparent
+    );
+    block-size: 0.24rem;
+    border-radius: 999px;
+    content: "";
+    inline-size: 100%;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    position: absolute;
+  }
+
+  :scope .pane__header {
+    @include ui.flex-bar();
+
+    justify-content: space-between;
+  }
+
+  :scope .pane__title-wrap {
+    @include ui.flex-bar();
+
     align-items: center;
-    flex-wrap: wrap;
+  }
+
+  :scope .pane__title-wrap h2 {
+    color: ui.ink();
+    font-weight: 700;
+    margin: 0;
+  }
+
+  :scope .pane__body {
+    color: ui.muted();
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  :scope .char-count {
+    @include ui.pill-chip();
+    @include ui.mono-font;
+
+    color: ui.muted();
+  }
+
+  :scope .editor {
+    @include ui.mono-font;
+    @include ui.focus-ring();
+
+    background: var(
+      --surface-field,
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 254, 0.98))
+    );
+    border: 1px solid ui.panel-border(0.12);
+    border-radius: ui.panel-radius(0.45);
+    color: var(--text-strong, #1e293b);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    min-block-size: 24rem;
+    padding: 0.9rem 1rem;
+    resize: vertical;
+    width: 100%;
+  }
+
+  :scope .editor::placeholder {
+    color: var(--text-placeholder, #6b7a88);
+    opacity: 0.85;
+  }
+
+  :scope .help-trigger {
+    @include ui.help-button;
+  }
+
+  :scope .sr-only {
+    block-size: 1px;
+    clip: rect(0 0 0 0);
+    inline-size: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+  }
+
+  @container (max-width: 34rem) {
+    :scope .pane__header {
+      align-items: start;
+      flex-direction: column;
+    }
+
+    :scope .pane__title-wrap {
+      align-items: center;
+      flex-wrap: wrap;
+    }
   }
 }

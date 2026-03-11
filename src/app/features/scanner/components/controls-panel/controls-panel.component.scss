@@ -1,38 +1,40 @@
 @use "../../../../shared/styles/design" as ui;
 
-.controls {
-  @include ui.surface-card();
+@scope (.controls) {
+  :scope {
+    @include ui.surface-card();
 
-  border: 1px solid var(--panel-border);
-  display: grid;
-  gap: 0.85rem;
-  padding: 1.1rem;
-}
+    border: 1px solid var(--panel-border);
+    display: grid;
+    gap: 0.85rem;
+    padding: 1.1rem;
+  }
 
-.controls__header {
-  @include ui.flex-bar();
+  :scope .controls__header {
+    @include ui.flex-bar();
 
-  justify-content: space-between;
-}
+    justify-content: space-between;
+  }
 
-.controls__title-wrap {
-  @include ui.flex-bar();
+  :scope .controls__title-wrap {
+    @include ui.flex-bar();
 
-  align-items: baseline;
-}
+    align-items: center;
+  }
 
-.controls h2 {
-  color: var(--ink);
-  font-weight: 700;
-  margin: 0;
-}
+  :scope h2 {
+    color: ui.ink();
+    font-weight: 700;
+    margin: 0;
+  }
 
-.controls__body {
-  color: var(--muted);
-  line-height: 1.7;
-  margin: 0;
-}
+  :scope .controls__body {
+    color: ui.muted();
+    line-height: 1.7;
+    margin: 0;
+  }
 
-.help-trigger {
-  @include ui.help-button;
+  :scope .help-trigger {
+    @include ui.help-button;
+  }
 }

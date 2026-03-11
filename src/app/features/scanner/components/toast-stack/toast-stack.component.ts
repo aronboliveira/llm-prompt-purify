@@ -8,7 +8,6 @@ import type { ToastMessage } from "@core/feedback/declarations/toast.types";
   imports: [CommonModule],
   selector: "app-toast-stack",
   standalone: true,
-  styleUrl: "./toast-stack.component.scss",
   templateUrl: "./toast-stack.component.html",
 })
 export class ToastStackComponent {

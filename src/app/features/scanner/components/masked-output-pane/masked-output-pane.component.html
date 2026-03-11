@@ -2,8 +2,17 @@
   <div class="pane__header">
     <div class="pane__title-wrap">
       <h2>{{ title() }}</h2>
-      <button class="help-trigger" type="button" (click)="requestHelp()">
-        (?)
+      <button
+        aria-label="Help"
+        class="help-trigger"
+        type="button"
+        (click)="requestHelp()"
+      >
+        <span
+          aria-hidden="true"
+          class="help-trigger__icon"
+          [innerHTML]="helpIcon()"
+        ></span>
       </button>
     </div>
     <button

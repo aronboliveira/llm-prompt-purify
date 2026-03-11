@@ -47,7 +47,7 @@ describe("CountryScopeModalComponent", () => {
       .querySelector(".help-trigger")
       .dispatchEvent(new MouseEvent("click", { bubbles: true }));
     fixture.nativeElement
-      .querySelector(".modal__close")
+      .querySelector(".country-modal__close")
       .dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
     expect(toggleSpy).toHaveBeenCalledWith({

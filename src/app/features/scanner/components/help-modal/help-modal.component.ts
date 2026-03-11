@@ -11,7 +11,6 @@ import type { HelpTopic } from "../../declarations/help-topic.types";
   imports: [CommonModule],
   selector: "app-help-modal",
   standalone: true,
-  styleUrl: "./help-modal.component.scss",
   templateUrl: "./help-modal.component.html",
 })
 export class HelpModalComponent {

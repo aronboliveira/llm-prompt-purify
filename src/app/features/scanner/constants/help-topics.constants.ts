@@ -15,6 +15,7 @@ export const HELP_TOPICS: Readonly<Record<HelpTopicId, HelpTopic>> = Object.free
     paragraphs: [
       "Mask groups let you switch broad classes of sensitive data on or off without leaving the live workspace. Credentials stay stricter because they are the most likely to cause immediate leaks.",
       "Each match row shows the relationship between the generated mask and the original captured value in the format label(mask):original, so you can take off or regenerate exactly what you need.",
+      "Compliance guideline: numeric financial and identifier values are always rewritten into clearly non-real placeholders (for example ####-####), regardless of selected masking strategy.",
       "Every checkbox and regenerate action updates the protected output immediately. There is no separate review screen in this layout.",
     ],
     title: "How the mask controls work",

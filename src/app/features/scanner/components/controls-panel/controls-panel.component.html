@@ -2,8 +2,17 @@
   <div class="controls__header">
     <div class="controls__title-wrap">
       <h2>{{ title() }}</h2>
-      <button class="help-trigger" type="button" (click)="requestHelp()">
-        (?)
+      <button
+        aria-label="Help"
+        class="help-trigger"
+        type="button"
+        (click)="requestHelp()"
+      >
+        <span
+          aria-hidden="true"
+          class="help-trigger__icon"
+          [innerHTML]="icons.help"
+        ></span>
       </button>
     </div>
   </div>

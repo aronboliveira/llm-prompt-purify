@@ -36,17 +36,17 @@ describe("HelpModalComponent", () => {
     fixture.detectChanges();
 
     fixture.nativeElement
-      .querySelector(".modal")
+      .querySelector(".help-modal")
       .dispatchEvent(new MouseEvent("click", { bubbles: true }));
     expect(emitSpy).not.toHaveBeenCalled();
 
     fixture.nativeElement
-      .querySelector(".modal-backdrop")
+      .querySelector(".help-modal-backdrop")
       .dispatchEvent(new MouseEvent("click", { bubbles: true }));
     expect(emitSpy).toHaveBeenCalledTimes(1);
 
     fixture.nativeElement
-      .querySelector(".modal__close")
+      .querySelector(".help-modal__close")
       .dispatchEvent(new MouseEvent("click", { bubbles: true }));
     expect(emitSpy).toHaveBeenCalledTimes(2);
   });
