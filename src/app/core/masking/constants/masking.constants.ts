@@ -428,6 +428,7 @@ export const DEFAULT_ADVANCED_PREFERENCES: Readonly<AdvancedMaskingPreferences> 
     maskingStrategy: "random",
     xmlWrapEnabled: false,
     xmlWrapTag: "document",
+    maskTimestamps: false,
     keywordBlocklist: Object.freeze([]),
     globalIgnoreList: Object.freeze([]),
   });

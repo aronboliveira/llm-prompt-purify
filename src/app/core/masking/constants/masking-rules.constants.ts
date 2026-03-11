@@ -11,6 +11,7 @@ import {
   IN_AADHAAR_LABEL_FLAGS,
   IN_GSTIN_LABEL_FLAGS,
   IN_PAN_LABEL_FLAGS,
+  INCIDENT_ID_LABEL_FLAGS,
   LATAM_CEDULA_LABEL_FLAGS,
   LATAM_DNI_LABEL_FLAGS,
   LATAM_RUC_LABEL_FLAGS,
@@ -1215,6 +1216,53 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     patternFactory: () =>
       /[A-Z]:\\(?:[\w.-]+\\){2,}[\w.-]*/gi,
     priority: 60,
+  },
+  // ─── Incident ID Patterns ───────────────────────────────────────────────────
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "incident-id-labeled",
+    label: "Incident ID",
+    locale: "shared",
+    patternFactory: () => createDelimitedLabelValuePattern(
+      INCIDENT_ID_LABEL_FLAGS,
+      String.raw`(?:INC|INCIDENT|CASE|TICKET|REQ|SR|CHG|PRB)?[#-]?\d{4,12}`
+    ),
+    priority: 95,
+    valueGroup: 1,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "incident-id-format",
+    label: "Incident ID format",
+    locale: "shared",
+    patternFactory: () => /\b(?:INC|INCIDENT|CASE|TICKET|REQ|SR|CHG|PRB)[#-]?\d{4,12}\b/giu,
+    priority: 90,
+  },
+  // ─── Timestamp Patterns (conditional on advancedPrefs.maskTimestamps) ───────
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "timestamp-iso8601",
+    label: "ISO 8601 timestamp",
+    locale: "shared",
+    patternFactory: () => /\b\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:?\d{2})?\b/g,
+    priority: 50,
+    validator: isValidIsoDate,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "timestamp-datetime",
+    label: "Date/time value",
+    locale: "shared",
+    patternFactory: () => /\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\s+\d{1,2}:\d{2}(?::\d{2})?\b/g,
+    priority: 45,
   },
 ]);
 

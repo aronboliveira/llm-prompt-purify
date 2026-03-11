@@ -107,7 +107,10 @@ const FAKER_CATEGORY_LABELS: Readonly<Record<string, string>> = Object.freeze({
   credential: "CREDENTIAL",
 });
 
-import type { FakerCounterState, BlocklistHit } from "../declarations/strategy.types";
+import type {
+  FakerCounterState,
+  BlocklistHit,
+} from "../declarations/strategy.types";
 
 export type { FakerCounterState, BlocklistHit };
 

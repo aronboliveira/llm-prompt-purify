@@ -52,6 +52,7 @@ export class MaskingSettingsModalComponent {
     globalIgnoreList: [],
     keywordBlocklist: [],
     maskingStrategy: "random",
+    maskTimestamps: false,
     xmlWrapEnabled: false,
     xmlWrapTag: "document",
   });

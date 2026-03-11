@@ -1,3 +1,24 @@
+export const INCIDENT_ID_LABEL_FLAGS = Object.freeze([
+  "case",
+  "case id",
+  "case number",
+  "chamado",
+  "id do chamado",
+  "id do incidente",
+  "incident",
+  "incident id",
+  "incident number",
+  "incidente",
+  "numero do chamado",
+  "número do chamado",
+  "numero do incidente",
+  "número do incidente",
+  "request id",
+  "ticket",
+  "ticket id",
+  "ticket number",
+]);
+
 export const SHARED_SECRET_ASSIGNMENT_FLAGS = Object.freeze([
   "account key",
   "accountkey",
@@ -165,9 +186,17 @@ export const ES_SECRET_ASSIGNMENT_FLAGS = Object.freeze([
 export const SHARED_PHONE_LABEL_FLAGS = Object.freeze([
   "celular",
   "contact number",
+  "contato",
+  "contato de emergencia",
+  "contato de emergência",
+  "contato urgencia",
+  "contato urgência",
+  "fone",
   "mobile",
   "mobile number",
+  "movel",
   "movil",
+  "móvel",
   "móvil",
   "numero celular",
   "numero de celular",
@@ -179,6 +208,7 @@ export const SHARED_PHONE_LABEL_FLAGS = Object.freeze([
   "phone",
   "phone no",
   "phone number",
+  "tel",
   "telephone",
   "telefone",
   "telefone principal",
@@ -382,19 +412,27 @@ export const BR_CNH_LABEL_FLAGS = Object.freeze([
 ]);
 
 export const BR_PIS_PASEP_LABEL_FLAGS = Object.freeze([
+  "cadastro pis",
+  "meu pis",
   "nis",
   "numero do nis",
   "numero do pis",
+  "numero pis",
   "número do nis",
   "número do pis",
+  "número pis",
   "pasep",
   "pis",
+  "pis pasep",
 ]);
 
 export const BR_RG_LABEL_FLAGS = Object.freeze([
   "carteira de identidade",
   "documento de identidade",
   "identidade",
+  "meu rg",
+  "numero do rg",
+  "número do rg",
   "registro geral",
   "rg",
 ]);
@@ -402,9 +440,14 @@ export const BR_RG_LABEL_FLAGS = Object.freeze([
 export const BR_VOTER_LABEL_FLAGS = Object.freeze([
   "inscricao eleitoral",
   "inscrição eleitoral",
+  "meu titulo de eleitor",
+  "meu título de eleitor",
+  "numero do titulo",
+  "número do título",
   "titulo de eleitor",
   "titulo eleitoral",
   "título de eleitor",
+  "título eleitoral",
 ]);
 
 export const LATAM_CEDULA_LABEL_FLAGS = Object.freeze([

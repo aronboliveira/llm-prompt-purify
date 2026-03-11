@@ -1073,15 +1073,15 @@ def main():
     print("GENERATION COMPLETE")
     print("=" * 60)
     print(f"Total documents: {stats['total']}")
-    print(f"\nBy language:")
+    print("\nBy language:")
     for lang, count in stats["by_language"].items():
         print(f"  {lang}: {count}")
-    print(f"\nBy category:")
+    print("\nBy category:")
     for category, count in sorted(stats["by_category"].items()):
         print(f"  {category}: {count}")
-    print(f"\nManifests created:")
-    print(f"  - corpus-manifest.csv")
-    print(f"  - corpus-manifest.json")
+    print("\nManifests created:")
+    print("  - corpus-manifest.csv")
+    print("  - corpus-manifest.json")
 
 
 if __name__ == "__main__":

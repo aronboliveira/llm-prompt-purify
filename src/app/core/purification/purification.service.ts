@@ -26,8 +26,6 @@
  * @module ContentPurifier
  */
 
-import { Injectable } from "@angular/core";
-
 import type {
   PurificationConfig,
   PurificationResult,
@@ -41,13 +39,11 @@ import {
 import {
   containsSqlInjection,
   detectSqlInjection,
-  neutralizeSqlInjection,
 } from "./utils/sql-detect.utils";
 import {
   containsXss,
   detectXssPatterns,
   encodeHtmlEntities,
-  sanitizeXss,
   stripHtmlTags,
 } from "./utils/xss-purify.utils";
 import { containsXxe, detectXxe, neutralizeXxe } from "./utils/xxe-detect.utils";
@@ -73,9 +69,6 @@ export const DEFAULT_PURIFICATION_CONFIG: PurificationConfig = Object.freeze({
  * Works in both browser and Node.js environments without DOM dependencies.
  * Uses pattern-based detection and string manipulation for sanitization.
  */
-@Injectable({
-  providedIn: "root",
-})
 export class ContentPurifier {
   readonly #config: PurificationConfig;
 
@@ -298,9 +291,7 @@ export {
   sanitizeXss,
   stripHtmlTags,
 } from "./utils/xss-purify.utils";
-export {
-  neutralizeSqlInjection,
-} from "./utils/sql-detect.utils";
+export { neutralizeSqlInjection } from "./utils/sql-detect.utils";
 export {
   neutralizeXxe,
 } from "./utils/xxe-detect.utils";

@@ -130,7 +130,12 @@ export class MaskingEngine {
         strategy === "faker" ? createFakerCounterState() : undefined,
       ignoreList = advancedPrefs?.globalIgnoreList ?? [],
       blocklist = advancedPrefs?.keywordBlocklist ?? [],
-      activeRules = filterRulesForScope(MASKING_RULES, scopeSelection),
+      maskTimestamps = advancedPrefs?.maskTimestamps ?? false,
+      scopeFilteredRules = filterRulesForScope(MASKING_RULES, scopeSelection),
+      // Filter out timestamp rules if maskTimestamps is false
+      activeRules = maskTimestamps
+        ? scopeFilteredRules
+        : scopeFilteredRules.filter(rule => !rule.id.startsWith("timestamp-")),
       regexCandidates = activeRules.flatMap(rule => {
         return Array.from(sourceText.matchAll(rule.patternFactory()))
           .map(match => extractCandidateMatch(match, rule))

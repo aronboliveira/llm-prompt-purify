@@ -175,6 +175,12 @@ export interface AdvancedMaskingPreferences {
   xmlWrapTag: XmlWrapTag;
 
   /**
+   * Whether to mask timestamp values (ISO 8601, common date/time formats).
+   * Default: false
+   */
+  maskTimestamps: boolean;
+
+  /**
    * Words / patterns the user wants **always** masked regardless of
    * whether any detection rule catches them.
    * Stored lower-cased; matching is case-insensitive.

@@ -179,6 +179,10 @@ export function loadPersistedAdvancedPreferences(): AdvancedMaskingPreferences {
         parsed.xmlWrapTag && VALID_XML_TAGS.includes(parsed.xmlWrapTag)
           ? parsed.xmlWrapTag
           : DEFAULT_ADVANCED_PREFERENCES.xmlWrapTag,
+      maskTimestamps:
+        typeof parsed.maskTimestamps === "boolean"
+          ? parsed.maskTimestamps
+          : DEFAULT_ADVANCED_PREFERENCES.maskTimestamps,
       keywordBlocklist: Array.isArray(parsed.keywordBlocklist)
         ? Object.freeze(
             parsed.keywordBlocklist.filter(k => typeof k === "string"),
