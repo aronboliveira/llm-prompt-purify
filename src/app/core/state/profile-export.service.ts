@@ -58,9 +58,13 @@ export class ProfileExportService {
    */
   async importProfile(file: File): Promise<MaskingProfile> {
     const text = await file.text();
-    const json = JSON.parse(text);
-
-    return this.#validateProfile(json);
+    try {
+      const json = JSON.parse(text);
+      return this.#validateProfile(json);
+    } catch (error) {
+      console.error("Profile import JSON parse failed:", error);
+      throw error;
+    }
   }
 
   /**

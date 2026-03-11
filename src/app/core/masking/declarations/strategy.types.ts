@@ -96,3 +96,21 @@ export interface IMaskingStrategy {
  * Factory function type for creating counter state.
  */
 export type CounterStateFactory = () => CounterState;
+
+/**
+ * State object for tracking faker counters across a scan session.
+ * Each category gets its own incrementing counter.
+ */
+export interface FakerCounterState {
+  counters: Map<string, number>;
+}
+
+/**
+ * Blocklist hit result from credential prefix detection.
+ */
+export interface BlocklistHit {
+  start: number;
+  end: number;
+  value: string;
+  keyword: string;
+}

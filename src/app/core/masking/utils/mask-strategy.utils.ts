@@ -107,13 +107,9 @@ const FAKER_CATEGORY_LABELS: Readonly<Record<string, string>> = Object.freeze({
   credential: "CREDENTIAL",
 });
 
-/**
- * State object for tracking faker counters across a scan session.
- * Each category gets its own incrementing counter.
- */
-export interface FakerCounterState {
-  counters: Map<string, number>;
-}
+import type { FakerCounterState, BlocklistHit } from "../declarations/strategy.types";
+
+export type { FakerCounterState, BlocklistHit };
 
 /**
  * Creates a fresh counter state for a new scan session.
@@ -360,12 +356,7 @@ export function isIgnored(
   return ignoreList.some(ignored => lower === ignored.toLowerCase());
 }
 
-export interface BlocklistHit {
-  start: number;
-  end: number;
-  value: string;
-  keyword: string;
-}
+// BlocklistHit type is re-exported from strategy.types.ts
 
 // ─── Internal Faker Helpers ──────────────────────────────────────────────────
 
