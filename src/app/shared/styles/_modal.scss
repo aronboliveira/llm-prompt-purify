@@ -2,7 +2,7 @@
 
 @mixin modal-backdrop {
   align-items: center;
-  background: rgba(7, 22, 38, 0.56);
+  background: var(--modal-backdrop, rgba(7, 22, 38, 0.56));
   display: grid;
   inset: 0;
   padding: 1.5rem;

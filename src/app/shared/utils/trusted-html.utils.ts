@@ -1,5 +1,5 @@
 import type { SafeHtml } from "@angular/platform-browser";
-import { DomSanitizer } from "@angular/platform-browser";
+import { type DomSanitizer } from "@angular/platform-browser";
 
 export function createTrustedHtmlMap<T extends Record<string, string>>(
   sanitizer: DomSanitizer,

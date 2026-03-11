@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, input,
+  ViewEncapsulation
+} from "@angular/core";
 import type { WorkflowSnippet, WorkflowState } from "./workflow-strip.types";
 
 @Component({
@@ -7,6 +9,7 @@ import type { WorkflowSnippet, WorkflowState } from "./workflow-strip.types";
   standalone: true,
   styleUrl: "./workflow-strip.component.scss",
   templateUrl: "./workflow-strip.component.html",
+  encapsulation: ViewEncapsulation.None
 })
 export class WorkflowStripComponent {
   readonly snippets = input.required<readonly WorkflowSnippet[]>();

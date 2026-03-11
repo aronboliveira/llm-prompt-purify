@@ -1,25 +1,24 @@
-@use "../../../shared/styles/design" as ui;
+@use "../../styles/design" as ui;
 
-.product-header {
-  @include ui.entrance-slide(Y, 1rem);
-  @include ui.surface-card();
+@scope (.product-header) {
+  :scope {
+    display: grid;
+    gap: 0.5rem;
+    padding-block-end: 1rem;
+    text-align: center;
+  }
 
-  border: 1px solid var(--panel-border);
-  margin-block-end: 1rem;
-  padding: 1.5rem 1.3rem 1.2rem;
-  text-align: center;
-}
+  :scope .product-header__title {
+    color: var(--product-title-color, ui.ink());
+    font-size: clamp(1.4rem, 4vw, 1.8rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
 
-.product-header__title {
-  color: var(--ink);
-  font-size: clamp(1.8rem, 4vw, 2.4rem);
-  line-height: 1.1;
-  margin: 0 0 0.3rem;
-}
-
-.product-header__tagline {
-  @include ui.section-eyebrow;
-
-  color: var(--accent);
-  margin: 0;
+  :scope .product-header__tagline {
+    color: var(--product-tagline-color, ui.muted());
+    font-size: 1.05rem;
+    margin: 0;
+  }
 }

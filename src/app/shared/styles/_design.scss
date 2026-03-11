@@ -15,8 +15,8 @@
 
 @mixin surface-card($blur: 0.9, $strength: 0.12) {
   backdrop-filter: blur(18px * $blur);
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(11, 38, 61, 0.08);
+  background: var(--surface-elevated, rgba(255, 255, 255, 0.92));
+  border: 1px solid var(--surface-elevated-border, rgba(11, 38, 61, 0.08));
   border-radius: panel-radius();
   box-shadow: 0 24px 64px shadow-alpha($strength);
 }
@@ -59,10 +59,15 @@
 }
 
 @mixin icon-embed($size: 1.1rem) {
+  align-items: center;
   display: inline-flex;
+  justify-content: center;
+  line-height: 0;
+  vertical-align: middle;
 
   :is(svg) {
-    fill: currentColor;
+    display: block;
+    flex-shrink: 0;
     height: $size;
     width: $size;
   }
@@ -83,14 +88,52 @@
 @mixin help-button {
   @include focus-ring();
 
-  background: var(--surface-subtle, #eff5f8);
-  border: none;
+  align-items: center;
+  appearance: none;
+  background: var(--help-trigger-bg, #eef6f8);
+  border: 1px solid var(--help-trigger-border, rgba(15, 118, 110, 0.15));
   border-radius: var(--radius-pill, 999px);
-  color: ink();
+  box-shadow: none;
+  block-size: var(--help-trigger-size, 23px);
+  color: var(--help-trigger-color, #1e293b);
   cursor: pointer;
+  display: inline-flex;
   font: inherit;
   font-weight: 700;
-  padding: 0.15rem var(--space-xs, 0.55rem);
+  inline-size: var(--help-trigger-size, 23px);
+  justify-content: center;
+  line-height: 0;
+  outline: none;
+  padding: 0 0 0.5px;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    background: var(--help-trigger-bg-hover, #e0f2ef);
+    border-color: var(--surface-accent-border, rgba(15, 118, 110, 0.22));
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  .help-trigger__icon {
+    @include icon-embed(var(--help-trigger-icon-size, 1rem));
+
+    align-items: center;
+    block-size: 100%;
+    display: inline-flex;
+    inline-size: 100%;
+    justify-content: center;
+    line-height: 0;
+    pointer-events: none;
+
+    :is(svg) {
+      margin: 0;
+    }
+  }
 }
 
 @mixin close-button($padding: 0.7rem 1rem) {
@@ -119,10 +162,10 @@
 }
 
 @mixin warning-banner($padding: 0.75rem 0.9rem) {
-  background: rgba(245, 158, 11, 0.14);
-  border: 1px solid rgba(180, 83, 9, 0.18);
+  background: var(--warning-bg, rgba(245, 158, 11, 0.14));
+  border: 1px solid var(--warning-border, rgba(180, 83, 9, 0.18));
   border-radius: panel-radius(0.2);
-  color: #92400e;
+  color: var(--warning-text, #92400e);
   display: block;
   padding: $padding;
 }

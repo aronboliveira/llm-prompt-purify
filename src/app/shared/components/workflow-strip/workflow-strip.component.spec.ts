@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { type ComponentFixture, TestBed } from "@angular/core/testing";
 import { WorkflowStripComponent } from "./workflow-strip.component";
-import { WorkflowSnippet, WorkflowState } from "./workflow-strip.types";
+import { type WorkflowSnippet, type WorkflowState } from "./workflow-strip.types";
 
 describe("WorkflowStripComponent", () => {
   let component: WorkflowStripComponent;
