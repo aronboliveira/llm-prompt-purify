@@ -17,12 +17,23 @@ modules:
     layer: core-domain
     owner: masking-engine
     paths:
-      - src/app/core
+      - src/app/core/masking
       - src/app/features/scanner
     outcome:
       - deterministic detection
       - stable mask generation
       - recomposable output
+  - id: purification
+    layer: core-domain
+    owner: security
+    paths:
+      - src/app/core/purification
+    outcome:
+      - XSS detection and sanitization
+      - SQL injection detection
+      - XXE detection
+      - Path traversal detection
+      - Isomorphic (browser/server) operation
   - id: state_storage
     layer: core-state
     owner: state-and-storage
@@ -53,6 +64,7 @@ modules:
       - reduced duplication
 priority_order:
   - masking_engine
+  - purification
   - app_shell
   - state_storage
   - testing

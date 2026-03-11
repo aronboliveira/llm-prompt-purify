@@ -17,6 +17,7 @@
 - **Real-Time Interception**: Listens to keystrokes and pastes via DOM Observers.
 - **Robust Rule Engine**: Detects API Keys, Credit Cards, Brazilian IDs (CPF/CNPJ), Emails, IPs, and more using regex and heuristic fuzzing.
 - **Lightweight**: Pure TypeScript/Vanilla DOM implementation. Zero heavy frameworks.
+- **Security Purification**: Detects and neutralizes XSS, SQL injection, XXE, and path traversal attacks in user content.
 
 ### 🔄 How it Works
 
@@ -65,6 +66,7 @@ O **LLM Prompt Purify** é uma extensão de navegador leve, construída purament
 - **Interceptação em Tempo Real**: Monitora digitação e colagem de textos via DOM Observers.
 - **Motor de Regras Robusto**: Detecta senhas, cartões de crédito, CPFs, CNPJs, E-mails e IPs com alta precisão usando regex e validação heurística.
 - **Leveza (Zero Dependências Pesadas)**: Implementação focada em performance usando TypeScript puro.
+- **Purificação de Segurança**: Detecta e neutraliza ataques XSS, SQL injection, XXE e path traversal.
 
 ### 🔄 Como Funciona
 

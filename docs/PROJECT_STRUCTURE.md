@@ -11,6 +11,7 @@ llm-prompt-purify/
 │   │   ├── feedback/     # Feedback submission service
 │   │   ├── masking/      # Masking engine & rules
 │   │   ├── mask-safety/  # Mask validation service
+│   │   ├── purification/ # Isomorphic content purification (XSS, XXE, SQLi)
 │   │   └── state/        # Session state management
 │   ├── features/         # Feature modules
 │   │   ├── feedback/     # Feedback UI components
@@ -92,3 +93,57 @@ npm run docker:up   # Start Docker stack
 | frontend | 44200 | Angular app (nginx) |
 | backend  | 48080 | .NET API |
 | db       | -     | PostgreSQL (internal) |
+
+## Core Modules
+
+### Masking Engine (`core/masking/`)
+
+Pattern-based PII detection and masking engine. Supports multiple locales (US, BR) with configurable detection profiles.
+
+```
+masking/
+├── constants/           # Pattern definitions, locale configs
+├── declarations/        # ScanMatch, MaskResult types
+├── strategies/          # Strategy pattern for mask generation
+│   ├── strategy-registry.ts
+│   └── masking-strategy.interface.ts
+├── utils/               # Luhn generation, mask formatting
+├── masking.engine.ts    # Main engine class (deterministic, pure)
+└── masking.engine.*.spec.ts # Exhaustive test suite (1300+ tests)
+```
+
+### Purification Module (`core/purification/`)
+
+Isomorphic content sanitization for security threats. Works in both browser and server environments without DOM dependencies.
+
+```
+purification/
+├── declarations/
+│   └── purification.types.ts    # ThreatMatch, PurificationResult
+├── utils/
+│   ├── xss-purify.utils.ts      # XSS patterns & HTML encoding
+│   ├── sql-detect.utils.ts      # SQL injection detection
+│   ├── xxe-detect.utils.ts      # XXE/XML entity detection
+│   └── path-traversal.utils.ts  # Path traversal detection
+├── purification.service.ts      # ContentPurifier service
+└── index.ts                     # Public API exports
+```
+
+**Threat Types:**
+- **XSS**: Script injection, event handlers, javascript: protocol
+- **SQL Injection**: OR-based, UNION SELECT, stacked queries, blind injection
+- **XXE**: External entities, DTD references, XInclude
+- **Path Traversal**: `../` sequences, URL-encoded variants, absolute paths
+
+**Usage:**
+```typescript
+import { ContentPurifier, purifyContent } from "@core/purification";
+
+// Angular DI
+const purifier = inject(ContentPurifier);
+const result = purifier.purify(userInput, { stripThreats: true });
+
+// Standalone (no Angular)
+const threats = detectThreats(userInput);
+const clean = purifyContent(userInput, { encodeHtml: true });
+```
