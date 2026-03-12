@@ -92,6 +92,18 @@ import {
   CROSS_SCOPE_POSITIVE,
   CROSS_SCOPE_GLOBAL_ONLY,
   CROSS_SCOPE_STRESS,
+  // ── High Entropy (Edge Cases) ──
+  AMBIGUOUS_SEPARATOR_BOUNDARY,
+  BR_INFORMAL_VARIATIONS,
+  BR_TYPO_POSITIVE,
+  HIGH_ENTROPY_NEGATIVES,
+  INFORMAL_LANGUAGE_POSITIVE,
+  MALICIOUS_CODE_FIXTURES,
+  MIXED_SEPARATOR_POSITIVE,
+  UNICODE_EDGE_CASES,
+  US_INFORMAL_VARIATIONS,
+  US_TYPO_POSITIVE,
+  WHITESPACE_CHAOS,
 } from "@testing/constants/matrix";
 
 // ─── Helper: DRY iteration wrappers ────────────────────────────────────────
@@ -340,5 +352,33 @@ describe("MaskingEngine country × rule matrix", () => {
       boundaries(CROSS_SCOPE_GLOBAL_ONLY)(engine));
     describe("stress: many countries", () =>
       boundaries(CROSS_SCOPE_STRESS)(engine));
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // HIGH ENTROPY EDGE CASES
+  // ═══════════════════════════════════════════════════════════════════════════
+  describe("High-entropy edge cases", () => {
+    describe("typos and grammatical errors", () => {
+      describe("PT-BR typos", () => positives(BR_TYPO_POSITIVE)(engine));
+      describe("EN-US typos", () => positives(US_TYPO_POSITIVE)(engine));
+    });
+    describe("mixed separators", () =>
+      positives(MIXED_SEPARATOR_POSITIVE)(engine));
+    describe("informal language", () =>
+      positives(INFORMAL_LANGUAGE_POSITIVE)(engine));
+    describe("malicious code patterns", () =>
+      positives(MALICIOUS_CODE_FIXTURES)(engine));
+    describe("unicode edge cases", () =>
+      positives(UNICODE_EDGE_CASES)(engine));
+    describe("whitespace chaos", () =>
+      positives(WHITESPACE_CHAOS)(engine));
+    describe("informal variations", () => {
+      describe("PT-BR informal", () => positives(BR_INFORMAL_VARIATIONS)(engine));
+      describe("EN-US informal", () => positives(US_INFORMAL_VARIATIONS)(engine));
+    });
+    describe("ambiguous separator boundary", () =>
+      boundaries(AMBIGUOUS_SEPARATOR_BOUNDARY)(engine));
+    describe("false positive avoidance", () =>
+      negatives(HIGH_ENTROPY_NEGATIVES)(engine));
   });
 });

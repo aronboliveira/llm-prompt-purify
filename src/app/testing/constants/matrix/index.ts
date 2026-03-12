@@ -102,3 +102,18 @@ export {
   CROSS_SCOPE_POSITIVE,
   CROSS_SCOPE_STRESS,
 } from "./cross-scope.fixtures";
+
+// ─── High Entropy (Edge Cases) ──────────────────────────────────────────────
+export {
+  AMBIGUOUS_SEPARATOR_BOUNDARY,
+  BR_INFORMAL_VARIATIONS,
+  BR_TYPO_POSITIVE,
+  HIGH_ENTROPY_NEGATIVES,
+  INFORMAL_LANGUAGE_POSITIVE,
+  MALICIOUS_CODE_FIXTURES,
+  MIXED_SEPARATOR_POSITIVE,
+  UNICODE_EDGE_CASES,
+  US_INFORMAL_VARIATIONS,
+  US_TYPO_POSITIVE,
+  WHITESPACE_CHAOS,
+} from "./high-entropy.fixtures";
