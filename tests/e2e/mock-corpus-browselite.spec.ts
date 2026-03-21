@@ -314,9 +314,26 @@ function luhnValid(value: string): boolean {
   return total % 10 === 0;
 }
 
+function isTestValidRut(value: string): boolean {
+  const normalized = value.replace(/[.\-]/g, "").toUpperCase();
+  if (!/^\d{7,8}[0-9K]$/u.test(normalized)) return false;
+  const body = normalized.slice(0, -1);
+  const verifier = normalized.slice(-1);
+  let sum = 0;
+  let multiplier = 2;
+  for (let i = body.length - 1; i >= 0; i--) {
+    sum += Number(body[i]) * multiplier;
+    multiplier = multiplier === 7 ? 2 : multiplier + 1;
+  }
+  const remainder = 11 - (sum % 11);
+  const expected =
+    remainder === 11 ? "0" : remainder === 10 ? "K" : String(remainder);
+  return verifier === expected;
+}
+
 function extractSensitiveValues(sourceText: string): readonly string[] {
   const values: string[] = [];
-  const patterns: { re: RegExp; luhn?: boolean }[] = [
+  const patterns: { re: RegExp; luhn?: boolean; validator?: (v: string) => boolean }[] = [
     /* Emails */
     { re: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/giu },
     /* JWT */
@@ -346,7 +363,7 @@ function extractSensitiveValues(sourceText: string): readonly string[] {
     /* IBAN */
     { re: /\b[A-Z]{2}\d{2}[A-Z0-9]{11,30}\b/g },
     /* Chilean RUT */
-    { re: /\b\d{1,2}\.?\d{3}\.?\d{3}-?[\dKk]\b/g },
+    { re: /\b\d{1,2}\.?\d{3}\.?\d{3}-?[\dKk]\b/g, validator: isTestValidRut },
     /* Mexican CURP */
     { re: /\b[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d\b/g },
     /* Mexican RFC */
@@ -355,9 +372,10 @@ function extractSensitiveValues(sourceText: string): readonly string[] {
     { re: /\b\d{2}-\d{8}-\d\b/g },
   ];
 
-  for (const { re, luhn } of patterns) {
+  for (const { re, luhn, validator } of patterns) {
     for (const match of sourceText.matchAll(re)) {
       if (luhn && !luhnValid(match[0])) continue;
+      if (validator && !validator(match[0])) continue;
       values.push(match[0]);
     }
   }
