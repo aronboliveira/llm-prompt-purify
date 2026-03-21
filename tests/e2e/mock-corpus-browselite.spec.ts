@@ -331,6 +331,19 @@ function isTestValidRut(value: string): boolean {
   return verifier === expected;
 }
 
+function isTestValidIban(value: string): boolean {
+  const v = value.toUpperCase();
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(v)) return false;
+  const rearranged = v.slice(4) + v.slice(0, 4);
+  let numeric = "";
+  for (const ch of rearranged) {
+    numeric += /[A-Z]/.test(ch) ? (ch.charCodeAt(0) - 55).toString() : ch;
+  }
+  let rem = 0;
+  for (const d of numeric) rem = (rem * 10 + Number(d)) % 97;
+  return rem === 1;
+}
+
 function extractSensitiveValues(sourceText: string): readonly string[] {
   const values: string[] = [];
   const patterns: { re: RegExp; luhn?: boolean; validator?: (v: string) => boolean }[] = [
@@ -361,7 +374,7 @@ function extractSensitiveValues(sourceText: string): readonly string[] {
     /* Bearer tokens (min 20 chars after "Bearer ") */
     { re: /\bBearer\s+[A-Za-z0-9\-._~+/]{20,}=*/gu },
     /* IBAN */
-    { re: /\b[A-Z]{2}\d{2}[A-Z0-9]{11,30}\b/g },
+    { re: /\b[A-Z]{2}\d{2}[A-Z0-9]{11,30}\b/g, validator: isTestValidIban },
     /* Chilean RUT */
     { re: /\b\d{1,2}\.?\d{3}\.?\d{3}-?[\dKk]\b/g, validator: isTestValidRut },
     /* Mexican CURP */
