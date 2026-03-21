@@ -358,8 +358,8 @@ function extractSensitiveValues(sourceText: string): readonly string[] {
     { re: /\b\d{3}-\d{2}-\d{4}\b/g },
     /* GitHub PAT */
     { re: /\bgh[pousr]_[A-Za-z0-9]{20,}\b/g },
-    /* Bearer tokens */
-    { re: /\bBearer\s+[A-Za-z0-9\-._~+/]+=*/gu },
+    /* Bearer tokens (min 20 chars after "Bearer ") */
+    { re: /\bBearer\s+[A-Za-z0-9\-._~+/]{20,}=*/gu },
     /* IBAN */
     { re: /\b[A-Z]{2}\d{2}[A-Z0-9]{11,30}\b/g },
     /* Chilean RUT */
