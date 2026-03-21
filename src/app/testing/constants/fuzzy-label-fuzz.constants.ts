@@ -400,7 +400,7 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
     description: "Chinese resident ID fuzzy labels",
     extraPositiveLabels: ["shenfenzheng hao"],
     invalidValue: "110105194912310021",
-    negativeLabels: ["resident profile", "national registry"],
+    negativeLabels: [],
     positiveRecipes: Object.freeze([
       {
         description: "split pinyin words",

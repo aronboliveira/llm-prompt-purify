@@ -250,15 +250,14 @@ export const SCOPE_BOUNDARY_MASK_FIXTURES: readonly BoundaryMaskFixture[] = Obje
   },
   {
     countryProfileIds: ["us"],
-    description: "does not activate Chinese resident ID rules in United States scope",
-    excludedRuleIds: ["cn-resident-id-labeled"],
-    expectedRuleIds: ["email-address"],
-    hiddenValues: ["analyst@example.com"],
+    description:
+      "masks Chinese resident ID globally even in United States scope",
+    expectedRuleIds: ["cn-resident-id", "email-address"],
+    hiddenValues: ["11010519491231002X", "analyst@example.com"],
     sourceText: [
       "National ID: 11010519491231002X",
       "Email: analyst@example.com",
     ].join("\n"),
-    visibleValues: ["11010519491231002X"],
   },
   {
     countryProfileIds: ["cn", "ru"],

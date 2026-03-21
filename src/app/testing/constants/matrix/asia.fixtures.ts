@@ -53,13 +53,6 @@ export const CN_RESIDENT_ID_POSITIVE: readonly LocaleMaskFixture[] = Object.free
 export const CN_RESIDENT_ID_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([
   {
     countryProfileIds: ["cn"],
-    description: "does NOT mask CN ID without label",
-    excludedRuleIds: ["cn-resident-id-labeled"],
-    sourceText: "Record 11010519491231002X in system.",
-    visibleValues: ["11010519491231002X"],
-  },
-  {
-    countryProfileIds: ["cn"],
     description: "does NOT mask 18 repeated digits (invalid body)",
     excludedRuleIds: ["cn-resident-id-labeled"],
     sourceText: "resident id: 111111111111111111",
@@ -392,13 +385,12 @@ export const ASIA_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["ru"],
-    description: "RU scope masks INN but not CN ID in same text",
-    excludedRuleIds: ["cn-resident-id-labeled"],
-    expectedRuleIds: ["ru-inn-labeled"],
-    hiddenValues: ["7728495344"],
+    description:
+      "RU scope masks INN and CN ID (global standalone) in same text",
+    expectedRuleIds: ["ru-inn-labeled", "cn-resident-id"],
+    hiddenValues: ["7728495344", "11010519491231002X"],
     sourceText:
       "инн: 7728495344 and resident id: 11010519491231002X both present.",
-    visibleValues: ["11010519491231002X"],
   },
   {
     countryProfileIds: ["in"],
@@ -422,13 +414,15 @@ export const ASIA_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   {
     countryProfileIds: ["in"],
     description:
-      "IN scope masks GSTIN and Aadhaar but not CN Resident ID",
-    excludedRuleIds: ["cn-resident-id-labeled"],
-    expectedRuleIds: ["in-gstin-labeled", "in-aadhaar-labeled"],
-    hiddenValues: ["27ABCDE1234F1ZG", "276592857148"],
+      "IN scope masks GSTIN, Aadhaar, and CN Resident ID (global)",
+    expectedRuleIds: [
+      "in-gstin-labeled",
+      "in-aadhaar-labeled",
+      "cn-resident-id",
+    ],
+    hiddenValues: ["27ABCDE1234F1ZG", "276592857148", "11010519491231002X"],
     sourceText:
       "gstin: 27ABCDE1234F1ZG aadhaar: 276592857148 resident id: 11010519491231002X",
-    visibleValues: ["11010519491231002X"],
   },
   {
     countryProfileIds: ["ru"],
@@ -442,11 +436,13 @@ export const ASIA_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   {
     countryProfileIds: ["cn"],
     description:
-      "global-only mode does NOT mask CN-scoped rules even with CN text",
+      "global-only mode masks CN ID (global standalone) but not CN phone",
     detectionMode: "global-only",
     excludedRuleIds: ["cn-resident-id-labeled", "cn-phone"],
+    expectedRuleIds: ["cn-resident-id"],
+    hiddenValues: ["11010519491231002X"],
     sourceText:
       "resident id: 11010519491231002X and call +86 13712345678",
-    visibleValues: ["11010519491231002X", "+86 13712345678"],
+    visibleValues: ["+86 13712345678"],
   },
 ]);
