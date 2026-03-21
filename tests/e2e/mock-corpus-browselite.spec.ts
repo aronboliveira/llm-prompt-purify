@@ -442,21 +442,35 @@ function appendResults(newResults: readonly TestResult[]): void {
 /* ------------------------------------------------------------------ */
 
 function categorizeLeak(leak: string): string {
-  if (leak.includes("@")) return "Email Addresses";
-  if (/eyJ/.test(leak)) return "JWT Tokens";
-  if (/sk[-_]/.test(leak)) return "API Keys (OpenAI/Stripe)";
-  if (/AKIA|ASIA/.test(leak)) return "AWS Access Keys";
-  if (/AC[a-f0-9]{32}/i.test(leak)) return "Twilio SIDs";
-  if (/Bearer/.test(leak)) return "Bearer Tokens";
-  if (/gh[pousr]_/.test(leak)) return "GitHub PATs";
-  if (/\d{3}-\d{2}-\d{4}/.test(leak)) return "US SSNs";
-  if (/\d{3}\.?\d{3}\.?\d{3}-?\d{2}/.test(leak)) return "Brazilian CPFs";
-  if (/\d{2}\.?\d{3}\.?\d{3}\/?\d{4}/.test(leak)) return "Brazilian CNPJs";
-  if (/\d{17}[\dX]/i.test(leak)) return "Chinese Resident IDs";
-  if (/\d{2}-\d{8}-\d/.test(leak)) return "Argentine CUITs";
-  if (/[A-Z]{2}\d{2}[A-Z0-9]{11,}/.test(leak)) return "IBANs";
-  if (/\d{1,2}\.?\d{3}\.?\d{3}-?[\dKk]/.test(leak)) return "Chilean RUTs";
-  if (/[A-Z]{4}\d{6}[HM]/.test(leak)) return "Mexican CURPs";
+  const v = leak.replace(/^leak:\s*/, "");
+
+  // Exact-format checks (anchored, most specific first)
+  if (/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/iu.test(v))
+    return "Email Addresses";
+  if (/^eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(v))
+    return "JWT Tokens";
+  if (/^(?:AKIA|ASIA)[A-Z0-9]{16}$/.test(v)) return "AWS Access Keys";
+  if (/^AC[a-f0-9]{32}$/i.test(v)) return "Twilio SIDs";
+  if (/^gh[pousr]_[A-Za-z0-9]{20,}$/.test(v)) return "GitHub PATs";
+  if (/^Bearer\s/.test(v)) return "Bearer Tokens";
+  if (/^sk[-_]/.test(v)) return "API Keys (OpenAI/Stripe)";
+
+  // Chinese IDs BEFORE CPF (18 digits would match CPF's 11-digit subsequence)
+  if (/^\d{17}[\dXx]$/.test(v)) return "Chinese Resident IDs";
+
+  // Structured identifiers (anchored)
+  if (/^\d{3}-\d{2}-\d{4}$/.test(v)) return "US SSNs";
+  if (/^\d{2}-\d{8}-\d$/.test(v)) return "Argentine CUITs";
+  if (/^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/.test(v))
+    return "Brazilian CNPJs";
+  if (/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/.test(v)) return "Brazilian CPFs";
+  if (/^\d{11}$/.test(v)) return "Brazilian CPFs (unformatted)";
+  if (/^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/.test(v))
+    return "Mexican CURPs";
+  if (/^[A-Z&Ñ]{3,4}\d{6}[A-Z0-9]{3}$/i.test(v)) return "Mexican RFCs";
+  if (/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(v)) return "IBANs";
+  if (/^\d{1,2}\.?\d{3}\.?\d{3}-?[\dKk]$/.test(v)) return "Chilean RUTs";
+
   return "Credit Cards / Other Financial";
 }
 
