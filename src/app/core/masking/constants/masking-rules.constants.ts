@@ -268,13 +268,14 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   {
     category: "identifier",
     countryProfileIds: ["us"],
-    coverage: "country",
+    coverage: "global",
     confidence: "high",
     id: "us-ssn",
     label: "US Social Security number",
     locale: "en-US",
     patternFactory: () => /\b\d{3}-\d{2}-\d{4}\b/g,
     priority: 116,
+    validator: isValidUsaSsn,
   },
   {
     category: "personal",
@@ -840,7 +841,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   {
     category: "identifier",
     countryProfileIds: ["us"],
-    coverage: "country",
+    coverage: "global",
     confidence: "high",
     id: "us-ssn-json",
     label: "US SSN in JSON/structured data",
@@ -854,7 +855,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   {
     category: "identifier",
     countryProfileIds: ["us"],
-    coverage: "country",
+    coverage: "global",
     confidence: "high",
     id: "us-ssn-quoted",
     label: "Quoted US SSN",
@@ -1127,7 +1128,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   {
     category: "identifier",
     countryProfileIds: ["us"],
-    coverage: "country",
+    coverage: "global",
     confidence: "high",
     id: "us-ssn-json-suffixed",
     label: "US SSN in JSON with numbered key suffix",

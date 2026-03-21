@@ -192,16 +192,16 @@ export const US_SSN_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
     countryProfileIds: ["us"],
     description: "masks US SSN embedded in HR document",
     expectedRuleIds: ["us-ssn"],
-    hiddenValues: ["987-65-4320"],
+    hiddenValues: ["456-78-9012"],
     sourceText:
-      "The employee's SSN is 987-65-4320 per the onboarding form submitted last week.",
+      "The employee's SSN is 456-78-9012 per the onboarding form submitted last week.",
   },
   {
     countryProfileIds: ["us"],
     description: "masks multiple SSNs in same prompt",
     expectedRuleIds: ["us-ssn"],
-    hiddenValues: ["123-45-6789", "987-65-4320"],
-    sourceText: "Employee SSN: 123-45-6789\nSpouse SSN: 987-65-4320",
+    hiddenValues: ["123-45-6789", "456-78-9012"],
+    sourceText: "Employee SSN: 123-45-6789\nSpouse SSN: 456-78-9012",
   },
 ]);
 
@@ -263,10 +263,10 @@ export const EU_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   {
     countryProfileIds: ["us"],
     detectionMode: "global-only",
-    description: "US SSN stays visible in global-only mode",
-    excludedRuleIds: ["us-ssn"],
+    description: "US SSN is masked in global-only mode (SSN is now global)",
+    expectedRuleIds: ["us-ssn"],
+    hiddenValues: ["123-45-6789"],
     sourceText: "SSN: 123-45-6789",
-    visibleValues: ["123-45-6789"],
   },
   {
     countryProfileIds: ["es"],
