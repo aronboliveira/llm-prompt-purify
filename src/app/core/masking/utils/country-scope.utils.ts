@@ -6,6 +6,23 @@ import type {
   ScanScopeSelection,
 } from "../declarations/masking.types";
 
+const LATAM_COUNTRY_IDS: ReadonlySet<CountryProfileId> = new Set([
+  "ar", "cl", "co", "mx", "pe",
+]);
+
+export function expandCountryScope(
+  selectedIds: readonly CountryProfileId[],
+): readonly CountryProfileId[] {
+  const expanded = new Set<CountryProfileId>(selectedIds);
+  for (const id of selectedIds) {
+    if (LATAM_COUNTRY_IDS.has(id)) {
+      expanded.add("latam-es");
+      break;
+    }
+  }
+  return [...expanded];
+}
+
 export function buildScanScopeSelection(
   countryProfileIds: readonly CountryProfileId[],
   detectionMode: DetectionMode

@@ -163,10 +163,10 @@ export const AR_CUIT_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["ar"],
-    description: "ignores CUIT with all same digits",
+    description: "ignores CUIT with wrong check digit (inner digits also fail RUT validation)",
     excludedRuleIds: ["cuit"],
-    sourceText: "CUIT: 11-11111111-1",
-    visibleValues: ["11-11111111-1"],
+    sourceText: "CUIT: 23-98765432-0",
+    visibleValues: ["23-98765432-0"],
   },
 ]);
 
@@ -310,10 +310,10 @@ export const LATAM_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["mx"],
-    description: "Argentine CUIT stays visible when only MX is selected",
-    excludedRuleIds: ["cuit"],
+    description: "Argentine CUIT is masked when MX is selected (latam-es expansion)",
+    expectedRuleIds: ["cuit"],
+    hiddenValues: ["20-12345678-6"],
     sourceText: "CUIT: 20-12345678-6",
-    visibleValues: ["20-12345678-6"],
   },
   {
     countryProfileIds: ["cl", "co"],

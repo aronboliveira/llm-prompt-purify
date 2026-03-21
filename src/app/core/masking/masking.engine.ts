@@ -8,7 +8,7 @@ import type {
   ScanScopeSelection,
   XmlWrapTag,
 } from "./declarations/masking.types";
-import { filterRulesForScope } from "./utils/country-scope.utils";
+import { expandCountryScope, filterRulesForScope } from "./utils/country-scope.utils";
 import { collectFuzzyLabelCandidates } from "./utils/fuzzy-label.utils";
 import { createDistinctMask } from "./utils/mask-format.utils";
 import {
@@ -131,7 +131,10 @@ export class MaskingEngine {
       ignoreList = advancedPrefs?.globalIgnoreList ?? [],
       blocklist = advancedPrefs?.keywordBlocklist ?? [],
       maskTimestamps = advancedPrefs?.maskTimestamps ?? false,
-      scopeFilteredRules = filterRulesForScope(MASKING_RULES, scopeSelection),
+      scopeFilteredRules = filterRulesForScope(MASKING_RULES, {
+        ...scopeSelection,
+        countryProfileIds: expandCountryScope(scopeSelection.countryProfileIds),
+      }),
       // Filter out timestamp rules if maskTimestamps is false
       activeRules = maskTimestamps
         ? scopeFilteredRules
