@@ -1,0 +1,218 @@
+{
+  "metadata": {
+    "generated": "2026-03-21",
+    "source": "vulnerability-results.json",
+    "total_items": 9772,
+    "passed": 7366,
+    "leaked_items": 2406,
+    "total_leak_values": 7352
+  },
+  "by_type": {
+    "rut-dashed": 2186,
+    "cuit": 2106,
+    "cpf-unformatted": 1142,
+    "iban": 574,
+    "rut-dotted": 490,
+    "cn-resident-id": 470,
+    "rut-compact": 104,
+    "us-ssn": 80,
+    "cpf-formatted": 58,
+    "cnpj": 38,
+    "numeric-8digit": 34,
+    "curp": 22,
+    "rfc": 22,
+    "other": 22,
+    "bearer-literal": 4
+  },
+  "by_root_cause": {
+    "cross-scope:rule-not-active": 3328,
+    "test-inflation:cuit-substring": 2186,
+    "mock-data:iban-checksum-invalid": 574,
+    "test-fp:rg-matches-rut-regex": 472,
+    "engine-gap:missing-standalone-rule": 470,
+    "unclassified": 150,
+    "cross-scope:ssn-country-scoped": 80,
+    "mock-data:cuit-checksum-invalid": 34,
+    "mock-data:cnpj-checksum-invalid": 18,
+    "mock-data:cpf-checksum-invalid": 18,
+    "mock-data:rut-checksum-invalid": 18,
+    "test-fp:bearer-literal": 4
+  },
+  "by_scope": {
+    "en|in": {
+      "total_leaks": 40,
+      "by_type": {
+        "us-ssn": 40
+      },
+      "by_root_cause": {
+        "cross-scope:ssn-country-scoped": 40
+      }
+    },
+    "en|ru": {
+      "total_leaks": 40,
+      "by_type": {
+        "us-ssn": 40
+      },
+      "by_root_cause": {
+        "cross-scope:ssn-country-scoped": 40
+      }
+    },
+    "en|us": {
+      "total_leaks": 88,
+      "by_type": {
+        "iban": 74,
+        "numeric-8digit": 12,
+        "bearer-literal": 2
+      },
+      "by_root_cause": {
+        "mock-data:iban-checksum-invalid": 74,
+        "unclassified": 12,
+        "test-fp:bearer-literal": 2
+      }
+    },
+    "es|ar": {
+      "total_leaks": 110,
+      "by_type": {
+        "rut-dashed": 50,
+        "cuit": 34,
+        "cpf-unformatted": 20,
+        "other": 4,
+        "rut-compact": 2
+      },
+      "by_root_cause": {
+        "test-inflation:cuit-substring": 50,
+        "mock-data:cuit-checksum-invalid": 34,
+        "cross-scope:rule-not-active": 22,
+        "unclassified": 4
+      }
+    },
+    "es|cl": {
+      "total_leaks": 5562,
+      "by_type": {
+        "rut-dashed": 1912,
+        "cuit": 1912,
+        "cpf-unformatted": 1062,
+        "iban": 496,
+        "rut-compact": 94,
+        "curp": 22,
+        "numeric-8digit": 22,
+        "rfc": 22,
+        "rut-dotted": 18,
+        "other": 2
+      },
+      "by_root_cause": {
+        "cross-scope:rule-not-active": 3018,
+        "test-inflation:cuit-substring": 1912,
+        "mock-data:iban-checksum-invalid": 496,
+        "unclassified": 118,
+        "mock-data:rut-checksum-invalid": 18
+      }
+    },
+    "es|co": {
+      "total_leaks": 122,
+      "by_type": {
+        "rut-dashed": 56,
+        "cuit": 40,
+        "cpf-unformatted": 20,
+        "other": 4,
+        "rut-compact": 2
+      },
+      "by_root_cause": {
+        "cross-scope:rule-not-active": 62,
+        "test-inflation:cuit-substring": 56,
+        "unclassified": 4
+      }
+    },
+    "es|es": {
+      "total_leaks": 122,
+      "by_type": {
+        "rut-dashed": 56,
+        "cuit": 40,
+        "cpf-unformatted": 20,
+        "other": 4,
+        "rut-compact": 2
+      },
+      "by_root_cause": {
+        "cross-scope:rule-not-active": 62,
+        "test-inflation:cuit-substring": 56,
+        "unclassified": 4
+      }
+    },
+    "es|mx": {
+      "total_leaks": 122,
+      "by_type": {
+        "rut-dashed": 56,
+        "cuit": 40,
+        "cpf-unformatted": 20,
+        "other": 4,
+        "rut-compact": 2
+      },
+      "by_root_cause": {
+        "cross-scope:rule-not-active": 62,
+        "test-inflation:cuit-substring": 56,
+        "unclassified": 4
+      }
+    },
+    "es|pe": {
+      "total_leaks": 102,
+      "by_type": {
+        "rut-dashed": 56,
+        "cuit": 40,
+        "other": 4,
+        "rut-compact": 2
+      },
+      "by_root_cause": {
+        "test-inflation:cuit-substring": 56,
+        "cross-scope:rule-not-active": 42,
+        "unclassified": 4
+      }
+    },
+    "pt-br|br": {
+      "total_leaks": 496,
+      "by_type": {
+        "rut-dotted": 458,
+        "cnpj": 18,
+        "cpf-formatted": 18,
+        "iban": 2
+      },
+      "by_root_cause": {
+        "test-fp:rg-matches-rut-regex": 458,
+        "mock-data:cnpj-checksum-invalid": 18,
+        "mock-data:cpf-checksum-invalid": 18,
+        "mock-data:iban-checksum-invalid": 2
+      }
+    },
+    "pt-br|pt": {
+      "total_leaks": 74,
+      "by_type": {
+        "cpf-formatted": 40,
+        "cnpj": 20,
+        "rut-dotted": 14
+      },
+      "by_root_cause": {
+        "cross-scope:rule-not-active": 60,
+        "test-fp:rg-matches-rut-regex": 14
+      }
+    },
+    "zh|cn": {
+      "total_leaks": 474,
+      "by_type": {
+        "cn-resident-id": 470,
+        "bearer-literal": 2,
+        "iban": 2
+      },
+      "by_root_cause": {
+        "engine-gap:missing-standalone-rule": 470,
+        "test-fp:bearer-literal": 2,
+        "mock-data:iban-checksum-invalid": 2
+      }
+    }
+  },
+  "root_cause_summary": {
+    "cross-scope": 3408,
+    "engine-gap": 470,
+    "test-inflation": 2662,
+    "mock-data-quality": 662,
+    "unclassified": 150
+  }
+}

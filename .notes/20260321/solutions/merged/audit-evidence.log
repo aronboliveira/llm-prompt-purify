@@ -1,0 +1,190 @@
+# Audit Evidence Log — Leak Classification
+# Generated: 2026-03-21
+# Source: vulnerability-results.json (9772 items, 2406 leaked, 7352 leak values)
+# Classification method: regex-based pattern matching on raw leak values
+
+=== GLOBAL TYPE SUMMARY ===
+  rut-dashed            2186
+  cuit                  2106
+  cpf-unformatted       1142
+  iban                   574
+  rut-dotted             490
+  cn-resident-id         470
+  rut-compact            104
+  us-ssn                  80
+  cpf-formatted           58
+  cnpj                    38
+  numeric-8digit          34
+  curp                    22
+  rfc                     22
+  other                   22
+  bearer-literal           4
+  TOTAL                 7352
+
+=== BY SCOPE ===
+
+--- en|in ---
+  us-ssn                  40
+
+--- en|ru ---
+  us-ssn                  40
+
+--- en|us ---
+  bearer-literal           2
+  iban                    74
+  numeric-8digit          12
+
+--- es|ar ---
+  cpf-unformatted         20
+  cuit                    34
+  other                    4
+  rut-compact              2
+  rut-dashed              50
+
+--- es|cl ---
+  cpf-unformatted       1062
+  cuit                  1912
+  curp                    22
+  iban                   496
+  numeric-8digit          22
+  other                    2
+  rfc                     22
+  rut-compact             94
+  rut-dashed            1912
+  rut-dotted              18
+
+--- es|co ---
+  cpf-unformatted         20
+  cuit                    40
+  other                    4
+  rut-compact              2
+  rut-dashed              56
+
+--- es|es ---
+  cpf-unformatted         20
+  cuit                    40
+  other                    4
+  rut-compact              2
+  rut-dashed              56
+
+--- es|mx ---
+  cpf-unformatted         20
+  cuit                    40
+  other                    4
+  rut-compact              2
+  rut-dashed              56
+
+--- es|pe ---
+  cuit                    40
+  other                    4
+  rut-compact              2
+  rut-dashed              56
+
+--- pt-br|br ---
+  cnpj                    18
+  cpf-formatted           18
+  iban                     2
+  rut-dotted             458
+
+--- pt-br|pt ---
+  cnpj                    20
+  cpf-formatted           40
+  rut-dotted              14
+
+--- zh|cn ---
+  bearer-literal           2
+  cn-resident-id         470
+  iban                     2
+
+=== SAMPLE VALUES PER TYPE ===
+
+[bearer-literal]
+  zh|cn | Bearer token
+  zh|cn | Bearer token
+  en|us | Bearer token
+
+[cn-resident-id]
+  zh|cn | 440301199203239392
+  zh|cn | 11010119831127592X
+  zh|cn | 500101197406220962
+
+[cnpj]
+  pt-br|br | 12.345.678/0001-90
+  pt-br|br | 98.765.432/0001-10
+  pt-br|br | 11.222.333/0001-44
+
+[cpf-formatted]
+  pt-br|br | 456.789.123-45
+  pt-br|br | 111.222.333-44
+  pt-br|br | 555.666.777-88
+
+[cpf-unformatted]
+  es|cl | 20126535342
+  es|cl | 20942583100
+  es|cl | 20756842197
+
+[cuit]
+  es|cl | 20-29530492-2
+  es|cl | 27-36403173-3
+  es|cl | 27-34101155-4
+
+[curp]
+  es|cl | CADF850420HDFRRN08
+  es|cl | ROMC850512HDFNRL09
+  es|cl | ABCD123456HDFLRN09
+
+[iban]
+  pt-br|br | BR9700360305000010000000145C
+  pt-br|br | BR9700360305000010000000145C
+  es|cl | ES17610290084592491
+
+[numeric-8digit]
+  es|cl | 28345921
+  es|cl | 36789012
+  es|cl | 12345678
+
+[other]
+  es|cl | 999888777
+  es|cl | 999888777
+  es|mx | 6746238-6
+
+[rfc]
+  es|cl | ROMC8505126A3
+  es|cl | ABCD890123ABC
+  es|cl | XYZW123456XYZ
+
+[rut-compact]
+  es|cl | 12348054K
+  es|cl | 77207479K
+  es|cl | 85012345K
+
+[rut-dashed]
+  es|cl | 29530492-2
+  es|cl | 36403173-3
+  es|cl | 34101155-4
+
+[rut-dotted]
+  pt-br|br | 71.245.512-3
+  pt-br|br | 84.142.250-3
+  pt-br|br | 20.841.367-1
+
+[us-ssn]
+  en|ru | 614-30-9184
+  en|ru | 226-23-4438
+  en|ru | 141-41-1973
+
+
+=== ROOT CAUSE CLASSIFICATION ===
+  cross-scope:rule-not-active                    3328
+  test-inflation:cuit-substring                  2186
+  mock-data:iban-checksum-invalid                 574
+  test-fp:rg-matches-rut-regex                    472
+  engine-gap:missing-standalone-rule              470
+  unclassified                                    150
+  cross-scope:ssn-country-scoped                   80
+  mock-data:cuit-checksum-invalid                  34
+  mock-data:cnpj-checksum-invalid                  18
+  mock-data:cpf-checksum-invalid                   18
+  mock-data:rut-checksum-invalid                   18
+  test-fp:bearer-literal                            4
+  TOTAL                                          7352
