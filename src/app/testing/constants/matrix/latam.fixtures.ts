@@ -163,7 +163,8 @@ export const AR_CUIT_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["ar"],
-    description: "ignores CUIT with wrong check digit (inner digits also fail RUT validation)",
+    description:
+      "ignores CUIT with wrong check digit (inner digits also fail RUT validation)",
     excludedRuleIds: ["cuit"],
     sourceText: "CUIT: 23-98765432-0",
     visibleValues: ["23-98765432-0"],
@@ -217,7 +218,8 @@ export const CO_CEDULA_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["co"],
-    description: "masks Cedula with full label 'Cédula de ciudadanía: 80123456'",
+    description:
+      "masks Cedula with full label 'Cédula de ciudadanía: 80123456'",
     expectedRuleIds: ["cedula-labeled"],
     hiddenValues: ["80123456"],
     sourceText: "Cédula de ciudadanía: 80123456",
@@ -242,7 +244,8 @@ export const LATAM_DNI_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["pe"],
-    description: "masks Peruvian DNI 'Documento nacional de identidad: 12345678'",
+    description:
+      "masks Peruvian DNI 'Documento nacional de identidad: 12345678'",
     expectedRuleIds: ["dni-labeled"],
     hiddenValues: ["12345678"],
     sourceText: "Documento nacional de identidad: 12345678",
@@ -303,14 +306,15 @@ export const PE_RUC_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([
 export const LATAM_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   {
     countryProfileIds: ["br"],
-    description: "Chilean RUT stays visible when only BR is selected",
-    excludedRuleIds: ["chile-rut"],
+    description: "Chilean RUT is masked when BR is selected via global labeled rule",
+    expectedRuleIds: ["rut-global-labeled"],
+    hiddenValues: ["12.345.678-5"],
     sourceText: "RUT: 12.345.678-5",
-    visibleValues: ["12.345.678-5"],
   },
   {
     countryProfileIds: ["mx"],
-    description: "Argentine CUIT is masked when MX is selected (latam-es expansion)",
+    description:
+      "Argentine CUIT is masked when MX is selected (latam-es expansion)",
     expectedRuleIds: ["cuit"],
     hiddenValues: ["20-12345678-6"],
     sourceText: "CUIT: 20-12345678-6",

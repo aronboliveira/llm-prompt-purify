@@ -55,7 +55,7 @@ describe("ScanSessionService", () => {
     expect(service.state().result?.maskedText).toContain("529.982.247-25");
   });
 
-  it("uses global-only mode to skip country-specific document matches", async () => {
+  it("uses global-only mode to mask labeled CPF via global rule", async () => {
     const service = createService();
 
     service.setCountryProfiles(["br"]);
@@ -66,7 +66,8 @@ describe("ScanSessionService", () => {
     await scanPromise;
 
     expect(service.state().result?.matches.some(match => match.ruleId === "cpf")).toBe(false);
-    expect(service.state().result?.maskedText).toContain("529.982.247-25");
+    expect(service.state().result?.matches.some(match => match.ruleId === "cpf-global-labeled")).toBe(true);
+    expect(service.state().result?.maskedText).not.toContain("529.982.247-25");
     expect(service.state().result?.maskedText).not.toContain("maria@example.com");
   });
 

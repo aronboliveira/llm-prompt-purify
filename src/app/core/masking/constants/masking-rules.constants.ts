@@ -1307,6 +1307,61 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
       /\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\s+\d{1,2}:\d{2}(?::\d{2})?\b/g,
     priority: 45,
   },
+
+  // ─── Global labeled variants (keyword-gated, zero FP risk) ──────────────────
+
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "high",
+    id: "cpf-global-labeled",
+    label: "CPF (labeled, global)",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(?:cpf|cadastro\s+de?\s+pessoa)\b[^\n\r\d]{0,12}(\d{3}\.?\d{3}\.?\d{3}-?\d{2})\b/giu,
+    priority: 109,
+    validator: isValidCpf,
+    valueGroup: 1,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "high",
+    id: "cnpj-global-labeled",
+    label: "CNPJ (labeled, global)",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(?:cnpj|cadastro\s+nacional)\b[^\n\r\d]{0,12}(\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2})\b/giu,
+    priority: 109,
+    validator: isValidCnpj,
+    valueGroup: 1,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "high",
+    id: "cuit-global-labeled",
+    label: "Argentine CUIT (labeled, global)",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(?:cuit|cuil|clave\s+[uú]nica)\b[^\n\r\d]{0,12}(\d{2}-\d{8}-\d)\b/giu,
+    priority: 109,
+    validator: isValidArgentineCuit,
+    valueGroup: 1,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "rut-global-labeled",
+    label: "Chilean RUT (labeled, global)",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(?:rut|n[uú]mero\s+rut)\b[^\n\r\d]{0,12}(\d{1,2}\.?\d{3}\.?\d{3}-?[\dKk])\b/giu,
+    priority: 109,
+    validator: isValidChileanRut,
+    valueGroup: 1,
+  },
 ]);
 
 /**

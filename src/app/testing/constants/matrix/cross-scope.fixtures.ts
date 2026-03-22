@@ -64,14 +64,12 @@ export const CROSS_SCOPE_GLOBAL_ONLY: readonly BoundaryMaskFixture[] =
   Object.freeze([
     {
       countryProfileIds: ["br"],
-      description: "global-only mode does NOT mask CPF but still masks email",
+      description: "global-only mode masks labeled CPF/CNPJ via global rules and email",
       detectionMode: "global-only",
-      excludedRuleIds: ["cpf", "cnpj", "br-phone"],
-      expectedRuleIds: ["email-address"],
-      hiddenValues: ["user@example.com"],
+      expectedRuleIds: ["cpf-global-labeled", "cnpj-global-labeled", "email-address"],
+      hiddenValues: ["529.982.247-25", "11.222.333/0001-81", "user@example.com"],
       sourceText:
         "CPF 529.982.247-25 CNPJ 11.222.333/0001-81 email user@example.com.",
-      visibleValues: ["529.982.247-25", "11.222.333/0001-81"],
     },
     {
       countryProfileIds: ["ru"],
@@ -106,20 +104,13 @@ export const CROSS_SCOPE_GLOBAL_ONLY: readonly BoundaryMaskFixture[] =
     {
       countryProfileIds: ["es", "cl", "mx", "ar", "co", "pe"],
       description:
-        "global-only mode suppresses all LatAm + ES rules but masks IBAN",
+        "global-only mode masks IBAN + labeled RUT/CUIT via global rules",
       detectionMode: "global-only",
-      excludedRuleIds: [
-        "es-dni-labeled",
-        "chile-rut",
-        "curp",
-        "cuit",
-        "nit",
-      ],
-      expectedRuleIds: ["iban"],
-      hiddenValues: ["DE89370400440532013000"],
+      expectedRuleIds: ["iban", "rut-global-labeled", "cuit-global-labeled"],
+      hiddenValues: ["DE89370400440532013000", "12.345.678-5", "20-12345678-6"],
       sourceText:
         "DNI: 12345678Z RUT 12.345.678-5 CURP GARC850101HDFRRL09 CUIT 20-12345678-6 IBAN DE89370400440532013000",
-      visibleValues: ["12345678Z", "12.345.678-5", "GARC850101HDFRRL09"],
+      visibleValues: ["12345678Z", "GARC850101HDFRRL09"],
     },
   ]);
 

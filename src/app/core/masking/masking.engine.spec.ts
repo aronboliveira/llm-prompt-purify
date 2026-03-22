@@ -193,7 +193,7 @@ describe("MaskingEngine", () => {
     expect(regenerated.matches[0].mask).toBe(regenerated.matches[1].mask);
   });
 
-  it("uses global-only mode to ignore country-specific identifiers while keeping shared rules", () => {
+  it("uses global-only mode to mask labeled CPF via global rule while keeping shared rules", () => {
     const sourceText =
         "CPF: 529.982.247-25\nEmail: maria@example.com\nToken: sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
       result = engine.scan(
@@ -203,17 +203,17 @@ describe("MaskingEngine", () => {
       );
 
     expect(result.matches.map(match => match.ruleId)).toEqual(
-      expect.arrayContaining(["email-address", "openai-style-key"]),
+      expect.arrayContaining(["cpf-global-labeled", "email-address", "openai-style-key"]),
     );
     expect(result.matches.some(match => match.ruleId === "cpf")).toBe(false);
-    expect(result.maskedText).toContain("529.982.247-25");
+    expect(result.maskedText).not.toContain("529.982.247-25");
     expect(result.maskedText).not.toContain("maria@example.com");
     expect(result.maskedText).not.toContain(
       "sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
     );
   });
 
-  it("does not activate Brazilian document rules when the country scope is set to the United States", () => {
+  it("masks labeled CPF via global rule even when the country scope is set to the United States", () => {
     const sourceText = "CPF: 529.982.247-25\nEmail: maria@example.com",
       result = engine.scan(
         sourceText,
@@ -222,7 +222,8 @@ describe("MaskingEngine", () => {
       );
 
     expect(result.matches.some(match => match.ruleId === "cpf")).toBe(false);
-    expect(result.maskedText).toContain("529.982.247-25");
+    expect(result.matches.some(match => match.ruleId === "cpf-global-labeled")).toBe(true);
+    expect(result.maskedText).not.toContain("529.982.247-25");
     expect(result.maskedText).not.toContain("maria@example.com");
   });
 
