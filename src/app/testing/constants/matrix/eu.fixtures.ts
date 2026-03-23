@@ -92,7 +92,8 @@ export const ES_NIE_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["es"],
-    description: "masks NIE with 'Número de identidad de extranjero: X1234567L'",
+    description:
+      "masks NIE with 'Número de identidad de extranjero: X1234567L'",
     expectedRuleIds: ["es-nie-labeled"],
     hiddenValues: ["X1234567L"],
     sourceText: "Número de identidad de extranjero: X1234567L",
@@ -128,7 +129,8 @@ export const PT_NIF_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["pt"],
-    description: "masks NIF with full label 'Número de identificação fiscal: 245716840'",
+    description:
+      "masks NIF with full label 'Número de identificação fiscal: 245716840'",
     expectedRuleIds: ["pt-nif-labeled"],
     hiddenValues: ["245716840"],
     sourceText: "Número de identificação fiscal: 245716840",
@@ -172,7 +174,8 @@ export const PT_NISS_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["pt"],
-    description: "masks NISS with full label 'Número de segurança social: 11234567890'",
+    description:
+      "masks NISS with full label 'Número de segurança social: 11234567890'",
     expectedRuleIds: ["pt-niss-labeled"],
     hiddenValues: ["11234567890"],
     sourceText: "Número de segurança social: 11234567890",
