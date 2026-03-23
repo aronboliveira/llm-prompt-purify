@@ -346,7 +346,11 @@ function isTestValidIban(value: string): boolean {
 
 function extractSensitiveValues(sourceText: string): readonly string[] {
   const values: string[] = [];
-  const patterns: { re: RegExp; luhn?: boolean; validator?: (v: string) => boolean }[] = [
+  const patterns: {
+    re: RegExp;
+    luhn?: boolean;
+    validator?: (v: string) => boolean;
+  }[] = [
     /* Emails */
     { re: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/giu },
     /* JWT */
@@ -465,8 +469,7 @@ function categorizeLeak(leak: string): string {
     return "Brazilian CNPJs";
   if (/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/.test(v)) return "Brazilian CPFs";
   if (/^\d{11}$/.test(v)) return "Brazilian CPFs (unformatted)";
-  if (/^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/.test(v))
-    return "Mexican CURPs";
+  if (/^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/.test(v)) return "Mexican CURPs";
   if (/^[A-Z&Ñ]{3,4}\d{6}[A-Z0-9]{3}$/i.test(v)) return "Mexican RFCs";
   if (/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(v)) return "IBANs";
   if (/^\d{1,2}\.?\d{3}\.?\d{3}-?[\dKk]$/.test(v)) return "Chilean RUTs";

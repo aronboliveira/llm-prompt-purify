@@ -306,7 +306,8 @@ export const PE_RUC_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([
 export const LATAM_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   {
     countryProfileIds: ["br"],
-    description: "Chilean RUT is masked when BR is selected via global labeled rule",
+    description:
+      "Chilean RUT is masked when BR is selected via global labeled rule",
     expectedRuleIds: ["rut-global-labeled"],
     hiddenValues: ["12.345.678-5"],
     sourceText: "RUT: 12.345.678-5",

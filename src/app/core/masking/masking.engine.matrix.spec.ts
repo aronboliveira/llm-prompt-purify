@@ -107,19 +107,28 @@ import {
 } from "@testing/constants/matrix";
 
 // ─── Helper: DRY iteration wrappers ────────────────────────────────────────
-function positives(fixtures: readonly Parameters<typeof assertPositiveFixture>[1][]) {
+function positives(
+  fixtures: readonly Parameters<typeof assertPositiveFixture>[1][],
+) {
   return (engine: MaskingEngine) => {
-    for (const f of fixtures) it(f.description, () => assertPositiveFixture(engine, f));
+    for (const f of fixtures)
+      it(f.description, () => assertPositiveFixture(engine, f));
   };
 }
-function negatives(fixtures: readonly Parameters<typeof assertNegativeFixture>[1][]) {
+function negatives(
+  fixtures: readonly Parameters<typeof assertNegativeFixture>[1][],
+) {
   return (engine: MaskingEngine) => {
-    for (const f of fixtures) it(f.description, () => assertNegativeFixture(engine, f));
+    for (const f of fixtures)
+      it(f.description, () => assertNegativeFixture(engine, f));
   };
 }
-function boundaries(fixtures: readonly Parameters<typeof assertBoundaryFixture>[1][]) {
+function boundaries(
+  fixtures: readonly Parameters<typeof assertBoundaryFixture>[1][],
+) {
   return (engine: MaskingEngine) => {
-    for (const f of fixtures) it(f.description, () => assertBoundaryFixture(engine, f));
+    for (const f of fixtures)
+      it(f.description, () => assertBoundaryFixture(engine, f));
   };
 }
 
@@ -368,13 +377,13 @@ describe("MaskingEngine country × rule matrix", () => {
       positives(INFORMAL_LANGUAGE_POSITIVE)(engine));
     describe("malicious code patterns", () =>
       positives(MALICIOUS_CODE_FIXTURES)(engine));
-    describe("unicode edge cases", () =>
-      positives(UNICODE_EDGE_CASES)(engine));
-    describe("whitespace chaos", () =>
-      positives(WHITESPACE_CHAOS)(engine));
+    describe("unicode edge cases", () => positives(UNICODE_EDGE_CASES)(engine));
+    describe("whitespace chaos", () => positives(WHITESPACE_CHAOS)(engine));
     describe("informal variations", () => {
-      describe("PT-BR informal", () => positives(BR_INFORMAL_VARIATIONS)(engine));
-      describe("EN-US informal", () => positives(US_INFORMAL_VARIATIONS)(engine));
+      describe("PT-BR informal", () =>
+        positives(BR_INFORMAL_VARIATIONS)(engine));
+      describe("EN-US informal", () =>
+        positives(US_INFORMAL_VARIATIONS)(engine));
     });
     describe("ambiguous separator boundary", () =>
       boundaries(AMBIGUOUS_SEPARATOR_BOUNDARY)(engine));

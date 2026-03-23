@@ -18,16 +18,24 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
       },
       {
         description: "digit for letter OCR swap",
-        operations: Object.freeze([{ index: 5, kind: "replace-char", value: "0" }]),
+        operations: Object.freeze([
+          { index: 5, kind: "replace-char", value: "0" },
+        ]),
       },
       {
         description: "trailing duplicate character",
-        operations: Object.freeze([{ index: 8, kind: "insert-char", value: "d" }]),
+        operations: Object.freeze([
+          { index: 8, kind: "insert-char", value: "d" },
+        ]),
       },
       {
         description: "shorthand credential label",
         operations: Object.freeze([
-          { kind: "replace-substring", replacement: "passwd", search: "password" },
+          {
+            kind: "replace-substring",
+            replacement: "passwd",
+            search: "password",
+          },
         ]),
       },
     ]),
@@ -44,7 +52,9 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
     positiveRecipes: Object.freeze([
       {
         description: "OCR digit swap",
-        operations: Object.freeze([{ index: 5, kind: "replace-char", value: "0" }]),
+        operations: Object.freeze([
+          { index: 5, kind: "replace-char", value: "0" },
+        ]),
       },
       {
         description: "deleted vowel",
@@ -83,11 +93,15 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
     positiveRecipes: Object.freeze([
       {
         description: "OCR digit swap",
-        operations: Object.freeze([{ index: 1, kind: "replace-char", value: "0" }]),
+        operations: Object.freeze([
+          { index: 1, kind: "replace-char", value: "0" },
+        ]),
       },
       {
         description: "extra vowel",
-        operations: Object.freeze([{ index: 4, kind: "insert-char", value: "e" }]),
+        operations: Object.freeze([
+          { index: 4, kind: "insert-char", value: "e" },
+        ]),
       },
       {
         description: "misspelled surname marker",
@@ -222,13 +236,21 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
       {
         description: "m to rn OCR confusion",
         operations: Object.freeze([
-          { kind: "replace-substring", replacement: "nurnero", search: "numero" },
+          {
+            kind: "replace-substring",
+            replacement: "nurnero",
+            search: "numero",
+          },
         ]),
       },
       {
         description: "digit in fiscal suffix",
         operations: Object.freeze([
-          { kind: "replace-substring", replacement: "fisca1", search: "fiscal" },
+          {
+            kind: "replace-substring",
+            replacement: "fisca1",
+            search: "fiscal",
+          },
         ]),
       },
       {
@@ -266,13 +288,21 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
       {
         description: "m to rn OCR confusion",
         operations: Object.freeze([
-          { kind: "replace-substring", replacement: "nurnero", search: "numero" },
+          {
+            kind: "replace-substring",
+            replacement: "nurnero",
+            search: "numero",
+          },
         ]),
       },
       {
         description: "i/l OCR confusion",
         operations: Object.freeze([
-          { kind: "replace-substring", replacement: "soclal", search: "social" },
+          {
+            kind: "replace-substring",
+            replacement: "soclal",
+            search: "social",
+          },
         ]),
       },
       {
@@ -288,7 +318,11 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
       {
         description: "digit in social suffix",
         operations: Object.freeze([
-          { kind: "replace-substring", replacement: "soc1al", search: "social" },
+          {
+            kind: "replace-substring",
+            replacement: "soc1al",
+            search: "social",
+          },
         ]),
       },
     ]),
@@ -357,7 +391,11 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
       {
         description: "m to rn OCR confusion",
         operations: Object.freeze([
-          { kind: "replace-substring", replacement: "nurnero", search: "numero" },
+          {
+            kind: "replace-substring",
+            replacement: "nurnero",
+            search: "numero",
+          },
         ]),
       },
       {
@@ -456,7 +494,9 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
     positiveRecipes: Object.freeze([
       {
         description: "digit for letter OCR swap",
-        operations: Object.freeze([{ index: 3, kind: "replace-char", value: "1" }]),
+        operations: Object.freeze([
+          { index: 3, kind: "replace-char", value: "1" },
+        ]),
       },
       {
         description: "transposed characters",
@@ -464,11 +504,15 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
       },
       {
         description: "digit in suffix",
-        operations: Object.freeze([{ index: 4, kind: "replace-char", value: "5" }]),
+        operations: Object.freeze([
+          { index: 4, kind: "replace-char", value: "5" },
+        ]),
       },
       {
         description: "duplicated ending",
-        operations: Object.freeze([{ index: 5, kind: "insert-char", value: "s" }]),
+        operations: Object.freeze([
+          { index: 5, kind: "insert-char", value: "s" },
+        ]),
       },
     ]),
     ruleId: "ru-snils-labeled",
@@ -485,12 +529,18 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
       {
         description: "deleted vowel",
         operations: Object.freeze([
-          { kind: "replace-substring", replacement: "aadhr", search: "aadhaar" },
+          {
+            kind: "replace-substring",
+            replacement: "aadhr",
+            search: "aadhaar",
+          },
         ]),
       },
       {
         description: "extra leading a",
-        operations: Object.freeze([{ index: 1, kind: "insert-char", value: "a" }]),
+        operations: Object.freeze([
+          { index: 1, kind: "insert-char", value: "a" },
+        ]),
       },
       {
         description: "attached card suffix",
@@ -505,7 +555,11 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
       {
         description: "reduced transliteration",
         operations: Object.freeze([
-          { kind: "replace-substring", replacement: "aadhar", search: "aadhaar" },
+          {
+            kind: "replace-substring",
+            replacement: "aadhar",
+            search: "aadhaar",
+          },
         ]),
       },
     ]),
@@ -543,7 +597,11 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
       {
         description: "m to rn OCR confusion",
         operations: Object.freeze([
-          { kind: "replace-substring", replacement: "nurnber", search: "number" },
+          {
+            kind: "replace-substring",
+            replacement: "nurnber",
+            search: "number",
+          },
         ]),
       },
       {
@@ -571,7 +629,11 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
       {
         description: "number OCR confusion",
         operations: Object.freeze([
-          { kind: "replace-substring", replacement: "nurnber", search: "number" },
+          {
+            kind: "replace-substring",
+            replacement: "nurnber",
+            search: "number",
+          },
         ]),
       },
       {
@@ -659,10 +721,8 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
   },
 ]) as readonly FuzzyLabelFuzzSeed[];
 
-export const FUZZY_LABEL_FUZZ_POSITIVE_FIXTURES = buildFuzzyLabelPositiveFixtures(
-  FUZZY_LABEL_FUZZ_SEEDS
-);
+export const FUZZY_LABEL_FUZZ_POSITIVE_FIXTURES =
+  buildFuzzyLabelPositiveFixtures(FUZZY_LABEL_FUZZ_SEEDS);
 
-export const FUZZY_LABEL_FUZZ_NEGATIVE_FIXTURES = buildFuzzyLabelNegativeFixtures(
-  FUZZY_LABEL_FUZZ_SEEDS
-);
+export const FUZZY_LABEL_FUZZ_NEGATIVE_FIXTURES =
+  buildFuzzyLabelNegativeFixtures(FUZZY_LABEL_FUZZ_SEEDS);

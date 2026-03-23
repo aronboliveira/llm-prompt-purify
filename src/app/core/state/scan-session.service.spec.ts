@@ -22,7 +22,7 @@ describe("ScanSessionService", () => {
 
     expect(service.state().sourceText).toBe("Email maria@example.com");
     expect(sessionStorage.getItem("llm-prompt-purify:source-text:v2")).toBe(
-      "Email maria@example.com"
+      "Email maria@example.com",
     );
   });
 
@@ -34,10 +34,12 @@ describe("ScanSessionService", () => {
 
     expect(service.state().countryProfileIds).toEqual(["latam-es", "cl"]);
     expect(service.state().detectionMode).toBe("global-only");
-    expect(sessionStorage.getItem("llm-prompt-purify:country-profiles:v2")).toBe(
-      JSON.stringify(["latam-es", "cl"])
+    expect(
+      sessionStorage.getItem("llm-prompt-purify:country-profiles:v2"),
+    ).toBe(JSON.stringify(["latam-es", "cl"]));
+    expect(sessionStorage.getItem("llm-prompt-purify:detection-mode:v1")).toBe(
+      "global-only",
     );
-    expect(sessionStorage.getItem("llm-prompt-purify:detection-mode:v1")).toBe("global-only");
   });
 
   it("creates a scan result and can disable editable matches", async () => {
@@ -65,16 +67,26 @@ describe("ScanSessionService", () => {
     jest.advanceTimersByTime(1000);
     await scanPromise;
 
-    expect(service.state().result?.matches.some(match => match.ruleId === "cpf")).toBe(false);
-    expect(service.state().result?.matches.some(match => match.ruleId === "cpf-global-labeled")).toBe(true);
+    expect(
+      service.state().result?.matches.some(match => match.ruleId === "cpf"),
+    ).toBe(false);
+    expect(
+      service
+        .state()
+        .result?.matches.some(match => match.ruleId === "cpf-global-labeled"),
+    ).toBe(true);
     expect(service.state().result?.maskedText).not.toContain("529.982.247-25");
-    expect(service.state().result?.maskedText).not.toContain("maria@example.com");
+    expect(service.state().result?.maskedText).not.toContain(
+      "maria@example.com",
+    );
   });
 
   it("can disable a whole mask group after scanning", async () => {
     const service = createService();
 
-    service.updateSourceText("Token: sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890\nCPF: 529.982.247-25");
+    service.updateSourceText(
+      "Token: sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890\nCPF: 529.982.247-25",
+    );
     const scanPromise = service.runScan();
     jest.advanceTimersByTime(1000);
     await scanPromise;
@@ -83,7 +95,7 @@ describe("ScanSessionService", () => {
 
     expect(service.state().result?.maskedText).toContain("529.982.247-25");
     expect(service.state().result?.maskedText).not.toContain(
-      "sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+      "sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
     );
   });
 
@@ -107,7 +119,7 @@ describe("ScanSessionService", () => {
     const service = createService({
       hardenMatches: async matches => ({
         matches: matches.map((match, index) =>
-          index === 0 ? { ...match, mask: "111.111.111-11" } : match
+          index === 0 ? { ...match, mask: "111.111.111-11" } : match,
         ),
       }),
     });
@@ -125,7 +137,9 @@ describe("ScanSessionService", () => {
     const service = createService(),
       initialCountryProfileIds = service.state().countryProfileIds;
 
-    service.updateSourceText("Token: sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
+    service.updateSourceText(
+      "Token: sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+    );
     service.clear();
 
     expect(service.state()).toEqual({
@@ -141,17 +155,23 @@ describe("ScanSessionService", () => {
       statusMessage:
         "Pick the masking scope, paste the raw prompt, and the protected output will rebuild locally.",
     });
-    expect(sessionStorage.getItem("llm-prompt-purify:source-text:v2")).toBeNull();
+    expect(
+      sessionStorage.getItem("llm-prompt-purify:source-text:v2"),
+    ).toBeNull();
   });
 });
 
-function createService(maskSafetyHardener: MaskSafetyHardener = createPassthroughHardener()) {
+function createService(
+  maskSafetyHardener: MaskSafetyHardener = createPassthroughHardener(),
+) {
   return new ScanSessionService(maskSafetyHardener);
 }
 
 function createPassthroughHardener(): MaskSafetyHardener {
   return {
-    hardenMatches(matches: readonly ScanMatch[]): Promise<MaskSafetyHardeningResult> {
+    hardenMatches(
+      matches: readonly ScanMatch[],
+    ): Promise<MaskSafetyHardeningResult> {
       return Promise.resolve({
         matches,
       });

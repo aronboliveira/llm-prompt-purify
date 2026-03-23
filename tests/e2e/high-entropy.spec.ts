@@ -81,12 +81,7 @@ test.describe("high-entropy masking edge cases", () => {
     test("masks credit card numbers", async ({ page }) => {
       await page
         .getByTestId("source-textarea")
-        .fill(
-          [
-            "Card: 4111111111111111",
-            "Email: payment@shop.com",
-          ].join("\n"),
-        );
+        .fill(["Card: 4111111111111111", "Email: payment@shop.com"].join("\n"));
 
       const output = page.getByTestId("masked-output");
       await expect(output).not.toContainText("4111111111111111");
@@ -108,9 +103,7 @@ test.describe("high-entropy masking edge cases", () => {
     test("masks credentials in SQL injection attempt", async ({ page }) => {
       await page
         .getByTestId("source-textarea")
-        .fill(
-          "SELECT * FROM users WHERE email='admin@site.com' OR '1'='1'",
-        );
+        .fill("SELECT * FROM users WHERE email='admin@site.com' OR '1'='1'");
 
       const output = page.getByTestId("masked-output");
       await expect(output).not.toContainText("admin@site.com");
@@ -242,9 +235,7 @@ test.describe("high-entropy masking edge cases", () => {
     });
 
     test("does NOT mask alphanumeric protocol numbers", async ({ page }) => {
-      await page
-        .getByTestId("source-textarea")
-        .fill("Protocolo: ABC-123456");
+      await page.getByTestId("source-textarea").fill("Protocolo: ABC-123456");
 
       const output = page.getByTestId("masked-output");
       await expect(output).toContainText("ABC-123456");

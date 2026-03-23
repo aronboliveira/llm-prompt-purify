@@ -203,7 +203,11 @@ describe("MaskingEngine", () => {
       );
 
     expect(result.matches.map(match => match.ruleId)).toEqual(
-      expect.arrayContaining(["cpf-global-labeled", "email-address", "openai-style-key"]),
+      expect.arrayContaining([
+        "cpf-global-labeled",
+        "email-address",
+        "openai-style-key",
+      ]),
     );
     expect(result.matches.some(match => match.ruleId === "cpf")).toBe(false);
     expect(result.maskedText).not.toContain("529.982.247-25");
@@ -222,7 +226,9 @@ describe("MaskingEngine", () => {
       );
 
     expect(result.matches.some(match => match.ruleId === "cpf")).toBe(false);
-    expect(result.matches.some(match => match.ruleId === "cpf-global-labeled")).toBe(true);
+    expect(
+      result.matches.some(match => match.ruleId === "cpf-global-labeled"),
+    ).toBe(true);
     expect(result.maskedText).not.toContain("529.982.247-25");
     expect(result.maskedText).not.toContain("maria@example.com");
   });

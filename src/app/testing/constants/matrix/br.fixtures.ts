@@ -46,8 +46,7 @@ export const BR_CPF_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
     description: "masks two different CPFs in the same prompt",
     expectedRuleIds: ["cpf"],
     hiddenValues: ["529.982.247-25", "347.066.120-04"],
-    sourceText:
-      "Titular: CPF 529.982.247-25\nDependente: CPF 347.066.120-04",
+    sourceText: "Titular: CPF 529.982.247-25\nDependente: CPF 347.066.120-04",
   },
   {
     countryProfileIds: ["br"],
@@ -330,7 +329,8 @@ export const BR_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["es"],
-    description: "CNPJ is masked when Spain is selected via global labeled rule",
+    description:
+      "CNPJ is masked when Spain is selected via global labeled rule",
     expectedRuleIds: ["cnpj-global-labeled"],
     hiddenValues: ["11.222.333/0001-81"],
     sourceText: "CNPJ: 11.222.333/0001-81",
@@ -344,7 +344,8 @@ export const BR_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["br"],
-    description: "masks CPF + CNPJ + phone + email in a single Brazilian document",
+    description:
+      "masks CPF + CNPJ + phone + email in a single Brazilian document",
     expectedRuleIds: ["cpf", "cnpj", "br-phone", "email-address"],
     hiddenValues: [
       "529.982.247-25",

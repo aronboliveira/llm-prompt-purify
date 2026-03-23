@@ -11,61 +11,63 @@ import type {
 } from "../../declarations/testing.types";
 
 // ─── Positive: Chinese Resident ID (labeled) ───────────────────────────────
-export const CN_RESIDENT_ID_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
-  {
-    countryProfileIds: ["cn"],
-    description: "masks CN ID with 'resident id:' English label",
-    expectedRuleIds: ["cn-resident-id-labeled"],
-    hiddenValues: ["11010519491231002X"],
-    sourceText: "resident id: 11010519491231002X",
-  },
-  {
-    countryProfileIds: ["cn"],
-    description: "masks CN ID with '身份证号:' Chinese label",
-    expectedRuleIds: ["cn-resident-id-labeled"],
-    hiddenValues: ["440306198305121333"],
-    sourceText: "身份证号: 440306198305121333",
-  },
-  {
-    countryProfileIds: ["cn"],
-    description: "masks CN ID with 'national id:' label",
-    expectedRuleIds: ["cn-resident-id-labeled"],
-    hiddenValues: ["310103199001020010"],
-    sourceText: "national id: 310103199001020010",
-  },
-  {
-    countryProfileIds: ["cn"],
-    description: "masks CN ID with 'identity card:' label embedded in prose",
-    expectedRuleIds: ["cn-resident-id-labeled"],
-    hiddenValues: ["500102200012256787"],
-    sourceText: "The identity card: 500102200012256787 was verified.",
-  },
-  {
-    countryProfileIds: ["cn"],
-    description: "masks CN ID ending in lowercase x with '身份证:' label",
-    expectedRuleIds: ["cn-resident-id-labeled"],
-    hiddenValues: ["11010519491231002X"],
-    sourceText: "身份证: 11010519491231002X",
-  },
-]);
+export const CN_RESIDENT_ID_POSITIVE: readonly LocaleMaskFixture[] =
+  Object.freeze([
+    {
+      countryProfileIds: ["cn"],
+      description: "masks CN ID with 'resident id:' English label",
+      expectedRuleIds: ["cn-resident-id-labeled"],
+      hiddenValues: ["11010519491231002X"],
+      sourceText: "resident id: 11010519491231002X",
+    },
+    {
+      countryProfileIds: ["cn"],
+      description: "masks CN ID with '身份证号:' Chinese label",
+      expectedRuleIds: ["cn-resident-id-labeled"],
+      hiddenValues: ["440306198305121333"],
+      sourceText: "身份证号: 440306198305121333",
+    },
+    {
+      countryProfileIds: ["cn"],
+      description: "masks CN ID with 'national id:' label",
+      expectedRuleIds: ["cn-resident-id-labeled"],
+      hiddenValues: ["310103199001020010"],
+      sourceText: "national id: 310103199001020010",
+    },
+    {
+      countryProfileIds: ["cn"],
+      description: "masks CN ID with 'identity card:' label embedded in prose",
+      expectedRuleIds: ["cn-resident-id-labeled"],
+      hiddenValues: ["500102200012256787"],
+      sourceText: "The identity card: 500102200012256787 was verified.",
+    },
+    {
+      countryProfileIds: ["cn"],
+      description: "masks CN ID ending in lowercase x with '身份证:' label",
+      expectedRuleIds: ["cn-resident-id-labeled"],
+      hiddenValues: ["11010519491231002X"],
+      sourceText: "身份证: 11010519491231002X",
+    },
+  ]);
 
 // ─── Negative: Chinese Resident ID ──────────────────────────────────────────
-export const CN_RESIDENT_ID_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([
-  {
-    countryProfileIds: ["cn"],
-    description: "does NOT mask 18 repeated digits (invalid body)",
-    excludedRuleIds: ["cn-resident-id-labeled"],
-    sourceText: "resident id: 111111111111111111",
-    visibleValues: ["111111111111111111"],
-  },
-  {
-    countryProfileIds: ["cn"],
-    description: "does NOT mask CN ID with invalid birthdate month 13",
-    excludedRuleIds: ["cn-resident-id-labeled"],
-    sourceText: "resident id: 11010519491331002X",
-    visibleValues: ["11010519491331002X"],
-  },
-]);
+export const CN_RESIDENT_ID_NEGATIVE: readonly NegativeMaskFixture[] =
+  Object.freeze([
+    {
+      countryProfileIds: ["cn"],
+      description: "does NOT mask 18 repeated digits (invalid body)",
+      excludedRuleIds: ["cn-resident-id-labeled"],
+      sourceText: "resident id: 111111111111111111",
+      visibleValues: ["111111111111111111"],
+    },
+    {
+      countryProfileIds: ["cn"],
+      description: "does NOT mask CN ID with invalid birthdate month 13",
+      excludedRuleIds: ["cn-resident-id-labeled"],
+      sourceText: "resident id: 11010519491331002X",
+      visibleValues: ["11010519491331002X"],
+    },
+  ]);
 
 // ─── Positive: Chinese Phone ────────────────────────────────────────────────
 export const CN_PHONE_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
@@ -260,29 +262,30 @@ export const IN_AADHAAR_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
 ]);
 
 // ─── Negative: Indian Aadhaar ───────────────────────────────────────────────
-export const IN_AADHAAR_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([
-  {
-    countryProfileIds: ["in"],
-    description: "does NOT mask Aadhaar without label",
-    excludedRuleIds: ["in-aadhaar-labeled"],
-    sourceText: "Reference 276592857148 in database.",
-    visibleValues: ["276592857148"],
-  },
-  {
-    countryProfileIds: ["in"],
-    description: "does NOT mask 12 repeated digits",
-    excludedRuleIds: ["in-aadhaar-labeled"],
-    sourceText: "aadhaar: 111111111111",
-    visibleValues: ["111111111111"],
-  },
-  {
-    countryProfileIds: ["in"],
-    description: "does NOT mask Aadhaar with wrong Verhoeff check digit",
-    excludedRuleIds: ["in-aadhaar-labeled"],
-    sourceText: "aadhaar: 276592857149",
-    visibleValues: ["276592857149"],
-  },
-]);
+export const IN_AADHAAR_NEGATIVE: readonly NegativeMaskFixture[] =
+  Object.freeze([
+    {
+      countryProfileIds: ["in"],
+      description: "does NOT mask Aadhaar without label",
+      excludedRuleIds: ["in-aadhaar-labeled"],
+      sourceText: "Reference 276592857148 in database.",
+      visibleValues: ["276592857148"],
+    },
+    {
+      countryProfileIds: ["in"],
+      description: "does NOT mask 12 repeated digits",
+      excludedRuleIds: ["in-aadhaar-labeled"],
+      sourceText: "aadhaar: 111111111111",
+      visibleValues: ["111111111111"],
+    },
+    {
+      countryProfileIds: ["in"],
+      description: "does NOT mask Aadhaar with wrong Verhoeff check digit",
+      excludedRuleIds: ["in-aadhaar-labeled"],
+      sourceText: "aadhaar: 276592857149",
+      visibleValues: ["276592857149"],
+    },
+  ]);
 
 // ─── Positive: Indian PAN (labeled) ─────────────────────────────────────────
 export const IN_PAN_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
@@ -345,8 +348,7 @@ export const IN_GSTIN_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["in"],
-    description:
-      "masks GSTIN with 'goods and services tax number:' long label",
+    description: "masks GSTIN with 'goods and services tax number:' long label",
     expectedRuleIds: ["in-gstin-labeled"],
     hiddenValues: ["33AABCU9603R1ZM"],
     sourceText: "goods and services tax number: 33AABCU9603R1ZM",
@@ -413,8 +415,7 @@ export const ASIA_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["in"],
-    description:
-      "IN scope masks GSTIN, Aadhaar, and CN Resident ID (global)",
+    description: "IN scope masks GSTIN, Aadhaar, and CN Resident ID (global)",
     expectedRuleIds: [
       "in-gstin-labeled",
       "in-aadhaar-labeled",
@@ -426,12 +427,10 @@ export const ASIA_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   },
   {
     countryProfileIds: ["ru"],
-    description:
-      "RU scope masks INN and SNILS but global email still masked",
+    description: "RU scope masks INN and SNILS but global email still masked",
     expectedRuleIds: ["ru-inn-labeled", "ru-snils-labeled", "email-address"],
     hiddenValues: ["7728495344", "112-233-445 95", "user@example.com"],
-    sourceText:
-      "инн: 7728495344 снилс: 112-233-445 95 email user@example.com",
+    sourceText: "инн: 7728495344 снилс: 112-233-445 95 email user@example.com",
   },
   {
     countryProfileIds: ["cn"],
@@ -441,8 +440,7 @@ export const ASIA_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
     excludedRuleIds: ["cn-resident-id-labeled", "cn-phone"],
     expectedRuleIds: ["cn-resident-id"],
     hiddenValues: ["11010519491231002X"],
-    sourceText:
-      "resident id: 11010519491231002X and call +86 13712345678",
+    sourceText: "resident id: 11010519491231002X and call +86 13712345678",
     visibleValues: ["+86 13712345678"],
   },
 ]);

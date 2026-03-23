@@ -7,7 +7,7 @@
  * - Malicious code with embedded sensitive data
  * - Multi-line config blocks
  *
- * Note: More aggressive informal language patterns (internet slang, 
+ * Note: More aggressive informal language patterns (internet slang,
  * broken grammar) are documented but not yet supported by the engine.
  *
  * @module HighEntropyFixtures
@@ -115,123 +115,134 @@ export const US_TYPO_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
 
 // ─── Working: Mixed Separators (Standard) ───────────────────────────────────
 
-export const MIXED_SEPARATOR_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
-  {
-    countryProfileIds: ["br"],
-    description: "masks CPF with dots format",
-    expectedRuleIds: ["cpf"],
-    hiddenValues: ["123.456.789-09"],
-    sourceText: "CPF: 123.456.789-09",
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "masks phone with standard format",
-    expectedRuleIds: ["labeled-phone"],
-    hiddenValues: ["+55 11 98765-4321"],
-    sourceText: "Tel: +55 11 98765-4321",
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks SSN with dashes",
-    expectedRuleIds: ["us-ssn"],
-    hiddenValues: ["123-45-6789"],
-    sourceText: "SSN: 123-45-6789",
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks credit card with mixed spaces/dashes",
-    expectedRuleIds: ["credit-card"],
-    hiddenValues: ["4111 1111-1111 1111"],
-    sourceText: "Card: 4111 1111-1111 1111",
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks phone with dots and dashes",
-    expectedRuleIds: ["us-phone"],
-    hiddenValues: ["555.123-4567"],
-    sourceText: "Call: 555.123-4567",
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "masks CEP with dash",
-    expectedRuleIds: ["cep-labeled"],
-    hiddenValues: ["01310-100"],
-    sourceText: "CEP: 01310-100",
-  },
-]);
+export const MIXED_SEPARATOR_POSITIVE: readonly LocaleMaskFixture[] =
+  Object.freeze([
+    {
+      countryProfileIds: ["br"],
+      description: "masks CPF with dots format",
+      expectedRuleIds: ["cpf"],
+      hiddenValues: ["123.456.789-09"],
+      sourceText: "CPF: 123.456.789-09",
+    },
+    {
+      countryProfileIds: ["br"],
+      description: "masks phone with standard format",
+      expectedRuleIds: ["labeled-phone"],
+      hiddenValues: ["+55 11 98765-4321"],
+      sourceText: "Tel: +55 11 98765-4321",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks SSN with dashes",
+      expectedRuleIds: ["us-ssn"],
+      hiddenValues: ["123-45-6789"],
+      sourceText: "SSN: 123-45-6789",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks credit card with mixed spaces/dashes",
+      expectedRuleIds: ["credit-card"],
+      hiddenValues: ["4111 1111-1111 1111"],
+      sourceText: "Card: 4111 1111-1111 1111",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks phone with dots and dashes",
+      expectedRuleIds: ["us-phone"],
+      hiddenValues: ["555.123-4567"],
+      sourceText: "Call: 555.123-4567",
+    },
+    {
+      countryProfileIds: ["br"],
+      description: "masks CEP with dash",
+      expectedRuleIds: ["cep-labeled"],
+      hiddenValues: ["01310-100"],
+      sourceText: "CEP: 01310-100",
+    },
+  ]);
 
 // ─── Working: Informal but Recognized Labels ────────────────────────────────
 
-export const INFORMAL_LANGUAGE_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
-  {
-    countryProfileIds: ["br"],
-    description: "masks email standalone",
-    expectedRuleIds: ["email-address"],
-    hiddenValues: ["fulano@hotmail.com"],
-    sourceText: "contact fulano@hotmail.com for info",
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks email inline",
-    expectedRuleIds: ["email-address"],
-    hiddenValues: ["dude123@yahoo.com"],
-    sourceText: "reach me at dude123@yahoo.com",
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks OpenAI API key standalone",
-    expectedRuleIds: ["openai-style-key"],
-    hiddenValues: ["sk-test-ABCDEFGHIJKLMNOPQRSTUVWXYz123456"],
-    sourceText: "use key sk-test-ABCDEFGHIJKLMNOPQRSTUVWXYz123456",
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "masks multiple emails in text",
-    expectedRuleIds: ["email-address"],
-    hiddenValues: ["maria@gmail.com", "joao@outlook.com"],
-    sourceText: "contact maria@gmail.com or joao@outlook.com",
-  },
-]);
+export const INFORMAL_LANGUAGE_POSITIVE: readonly LocaleMaskFixture[] =
+  Object.freeze([
+    {
+      countryProfileIds: ["br"],
+      description: "masks email standalone",
+      expectedRuleIds: ["email-address"],
+      hiddenValues: ["fulano@hotmail.com"],
+      sourceText: "contact fulano@hotmail.com for info",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks email inline",
+      expectedRuleIds: ["email-address"],
+      hiddenValues: ["dude123@yahoo.com"],
+      sourceText: "reach me at dude123@yahoo.com",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks OpenAI API key standalone",
+      expectedRuleIds: ["openai-style-key"],
+      hiddenValues: ["sk-test-ABCDEFGHIJKLMNOPQRSTUVWXYz123456"],
+      sourceText: "use key sk-test-ABCDEFGHIJKLMNOPQRSTUVWXYz123456",
+    },
+    {
+      countryProfileIds: ["br"],
+      description: "masks multiple emails in text",
+      expectedRuleIds: ["email-address"],
+      hiddenValues: ["maria@gmail.com", "joao@outlook.com"],
+      sourceText: "contact maria@gmail.com or joao@outlook.com",
+    },
+  ]);
 
 // ─── Working: Malicious Code with Sensitive Data ────────────────────────────
 
-export const MALICIOUS_CODE_FIXTURES: readonly LocaleMaskFixture[] = Object.freeze([
-  {
-    countryProfileIds: ["us"],
-    description: "masks email in XSS script tag",
-    expectedRuleIds: ["email-address"],
-    hiddenValues: ["hacker@evil.com"],
-    sourceText: '<script>alert("hacker@evil.com")</script>',
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks email in SQL query",
-    expectedRuleIds: ["email-address"],
-    hiddenValues: ["admin@site.com"],
-    sourceText: "SELECT * FROM users WHERE email='admin@site.com'",
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks email in HTML onclick",
-    expectedRuleIds: ["email-address"],
-    hiddenValues: ["attacker@phish.com"],
-    sourceText: '<button onclick="send(\'attacker@phish.com\')">Click</button>',
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks JWT in XML payload",
-    expectedRuleIds: ["jwt-token"],
-    hiddenValues: ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U"],
-    sourceText: '<token>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U</token>',
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks AWS keys in env export",
-    expectedRuleIds: ["aws-access-key", "aws-secret-key"],
-    hiddenValues: ["AKIAIOSFODNN7EXAMPLE", "wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY"],
-    sourceText: "export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE\nexport AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY",
-  },
-]);
+export const MALICIOUS_CODE_FIXTURES: readonly LocaleMaskFixture[] =
+  Object.freeze([
+    {
+      countryProfileIds: ["us"],
+      description: "masks email in XSS script tag",
+      expectedRuleIds: ["email-address"],
+      hiddenValues: ["hacker@evil.com"],
+      sourceText: '<script>alert("hacker@evil.com")</script>',
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks email in SQL query",
+      expectedRuleIds: ["email-address"],
+      hiddenValues: ["admin@site.com"],
+      sourceText: "SELECT * FROM users WHERE email='admin@site.com'",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks email in HTML onclick",
+      expectedRuleIds: ["email-address"],
+      hiddenValues: ["attacker@phish.com"],
+      sourceText:
+        "<button onclick=\"send('attacker@phish.com')\">Click</button>",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks JWT in XML payload",
+      expectedRuleIds: ["jwt-token"],
+      hiddenValues: [
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",
+      ],
+      sourceText:
+        "<token>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U</token>",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks AWS keys in env export",
+      expectedRuleIds: ["aws-access-key", "aws-secret-key"],
+      hiddenValues: [
+        "AKIAIOSFODNN7EXAMPLE",
+        "wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY",
+      ],
+      sourceText:
+        "export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE\nexport AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY",
+    },
+  ]);
 
 // ─── Working: Unicode That Works ────────────────────────────────────────────
 
@@ -284,139 +295,143 @@ token = api_key_12345abcde`,
 
 // ─── Working: Portuguese Informal (Recognized Labels) ───────────────────────
 
-export const BR_INFORMAL_VARIATIONS: readonly LocaleMaskFixture[] = Object.freeze([
-  {
-    countryProfileIds: ["br"],
-    description: "masks email with 'manda email pra' context",
-    expectedRuleIds: ["email-address"],
-    hiddenValues: ["contato@empresa.com.br"],
-    sourceText: "manda email pra contato@empresa.com.br",
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "masks CPF with standard format",
-    expectedRuleIds: ["cpf"],
-    hiddenValues: ["12345678909"],
-    sourceText: "CPF: 12345678909",
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "masks CNPJ with standard format",
-    expectedRuleIds: ["cnpj"],
-    hiddenValues: ["12.345.678/0001-95"],
-    sourceText: "CNPJ: 12.345.678/0001-95",
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "masks CEP with 'cep' label",
-    expectedRuleIds: ["cep-labeled"],
-    hiddenValues: ["01310-100"],
-    sourceText: "CEP: 01310-100",
-  },
-]);
+export const BR_INFORMAL_VARIATIONS: readonly LocaleMaskFixture[] =
+  Object.freeze([
+    {
+      countryProfileIds: ["br"],
+      description: "masks email with 'manda email pra' context",
+      expectedRuleIds: ["email-address"],
+      hiddenValues: ["contato@empresa.com.br"],
+      sourceText: "manda email pra contato@empresa.com.br",
+    },
+    {
+      countryProfileIds: ["br"],
+      description: "masks CPF with standard format",
+      expectedRuleIds: ["cpf"],
+      hiddenValues: ["12345678909"],
+      sourceText: "CPF: 12345678909",
+    },
+    {
+      countryProfileIds: ["br"],
+      description: "masks CNPJ with standard format",
+      expectedRuleIds: ["cnpj"],
+      hiddenValues: ["12.345.678/0001-95"],
+      sourceText: "CNPJ: 12.345.678/0001-95",
+    },
+    {
+      countryProfileIds: ["br"],
+      description: "masks CEP with 'cep' label",
+      expectedRuleIds: ["cep-labeled"],
+      hiddenValues: ["01310-100"],
+      sourceText: "CEP: 01310-100",
+    },
+  ]);
 
 // ─── Working: English Informal (Recognized Labels) ──────────────────────────
 
-export const US_INFORMAL_VARIATIONS: readonly LocaleMaskFixture[] = Object.freeze([
-  {
-    countryProfileIds: ["us"],
-    description: "masks phone with standard pattern",
-    expectedRuleIds: ["us-phone"],
-    hiddenValues: ["5551234567"],
-    sourceText: "call 5551234567",
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks email standalone",
-    expectedRuleIds: ["email-address"],
-    hiddenValues: ["john.smith@gmail.com"],
-    sourceText: "contact john.smith@gmail.com",
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks credit card standalone",
-    expectedRuleIds: ["credit-card"],
-    hiddenValues: ["4111111111111111"],
-    sourceText: "card number 4111111111111111",
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks OpenAI key standalone",
-    expectedRuleIds: ["openai-style-key"],
-    hiddenValues: ["sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYz123"],
-    sourceText: "token sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYz123",
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "masks AWS access key",
-    expectedRuleIds: ["aws-access-key"],
-    hiddenValues: ["AKIAIOSFODNN7EXAMPLE"],
-    sourceText: "aws key AKIAIOSFODNN7EXAMPLE",
-  },
-]);
+export const US_INFORMAL_VARIATIONS: readonly LocaleMaskFixture[] =
+  Object.freeze([
+    {
+      countryProfileIds: ["us"],
+      description: "masks phone with standard pattern",
+      expectedRuleIds: ["us-phone"],
+      hiddenValues: ["5551234567"],
+      sourceText: "call 5551234567",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks email standalone",
+      expectedRuleIds: ["email-address"],
+      hiddenValues: ["john.smith@gmail.com"],
+      sourceText: "contact john.smith@gmail.com",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks credit card standalone",
+      expectedRuleIds: ["credit-card"],
+      hiddenValues: ["4111111111111111"],
+      sourceText: "card number 4111111111111111",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks OpenAI key standalone",
+      expectedRuleIds: ["openai-style-key"],
+      hiddenValues: ["sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYz123"],
+      sourceText: "token sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYz123",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "masks AWS access key",
+      expectedRuleIds: ["aws-access-key"],
+      hiddenValues: ["AKIAIOSFODNN7EXAMPLE"],
+      sourceText: "aws key AKIAIOSFODNN7EXAMPLE",
+    },
+  ]);
 
 // ─── Boundary Cases: Standard Separators ────────────────────────────────────
 
-export const AMBIGUOUS_SEPARATOR_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
-  {
-    countryProfileIds: ["us"],
-    description: "Credit card in brackets is masked",
-    expectedRuleIds: ["credit-card"],
-    hiddenValues: ["4111111111111111"],
-    sourceText: "Card: [4111111111111111]",
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "Phone with standard colon-space",
-    expectedRuleIds: ["labeled-phone"],
-    hiddenValues: ["+55 11 98765-4321"],
-    sourceText: "Telefone: +55 11 98765-4321",
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "Email with equals sign is masked",
-    expectedRuleIds: ["email-address"],
-    hiddenValues: ["test@example.com"],
-    sourceText: "email=test@example.com",
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "masks CNPJ with standard label",
-    expectedRuleIds: ["cnpj"],
-    hiddenValues: ["12.345.678/0001-95"],
-    sourceText: "CNPJ: 12.345.678/0001-95",
-  },
-]);
+export const AMBIGUOUS_SEPARATOR_BOUNDARY: readonly BoundaryMaskFixture[] =
+  Object.freeze([
+    {
+      countryProfileIds: ["us"],
+      description: "Credit card in brackets is masked",
+      expectedRuleIds: ["credit-card"],
+      hiddenValues: ["4111111111111111"],
+      sourceText: "Card: [4111111111111111]",
+    },
+    {
+      countryProfileIds: ["br"],
+      description: "Phone with standard colon-space",
+      expectedRuleIds: ["labeled-phone"],
+      hiddenValues: ["+55 11 98765-4321"],
+      sourceText: "Telefone: +55 11 98765-4321",
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "Email with equals sign is masked",
+      expectedRuleIds: ["email-address"],
+      hiddenValues: ["test@example.com"],
+      sourceText: "email=test@example.com",
+    },
+    {
+      countryProfileIds: ["br"],
+      description: "masks CNPJ with standard label",
+      expectedRuleIds: ["cnpj"],
+      hiddenValues: ["12.345.678/0001-95"],
+      sourceText: "CNPJ: 12.345.678/0001-95",
+    },
+  ]);
 
 // ─── Negative Cases: True Negatives ─────────────────────────────────────────
 
-export const HIGH_ENTROPY_NEGATIVES: readonly NegativeMaskFixture[] = Object.freeze([
-  {
-    countryProfileIds: ["us"],
-    description: "hex color should not be masked",
-    excludedRuleIds: ["keyed-secret-assignment"],
-    sourceText: "color: #FF5733",
-    visibleValues: ["#FF5733"],
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "currency amount should not be masked",
-    excludedRuleIds: ["cpf-bare"],
-    sourceText: "Total: R$ 1.234,56",
-    visibleValues: ["1.234,56"],
-  },
-  {
-    countryProfileIds: ["us"],
-    description: "postal code should not be masked as SSN",
-    excludedRuleIds: ["us-ssn"],
-    sourceText: "ZIP: 12345",
-    visibleValues: ["12345"],
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "alphanumeric protocol should not be masked",
-    excludedRuleIds: ["cpf-bare"],
-    sourceText: "Protocolo: ABC-123456",
-    visibleValues: ["ABC-123456"],
-  },
-]);
+export const HIGH_ENTROPY_NEGATIVES: readonly NegativeMaskFixture[] =
+  Object.freeze([
+    {
+      countryProfileIds: ["us"],
+      description: "hex color should not be masked",
+      excludedRuleIds: ["keyed-secret-assignment"],
+      sourceText: "color: #FF5733",
+      visibleValues: ["#FF5733"],
+    },
+    {
+      countryProfileIds: ["br"],
+      description: "currency amount should not be masked",
+      excludedRuleIds: ["cpf-bare"],
+      sourceText: "Total: R$ 1.234,56",
+      visibleValues: ["1.234,56"],
+    },
+    {
+      countryProfileIds: ["us"],
+      description: "postal code should not be masked as SSN",
+      excludedRuleIds: ["us-ssn"],
+      sourceText: "ZIP: 12345",
+      visibleValues: ["12345"],
+    },
+    {
+      countryProfileIds: ["br"],
+      description: "alphanumeric protocol should not be masked",
+      excludedRuleIds: ["cpf-bare"],
+      sourceText: "Protocolo: ABC-123456",
+      visibleValues: ["ABC-123456"],
+    },
+  ]);
