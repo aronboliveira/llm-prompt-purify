@@ -7,7 +7,11 @@ import type {
 } from "../declarations/masking.types";
 
 const LATAM_COUNTRY_IDS: ReadonlySet<CountryProfileId> = new Set([
-  "ar", "cl", "co", "mx", "pe",
+  "ar",
+  "cl",
+  "co",
+  "mx",
+  "pe",
 ]);
 
 export function expandCountryScope(
@@ -25,7 +29,7 @@ export function expandCountryScope(
 
 export function buildScanScopeSelection(
   countryProfileIds: readonly CountryProfileId[],
-  detectionMode: DetectionMode
+  detectionMode: DetectionMode,
 ): ScanScopeSelection {
   return {
     countryProfileIds: normalizeCountryProfileIds(countryProfileIds),
@@ -35,34 +39,38 @@ export function buildScanScopeSelection(
 
 export function filterRulesForScope(
   rules: readonly DetectionRule[],
-  scopeSelection: ScanScopeSelection
+  scopeSelection: ScanScopeSelection,
 ): readonly DetectionRule[] {
   return rules.filter(rule => isRuleEnabledForScope(rule, scopeSelection));
 }
 
 export function isRuleEnabledForScope(
   rule: DetectionRule,
-  scopeSelection: ScanScopeSelection
+  scopeSelection: ScanScopeSelection,
 ): boolean {
   if (rule.coverage === "global") return true;
   if (scopeSelection.detectionMode === "global-only") return false;
   return scopeSelection.countryProfileIds.some(countryProfileId =>
-    rule.countryProfileIds?.includes(countryProfileId)
+    rule.countryProfileIds?.includes(countryProfileId),
   );
 }
 
-export function isKnownCountryProfileId(value: string): value is CountryProfileId {
+export function isKnownCountryProfileId(
+  value: string,
+): value is CountryProfileId {
   return COUNTRY_PROFILE_ORDER.includes(value as CountryProfileId);
 }
 
 export function normalizeCountryProfileIds(
-  countryProfileIds: readonly CountryProfileId[]
+  countryProfileIds: readonly CountryProfileId[],
 ): readonly CountryProfileId[] {
-  const knownCountryProfileIds = countryProfileIds.filter(isKnownCountryProfileId);
+  const knownCountryProfileIds = countryProfileIds.filter(
+    isKnownCountryProfileId,
+  );
 
   return Object.freeze(
     COUNTRY_PROFILE_ORDER.filter(countryProfileId =>
-      knownCountryProfileIds.includes(countryProfileId)
-    )
+      knownCountryProfileIds.includes(countryProfileId),
+    ),
   );
 }

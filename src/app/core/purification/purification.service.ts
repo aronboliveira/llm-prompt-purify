@@ -46,7 +46,11 @@ import {
   encodeHtmlEntities,
   stripHtmlTags,
 } from "./utils/xss-purify.utils";
-import { containsXxe, detectXxe, neutralizeXxe } from "./utils/xxe-detect.utils";
+import {
+  containsXxe,
+  detectXxe,
+  neutralizeXxe,
+} from "./utils/xxe-detect.utils";
 
 /**
  * Default purification configuration.
@@ -206,10 +210,7 @@ export class ContentPurifier {
    * Strips detected threats from text.
    * Handles overlapping ranges by merging them first.
    */
-  #stripThreatsFromText(
-    text: string,
-    threats: readonly ThreatMatch[],
-  ): string {
+  #stripThreatsFromText(text: string, threats: readonly ThreatMatch[]): string {
     if (threats.length === 0) return text;
 
     // Merge overlapping ranges
@@ -239,9 +240,7 @@ export class ContentPurifier {
   /**
    * Counts threats by type.
    */
-  #countThreats(
-    threats: readonly ThreatMatch[],
-  ): Record<ThreatType, number> {
+  #countThreats(threats: readonly ThreatMatch[]): Record<ThreatType, number> {
     const counts: Record<ThreatType, number> = {
       xss: 0,
       xxe: 0,
@@ -292,9 +291,5 @@ export {
   stripHtmlTags,
 } from "./utils/xss-purify.utils";
 export { neutralizeSqlInjection } from "./utils/sql-detect.utils";
-export {
-  neutralizeXxe,
-} from "./utils/xxe-detect.utils";
-export {
-  sanitizePath,
-} from "./utils/path-traversal.utils";
+export { neutralizeXxe } from "./utils/xxe-detect.utils";
+export { sanitizePath } from "./utils/path-traversal.utils";

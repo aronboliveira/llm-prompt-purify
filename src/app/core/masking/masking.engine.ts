@@ -8,7 +8,10 @@ import type {
   ScanScopeSelection,
   XmlWrapTag,
 } from "./declarations/masking.types";
-import { expandCountryScope, filterRulesForScope } from "./utils/country-scope.utils";
+import {
+  expandCountryScope,
+  filterRulesForScope,
+} from "./utils/country-scope.utils";
 import { collectFuzzyLabelCandidates } from "./utils/fuzzy-label.utils";
 import { createDistinctMask } from "./utils/mask-format.utils";
 import {

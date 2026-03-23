@@ -295,8 +295,7 @@ export const MASKING_STRATEGY_DESCRIPTIONS: Readonly<
 > = Object.freeze({
   random:
     "Each character is replaced with a random character of the same class (digit → digit, letter → letter). Numeric financial and identifier values still follow mandatory compliance redaction into clearly non-real placeholders (for example ####-####).",
-  tags:
-    "Replaces values with semantic labels like <EMAIL>, <API_KEY>, or <CPF> based on the detection rule. Numeric financial and identifier values still follow mandatory compliance redaction into clearly non-real placeholders.",
+  tags: "Replaces values with semantic labels like <EMAIL>, <API_KEY>, or <CPF> based on the detection rule. Numeric financial and identifier values still follow mandatory compliance redaction into clearly non-real placeholders.",
   faker:
     "Uses privacy-safe placeholders like {CPF1}, {TELEFONE2}, {NOME3} that can never match real data. Emails use RFC 2606 reserved domains. Numeric financial and identifier values still follow mandatory compliance redaction into clearly non-real placeholders.",
   redacted:
