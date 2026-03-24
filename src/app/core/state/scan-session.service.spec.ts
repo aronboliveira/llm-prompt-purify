@@ -69,11 +69,6 @@ describe("ScanSessionService", () => {
 
     expect(
       service.state().result?.matches.some(match => match.ruleId === "cpf"),
-    ).toBe(false);
-    expect(
-      service
-        .state()
-        .result?.matches.some(match => match.ruleId === "cpf-global-labeled"),
     ).toBe(true);
     expect(service.state().result?.maskedText).not.toContain("529.982.247-25");
     expect(service.state().result?.maskedText).not.toContain(

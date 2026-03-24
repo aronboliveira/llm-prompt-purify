@@ -156,7 +156,8 @@ export class ScanSessionService {
 
   public async refreshMaskedOutput(): Promise<boolean> {
     this.#clearQueuedRefresh();
-    const sourceText = this.#state().sourceText;
+    const currentState = this.#state();
+    const sourceText = currentState.sourceText;
     if (!sourceText.trim()) {
       this.#state.update(state => ({
         ...state,
@@ -181,13 +182,13 @@ export class ScanSessionService {
     try {
       const localResult = this.#engine.scan(
         sourceText,
-        this.#state().groupPreferences,
+        currentState.groupPreferences,
         buildScanScopeSelection(
-          this.#state().countryProfileIds,
-          this.#state().detectionMode,
+          currentState.countryProfileIds,
+          currentState.detectionMode,
         ),
         scannedAt,
-        this.#state().advancedPreferences,
+        currentState.advancedPreferences,
       );
       this.#setPhase("validating");
 
@@ -390,6 +391,7 @@ export class ScanSessionService {
       ...currentState,
       detectionMode,
       errorMessage: null,
+      result: null,
       scanPhase: "idle",
       statusMessage: SCAN_PHASE_MESSAGES.idle,
     });

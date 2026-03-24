@@ -27,18 +27,16 @@ const SCOPE_BY_LANGUAGE: Readonly<Record<MockLanguage, readonly CountryProfileId
     zh: ["cn"],
   });
 
+const REPORT_DATE = "20260323";
+const REPORT_ISO = "2026-03-23T00:00:00.000Z";
+
 describe("MaskingEngine exhaustive corpus report", () => {
   const engine = new MaskingEngine();
 
-  it("writes exhaustive per-file report to .tmp/codex/reports-20260307/exhaustive-tests.log", () => {
+  it(`writes exhaustive per-file report to .tmp/codex/reports-${REPORT_DATE}/exhaustive-tests.log`, () => {
     const mockRoot = join(process.cwd(), ".tmp", "input-mocks"),
-      reportPath = join(
-        process.cwd(),
-        ".tmp",
-        "codex",
-        "reports-20260307",
-        "exhaustive-tests.log",
-      ),
+      reportDir = join(process.cwd(), ".tmp", "codex", `reports-${REPORT_DATE}`),
+      reportPath = join(reportDir, "exhaustive-tests.log"),
       reportEntries: Record<string, ExhaustiveResultEntry> = {};
 
     const languages = readdirSync(mockRoot)
@@ -68,7 +66,7 @@ describe("MaskingEngine exhaustive corpus report", () => {
               sourceText,
               DEFAULT_GROUP_PREFERENCES,
               scopeSelection,
-              "2026-03-09T00:00:00.000Z",
+              REPORT_ISO,
               {
                 ...DEFAULT_ADVANCED_PREFERENCES,
                 maskingStrategy: strategy,
@@ -121,9 +119,7 @@ describe("MaskingEngine exhaustive corpus report", () => {
       }
     }
 
-    mkdirSync(join(process.cwd(), ".tmp", "codex", "reports-20260307"), {
-      recursive: true,
-    });
+    mkdirSync(reportDir, { recursive: true });
 
     const lines = Object.keys(reportEntries)
       .sort((left, right) => left.localeCompare(right))

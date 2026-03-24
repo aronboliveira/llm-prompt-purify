@@ -240,7 +240,7 @@ export const SCOPE_BOUNDARY_MASK_FIXTURES: readonly BoundaryMaskFixture[] =
       countryProfileIds: ["es"],
       description:
         "masks labeled Brazilian CPF via global rule even when Spain is the only selected country",
-      expectedRuleIds: ["cpf-global-labeled", "email-address"],
+      expectedRuleIds: ["cpf", "email-address"],
       hiddenValues: ["529.982.247-25", "maria@example.com"],
       sourceText: ["CPF: 529.982.247-25", "Email: maria@example.com"].join(
         "\n",

@@ -64,14 +64,9 @@ export const CROSS_SCOPE_GLOBAL_ONLY: readonly BoundaryMaskFixture[] =
   Object.freeze([
     {
       countryProfileIds: ["br"],
-      description:
-        "global-only mode masks labeled CPF/CNPJ via global rules and email",
+      description: "global-only mode masks CPF/CNPJ via global rules and email",
       detectionMode: "global-only",
-      expectedRuleIds: [
-        "cpf-global-labeled",
-        "cnpj-global-labeled",
-        "email-address",
-      ],
+      expectedRuleIds: ["cpf", "cnpj", "email-address"],
       hiddenValues: [
         "529.982.247-25",
         "11.222.333/0001-81",

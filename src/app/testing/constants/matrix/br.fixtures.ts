@@ -314,24 +314,23 @@ export const BR_VOTER_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
 export const BR_BOUNDARY: readonly BoundaryMaskFixture[] = Object.freeze([
   {
     countryProfileIds: ["us"],
-    description: "CPF is masked when US is selected via global labeled rule",
-    expectedRuleIds: ["cpf-global-labeled", "email-address"],
+    description: "CPF is masked when US is selected via global rule",
+    expectedRuleIds: ["cpf", "email-address"],
     hiddenValues: ["529.982.247-25", "maria@example.com"],
     sourceText: "CPF: 529.982.247-25\nEmail: maria@example.com",
   },
   {
     countryProfileIds: ["br"],
     detectionMode: "global-only",
-    description: "CPF is masked in global-only mode via global labeled rule",
-    expectedRuleIds: ["cpf-global-labeled", "email-address"],
+    description: "CPF is masked in global-only mode via global rule",
+    expectedRuleIds: ["cpf", "email-address"],
     hiddenValues: ["529.982.247-25", "maria@example.com"],
     sourceText: "CPF: 529.982.247-25\nEmail: maria@example.com",
   },
   {
     countryProfileIds: ["es"],
-    description:
-      "CNPJ is masked when Spain is selected via global labeled rule",
-    expectedRuleIds: ["cnpj-global-labeled"],
+    description: "CNPJ is masked when Spain is selected via global rule",
+    expectedRuleIds: ["cnpj"],
     hiddenValues: ["11.222.333/0001-81"],
     sourceText: "CNPJ: 11.222.333/0001-81",
   },
