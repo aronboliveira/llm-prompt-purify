@@ -1,17 +1,17 @@
 services:
   db:
-    image: postgres:15-alpine
+    image: mongo:7.0
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-llm_prompt_purify}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-llm_prompt_purify}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/llm_prompt_purify --quiet
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
-      - feedback-db:/var/lib/postgresql/data
+      - feedback-db:/data/db
 
   backend:
     build:
@@ -22,7 +22,7 @@ services:
         condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__FeedbackDatabase: Host=db;Port=5432;Database=${POSTGRES_DB:-llm_prompt_purify};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      ConnectionStrings__FeedbackDatabase: mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-password}@db:27017/${MONGO_DATABASE:-llm_prompt_purify}?authSource=admin
       DeveloperEmail__EnableSsl: ${SMTP_ENABLE_SSL:-true}
       DeveloperEmail__Host: ${SMTP_HOST:-smtp.gmail.com}
       DeveloperEmail__Password: ${SMTP_PASSWORD:-}

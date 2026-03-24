@@ -1,3 +1,6 @@
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson;
 using System.Threading.RateLimiting;
 using LLMPromptPurify.Api.Features.Auth;
 using LLMPromptPurify.Api.Features.Feedback.Abstractions;
@@ -10,6 +13,10 @@ using LLMPromptPurify.Api.Features.MaskSafety.Contracts;
 using LLMPromptPurify.Api.Features.MaskSafety.Services;
 using MongoDB.Driver;
 
+if (BsonSerializer.LookupSerializer<Guid>() == null)
+{
+    BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
+}
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddProblemDetails();
