@@ -54,7 +54,7 @@ interface TestResult {
 /* ------------------------------------------------------------------ */
 
 const PROCESS_WAIT_MS = 800;
-const INTER_ITEM_MS = 300;
+const INTER_ITEM_MS = 50_000;
 const MAX_CONSECUTIVE_ERRORS = 5;
 const RELOAD_EVERY_N = 200;
 const REPRESENTATIVE_SAMPLE = 10;
@@ -65,7 +65,7 @@ const REPORT_DIR = join(process.cwd(), ".tmp", "copilot", "reports-20260307");
 const RESULTS_FILE = join(REPORT_DIR, "browselite-results.json");
 
 const samplePerLanguage = Number(process.env["MOCK_SAMPLE_PER_LANG"] ?? "0");
-const defaultLimit = process.env["CI"] ? 0 : 20;
+const defaultLimit = process.env["CI"] ? 0 : 50;
 const mockLimit = Number(process.env["MOCK_LIMIT"] ?? String(defaultLimit));
 
 const LOCALE_CONFIGS = [
@@ -229,10 +229,12 @@ async function processBatch(
 
     try {
       await page.getByTestId("source-textarea").fill(item.sourceText);
-      await page.waitForTimeout(PROCESS_WAIT_MS);
 
       const output = page.getByTestId("masked-output");
-      await expect(output).toBeVisible({ timeout: 5_000 });
+      await expect(output).toHaveAttribute("data-state", "ready", {
+        timeout: 15_000,
+      });
+
       const maskedText = (await output.textContent()) ?? "";
       const leaks = evaluateUiResult(item.sourceText, maskedText);
 
@@ -331,6 +333,17 @@ function isTestValidRut(value: string): boolean {
   return verifier === expected;
 }
 
+function isTestValidCuit(value: string): boolean {
+  const digits = value.replace(/-/g, "");
+  if (!/^\d{11}$/.test(digits)) return false;
+  const weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+  let total = 0;
+  for (let i = 0; i < 10; i++) total += Number(digits[i]) * weights[i];
+  const remainder = 11 - (total % 11);
+  const expected = remainder === 11 ? 0 : remainder === 10 ? 9 : remainder;
+  return Number(digits[10]) === expected;
+}
+
 function isTestValidIban(value: string): boolean {
   const v = value.toUpperCase();
   if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(v)) return false;
@@ -386,7 +399,7 @@ function extractSensitiveValues(sourceText: string): readonly string[] {
     /* Mexican RFC */
     { re: /\b[A-Z&Ñ]{3,4}\d{6}[A-Z0-9]{3}\b/g },
     /* Argentine CUIT */
-    { re: /\b\d{2}-\d{8}-\d\b/g },
+    { re: /\b\d{2}-\d{8}-\d\b/g, validator: isTestValidCuit },
   ];
 
   for (const { re, luhn, validator } of patterns) {
@@ -656,9 +669,13 @@ for (const strategy of STRATEGIES) {
 
       try {
         await page.getByTestId("source-textarea").fill(item.sourceText);
-        await page.waitForTimeout(PROCESS_WAIT_MS);
-        const maskedText =
-          (await page.getByTestId("masked-output").textContent()) ?? "";
+
+        const output = page.getByTestId("masked-output");
+        await expect(output).toHaveAttribute("data-state", "ready", {
+          timeout: 15_000,
+        });
+
+        const maskedText = (await output.textContent()) ?? "";
         const leaks = evaluateUiResult(item.sourceText, maskedText);
         batchResults.push({
           file: item.file,

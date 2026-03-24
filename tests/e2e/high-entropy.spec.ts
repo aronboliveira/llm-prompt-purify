@@ -281,7 +281,7 @@ test.describe("high-entropy masking edge cases", () => {
         .fill("CPF: 529.982.247-25\nEmail: test@example.com");
 
       const output = page.getByTestId("masked-output");
-      await expect(output).toContainText("529.982.247-25");
+      await expect(output).not.toContainText("529.982.247-25");
       await expect(output).not.toContainText("test@example.com");
     });
   });

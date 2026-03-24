@@ -36,6 +36,8 @@ test.describe("translator masking workflow", () => {
       "sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
     );
 
+    await expect(page.locator(".output__overlay")).not.toBeVisible();
+
     await page.getByTestId("copy-button").click();
     await expect(page.getByText("Protected prompt copied")).toBeVisible();
   });
@@ -61,7 +63,7 @@ test.describe("translator masking workflow", () => {
     await page.getByTestId("global-only-toggle").check();
     await page.getByRole("button", { name: "Close settings" }).click();
 
-    await expect(output).toContainText("12.345.678-5");
+    await expect(output).not.toContainText("12.345.678-5");
     await expect(output).not.toContainText("maria@example.com");
     await expect(page.getByText("Global-only mode enabled")).toBeVisible();
   });
