@@ -26,6 +26,20 @@ test.describe("Visual Demo: Watch Masking in Real-Time", () => {
       });
     });
     await page.goto("/");
+
+    // Set BR country scope so Brazilian rules (phone, CEP, etc.) fire
+    await page.evaluate(() => {
+      window.sessionStorage.setItem(
+        "llm-prompt-purify:country-profiles:v2",
+        JSON.stringify(["br"]),
+      );
+      window.sessionStorage.setItem(
+        "llm-prompt-purify:country-profile:v1",
+        "br",
+      );
+    });
+    await page.reload();
+    await page.getByTestId("source-textarea").waitFor({ state: "visible" });
   });
 
   test("Watch email being masked character by character", async ({ page }) => {
@@ -51,14 +65,15 @@ test.describe("Visual Demo: Watch Masking in Real-Time", () => {
     const output = page.locator(OUTPUT);
 
     await textarea.click();
-    // Include email which definitely gets masked
-    await page.keyboard.type("CPF: 123.456.789-00, email: cpf-owner@test.com", {
+    // Use a valid CPF (passes checksum) + email that definitely gets masked
+    await page.keyboard.type("CPF: 529.982.247-25, email: cpf-owner@test.com", {
       delay: CHAR_DELAY,
     });
 
     await page.waitForTimeout(2000);
-    // Email should be masked
+    // Both CPF and email should be masked
     await expect(output).not.toContainText("cpf-owner@test.com");
+    await expect(output).not.toContainText("529.982.247-25");
     await expect(output).toContainText("[MASK");
   });
 
@@ -71,7 +86,8 @@ test.describe("Visual Demo: Watch Masking in Real-Time", () => {
 User Profile:
 - Email: secret@hidden.com
 - Telefone: (11) 99999-8888
-- CPF: 111.222.333-44
+- CPF: 111.444.777-35
+- CEP: 01310-100
 - Credit Card: 4111-1111-1111-1111
 `;
 
@@ -80,9 +96,11 @@ User Profile:
 
     await page.waitForTimeout(3000);
 
-    // Verify email and credit card are masked (these work reliably)
+    // Verify email, credit card, CPF, and phone are masked
     await expect(output).not.toContainText("secret@hidden.com");
     await expect(output).not.toContainText("4111-1111-1111-1111");
+    await expect(output).not.toContainText("111.444.777-35");
+    await expect(output).not.toContainText("(11) 99999-8888");
     // Output should contain MASK placeholders
     await expect(output).toContainText("[MASK");
   });
@@ -113,8 +131,9 @@ User Profile:
     });
 
     await page.waitForTimeout(2000);
-    // Email should be masked, phone detection depends on config
+    // Email should be masked, phone should also be masked with BR scope
     await expect(output).not.toContainText("test@example.com");
+    await expect(output).not.toContainText("98765-4321");
     await expect(output).toContainText("[MASK");
   });
 
