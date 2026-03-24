@@ -44,6 +44,10 @@ Thumbs.db
 .notes/project-scan/**
 !.notes/.llms/**
 
+.env
+.env.local
+.secrets/
+.secrets/**
 .env.docker
 .sct/
 .sct/**
