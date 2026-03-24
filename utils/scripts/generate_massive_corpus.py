@@ -124,10 +124,15 @@ def nie_es_generator() -> str:
 
 
 def cuit_generator() -> str:
-    """Generate Argentine CUIT."""
+    """Generate Argentine CUIT with correct verifier checksum."""
     prefix = random.choice(["20", "23", "24", "27"])
     dni = random.randint(10000000, 45000000)
-    return f"{prefix}-{dni}-{random.randint(0,9)}"
+    digits = [int(c) for c in prefix + str(dni)]
+    weights = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]
+    total = sum(d * w for d, w in zip(digits, weights))
+    remainder = 11 - (total % 11)
+    verifier = 0 if remainder == 11 else 9 if remainder == 10 else remainder
+    return f"{prefix}-{dni}-{verifier}"
 
 
 def rut_cl_generator() -> str:
