@@ -1,0 +1,20 @@
+{
+  "candidates": [
+    {
+      "candidateValue": "[MASKED_SSN_001]",
+      "ruleId": "ssn"
+    },
+    {
+      "candidateValue": "[MASKED_EMAIL_002]",
+      "ruleId": "email"
+    },
+    {
+      "candidateValue": "[MASKED_PHONE_003]",
+      "ruleId": "phone"
+    },
+    {
+      "candidateValue": "[MASKED_ADDR_004]",
+      "ruleId": "address"
+    }
+  ]
+}

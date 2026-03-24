@@ -1,0 +1,9 @@
+{
+  "category": "bug-report",
+  "email": "tester@example.com",
+  "message": "Found an issue when masking SSN numbers with hyphens. The mask format doesn't match the original structure.",
+  "name": "Test User",
+  "rating": 4,
+  "subject": "SSN masking format issue",
+  "wantsReply": true
+}

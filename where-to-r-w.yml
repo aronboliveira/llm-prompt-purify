@@ -1,0 +1,75 @@
+documentation:
+  etc:
+    paths:
+      - "docs/"
+      - "README.md"
+      - "where-to-r-w.yml"
+      - ".notes/.llms/coding-style.xml"
+      - ".notes/.llms/workflow.toml"
+      - ".notes/.llms/{agents,guidelines}/"
+notes:
+  agents:
+    paths:
+      - ".notes/.llms/*"
+      - ".tmp/{codex,copilot,gemini}/"
+  volatile:
+    - ".tmp/"
+    - "playwright-report/"
+    - ".notes/.llms/logs/"
+  etc: ".notes/$(date %Y%m%d) pattern"
+filesystem:
+  configs:
+    paths:
+      - ".dockerignore"
+      - ".prettierrc"
+      - "angular.json"
+      - "eslint.config.mjs"
+      - "jest.config.js"
+      - "LLMPromptPurify.sln"
+      - "netlify.toml"
+      - "ngsw-config.json"
+      - "package.json"
+      - "playwright.config.ts"
+      - "playwright.visual.config.ts"
+      - "proxy.conf.json"
+      - "pytest.ini"
+      - "server.ts"
+      - "tsconfig.app.json"
+      - "tsconfig.json"
+      - "tsconfig.spec.json"
+  coding-style:
+    paths:
+      - ".editorconfig"
+      - ".prettierrc"
+      - ".notes/.llms/coding-style.xml"
+      - ".notes/.llms/javascript-coding-style.md"
+  infra:
+    paths:
+      - "docker/"
+      - ".venv/"
+      - "docker-compose.yml"
+  backend:
+    paths:
+      - "backend/"
+    notes:
+      - "Minimal, just for feedback and mininalistic telemetric metadata"
+  frontend:
+    paths:
+      - "src/"
+    notes:
+      - "Most of the implementation is found here."
+  testing:
+    configs:
+      - "tests/"
+      - "http/"
+    volatile:
+      - ".tmp/{input-mocks,live-pages,project-overhaul}"
+      - "test-results/"
+  etc:
+    utils:
+      scripting:
+        paths:
+          - "utils/scripts/"
+
+OBS:
+  - .history/ folders are legacy
