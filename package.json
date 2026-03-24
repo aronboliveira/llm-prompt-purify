@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --proxy-config proxy.conf.json",
+    "start": "ng serve --proxy-config proxy.conf.json --port 4201",
     "start:prod": "node dist/llm-prompt-purify/server/server.mjs",
     "build": "ng build",
     "build:prod": "ng build --configuration production",
@@ -14,6 +14,9 @@
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
+    "test:e2e:trace": "playwright test --trace on",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:visual": "playwright test --config=playwright.visual.config.ts",
     "test:all": "npm run test && npm run test:e2e",
     "test:ci": "jest --ci --coverage && playwright test",
     "lint": "eslint src",
