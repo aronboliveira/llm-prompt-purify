@@ -76,7 +76,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "JWT token",
     locale: "shared",
     patternFactory: () =>
-      /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gu,
+      /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{2,}\.[A-Za-z0-9_-]{2,}\b/gu,
     priority: 130,
   },
   {
@@ -267,7 +267,6 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
-    countryProfileIds: ["us"],
     coverage: "global",
     confidence: "high",
     id: "us-ssn",
@@ -292,8 +291,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
-    countryProfileIds: ["br"],
-    coverage: "country",
+    coverage: "global",
     confidence: "high",
     id: "cpf",
     label: "CPF",
@@ -318,8 +316,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
-    countryProfileIds: ["br"],
-    coverage: "country",
+    coverage: "global",
     confidence: "high",
     id: "cnpj",
     label: "CNPJ",
@@ -350,7 +347,8 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "br-phone",
     label: "Brazil phone number",
     locale: "pt-BR",
-    patternFactory: () => /(?:\+55\s?)?(?:\(?\d{2}\)?\s?)?9?\d{4}-?\d{4}\b/g,
+    patternFactory: () =>
+      /(?:\+55\s{0,3})?(?:\(?\d{2}\)?\s{0,3})?9?\d{4}[\s-]{0,3}\d{4}\b/g,
     priority: 84,
     validator: isLikelyPhoneNumber,
   },
@@ -1110,7 +1108,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
 
   {
     category: "identifier",
-    countryProfileIds: ["es", "latam-es"],
+    countryProfileIds: ["cl", "latam-es"],
     coverage: "country",
     confidence: "high",
     id: "chile-rut-json",
@@ -1128,7 +1126,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   {
     category: "identifier",
     countryProfileIds: ["us"],
-    coverage: "global",
+    coverage: "country",
     confidence: "high",
     id: "us-ssn-json-suffixed",
     label: "US SSN in JSON with numbered key suffix",
@@ -1171,10 +1169,186 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     valueGroup: 1,
   },
 
+  // ─── PIS/PASEP JSON ──────────────────────────────────────────────────────────
+
+  {
+    category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
+    confidence: "high",
+    id: "pis-json",
+    label: "Brazilian PIS/PASEP in JSON/structured data",
+    locale: "pt-BR",
+    patternFactory: () =>
+      /(?:["'](?:pis|pasep|nis)["']\s*[:=]\s*["'])(\d{3}\.?\d{5}\.?\d{2}-?\d)(?=["'])/giu,
+    priority: 114,
+    validator: isValidPisPasep,
+    valueGroup: 1,
+  },
+  {
+    category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
+    confidence: "high",
+    id: "pis-json-suffixed",
+    label: "Brazilian PIS/PASEP in JSON with numbered key suffix",
+    locale: "pt-BR",
+    patternFactory: () =>
+      /(?:["'](?:pis|pasep|nis)[-_]?\d+["']\s*[:=]\s*["'])(\d{3}\.?\d{5}\.?\d{2}-?\d)(?=["'])/giu,
+    priority: 114,
+    validator: isValidPisPasep,
+    valueGroup: 1,
+  },
+
+  // ─── RG JSON ─────────────────────────────────────────────────────────────────
+
+  {
+    category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
+    confidence: "high",
+    id: "rg-json",
+    label: "Brazilian RG in JSON/structured data",
+    locale: "pt-BR",
+    patternFactory: () =>
+      /(?:["']rg["']\s*[:=]\s*["'])([0-9]{1,2}\.?\d{3}\.?\d{3}-?[\dXx])(?=["'])/giu,
+    priority: 114,
+    validator: isLikelyBrazilianStateId,
+    valueGroup: 1,
+  },
+  {
+    category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
+    confidence: "high",
+    id: "rg-json-suffixed",
+    label: "Brazilian RG in JSON with numbered key suffix",
+    locale: "pt-BR",
+    patternFactory: () =>
+      /(?:["']rg[-_]?\d+["']\s*[:=]\s*["'])([0-9]{1,2}\.?\d{3}\.?\d{3}-?[\dXx])(?=["'])/giu,
+    priority: 114,
+    validator: isLikelyBrazilianStateId,
+    valueGroup: 1,
+  },
+
+  // ─── CEP JSON ────────────────────────────────────────────────────────────────
+
+  {
+    category: "location",
+    countryProfileIds: ["br"],
+    coverage: "country",
+    confidence: "high",
+    id: "cep-json",
+    label: "Brazilian CEP in JSON/structured data",
+    locale: "pt-BR",
+    patternFactory: () =>
+      /(?:["']cep["']\s*[:=]\s*["'])(\d{5}-?\d{3})(?=["'])/giu,
+    priority: 114,
+    valueGroup: 1,
+  },
+  {
+    category: "location",
+    countryProfileIds: ["br"],
+    coverage: "country",
+    confidence: "high",
+    id: "cep-json-suffixed",
+    label: "Brazilian CEP in JSON with numbered key suffix",
+    locale: "pt-BR",
+    patternFactory: () =>
+      /(?:["']cep[-_]?\d+["']\s*[:=]\s*["'])(\d{5}-?\d{3})(?=["'])/giu,
+    priority: 114,
+    valueGroup: 1,
+  },
+
+  // ─── Título de Eleitor JSON ──────────────────────────────────────────────────
+
+  {
+    category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
+    confidence: "high",
+    id: "titulo-eleitor-json",
+    label: "Brazilian Título de Eleitor in JSON/structured data",
+    locale: "pt-BR",
+    patternFactory: () =>
+      /(?:["']titulo[-_]?(?:de[-_]?)?eleitor(?:al)?["']\s*[:=]\s*["'])((?:\d[\s.-]*){12})(?=["'])/giu,
+    priority: 114,
+    validator: looksLikeBrazilianVoterId,
+    valueGroup: 1,
+  },
+  {
+    category: "identifier",
+    countryProfileIds: ["br"],
+    coverage: "country",
+    confidence: "high",
+    id: "titulo-eleitor-json-suffixed",
+    label: "Brazilian Título de Eleitor in JSON with numbered key suffix",
+    locale: "pt-BR",
+    patternFactory: () =>
+      /(?:["']titulo[-_]?(?:de[-_]?)?eleitor(?:al)?[-_]?\d+["']\s*[:=]\s*["'])((?:\d[\s.-]*){12})(?=["'])/giu,
+    priority: 114,
+    validator: looksLikeBrazilianVoterId,
+    valueGroup: 1,
+  },
+
+  // ─── IBAN JSON ───────────────────────────────────────────────────────────────
+
+  {
+    category: "financial",
+    coverage: "global",
+    confidence: "high",
+    id: "iban-json",
+    label: "IBAN in JSON/structured data",
+    locale: "shared",
+    patternFactory: () =>
+      /(?:["']iban["']\s*[:=]\s*["'])([A-Z]{2}\d{2}[A-Z0-9]{11,30})(?=["'])/giu,
+    priority: 114,
+    valueGroup: 1,
+  },
+  {
+    category: "financial",
+    coverage: "global",
+    confidence: "high",
+    id: "iban-json-suffixed",
+    label: "IBAN in JSON with numbered key suffix",
+    locale: "shared",
+    patternFactory: () =>
+      /(?:["']iban[-_]?\d+["']\s*[:=]\s*["'])([A-Z]{2}\d{2}[A-Z0-9]{11,30})(?=["'])/giu,
+    priority: 114,
+    valueGroup: 1,
+  },
+
+  // ─── Phone JSON ──────────────────────────────────────────────────────────────
+
+  {
+    category: "personal",
+    coverage: "global",
+    confidence: "high",
+    id: "phone-json",
+    label: "Phone number in JSON/structured data",
+    locale: "shared",
+    patternFactory: () =>
+      /(?:["'](?:telefone|phone|cel(?:ular)?|mobile|fone|tel)["']\s*[:=]\s*["'])((?:\+?\d{1,3}\s?)?\(?\d{2,3}\)?\s?\d{4,5}[\s-]?\d{4})(?=["'])/giu,
+    priority: 114,
+    valueGroup: 1,
+  },
+  {
+    category: "personal",
+    coverage: "global",
+    confidence: "high",
+    id: "phone-json-suffixed",
+    label: "Phone number in JSON with numbered key suffix",
+    locale: "shared",
+    patternFactory: () =>
+      /(?:["'](?:telefone|phone|cel(?:ular)?|mobile|fone|tel)[-_]?\d+["']\s*[:=]\s*["'])((?:\+?\d{1,3}\s?)?\(?\d{2,3}\)?\s?\d{4,5}[\s-]?\d{4})(?=["'])/giu,
+    priority: 114,
+    valueGroup: 1,
+  },
+
   // ─── Generic URL Detection ───────────────────────────────────────────────────
 
   {
-    category: "credential",
+    category: "location",
     coverage: "global",
     confidence: "medium",
     id: "generic-url",
@@ -1182,6 +1356,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     locale: "shared",
     patternFactory: () => /\bhttps?:\/\/[^\s"'<>]{10,200}/giu,
     priority: 80,
+    validator: looksLikeUrlWithSensitiveData,
   },
 
   // ─── Labeled IPv4 Address ────────────────────────────────────────────────────
@@ -1230,8 +1405,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "ipv6-address",
     label: "IPv6 address",
     locale: "shared",
-    patternFactory: () => /\b(?:[0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}\b/g,
+    patternFactory: () =>
+      /\b(?:[0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}\b|\b(?:[0-9a-fA-F]{1,4}:)*::(?:[0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{0,4}\b/g,
     priority: 84,
+    validator: isValidIpv6,
   },
 
   // ─── Filesystem Paths ────────────────────────────────────────────────────────
@@ -1245,6 +1422,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     locale: "shared",
     patternFactory: () => /(?:\/[\w.-]+){3,}/g,
     priority: 60,
+    validator: looksLikeSensitivePath,
   },
   {
     category: "identifier",
@@ -1414,4 +1592,34 @@ function isValidUsaSsn(value: string): boolean {
   const serial = parseInt(digits.slice(5), 10);
   if (serial === 0) return false;
   return true;
+}
+
+/**
+ * Validator for generic URLs — only flag URLs containing sensitive data indicators.
+ */
+const URL_SENSITIVE_PARAMS =
+  /[?&](token|key|secret|password|api[_-]?key|access[_-]?token|auth|session[_-]?id|credential)=/i;
+const URL_BASIC_AUTH = /:\/\/[^@/\s]+:[^@/\s]+@/;
+
+function looksLikeUrlWithSensitiveData(value: string): boolean {
+  return URL_SENSITIVE_PARAMS.test(value) || URL_BASIC_AUTH.test(value);
+}
+
+/**
+ * Validator for Unix filesystem paths — exclude known-safe prefixes.
+ */
+const SAFE_PATH_PREFIXES =
+  /^\/(?:usr|var|etc|opt|bin|sbin|lib|proc|sys|dev|tmp|run|boot|node_modules|\.npm)\//;
+
+function looksLikeSensitivePath(value: string): boolean {
+  return !SAFE_PATH_PREFIXES.test(value);
+}
+
+/**
+ * Validator for IPv6 addresses — reject known non-IPv6 patterns.
+ */
+function isValidIpv6(value: string): boolean {
+  const groups = value.split(":");
+  if (groups.length < 3 || groups.length > 8) return false;
+  return groups.every(g => g.length <= 4);
 }

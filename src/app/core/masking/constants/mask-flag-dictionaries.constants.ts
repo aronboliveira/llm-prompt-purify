@@ -184,6 +184,7 @@ export const ES_SECRET_ASSIGNMENT_FLAGS = Object.freeze([
 ]);
 
 export const SHARED_PHONE_LABEL_FLAGS = Object.freeze([
+  "cel",
   "celular",
   "contact number",
   "contato",
