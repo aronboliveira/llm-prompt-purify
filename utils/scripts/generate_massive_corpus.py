@@ -72,8 +72,16 @@ def cep_generator() -> str:
 
 
 def pis_generator() -> str:
-    """Generate Brazilian PIS/PASEP."""
-    return f"{random.randint(100,999)}.{random.randint(10000,99999)}.{random.randint(10,99)}-{random.randint(0,9)}"
+    """Generate Brazilian PIS/PASEP with correct verifier checksum."""
+    first = random.randint(100, 999)
+    middle = random.randint(10000, 99999)
+    last_two = random.randint(10, 99)
+    digits = [int(c) for c in f"{first:03d}{middle:05d}{last_two:02d}"]
+    weights = [3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    total = sum(d * w for d, w in zip(digits, weights))
+    remainder = 11 - (total % 11)
+    verifier = 0 if remainder >= 10 else remainder
+    return f"{first}.{middle:05d}.{last_two:02d}-{verifier}"
 
 
 def titulo_eleitor_generator() -> str:

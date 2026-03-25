@@ -439,6 +439,7 @@ export const BR_PIS_PASEP_LABEL_FLAGS = Object.freeze([
   "pasep",
   "pis",
   "pis pasep",
+  "pis/pasep",
 ]);
 
 export const BR_RG_LABEL_FLAGS = Object.freeze([

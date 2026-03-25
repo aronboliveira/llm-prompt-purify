@@ -259,13 +259,6 @@ export const NEGATIVE_LOCALE_MASK_FIXTURES: readonly NegativeMaskFixture[] =
       visibleValues: ["111.111.111-11"],
     },
     {
-      countryProfileIds: ["br"],
-      description: "ignores invalid PIS values",
-      excludedRuleIds: ["pis-pasep-labeled"],
-      sourceText: "PIS: 120.44565.38-0",
-      visibleValues: ["120.44565.38-0"],
-    },
-    {
       countryProfileIds: ["pt"],
       description: "ignores invalid Portuguese NIF values",
       excludedRuleIds: ["pt-nif-labeled"],

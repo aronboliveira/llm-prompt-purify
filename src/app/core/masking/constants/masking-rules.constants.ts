@@ -395,7 +395,6 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
         String.raw`\d{3}\.?\d{5}\.?\d{2}-?\d|\d{11}`,
       ),
     priority: 111,
-    validator: isValidPisPasep,
     valueGroup: 1,
   },
   {
@@ -1182,7 +1181,6 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     patternFactory: () =>
       /(?:["'](?:pis|pasep|nis)["']\s*[:=]\s*["'])(\d{3}\.?\d{5}\.?\d{2}-?\d)(?=["'])/giu,
     priority: 114,
-    validator: isValidPisPasep,
     valueGroup: 1,
   },
   {
@@ -1196,7 +1194,6 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     patternFactory: () =>
       /(?:["'](?:pis|pasep|nis)[-_]?\d+["']\s*[:=]\s*["'])(\d{3}\.?\d{5}\.?\d{2}-?\d)(?=["'])/giu,
     priority: 114,
-    validator: isValidPisPasep,
     valueGroup: 1,
   },
 

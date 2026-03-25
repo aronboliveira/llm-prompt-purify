@@ -243,18 +243,31 @@ export const BR_PIS_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
     hiddenValues: ["12345678900"],
     sourceText: "PASEP: 12345678900",
   },
+  {
+    countryProfileIds: ["br"],
+    description: "masks PIS/PASEP slash label 'PIS/PASEP: 156.43806.30-3'",
+    expectedRuleIds: ["pis-pasep-labeled"],
+    hiddenValues: ["156.43806.30-3"],
+    sourceText: "PIS/PASEP: 156.43806.30-3",
+  },
+  {
+    countryProfileIds: ["br"],
+    description: "masks labeled PIS even with invalid checksum",
+    expectedRuleIds: ["pis-pasep-labeled"],
+    hiddenValues: ["120.44565.38-0"],
+    sourceText: "PIS: 120.44565.38-0",
+  },
+  {
+    countryProfileIds: ["br"],
+    description: "masks labeled PIS with repeating digits",
+    expectedRuleIds: ["pis-pasep-labeled"],
+    hiddenValues: ["111.11111.11-1"],
+    sourceText: "PIS: 111.11111.11-1",
+  },
 ]);
 
 // ─── Negative: PIS/PASEP ────────────────────────────────────────────────────
-export const BR_PIS_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([
-  {
-    countryProfileIds: ["br"],
-    description: "ignores PIS with all same digits",
-    excludedRuleIds: ["pis-pasep-labeled"],
-    sourceText: "PIS: 111.11111.11-1",
-    visibleValues: ["111.11111.11-1"],
-  },
-]);
+export const BR_PIS_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([]);
 
 // ─── Positive: RG labeled ───────────────────────────────────────────────────
 export const BR_RG_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
