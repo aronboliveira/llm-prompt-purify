@@ -5,7 +5,6 @@ import { MaskSafetyHardeningService } from "../mask-safety/mask-safety-hardening
 import {
   COUNTRY_PROFILE_DEFINITIONS,
   COUNTRY_PROFILE_ORDER,
-  DEFAULT_ADVANCED_PREFERENCES,
   DEFAULT_COUNTRY_PROFILE_IDS,
   MASK_GROUP_DEFINITIONS,
   MASK_GROUP_ORDER,
