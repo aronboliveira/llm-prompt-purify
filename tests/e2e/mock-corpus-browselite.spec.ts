@@ -54,7 +54,7 @@ interface TestResult {
 /* ------------------------------------------------------------------ */
 
 const PROCESS_WAIT_MS = 800;
-const INTER_ITEM_MS = 50_000;
+const INTER_ITEM_MS = Number(process.env["INTER_ITEM_MS"] ?? "300");
 const MAX_CONSECUTIVE_ERRORS = 5;
 const RELOAD_EVERY_N = 200;
 const REPRESENTATIVE_SAMPLE = 10;
@@ -610,7 +610,7 @@ for (const { countryId, language, items } of LOCALE_ITEMS) {
   test(`[corpus] ${language} — ${items.length} mocks (scope: ${countryId})`, async ({
     page,
   }) => {
-    test.setTimeout(Math.max(300_000, items.length * 2500 + 120_000));
+    test.setTimeout(Math.max(300_000, items.length * (2_500 + INTER_ITEM_MS) + 120_000));
     if (items.length === 0) return;
 
     await setupApiMock(page);
@@ -627,7 +627,7 @@ for (const { scope, mockLang } of EXTENDED_SCOPES) {
   test(`[scope] ${scope} — sample of ${REPRESENTATIVE_SAMPLE}`, async ({
     page,
   }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(Math.max(120_000, REPRESENTATIVE_SAMPLE * (2_500 + INTER_ITEM_MS) + 60_000));
     const items = buildLocaleItems(mockLang, scope).slice(
       0,
       REPRESENTATIVE_SAMPLE,
@@ -646,11 +646,11 @@ for (const { scope, mockLang } of EXTENDED_SCOPES) {
 /* ---- Strategy sweep: test each masking strategy on a sample ---- */
 for (const strategy of STRATEGIES) {
   test(`[strategy] ${strategy} — cross-locale sample`, async ({ page }) => {
-    test.setTimeout(180_000);
     const sample: RunItem[] = [];
     for (const { items } of LOCALE_ITEMS) {
       sample.push(...items.slice(0, 5));
     }
+    test.setTimeout(Math.max(180_000, sample.length * (2_500 + INTER_ITEM_MS) + 60_000));
     if (sample.length === 0) return;
 
     await setupApiMock(page);
