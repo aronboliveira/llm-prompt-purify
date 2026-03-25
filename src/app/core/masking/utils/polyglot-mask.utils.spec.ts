@@ -1,14 +1,14 @@
 import {
   generatePolyglotMask,
   createDistinctPolyglotMask,
-  PolyglotMaskConfig,
   DEFAULT_POLYGLOT_CONFIG,
 } from "./polyglot-mask.utils";
+import type { PolyglotMaskConfig } from "./polyglot-mask.utils";
 import {
   ALL_POOLS,
   POOLS_BY_FAMILY,
-  WritingSystemFamily,
 } from "../constants/polyglot-pools.constants";
+import type { WritingSystemFamily } from "../constants/polyglot-pools.constants";
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -89,10 +89,7 @@ describe("generatePolyglotMask", () => {
     };
     const devanagariPool = ALL_POOLS.find(p => p.subtype === "devanagari")!;
     const keyboardPool = ALL_POOLS.find(p => p.subtype === "keyboard")!;
-    const excluded = new Set([
-      ...devanagariPool.chars,
-      ...keyboardPool.chars,
-    ]);
+    const excluded = new Set([...devanagariPool.chars, ...keyboardPool.chars]);
 
     const mask = generatePolyglotMask("A".repeat(200), config);
     for (const ch of mask) {
@@ -162,7 +159,11 @@ describe("createDistinctPolyglotMask", () => {
   it("returns a mask different from the previous one", () => {
     const value = "A".repeat(30);
     const first = createDistinctPolyglotMask(value);
-    const second = createDistinctPolyglotMask(value, DEFAULT_POLYGLOT_CONFIG, first);
+    const second = createDistinctPolyglotMask(
+      value,
+      DEFAULT_POLYGLOT_CONFIG,
+      first,
+    );
     // With 30 chars from a large pool, collision probability is negligible
     expect(second).not.toBe(first);
   });
