@@ -106,6 +106,113 @@
         </div>
       </details>
 
+      <!-- ── Polyglot mask alphabet ───────────────────────── -->
+
+      @if (advancedPreferences().maskingStrategy === 'random') {
+        <fieldset class="settings-fieldset">
+          <legend class="settings-fieldset__legend"
+            >Polyglot mask alphabet</legend
+          >
+          <p class="settings-fieldset__description">
+            When enabled, the random strategy mixes characters from different
+            Unicode writing systems (abugidas, syllabaries, alphabetics, and
+            symbols) so masks are visually unpredictable and can never form real
+            words in any language.
+          </p>
+
+          <label class="settings-toggle">
+            <input
+              type="checkbox"
+              data-testid="polyglot-mask-toggle"
+              [checked]="advancedPreferences().polyglotMaskEnabled"
+              (change)="onPolyglotEnabledToggle($event)"
+            />
+            <span class="settings-toggle__copy">
+              <span class="settings-toggle__title"
+                >Enable polyglot mask characters</span
+              >
+              <span class="settings-toggle__body">
+                Interleaves characters from multiple Unicode scripts. No two
+                consecutive characters share the same writing-system family.
+              </span>
+            </span>
+          </label>
+
+          @if (advancedPreferences().polyglotMaskEnabled) {
+            <div class="polyglot-family-grid">
+              @for (family of polyglotFamilyOrder; track family) {
+                <div class="polyglot-family-card">
+                  <label
+                    class="polyglot-family-toggle"
+                    [attr.data-family]="family"
+                  >
+                    <input
+                      type="checkbox"
+                      [attr.data-testid]="'polyglot-family-' + family"
+                      [checked]="isFamilyEnabled(family)"
+                      (change)="onPolyglotFamilyToggle($event, family)"
+                    />
+                    <span class="polyglot-family-toggle__content">
+                      <span class="polyglot-family-toggle__title">{{
+                        polyglotFamilyLabels[family]
+                      }}</span>
+                      <span class="polyglot-family-toggle__body">{{
+                        polyglotFamilyDescriptions[family]
+                      }}</span>
+                    </span>
+                  </label>
+
+                  @if (isFamilyEnabled(family)) {
+                    <div class="polyglot-subtype-list">
+                      @for (
+                        pool of poolsByFamily[family];
+                        track pool.subtype
+                      ) {
+                        <label
+                          class="polyglot-subtype-toggle"
+                          [attr.data-subtype]="pool.subtype"
+                        >
+                          <input
+                            type="checkbox"
+                            [attr.data-testid]="
+                              'polyglot-subtype-' + pool.subtype
+                            "
+                            [checked]="!isSubtypeExcluded(pool.subtype)"
+                            (change)="
+                              onPolyglotSubtypeToggle($event, pool.subtype)
+                            "
+                          />
+                          <span class="polyglot-subtype-toggle__label">{{
+                            pool.label
+                          }}</span>
+                          <span class="polyglot-subtype-toggle__sample">{{
+                            pool.chars.slice(0, 6)
+                          }}</span>
+                        </label>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <details class="settings-risk-note">
+              <summary class="settings-risk-note__summary">
+                <span aria-hidden="true">ℹ️</span>
+                <span>How it works</span>
+              </summary>
+              <p class="settings-fieldset__description">
+                Each masked character is drawn from a randomly selected enabled
+                pool, with the constraint that consecutive characters must come
+                from different writing-system families. This prevents accidental
+                real-word formation in any script. Structural separators
+                (spaces, dashes, dots) are preserved.
+              </p>
+            </details>
+          }
+        </fieldset>
+      }
+
       <!-- ── Detection scope ──────────────────────────────── -->
 
       <fieldset class="settings-fieldset">

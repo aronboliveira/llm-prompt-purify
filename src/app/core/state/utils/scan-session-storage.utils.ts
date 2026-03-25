@@ -193,6 +193,24 @@ export function loadPersistedAdvancedPreferences(): AdvancedMaskingPreferences {
             parsed.globalIgnoreList.filter(k => typeof k === "string"),
           )
         : DEFAULT_ADVANCED_PREFERENCES.globalIgnoreList,
+      polyglotMaskEnabled:
+        typeof parsed.polyglotMaskEnabled === "boolean"
+          ? parsed.polyglotMaskEnabled
+          : DEFAULT_ADVANCED_PREFERENCES.polyglotMaskEnabled,
+      polyglotEnabledFamilies: Array.isArray(parsed.polyglotEnabledFamilies)
+        ? Object.freeze(
+            parsed.polyglotEnabledFamilies.filter(
+              k => typeof k === "string",
+            ),
+          )
+        : DEFAULT_ADVANCED_PREFERENCES.polyglotEnabledFamilies,
+      polyglotExcludedSubtypes: Array.isArray(parsed.polyglotExcludedSubtypes)
+        ? Object.freeze(
+            parsed.polyglotExcludedSubtypes.filter(
+              k => typeof k === "string",
+            ),
+          )
+        : DEFAULT_ADVANCED_PREFERENCES.polyglotExcludedSubtypes,
     };
   } catch {
     return DEFAULT_ADVANCED_PREFERENCES;

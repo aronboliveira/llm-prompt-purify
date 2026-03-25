@@ -30,6 +30,17 @@ import {
   isIgnored,
   wrapInXmlTag,
 } from "./utils/mask-strategy.utils";
+import type { PolyglotMaskConfig } from "./utils/polyglot-mask.utils";
+
+function buildPolyglotConfig(
+  prefs?: AdvancedMaskingPreferences,
+): PolyglotMaskConfig | undefined {
+  if (!prefs?.polyglotMaskEnabled) return undefined;
+  return {
+    enabledFamilies: prefs.polyglotEnabledFamilies as PolyglotMaskConfig["enabledFamilies"],
+    excludedSubtypes: prefs.polyglotExcludedSubtypes as PolyglotMaskConfig["excludedSubtypes"],
+  };
+}
 
 export class MaskingEngine {
   public rebuild(
@@ -69,6 +80,7 @@ export class MaskingEngine {
   ): ScanResult {
     const fakerCounter =
         strategy === "faker" ? createFakerCounterState() : undefined,
+      polyglot = buildPolyglotConfig(advancedPrefs),
       nextMasks = new Map<string, string>(),
       updatedMatches = matches.map(match => {
         const nextMask =
@@ -80,6 +92,7 @@ export class MaskingEngine {
             strategy,
             nextMasks.get(match.value),
             fakerCounter,
+            polyglot,
           );
 
         nextMasks.set(match.value, nextMask);
@@ -104,6 +117,7 @@ export class MaskingEngine {
     // For single match regeneration with faker, create fresh counter (starts at 1)
     const fakerCounter =
         strategy === "faker" ? createFakerCounterState() : undefined,
+      polyglot = buildPolyglotConfig(advancedPrefs),
       nextMask = createMaskForStrategy(
         targetMatch.value,
         targetMatch.ruleId,
@@ -111,6 +125,7 @@ export class MaskingEngine {
         strategy,
         targetMatch.mask,
         fakerCounter,
+        polyglot,
       ),
       updatedMatches = matches.map(match =>
         match.value === targetMatch.value
@@ -131,6 +146,7 @@ export class MaskingEngine {
     const strategy = advancedPrefs?.maskingStrategy ?? "random",
       fakerCounter =
         strategy === "faker" ? createFakerCounterState() : undefined,
+      polyglot = buildPolyglotConfig(advancedPrefs),
       ignoreList = advancedPrefs?.globalIgnoreList ?? [],
       blocklist = advancedPrefs?.keywordBlocklist ?? [],
       maskTimestamps = advancedPrefs?.maskTimestamps ?? false,
@@ -169,6 +185,7 @@ export class MaskingEngine {
             strategy,
             undefined,
             fakerCounter,
+            polyglot,
           );
         maskByValue.set(candidate.value, mask);
 
@@ -211,6 +228,7 @@ export class MaskingEngine {
             strategy,
             undefined,
             fakerCounter,
+            polyglot,
           ),
           ruleId: "blocklist-keyword",
           start: hit.start,

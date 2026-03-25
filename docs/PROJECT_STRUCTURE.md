@@ -103,14 +103,29 @@ Pattern-based PII detection and masking engine. Supports multiple locales (US, B
 ```
 masking/
 ├── constants/           # Pattern definitions, locale configs
+│   └── polyglot-pools.constants.ts  # Unicode character pools (21 scripts)
 ├── declarations/        # ScanMatch, MaskResult types
 ├── strategies/          # Strategy pattern for mask generation
 │   ├── strategy-registry.ts
 │   └── masking-strategy.interface.ts
 ├── utils/               # Luhn generation, mask formatting
+│   └── polyglot-mask.utils.ts       # Polyglot mask generator
 ├── masking.engine.ts    # Main engine class (deterministic, pure)
-└── masking.engine.*.spec.ts # Exhaustive test suite (1300+ tests)
+└── masking.engine.*.spec.ts # Exhaustive test suite (1400+ tests)
 ```
+
+#### Polyglot Mask Alphabet
+
+When the "random" strategy is active, users can opt into **polyglot masking** — masks built from characters drawn across four Unicode writing-system families:
+
+| Family       | Scripts included                                      |
+| ------------ | ----------------------------------------------------- |
+| Abugida      | Devanagari, Bengali, Tamil, Telugu, Gujarati, Kannada, Thai |
+| Alphabetic   | Cyrillic, Extended Latin, Armenian, Georgian           |
+| Syllabary    | Katakana, Hiragana, Hangul Jamo, Ethiopic             |
+| Symbol       | Keyboard, Math, Arrows, Geometric, Box-drawing, Misc  |
+
+Key invariant: **no two consecutive characters may come from the same family**, making it impossible for masked output to form real words in any language. Users can enable/disable families and exclude specific subtypes via the Masking Settings modal.
 
 ### Purification Module (`core/purification/`)
 

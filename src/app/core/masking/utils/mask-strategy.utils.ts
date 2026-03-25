@@ -15,6 +15,8 @@ import type {
   XmlWrapTag,
 } from "../declarations/masking.types";
 import { createDistinctMask } from "./mask-format.utils";
+import type { PolyglotMaskConfig } from "./polyglot-mask.utils";
+import { createDistinctPolyglotMask } from "./polyglot-mask.utils";
 
 // ─── Tag Strategy ────────────────────────────────────────────────────────────
 
@@ -249,6 +251,7 @@ function shouldForceNumericComplianceMask(
  * @param strategy - The masking strategy to use
  * @param previousMask - For "random" strategy, avoids generating the same mask
  * @param fakerCounterState - For "faker" strategy, tracks category counters
+ * @param polyglotConfig - For "random" strategy with polyglot enabled
  */
 export function createMaskForStrategy(
   value: string,
@@ -257,6 +260,7 @@ export function createMaskForStrategy(
   strategy: MaskingStrategy,
   previousMask?: string,
   fakerCounterState?: FakerCounterState,
+  polyglotConfig?: PolyglotMaskConfig,
 ): string {
   if (shouldForceNumericComplianceMask(value, category)) {
     return createNumericComplianceMask(value);
@@ -302,7 +306,9 @@ export function createMaskForStrategy(
       return createRedactedMask(value);
     case "random":
     default:
-      return createDistinctMask(value, previousMask);
+      return polyglotConfig
+        ? createDistinctPolyglotMask(value, polyglotConfig, previousMask)
+        : createDistinctMask(value, previousMask);
   }
 }
 

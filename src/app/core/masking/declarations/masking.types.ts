@@ -193,4 +193,27 @@ export interface AdvancedMaskingPreferences {
    * Stored as-is; matching is case-insensitive.
    */
   globalIgnoreList: readonly string[];
+
+  /**
+   * When true, the "random" strategy uses a polyglot mask generator
+   * that interleaves characters from multiple Unicode writing systems
+   * (abugidas, syllabaries, alphabetics, symbols) instead of plain
+   * ASCII same-class replacement.
+   *
+   * Default: false
+   */
+  polyglotMaskEnabled: boolean;
+
+  /**
+   * Which writing-system families are allowed in polyglot masks.
+   * Only relevant when `polyglotMaskEnabled` is true.
+   */
+  polyglotEnabledFamilies: readonly string[];
+
+  /**
+   * Specific script subtypes to exclude even if their family is enabled.
+   * For example, exclude "devanagari" while keeping the rest of the
+   * "abugida" family.
+   */
+  polyglotExcludedSubtypes: readonly string[];
 }

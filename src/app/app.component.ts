@@ -332,6 +332,20 @@ export class AppComponent {
     this.#scanSession.setXmlWrapTag(tag);
   }
 
+  protected updatePolyglotEnabled(enabled: boolean): void {
+    this.#scanSession.setPolyglotEnabled(enabled);
+  }
+
+  protected updatePolyglotFamilies(families: readonly string[]): void {
+    this.#scanSession.setPolyglotFamilies(families);
+  }
+
+  protected updatePolyglotExcludedSubtypes(
+    subtypes: readonly string[],
+  ): void {
+    this.#scanSession.setPolyglotExcludedSubtypes(subtypes);
+  }
+
   protected scopeCopy(): string {
     const selectedCountrySummary = this.selectedCountrySummary();
 

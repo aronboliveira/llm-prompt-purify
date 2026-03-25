@@ -220,6 +220,16 @@ These components use **`.module.scss`** files for globally-scoped styles, as the
 | `CountryScopeModalComponent`    | `country-scope-modal.module.scss`    |
 | `MaskingSettingsModalComponent` | `masking-settings-modal.module.scss` |
 
+#### MaskingSettingsModalComponent — Polyglot Outputs
+
+The modal exposes three additional outputs for the polyglot mask alphabet feature (active when the masking strategy is "random"):
+
+| Output                           | Type                          | Description                                  |
+| -------------------------------- | ----------------------------- | -------------------------------------------- |
+| `polyglotEnabledChanged`         | `EventEmitter<boolean>`       | Emits when the polyglot toggle is flipped    |
+| `polyglotFamiliesChanged`        | `EventEmitter<readonly string[]>` | Emits with the updated list of enabled families |
+| `polyglotExcludedSubtypesChanged`| `EventEmitter<readonly string[]>` | Emits with the updated list of excluded subtypes |
+
 ### Why `.module.scss`?
 
 Angular's view encapsulation adds attribute selectors to component styles, but this breaks for:

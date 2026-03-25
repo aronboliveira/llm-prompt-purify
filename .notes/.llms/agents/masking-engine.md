@@ -27,3 +27,4 @@ Own token detection, match normalization, mask generation, and final masked-outp
 - Normalized match model
 - Mask generation helpers
 - Final output assembler that recomputes masked text from current toggle state
+- Polyglot mask alphabet: optional Unicode masking mode that interleaves characters from abugidas, syllabaries, alphabetic scripts, and symbols with the constraint that no two consecutive characters share the same writing-system family

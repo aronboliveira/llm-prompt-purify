@@ -488,4 +488,12 @@ export const DEFAULT_ADVANCED_PREFERENCES: Readonly<AdvancedMaskingPreferences> 
     maskTimestamps: false,
     keywordBlocklist: Object.freeze([]),
     globalIgnoreList: Object.freeze([]),
+    polyglotMaskEnabled: false,
+    polyglotEnabledFamilies: Object.freeze([
+      "abugida",
+      "alphabetic",
+      "syllabary",
+      "symbol",
+    ]),
+    polyglotExcludedSubtypes: Object.freeze([]),
   });

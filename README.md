@@ -16,6 +16,7 @@
 - **Local Processing**: No data is ever sent to external servers. The scanning happens entirely in your browser.
 - **Real-Time Interception**: Listens to keystrokes and pastes via DOM Observers.
 - **Robust Rule Engine**: Detects API Keys, Credit Cards, Brazilian IDs (CPF/CNPJ), Emails, IPs, and more using regex and heuristic fuzzing.
+- **Polyglot Mask Alphabet**: Optional Unicode masking mode interleaves characters from abugidas, syllabaries, Cyrillic/Armenian/Georgian, and math/arrow symbols — no two consecutive characters share the same writing-system family, making output impossible to decode.
 - **Lightweight**: Pure TypeScript/Vanilla DOM implementation. Zero heavy frameworks.
 - **Security Purification**: Detects and neutralizes XSS, SQL injection, XXE, and path traversal attacks in user content.
 

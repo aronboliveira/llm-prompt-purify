@@ -548,7 +548,10 @@ export class ScanSessionService {
     if (
       prefs.keywordBlocklist !== undefined ||
       prefs.globalIgnoreList !== undefined ||
-      prefs.maskingStrategy !== undefined
+      prefs.maskingStrategy !== undefined ||
+      prefs.polyglotMaskEnabled !== undefined ||
+      prefs.polyglotEnabledFamilies !== undefined ||
+      prefs.polyglotExcludedSubtypes !== undefined
     ) {
       this.scheduleRefresh();
     }
@@ -572,6 +575,20 @@ export class ScanSessionService {
 
   public updateGlobalIgnoreList(terms: readonly string[]): void {
     this.setAdvancedPreferences({ globalIgnoreList: [...terms] });
+  }
+
+  public setPolyglotEnabled(enabled: boolean): void {
+    this.setAdvancedPreferences({ polyglotMaskEnabled: enabled });
+  }
+
+  public setPolyglotFamilies(families: readonly string[]): void {
+    this.setAdvancedPreferences({ polyglotEnabledFamilies: [...families] });
+  }
+
+  public setPolyglotExcludedSubtypes(subtypes: readonly string[]): void {
+    this.setAdvancedPreferences({
+      polyglotExcludedSubtypes: [...subtypes],
+    });
   }
 
   #setPhase(phase: ScanPhase): void {
