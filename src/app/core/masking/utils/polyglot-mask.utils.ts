@@ -13,7 +13,7 @@ import type {
   WritingSystemFamily,
   WritingSystemSubtype,
 } from "../constants/polyglot-pools.constants";
-import { ALL_POOLS, POOLS_BY_FAMILY } from "../constants/polyglot-pools.constants";
+import { ALL_POOLS } from "../constants/polyglot-pools.constants";
 
 // ─── Configuration ───────────────────────────────────────────────────────────
 
