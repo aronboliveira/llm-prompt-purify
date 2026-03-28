@@ -13,9 +13,18 @@ using LLMPromptPurify.Api.Features.MaskSafety.Contracts;
 using LLMPromptPurify.Api.Features.MaskSafety.Services;
 using MongoDB.Driver;
 
-if (BsonSerializer.LookupSerializer<Guid>() == null)
+if (!BsonClassMap.IsClassMapRegistered(typeof(FeedbackEntry)))
 {
-    BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
+    try
+    {
+        BsonClassMap.RegisterClassMap<FeedbackEntry>(cm =>
+        {
+            cm.AutoMap();
+            cm.MapIdMember(c => c.Id)
+              .SetSerializer(new GuidSerializer(BsonType.String));
+        });
+    }
+    catch (ArgumentException) { /* Already registered by a concurrent startup (e.g. parallel xUnit fixtures) */ }
 }
 var builder = WebApplication.CreateBuilder(args);
 
