@@ -61,7 +61,8 @@ const REPRESENTATIVE_SAMPLE = 10;
 
 const MOCK_ROOT = join(process.cwd(), ".tmp", "input-mocks");
 const NOTES_DIR = join(process.cwd(), ".notes");
-const REPORT_DIR = join(process.cwd(), ".tmp", "copilot", "reports-20260307");
+const REPORT_TAG = process.env["REPORT_TAG"] ?? "reports-20260307";
+const REPORT_DIR = join(process.cwd(), ".tmp", "copilot", REPORT_TAG);
 const RESULTS_FILE = join(REPORT_DIR, "browselite-results.json");
 
 const samplePerLanguage = Number(process.env["MOCK_SAMPLE_PER_LANG"] ?? "0");
