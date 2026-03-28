@@ -630,7 +630,20 @@ Generation Date: 2024-{month:02d}-{day:02d}
         ]
         
         while len(section_texts) < 3:
-            section_texts.append("(Nenhum dado adicional identificado)")
+            no_data_labels = {
+                "pt-br": "(Nenhum dado adicional identificado)",
+                "es": "(Sin datos adicionales identificados)",
+                "zh": "(未发现其他数据)",
+                "en": "(No additional data identified)",
+            }
+            section_texts.append(no_data_labels.get(lang, "(No additional data identified)"))
+        
+        severity_labels = {
+            "pt-br": ["CRÍTICA", "ALTA", "MÉDIA"],
+            "es": ["CRÍTICA", "ALTA", "MEDIA"],
+            "zh": ["严重", "高", "中等"],
+            "en": ["CRITICAL", "HIGH", "MEDIUM"],
+        }
         
         return templates[lang].format(
             id=random.randint(1000, 9999),
@@ -638,7 +651,7 @@ Generation Date: 2024-{month:02d}-{day:02d}
             day=random.randint(1, 28),
             hour=random.randint(0, 23),
             minute=random.randint(0, 59),
-            severity=random.choice(["CRÍTICA", "ALTA", "MÉDIA"]),
+            severity=random.choice(severity_labels.get(lang, ["CRITICAL", "HIGH", "MEDIUM"])),
             analyst=name_generator(lang),
             ip=f"{random.randint(1,255)}.{random.randint(1,255)}.{random.randint(1,255)}.{random.randint(1,255)}",
             systems=random.randint(3, 15),

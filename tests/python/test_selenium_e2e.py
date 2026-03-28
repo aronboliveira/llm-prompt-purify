@@ -687,15 +687,8 @@ class TestSafePassthrough:
         out = _get_output_text(driver)
         assert "function add" in out
 
-    @pytest.mark.xfail(
-        reason="Known issue: URLs without credentials may be masked due to overly broad patterns"
-    )
     def test_urls_without_credentials_not_masked(self, driver: webdriver.Chrome) -> None:
-        """KNOWN ISSUE: URLs without sensitive data are sometimes masked.
-        
-        This is a false positive where URL components trigger email-like patterns.
-        To fix: Add URL exclusion logic to prevent masking safe URLs.
-        """
+        """URLs without sensitive data should not be masked."""
         _fill_textarea(driver, "Visit https://example.com/docs?page=1 for details")
         _wait_for_masking(driver)
         out = _get_output_text(driver)
