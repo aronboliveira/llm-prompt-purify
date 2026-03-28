@@ -50,7 +50,9 @@ describe("MaskSafetyHardeningService", () => {
         })),
       },
       service = new MaskSafetyHardeningService(client),
-      result = await service.hardenMatches([createMatch("identifier:0", "us-ssn", initialMask)]);
+      result = await service.hardenMatches([
+        createMatch("identifier:0", "us-ssn", initialMask),
+      ]);
 
     expect(result.matches[0].mask).toBe(initialMask);
   });
@@ -64,11 +66,13 @@ describe("MaskSafetyHardeningService", () => {
             results: request.candidates.map(candidate => ({
               candidateValue: candidate.candidateValue,
               decision:
-                validationCallCount <= MASK_SAFETY_LIMITS.maxAttemptsPerCandidate
+                validationCallCount <=
+                MASK_SAFETY_LIMITS.maxAttemptsPerCandidate
                   ? MASK_SAFETY_DECISIONS.compromising
                   : MASK_SAFETY_DECISIONS.safe,
               isCompromising:
-                validationCallCount <= MASK_SAFETY_LIMITS.maxAttemptsPerCandidate,
+                validationCallCount <=
+                MASK_SAFETY_LIMITS.maxAttemptsPerCandidate,
               isSupported: true,
               message: "",
               ruleId: candidate.ruleId,
@@ -78,9 +82,13 @@ describe("MaskSafetyHardeningService", () => {
       },
       service = new MaskSafetyHardeningService(client),
       initialMask = "GB29NWBK60161331926819",
-      result = await service.hardenMatches([createMatch("financial:0", "iban", initialMask)]);
+      result = await service.hardenMatches([
+        createMatch("financial:0", "iban", initialMask),
+      ]);
 
-    expect(validationCallCount).toBe(MASK_SAFETY_LIMITS.maxAttemptsPerCandidate + 1);
+    expect(validationCallCount).toBe(
+      MASK_SAFETY_LIMITS.maxAttemptsPerCandidate + 1,
+    );
     expect(result.matches[0].mask).not.toBe(initialMask);
   });
 });
@@ -97,6 +105,7 @@ function createMatch(id: string, ruleId: string, mask: string): ScanMatch {
     locale: "shared",
     locked: false,
     mask,
+    matchTags: [],
     ruleId,
     start: 0,
     value: mask,

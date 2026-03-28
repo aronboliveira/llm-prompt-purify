@@ -307,6 +307,75 @@ export const SCOPE_BOUNDARY_MASK_FIXTURES: readonly BoundaryMaskFixture[] =
       hiddenValues: ["529.982.247-25", "245716840"],
       sourceText: ["CPF: 529.982.247-25", "NIF: 245716840"].join("\n"),
     },
+    {
+      countryProfileIds: ["cl"],
+      description: "masks 'DNI del Responsable' label in Chilean locale",
+      expectedRuleIds: ["dni-labeled"],
+      hiddenValues: ["45678901"],
+      sourceText: "DNI del Responsable: 45678901",
+    },
+    {
+      countryProfileIds: ["mx"],
+      description:
+        "masks 'DNI del Responsable' label with 8 digits in Mexican locale",
+      expectedRuleIds: ["dni-labeled"],
+      hiddenValues: ["12345678"],
+      sourceText: "DNI del responsable: 12345678",
+    },
+    {
+      countryProfileIds: ["cl"],
+      description:
+        "masks NIE values in Chilean locale via expanded latam-es scoping",
+      expectedRuleIds: ["es-nie-labeled"],
+      hiddenValues: ["X1234567L"],
+      sourceText: "NIE: X1234567L",
+    },
+    {
+      countryProfileIds: ["ar"],
+      description: "masks hyphenated CUIT in Argentine locale",
+      expectedRuleIds: ["cuit"],
+      hiddenValues: ["20-12345678-6"],
+      sourceText: "CUIT 20-12345678-6",
+    },
+    {
+      countryProfileIds: ["ar"],
+      description: "masks labeled unhyphenated CUIT/CUIL in Argentine locale",
+      expectedRuleIds: ["cuit-global-labeled"],
+      hiddenValues: ["27345678900"],
+      sourceText: "CUIL: 27345678900",
+    },
+    {
+      countryProfileIds: ["pt"],
+      description:
+        "masks RG label globally even when Portugal (not Brazil) is selected",
+      expectedRuleIds: ["rg-global-labeled"],
+      hiddenValues: ["12.345.678-9"],
+      sourceText: "RG: 12.345.678-9",
+    },
+    {
+      countryProfileIds: ["pt"],
+      description:
+        "masks CEP label globally even when Portugal (not Brazil) is selected",
+      expectedRuleIds: ["cep-global-labeled"],
+      hiddenValues: ["01310-100"],
+      sourceText: "CEP: 01310-100",
+    },
+    {
+      countryProfileIds: ["ru"],
+      description:
+        "masks EIN label globally even when Russia is the selected locale",
+      expectedRuleIds: ["ein-global-labeled"],
+      hiddenValues: ["47-2567754"],
+      sourceText: "EIN: 47-2567754",
+    },
+    {
+      countryProfileIds: ["ru"],
+      description:
+        "masks RUC label globally even when Russia is the selected locale",
+      expectedRuleIds: ["ruc-global-labeled"],
+      hiddenValues: ["20123456786"],
+      sourceText: "RUC: 20123456786",
+    },
   ]);
 
 export const FUZZY_LABEL_MASK_FIXTURES: readonly LocaleMaskFixture[] =

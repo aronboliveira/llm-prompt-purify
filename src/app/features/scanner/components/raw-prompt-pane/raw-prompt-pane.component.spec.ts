@@ -59,7 +59,41 @@ describe("RawPromptPaneComponent", () => {
     textarea.value = "New text";
     textarea.dispatchEvent(new Event("input"));
 
-    expect(emitSpy).toHaveBeenCalledWith("New text");
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ value: "New text" }),
+    );
+  });
+
+  it("should include inputType from InputEvent in sourceTextChanged payload", () => {
+    fixture.detectChanges();
+    const emitSpy = jest.spyOn(component.sourceTextChanged, "emit");
+
+    // JSDOM does not honour InputEventInit.inputType; call the handler
+    // directly via bracket notation to exercise the adaptive-debounce path.
+    const c = component as any;
+    c.onInput({ inputType: "insertFromPaste" });
+    c.updateSourceText("Pasted content");
+
+    expect(emitSpy).toHaveBeenCalledWith({
+      value: "Pasted content",
+      inputType: "insertFromPaste",
+      isComposing: false,
+    });
+  });
+
+  it("should emit undefined inputType when input is a non-InputEvent", () => {
+    fixture.detectChanges();
+    const emitSpy = jest.spyOn(component.sourceTextChanged, "emit");
+
+    const textarea = element.querySelector(".editor") as HTMLTextAreaElement;
+    textarea.value = "Programmatic";
+    textarea.dispatchEvent(new Event("input"));
+
+    expect(emitSpy).toHaveBeenCalledWith({
+      value: "Programmatic",
+      inputType: undefined,
+      isComposing: false,
+    });
   });
 
   it("should display character count", () => {

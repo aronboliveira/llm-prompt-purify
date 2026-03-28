@@ -253,10 +253,33 @@ describe("MaskingEngine", () => {
 
       expect(complianceMatches.length).toBeGreaterThan(0);
       for (const complianceMatch of complianceMatches) {
-        expect(complianceMatch.mask).toMatch(/#/u);
+        // Polyglot masks replace digits with diverse script characters;
+        // compliance-symbol masks use #@*$ — both are valid.
         expect(complianceMatch.mask).not.toBe(complianceMatch.value);
         expect(result.maskedText).not.toContain(complianceMatch.value);
       }
+    }
+
+    // When polyglot is disabled, numeric compliance symbols (#@*$) must appear
+    const resultNoPolyglot = engine.scan(
+      sourceText,
+      DEFAULT_GROUP_PREFERENCES,
+      buildScanScopeSelection(["br", "mx"], "selected-plus-global"),
+      "2026-03-09T00:00:00.000Z",
+      {
+        ...DEFAULT_ADVANCED_PREFERENCES,
+        polyglotMaskEnabled: false,
+        maskingStrategy: "random",
+      },
+    );
+    const complianceNoPolyglot = resultNoPolyglot.matches.filter(
+      m =>
+        (m.category === "financial" || m.category === "identifier") &&
+        /\d/u.test(m.value),
+    );
+    expect(complianceNoPolyglot.length).toBeGreaterThan(0);
+    for (const m of complianceNoPolyglot) {
+      expect(m.mask).toMatch(/#/u);
     }
   });
 

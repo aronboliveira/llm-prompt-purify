@@ -55,6 +55,14 @@ export const BR_CPF_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
     hiddenValues: ["529.982.247-25", "joao@empresa.com.br"],
     sourceText: "CPF: 529.982.247-25 — Email: joao@empresa.com.br",
   },
+  {
+    countryProfileIds: ["br"],
+    description:
+      "masks CPF with invalid check digits via labeled-loose structural fallback",
+    expectedRuleIds: ["cpf-labeled-loose"],
+    hiddenValues: ["529.982.247-99"],
+    sourceText: "CPF: 529.982.247-99",
+  },
 ]);
 
 // ─── Negative: CPF ──────────────────────────────────────────────────────────
@@ -65,13 +73,6 @@ export const BR_CPF_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([
     excludedRuleIds: ["cpf"],
     sourceText: "CPF: 111.111.111-11",
     visibleValues: ["111.111.111-11"],
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "ignores CPF with invalid check digits (529.982.247-99)",
-    excludedRuleIds: ["cpf"],
-    sourceText: "CPF: 529.982.247-99",
-    visibleValues: ["529.982.247-99"],
   },
   {
     countryProfileIds: ["br"],
@@ -113,6 +114,14 @@ export const BR_CNPJ_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
     sourceText:
       "Nota fiscal emitida pelo fornecedor CNPJ 11.222.333/0001-81 no mês de março.",
   },
+  {
+    countryProfileIds: ["br"],
+    description:
+      "masks CNPJ with invalid check digits via labeled-loose structural fallback",
+    expectedRuleIds: ["cnpj-labeled-loose"],
+    hiddenValues: ["11.222.333/0001-99"],
+    sourceText: "CNPJ: 11.222.333/0001-99",
+  },
 ]);
 
 // ─── Negative: CNPJ ─────────────────────────────────────────────────────────
@@ -123,13 +132,6 @@ export const BR_CNPJ_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([
     excludedRuleIds: ["cnpj"],
     sourceText: "CNPJ: 11.111.111/1111-11",
     visibleValues: ["11.111.111/1111-11"],
-  },
-  {
-    countryProfileIds: ["br"],
-    description: "ignores CNPJ with invalid check digits",
-    excludedRuleIds: ["cnpj"],
-    sourceText: "CNPJ: 11.222.333/0001-99",
-    visibleValues: ["11.222.333/0001-99"],
   },
 ]);
 
@@ -267,7 +269,9 @@ export const BR_PIS_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
 ]);
 
 // ─── Negative: PIS/PASEP ────────────────────────────────────────────────────
-export const BR_PIS_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([]);
+export const BR_PIS_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze(
+  [],
+);
 
 // ─── Positive: RG labeled ───────────────────────────────────────────────────
 export const BR_RG_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([

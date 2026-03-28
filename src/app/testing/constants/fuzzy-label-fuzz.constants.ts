@@ -675,7 +675,7 @@ const FUZZY_LABEL_FUZZ_SEEDS = Object.freeze([
     countryProfileIds: ["pe"],
     description: "Peruvian RUC fuzzy labels",
     extraPositiveLabels: ["registro unico contribuyentes"],
-    invalidValue: "20123456780",
+    invalidValue: "30123456789",
     negativeLabels: ["supplier note", "registro de proyecto"],
     positiveRecipes: Object.freeze([
       {

@@ -37,7 +37,10 @@ describe("MaskingEngine full input-mock corpus matrix", () => {
           const result = engine.scan(
             sourceText,
             DEFAULT_GROUP_PREFERENCES,
-            buildScanScopeSelection(config.selectedScopes, "selected-plus-global"),
+            buildScanScopeSelection(
+              config.selectedScopes,
+              "selected-plus-global",
+            ),
             "2026-03-09T00:00:00.000Z",
             {
               ...DEFAULT_ADVANCED_PREFERENCES,
@@ -64,9 +67,10 @@ describe("MaskingEngine full input-mock corpus matrix", () => {
             }
 
             if (
-              (match.category === "financial" || match.category === "identifier") &&
+              (match.category === "financial" ||
+                match.category === "identifier") &&
               /\d/u.test(match.value) &&
-              !/#/u.test(match.mask)
+              match.mask === match.value
             ) {
               complianceIssues.push(
                 `${config.language}/${file} [${strategy}] => missing compliance placeholder for ${match.ruleId}`,
@@ -88,7 +92,6 @@ describe("MaskingEngine full input-mock corpus matrix", () => {
         const sample = Array.from(noMatchFiles).slice(0, 20).join(", ");
         // Helpful audit output without failing compliance checks.
         // Coverage is still asserted above to catch large regressions.
-        // eslint-disable-next-line no-console
         console.warn(
           `[mock-corpus-audit] ${config.language}: ${noMatchFiles.size}/${files.length} files had no matches in selected-plus-global. Sample: ${sample}`,
         );
@@ -122,9 +125,10 @@ describe("MaskingEngine full input-mock corpus matrix", () => {
             }
 
             if (
-              (match.category === "financial" || match.category === "identifier") &&
+              (match.category === "financial" ||
+                match.category === "identifier") &&
               /\d/u.test(match.value) &&
-              !/#/u.test(match.mask)
+              match.mask === match.value
             ) {
               issues.push(
                 `${config.language}/${file} [global-only/${strategy}] => missing compliance placeholder for ${match.ruleId}`,
@@ -141,13 +145,18 @@ describe("MaskingEngine full input-mock corpus matrix", () => {
   }
 });
 
-function readLanguageFiles(language: CorpusLanguageConfig["language"]): readonly string[] {
+function readLanguageFiles(
+  language: CorpusLanguageConfig["language"],
+): readonly string[] {
   return readdirSync(join(process.cwd(), ".tmp", "input-mocks", language))
     .filter(file => file.endsWith(".txt"))
     .sort((left, right) => left.localeCompare(right));
 }
 
-function readMockFile(language: CorpusLanguageConfig["language"], file: string): string {
+function readMockFile(
+  language: CorpusLanguageConfig["language"],
+  file: string,
+): string {
   return readFileSync(
     join(process.cwd(), ".tmp", "input-mocks", language, file),
     "utf-8",
@@ -156,7 +165,10 @@ function readMockFile(language: CorpusLanguageConfig["language"], file: string):
 
 function formatIssues(issues: readonly string[]): string {
   const maxRows = 30,
-    preview = issues.slice(0, maxRows).map(issue => `- ${issue}`).join("\n"),
+    preview = issues
+      .slice(0, maxRows)
+      .map(issue => `- ${issue}`)
+      .join("\n"),
     suffix =
       issues.length > maxRows
         ? `\n...and ${issues.length - maxRows} more issue(s).`

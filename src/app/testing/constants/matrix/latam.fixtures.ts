@@ -282,6 +282,14 @@ export const PE_RUC_POSITIVE: readonly LocaleMaskFixture[] = Object.freeze([
     hiddenValues: ["20123456786"],
     sourceText: "RUC: 20123456786",
   },
+  {
+    countryProfileIds: ["pe"],
+    description:
+      "masks RUC with bad check digit via labeled-loose structural fallback",
+    expectedRuleIds: ["ruc-labeled-loose"],
+    hiddenValues: ["20123456780"],
+    sourceText: "RUC: 20123456780",
+  },
 ]);
 
 // ─── Negative: RUC ──────────────────────────────────────────────────────────
@@ -292,13 +300,6 @@ export const PE_RUC_NEGATIVE: readonly NegativeMaskFixture[] = Object.freeze([
     excludedRuleIds: ["ruc-labeled"],
     sourceText: "RUC: 30123456789",
     visibleValues: ["30123456789"],
-  },
-  {
-    countryProfileIds: ["pe"],
-    description: "ignores RUC with bad check digit",
-    excludedRuleIds: ["ruc-labeled"],
-    sourceText: "RUC: 20123456780",
-    visibleValues: ["20123456780"],
   },
 ]);
 
