@@ -61,7 +61,7 @@ export class MaskingSettingsModalComponent {
     keywordBlocklist: [],
     maskingStrategy: "random",
     maskTimestamps: false,
-    polyglotMaskEnabled: false,
+    polyglotMaskEnabled: true,
     polyglotEnabledFamilies: ["abugida", "alphabetic", "syllabary", "symbol"],
     polyglotExcludedSubtypes: [],
     xmlWrapEnabled: false,

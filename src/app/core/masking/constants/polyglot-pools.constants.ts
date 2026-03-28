@@ -10,55 +10,23 @@
 
 // ─── Writing System Taxonomy ─────────────────────────────────────────────────
 
-export type WritingSystemFamily =
-  | "abugida"
-  | "alphabetic"
-  | "syllabary"
-  | "symbol";
+import type {
+  CharacterPool,
+  WritingSystemFamily,
+  WritingSystemSubtype,
+} from "../declarations/polyglot-pools.types";
 
-export type AbugidaSubtype =
-  | "bengali"
-  | "devanagari"
-  | "gujarati"
-  | "kannada"
-  | "tamil"
-  | "telugu"
-  | "thai";
-
-export type AlphabeticSubtype =
-  | "armenian"
-  | "cyrillic"
-  | "georgian"
-  | "latin";
-
-export type SyllabarySubtype =
-  | "ethiopic"
-  | "hangul"
-  | "hiragana"
-  | "katakana";
-
-export type SymbolSubtype =
-  | "arrows"
-  | "box-drawing"
-  | "geometric"
-  | "keyboard"
-  | "math"
-  | "misc";
-
-export type WritingSystemSubtype =
-  | AbugidaSubtype
-  | AlphabeticSubtype
-  | SyllabarySubtype
-  | SymbolSubtype;
+export type {
+  AbugidaSubtype,
+  AlphabeticSubtype,
+  CharacterPool,
+  SyllabarySubtype,
+  SymbolSubtype,
+  WritingSystemFamily,
+  WritingSystemSubtype,
+} from "../declarations/polyglot-pools.types";
 
 // ─── Pool Definition ─────────────────────────────────────────────────────────
-
-export interface CharacterPool {
-  readonly family: WritingSystemFamily;
-  readonly subtype: WritingSystemSubtype;
-  readonly label: string;
-  readonly chars: string;
-}
 
 // ─── Abugidas ────────────────────────────────────────────────────────────────
 
@@ -131,7 +99,8 @@ const ARMENIAN: CharacterPool = {
   family: "alphabetic",
   subtype: "armenian",
   label: "Armenian",
-  chars: "ԱԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՍՎՏՐՑՒՓՔՕՖաբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցւփքօֆ",
+  chars:
+    "ԱԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՍՎՏՐՑՒՓՔՕՖաբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցւփքօֆ",
 };
 
 const GEORGIAN: CharacterPool = {
@@ -147,21 +116,24 @@ const KATAKANA: CharacterPool = {
   family: "syllabary",
   subtype: "katakana",
   label: "Katakana",
-  chars: "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン",
+  chars:
+    "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン",
 };
 
 const HIRAGANA: CharacterPool = {
   family: "syllabary",
   subtype: "hiragana",
   label: "Hiragana",
-  chars: "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわん",
+  chars:
+    "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわん",
 };
 
 const HANGUL: CharacterPool = {
   family: "syllabary",
   subtype: "hangul",
   label: "Hangul Jamo",
-  chars: "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ",
+  chars:
+    "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ",
 };
 
 const ETHIOPIC: CharacterPool = {
@@ -258,9 +230,7 @@ export const ALL_POOLS: readonly CharacterPool[] = Object.freeze([
 ]);
 
 export const POOL_BY_SUBTYPE: Readonly<Record<string, CharacterPool>> =
-  Object.freeze(
-    Object.fromEntries(ALL_POOLS.map(p => [p.subtype, p])),
-  );
+  Object.freeze(Object.fromEntries(ALL_POOLS.map(p => [p.subtype, p])));
 
 export const POOLS_BY_FAMILY: Readonly<
   Record<WritingSystemFamily, readonly CharacterPool[]>

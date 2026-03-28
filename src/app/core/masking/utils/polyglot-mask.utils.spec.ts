@@ -8,7 +8,10 @@ import {
   ALL_POOLS,
   POOLS_BY_FAMILY,
 } from "../constants/polyglot-pools.constants";
-import type { WritingSystemFamily } from "../constants/polyglot-pools.constants";
+import type {
+  WritingSystemFamily,
+  WritingSystemSubtype,
+} from "../constants/polyglot-pools.constants";
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -23,7 +26,41 @@ function charFamilyMap(): Map<string, WritingSystemFamily> {
   return map;
 }
 
+function charSubtypeMap(): Map<string, WritingSystemSubtype> {
+  const map = new Map<string, WritingSystemSubtype>();
+  for (const pool of ALL_POOLS) {
+    for (const ch of pool.chars) {
+      map.set(ch, pool.subtype);
+    }
+  }
+  return map;
+}
+
+type WeightTier = "digital" | "figure" | "script";
+
+const DIGITAL_SUBTYPES = new Set<WritingSystemSubtype>(["keyboard"]);
+const FIGURE_SUBTYPES = new Set<WritingSystemSubtype>([
+  "arrows",
+  "box-drawing",
+  "geometric",
+  "math",
+  "misc",
+]);
+const SCRIPT_FAMILIES = new Set<WritingSystemFamily>(["abugida", "syllabary"]);
+
+function tierOfChar(ch: string): WeightTier | undefined {
+  const sub = SUBTYPE_BY_CHAR.get(ch);
+  if (!sub) return undefined;
+  if (DIGITAL_SUBTYPES.has(sub)) return "digital";
+  if (FIGURE_SUBTYPES.has(sub)) return "figure";
+  const fam = FAMILY_BY_CHAR.get(ch);
+  if (fam && SCRIPT_FAMILIES.has(fam)) return "script";
+  // Alphabetic chars that survived filtering are treated as script
+  return "script";
+}
+
 const FAMILY_BY_CHAR = charFamilyMap();
+const SUBTYPE_BY_CHAR = charSubtypeMap();
 const SEPARATOR_RE = /[\s\-./:\\,;=|()[\]{}<>'"_]/;
 
 function familyOf(ch: string): WritingSystemFamily | undefined {
@@ -51,7 +88,7 @@ describe("generatePolyglotMask", () => {
     expect(mask[11]).toBe("/");
   });
 
-  it("never produces two consecutive characters from the same family", () => {
+  it("never produces two consecutive script characters from the same family (alphabetic/syllabary/abugida)", () => {
     // Run with a decently long input for statistical confidence
     const input = "A".repeat(120);
     const mask = generatePolyglotMask(input);
@@ -61,7 +98,8 @@ describe("generatePolyglotMask", () => {
       if (SEPARATOR_RE.test(ch)) continue;
       const fam = familyOf(ch);
       expect(fam).toBeDefined();
-      if (lastFamily !== null) {
+      // symbol-symbol is allowed; script-same-script is not
+      if (lastFamily !== null && lastFamily !== "symbol" && fam !== "symbol") {
         expect(fam).not.toBe(lastFamily);
       }
       lastFamily = fam!;
@@ -134,14 +172,14 @@ describe("generatePolyglotMask", () => {
   });
 
   describe("statistical diversity", () => {
-    it("uses at least 3 different families in a long mask", () => {
+    it("uses at least 2 different families in a long mask", () => {
       const mask = generatePolyglotMask("X".repeat(200));
       const families = new Set<WritingSystemFamily>();
       for (const ch of mask) {
         const f = familyOf(ch);
         if (f) families.add(f);
       }
-      expect(families.size).toBeGreaterThanOrEqual(3);
+      expect(families.size).toBeGreaterThanOrEqual(2);
     });
 
     it("produces different output on repeated calls (randomness)", () => {
@@ -149,8 +187,48 @@ describe("generatePolyglotMask", () => {
       const masks = new Set(
         Array.from({ length: 10 }, () => generatePolyglotMask(input)),
       );
-      // With 4 families and many chars, collisions are effectively impossible
       expect(masks.size).toBeGreaterThan(1);
+    });
+  });
+
+  describe("50/25/25 weighted tier distribution", () => {
+    it("produces all three tiers (digital, figure, script) in long output", () => {
+      const mask = generatePolyglotMask("X".repeat(500));
+      const tiers = new Set<WeightTier>();
+      for (const ch of mask) {
+        if (SEPARATOR_RE.test(ch)) continue;
+        const t = tierOfChar(ch);
+        if (t) tiers.add(t);
+      }
+      expect(tiers.size).toBe(3);
+    });
+
+    it("digital symbols appear roughly 50% of the time (±15%)", () => {
+      const mask = generatePolyglotMask("X".repeat(1000));
+      let digital = 0,
+        total = 0;
+      for (const ch of mask) {
+        if (SEPARATOR_RE.test(ch)) continue;
+        total++;
+        if (tierOfChar(ch) === "digital") digital++;
+      }
+      const ratio = digital / total;
+      expect(ratio).toBeGreaterThan(0.35);
+      expect(ratio).toBeLessThan(0.65);
+    });
+
+    it("script characters (abugida/syllabary) appear roughly 25% (±15%)", () => {
+      const mask = generatePolyglotMask("X".repeat(1000));
+      let script = 0,
+        total = 0;
+      for (const ch of mask) {
+        if (SEPARATOR_RE.test(ch)) continue;
+        total++;
+        if (tierOfChar(ch) === "script") script++;
+      }
+      const ratio = script / total;
+      expect(ratio).toBeGreaterThan(0.1);
+      expect(ratio).toBeLessThan(0.4);
     });
   });
 });
@@ -233,5 +311,144 @@ describe("polyglot-pools integrity", () => {
     const expected = new Set(ALL_POOLS.map(p => p.family));
     const actual = new Set(Object.keys(POOLS_BY_FAMILY));
     expect(actual).toEqual(expected);
+  });
+});
+
+describe("locale-aware polyglot masking", () => {
+  it("excludes latin subtype via localeExcludedSubtypes (e.g., Brazil)", () => {
+    const latinPool = ALL_POOLS.find(p => p.subtype === "latin")!;
+    const latinChars = new Set([...latinPool.chars]);
+
+    const config: PolyglotMaskConfig = {
+      enabledFamilies: ["alphabetic", "syllabary", "abugida", "symbol"],
+      excludedSubtypes: [],
+      localeExcludedSubtypes: ["latin"],
+    };
+
+    const mask = generatePolyglotMask("X".repeat(200), config);
+    for (const ch of mask) {
+      if (SEPARATOR_RE.test(ch)) continue;
+      expect(latinChars.has(ch)).toBe(false);
+    }
+  });
+
+  it("excludes the ENTIRE native family when nativeFamily is set (e.g., Brazil → no alphabetic at all)", () => {
+    // All alphabetic characters: latin, cyrillic, armenian, georgian
+    const alphabeticChars = new Set<string>();
+    for (const pool of ALL_POOLS) {
+      if (pool.family === "alphabetic") {
+        for (const ch of pool.chars) alphabeticChars.add(ch);
+      }
+    }
+
+    const config: PolyglotMaskConfig = {
+      enabledFamilies: ["alphabetic", "syllabary", "abugida", "symbol"],
+      excludedSubtypes: [],
+      localeExcludedSubtypes: ["latin"],
+      nativeFamily: "alphabetic",
+    };
+
+    const mask = generatePolyglotMask("X".repeat(500), config);
+    for (const ch of mask) {
+      if (SEPARATOR_RE.test(ch)) continue;
+      expect(alphabeticChars.has(ch)).toBe(false);
+    }
+  });
+
+  it("excludes the entire abugida family when nativeFamily is abugida (e.g., India)", () => {
+    const abugidaChars = new Set<string>();
+    for (const pool of ALL_POOLS) {
+      if (pool.family === "abugida") {
+        for (const ch of pool.chars) abugidaChars.add(ch);
+      }
+    }
+
+    const config: PolyglotMaskConfig = {
+      enabledFamilies: ["alphabetic", "syllabary", "abugida", "symbol"],
+      excludedSubtypes: [],
+      localeExcludedSubtypes: [
+        "devanagari",
+        "bengali",
+        "gujarati",
+        "kannada",
+        "tamil",
+        "telugu",
+      ],
+      nativeFamily: "abugida",
+    };
+
+    const mask = generatePolyglotMask("X".repeat(500), config);
+    for (const ch of mask) {
+      if (SEPARATOR_RE.test(ch)) continue;
+      expect(abugidaChars.has(ch)).toBe(false);
+    }
+  });
+
+  it("excludes cyrillic subtype via localeExcludedSubtypes (e.g., Russia)", () => {
+    const cyrillicPool = ALL_POOLS.find(p => p.subtype === "cyrillic")!;
+    const cyrillicChars = new Set([...cyrillicPool.chars]);
+
+    const config: PolyglotMaskConfig = {
+      enabledFamilies: ["alphabetic", "syllabary", "abugida", "symbol"],
+      excludedSubtypes: [],
+      localeExcludedSubtypes: ["cyrillic"],
+    };
+
+    const mask = generatePolyglotMask("X".repeat(200), config);
+    for (const ch of mask) {
+      if (SEPARATOR_RE.test(ch)) continue;
+      expect(cyrillicChars.has(ch)).toBe(false);
+    }
+  });
+
+  it("excludes devanagari subtype via localeExcludedSubtypes (e.g., India/Hindi)", () => {
+    const devanagariPool = ALL_POOLS.find(p => p.subtype === "devanagari")!;
+    const devanagariChars = new Set([...devanagariPool.chars]);
+
+    const config: PolyglotMaskConfig = {
+      enabledFamilies: ["alphabetic", "syllabary", "abugida", "symbol"],
+      excludedSubtypes: [],
+      localeExcludedSubtypes: ["devanagari"],
+    };
+
+    const mask = generatePolyglotMask("X".repeat(200), config);
+    for (const ch of mask) {
+      if (SEPARATOR_RE.test(ch)) continue;
+      expect(devanagariChars.has(ch)).toBe(false);
+    }
+  });
+
+  it("merges both excludedSubtypes and localeExcludedSubtypes", () => {
+    const latinPool = ALL_POOLS.find(p => p.subtype === "latin")!;
+    const keyboardPool = ALL_POOLS.find(p => p.subtype === "keyboard")!;
+    const excludedChars = new Set([...latinPool.chars, ...keyboardPool.chars]);
+
+    const config: PolyglotMaskConfig = {
+      enabledFamilies: ["alphabetic", "syllabary", "abugida", "symbol"],
+      excludedSubtypes: ["keyboard"],
+      localeExcludedSubtypes: ["latin"],
+    };
+
+    const mask = generatePolyglotMask("X".repeat(200), config);
+    for (const ch of mask) {
+      if (SEPARATOR_RE.test(ch)) continue;
+      expect(excludedChars.has(ch)).toBe(false);
+    }
+  });
+
+  it("never produces two consecutive chars from the same script subtype", () => {
+    const mask = generatePolyglotMask("A".repeat(120));
+    let lastSubtype: WritingSystemSubtype | null = null;
+    for (const ch of mask) {
+      if (SEPARATOR_RE.test(ch)) continue;
+      const sub = SUBTYPE_BY_CHAR.get(ch);
+      const fam = FAMILY_BY_CHAR.get(ch);
+      // Symbol-family subtypes may repeat (symbol-symbol is allowed).
+      // Script subtypes (alphabetic/syllabary/abugida) must not repeat.
+      if (sub && lastSubtype !== null && fam !== "symbol") {
+        expect(sub).not.toBe(lastSubtype);
+      }
+      if (sub) lastSubtype = sub;
+    }
   });
 });

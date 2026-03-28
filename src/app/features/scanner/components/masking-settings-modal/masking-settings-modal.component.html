@@ -108,11 +108,11 @@
 
       <!-- ── Polyglot mask alphabet ───────────────────────── -->
 
-      @if (advancedPreferences().maskingStrategy === 'random') {
+      @if (advancedPreferences().maskingStrategy === "random") {
         <fieldset class="settings-fieldset">
-          <legend class="settings-fieldset__legend"
-            >Polyglot mask alphabet</legend
-          >
+          <legend class="settings-fieldset__legend">
+            Polyglot mask alphabet
+          </legend>
           <p class="settings-fieldset__description">
             When enabled, the random strategy mixes characters from different
             Unicode writing systems (abugidas, syllabaries, alphabetics, and
@@ -164,10 +164,7 @@
 
                   @if (isFamilyEnabled(family)) {
                     <div class="polyglot-subtype-list">
-                      @for (
-                        pool of poolsByFamily[family];
-                        track pool.subtype
-                      ) {
+                      @for (pool of poolsByFamily[family]; track pool.subtype) {
                         <label
                           class="polyglot-subtype-toggle"
                           [attr.data-subtype]="pool.subtype"

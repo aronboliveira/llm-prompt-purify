@@ -12,6 +12,42 @@ import type {
   SupportedLocale,
   XmlWrapTag,
 } from "../declarations/masking.types";
+import type {
+  WritingSystemFamily,
+  WritingSystemSubtype,
+} from "./polyglot-pools.constants";
+
+/**
+ * Maps each country language family to the writing-system subtypes that are
+ * native to it. These subtypes are auto-excluded from polyglot masks so the
+ * output never contains characters from the user's own script.
+ */
+export const LOCALE_NATIVE_WRITING_SYSTEMS: Readonly<
+  Record<CountryLanguageFamily, readonly WritingSystemSubtype[]>
+> = Object.freeze({
+  english: ["latin"],
+  indic: ["devanagari", "bengali", "gujarati", "kannada", "tamil", "telugu"],
+  mandarin: [],
+  portuguese: ["latin"],
+  russian: ["cyrillic"],
+  spanish: ["latin"],
+});
+
+/**
+ * Maps each language family to its native writing-system family.
+ * Used for cross-category weighting: alphabetic locales should see
+ * syllabaries/abugidas most of the time, and vice versa.
+ */
+export const LOCALE_NATIVE_FAMILY: Readonly<
+  Partial<Record<CountryLanguageFamily, WritingSystemFamily>>
+> = Object.freeze({
+  english: "alphabetic",
+  indic: "abugida",
+  mandarin: undefined,
+  portuguese: "alphabetic",
+  russian: "alphabetic",
+  spanish: "alphabetic",
+});
 
 export const MAX_MASK_RETRIES = 8;
 
@@ -404,6 +440,10 @@ export const RULE_TAG_MAP: Readonly<Record<string, string>> = Object.freeze({
   "chile-rut-labeled": "RUT",
   "chile-rut-json": "RUT",
   "rut-global-labeled": "RUT",
+  "rg-global-labeled": "RG",
+  "cep-global-labeled": "CEP",
+  "ein-global-labeled": "EIN",
+  "ruc-global-labeled": "RUC",
   nit: "NIT",
   "cedula-labeled": "CEDULA",
   "dni-labeled": "DNI",
@@ -488,7 +528,7 @@ export const DEFAULT_ADVANCED_PREFERENCES: Readonly<AdvancedMaskingPreferences> 
     maskTimestamps: false,
     keywordBlocklist: Object.freeze([]),
     globalIgnoreList: Object.freeze([]),
-    polyglotMaskEnabled: false,
+    polyglotMaskEnabled: true,
     polyglotEnabledFamilies: Object.freeze([
       "abugida",
       "alphabetic",
