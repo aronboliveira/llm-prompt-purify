@@ -29,7 +29,7 @@ yarn-error.log
 .sass-cache/
 /connect.lock
 /coverage
-/test-results6
+/test-results
 /libpeerconnection.log
 testem.log
 /typings
@@ -64,6 +64,10 @@ __pycache__/
 *.user
 *.suo
 .vs/
+
+# Playwright reports & artifacts
+playwright-report/data/
+playwright-report/trace/
 
 # Mobile (lives on its own branch)
 /mobile/
