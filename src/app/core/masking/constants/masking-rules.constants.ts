@@ -33,8 +33,11 @@ import {
   isValidChineseResidentId,
   isValidColombianNit,
   isLikelyCreditCard,
-  looksLikeCnpjLikeId,
+  looksLikeCnpjStructural,
+  looksLikeCpfStructural,
   looksLikeCardNumberSequence,
+  looksLikePeruvianRucStructural,
+  looksLikeUsaSsnStructural,
   isLikelyIban,
   isLikelyPhoneNumber,
   isValidChileanRut,
@@ -42,7 +45,6 @@ import {
   isValidCpf,
   isValidIndianAadhaar,
   isValidPeruvianRuc,
-  isValidPisPasep,
   isValidPortugueseNif,
   isValidRussianInn,
   isValidRussianSnils,
@@ -54,7 +56,18 @@ import {
   looksLikeStructuredAddress,
   looksLikeStructuredName,
   looksSecretLike,
+  detectObfuscationTags,
 } from "../utils/mask-validation.utils";
+
+// ─── Anti-bypass separator character classes ────────────────────────────────
+// Used in contextual fallback patterns to handle separator-stuffing attacks.
+// Covers: dot variants (. · 。 ．), dash variants (- – — _ =), slash (/ \ ⁄ ⧸),
+// and optional surrounding whitespace. {1,3} allows repeated separators.
+// Reserved for future `new RegExp()` constructed patterns:
+const _DOT_LIKE = String.raw`[.·。．]`;
+const _DASH_LIKE = String.raw`[-\u2013\u2014_=~*#]`;
+const _SLASH_LIKE = String.raw`[/\\\u2044\u29F8]`;
+void [_DOT_LIKE, _DASH_LIKE, _SLASH_LIKE];
 import { createDelimitedLabelValuePattern } from "../utils/mask-pattern.utils";
 
 export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
@@ -272,9 +285,26 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     id: "us-ssn",
     label: "US Social Security number",
     locale: "en-US",
-    patternFactory: () => /\b\d{3}-\d{2}-\d{4}\b/g,
+    patternFactory: () =>
+      /\b\d{3}[\-\u2013\u2014]{1,3}\d{2}[\-\u2013\u2014]{1,3}\d{4}\b/g,
     priority: 116,
+    tagFactory: detectObfuscationTags,
     validator: isValidUsaSsn,
+  },
+  {
+    category: "identifier",
+    countryProfileIds: ["us"],
+    coverage: "country",
+    confidence: "medium",
+    id: "us-ssn-labeled-loose",
+    label: "US SSN (labeled)",
+    locale: "en-US",
+    patternFactory: () =>
+      /\b(?:ssn|social\s+security(?:\s+(?:number|num|no\.?|#))?|ss\s*#)\b[^\n\r\d]{0,16}(\d{3}[\-\u2013\u2014\s]{0,3}\d{2}[\-\u2013\u2014\s]{0,3}\d{4})\b/giu,
+    priority: 107,
+    tagFactory: detectObfuscationTags,
+    validator: looksLikeUsaSsnStructural,
+    valueGroup: 1,
   },
   {
     category: "personal",
@@ -309,9 +339,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "CPF (labeled)",
     locale: "pt-BR",
     patternFactory: () =>
-      /\b(?:cpf|meu\s+cpf|cpf\s+do\s+cliente|n[uú]mero\s+do\s+cpf)\b[^\n\r\d]{0,12}(\d{3}\.?\d{3}\.?\d{3}-?\d{2})\b/giu,
+      /\b(?:cpf|meu\s+cpf|cpf\s+do\s+cliente|n[uú]mero\s+do\s+cpf|cadastro\s+cpf|cpf\s+pessoal|cpf\s+fiscal|identifica[çc][ãa]o\s+cpf|contribuinte\s+cpf|cpf\s+registrado|cpf\s+do\s+titular|n[uú]mero\s+de\s+cpf)\b[^\n\r\d]{0,16}(\d{3}[.·。．]{0,3}\d{3}[.·。．]{0,3}\d{3}[\-\u2013\u2014_=~]{0,3}\d{2})\b/giu,
     priority: 109,
-    validator: isValidCpf,
+    tagFactory: detectObfuscationTags,
+    validator: looksLikeCpfStructural,
     valueGroup: 1,
   },
   {
@@ -334,9 +365,10 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "CNPJ (labeled)",
     locale: "pt-BR",
     patternFactory: () =>
-      /\b(?:cnpj|cnpj\s+da\s+empresa|registro\s+cnpj|empresa\s+cnpj|cnpj\s+matriz)\b[^\n\r\d]{0,12}(\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2})\b/giu,
+      /\b(?:cnpj|cnpj\s+da\s+empresa|registro\s+cnpj|empresa\s+cnpj|cnpj\s+matriz|cnpj\s+mei|filial\s+cnpj|contribuinte\s+cnpj|cnpj\s+filial)\b[^\n\r\d]{0,16}(\d{2}[.·。．]{0,3}\d{3}[.·。．]{0,3}\d{3}[/\\\u2044\u29F8]{0,3}\d{4}[\-\u2013\u2014_=~]{0,3}\d{2})\b/giu,
     priority: 109,
-    validator: isValidCnpj,
+    tagFactory: detectObfuscationTags,
+    validator: looksLikeCnpjStructural,
     valueGroup: 1,
   },
   {
@@ -500,7 +532,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "CUIT (labeled)",
     locale: "es-LatAm",
     patternFactory: () =>
-      /\b(?:cuit|mi\s+cuit|cuit\s+empresa|empresa\s+cuit|cuit\s+personal|n[uú]mero\s+cuit)\b[^\n\r\d]{0,12}(\d{2}-\d{8}-\d)\b/giu,
+      /\b(?:cuit|mi\s+cuit|cuit\s+empresa|empresa\s+cuit|cuit\s+personal|n[uú]mero\s+cuit)\b[^\n\r\d]{0,12}(\d{2}-?\d{8}-?\d)\b/giu,
     priority: 109,
     validator: isValidArgentineCuit,
     valueGroup: 1,
@@ -570,6 +602,24 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
+    countryProfileIds: ["latam-es", "pe"],
+    coverage: "country",
+    confidence: "medium",
+    id: "ruc-labeled-loose",
+    label: "RUC (labeled, structural)",
+    locale: "es-LatAm",
+    patternFactory: () =>
+      createDelimitedLabelValuePattern(
+        LATAM_RUC_LABEL_FLAGS,
+        String.raw`\d{11,13}`,
+      ),
+    priority: 104,
+    tagFactory: detectObfuscationTags,
+    validator: looksLikePeruvianRucStructural,
+    valueGroup: 1,
+  },
+  {
+    category: "identifier",
     countryProfileIds: ["pt"],
     coverage: "country",
     confidence: "high",
@@ -615,7 +665,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
   },
   {
     category: "identifier",
-    countryProfileIds: ["es"],
+    countryProfileIds: ["es", "latam-es"],
     coverage: "country",
     confidence: "high",
     id: "es-nie-labeled",
@@ -1519,7 +1569,7 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
     label: "Argentine CUIT (labeled, global)",
     locale: "shared",
     patternFactory: () =>
-      /\b(?:cuit|cuil|clave\s+[uú]nica)\b[^\n\r\d]{0,12}(\d{2}-\d{8}-\d)\b/giu,
+      /\b(?:cuit|cuil|clave\s+[uú]nica)\b[^\n\r\d]{0,12}(\d{2}-?\d{8}-?\d)\b/giu,
     priority: 109,
     validator: isValidArgentineCuit,
     valueGroup: 1,
@@ -1535,6 +1585,59 @@ export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
       /\b(?:rut|n[uú]mero\s+rut)\b[^\n\r\d]{0,12}(\d{1,2}\.?\d{3}\.?\d{3}-?[\dKk])\b/giu,
     priority: 109,
     validator: isValidChileanRut,
+    valueGroup: 1,
+  },
+
+  // ─── Global labeled rules (keyword-gated, any locale) ──────────────────────
+
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "high",
+    id: "rg-global-labeled",
+    label: "Brazilian RG (labeled, global)",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(?:rg|registro\s+geral|carteira\s+de\s+identidade)\b[^\n\r\d]{0,12}([0-9]{1,2}\.?\d{3}\.?\d{3}-?[\dXx])\b/giu,
+    priority: 109,
+    validator: isLikelyBrazilianStateId,
+    valueGroup: 1,
+  },
+  {
+    category: "location",
+    coverage: "global",
+    confidence: "high",
+    id: "cep-global-labeled",
+    label: "Brazilian CEP (labeled, global)",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(?:cep|c[oó]digo\s+postal)\b[^\n\r\d]{0,12}(\d{5}-?\d{3})\b/giu,
+    priority: 109,
+    valueGroup: 1,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "high",
+    id: "ein-global-labeled",
+    label: "US EIN (labeled, global)",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(?:ein|employer\s+id(?:entification)?(?:\s+number)?|fein|federal\s+tax\s+id)\b[^\n\r\d]{0,12}(\d{2}-\d{7})\b/giu,
+    priority: 109,
+    valueGroup: 1,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "high",
+    id: "ruc-global-labeled",
+    label: "Peruvian RUC (labeled, global)",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(?:ruc|registro\s+[uú]nico\s+(?:de\s+)?contribuyentes?)\b[^\n\r\d]{0,12}(\d{11,13})\b/giu,
+    priority: 109,
+    validator: isValidPeruvianRuc,
     valueGroup: 1,
   },
 ]);
@@ -1575,17 +1678,17 @@ function isValidDmyDate(value: string): boolean {
 
 /**
  * Validator for US SSN
+ * NOTE: area >= 900 was historically rejected (pre-2011 geographic allocation).
+ * Since June 2011 the SSA uses full randomization; 9xx area codes are valid.
+ * A PII masker must mask on appearance, not policy — removed the 9xx gate.
  */
 function isValidUsaSsn(value: string): boolean {
   const digits = value.replace(/\D/g, "");
   if (digits.length !== 9) return false;
-  // SSN cannot start with 000, 666, or 9xx
   const area = parseInt(digits.slice(0, 3), 10);
-  if (area === 0 || area === 666 || area >= 900) return false;
-  // Group number cannot be 00
+  if (area === 0 || area === 666) return false;
   const group = parseInt(digits.slice(3, 5), 10);
   if (group === 0) return false;
-  // Serial number cannot be 0000
   const serial = parseInt(digits.slice(5), 10);
   if (serial === 0) return false;
   return true;

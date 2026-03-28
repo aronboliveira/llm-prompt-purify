@@ -36,7 +36,8 @@ export function isLikelyIban(value: string): boolean {
   }
 
   let remainder = 0;
-  for (const digit of numeric) remainder = (remainder * 10 + Number(digit)) % 97;
+  for (const digit of numeric)
+    remainder = (remainder * 10 + Number(digit)) % 97;
   return remainder === 1;
 }
 
@@ -52,6 +53,70 @@ export function isLikelyBrazilianStateId(value: string): boolean {
   return /^\d{7,9}[\dX]?$/u.test(normalized) && !/^(\d)\1+$/u.test(digitsOnly);
 }
 
+/**
+ * Structural CPF check — correct digit count + non-repeating.
+ * Does NOT validate check digits, so it catches malformed/fake CPFs.
+ */
+export function looksLikeCpfStructural(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  return /^\d{11}$/.test(digits) && !/^(\d)\1+$/.test(digits);
+}
+
+/**
+ * Structural CNPJ check — correct digit count + non-repeating.
+ * Does NOT validate check digits.
+ */
+export function looksLikeCnpjStructural(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  return /^\d{14}$/.test(digits) && !/^(\d)\1+$/.test(digits);
+}
+
+/**
+ * Structural Peruvian RUC check — 11 digits, valid prefix (10|15|16|17|20),
+ * non-repeating. Does NOT validate the check digit.
+ */
+export function looksLikePeruvianRucStructural(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  if (!/^\d{11}$/.test(digits) || /^(\d)\1+$/.test(digits)) return false;
+  return /^(10|15|16|17|20)/.test(digits);
+}
+
+/**
+ * Structural US SSN check — 9 digits, area != 000|666, group != 00,
+ * serial != 0000, non-repeating. Does NOT reject area >= 900
+ * (SSA randomized allocation since 2011).
+ */
+export function looksLikeUsaSsnStructural(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 9 || /^(\d)\1+$/.test(digits)) return false;
+  const area = parseInt(digits.slice(0, 3), 10);
+  if (area === 0 || area === 666) return false;
+  const group = parseInt(digits.slice(3, 5), 10);
+  if (group === 0) return false;
+  const serial = parseInt(digits.slice(5), 10);
+  return serial !== 0;
+}
+
+// ─── Obfuscation Detection ────────────────────────────────────────────────
+
+const HOMOGLYPH_DOTS = /[·。．]/;
+const HOMOGLYPH_DASHES = /[\u2013\u2014\uFF0D_=~]/;
+const HOMOGLYPH_SLASHES = /[\u2044\u29F8\\]/;
+const STUFFED_DOTS = /\.{2,}/;
+const STUFFED_DASHES = /-{2,}|[\u2013\u2014]{2,}/;
+const STUFFED_SLASHES = /\/{2,}/;
+
+export function detectObfuscationTags(rawFragment: string): readonly string[] {
+  const tags: string[] = [];
+  if (HOMOGLYPH_DOTS.test(rawFragment)) tags.push("homoglyph-dot");
+  if (HOMOGLYPH_DASHES.test(rawFragment)) tags.push("homoglyph-dash");
+  if (HOMOGLYPH_SLASHES.test(rawFragment)) tags.push("homoglyph-slash");
+  if (STUFFED_DOTS.test(rawFragment)) tags.push("separator-stuffing-dot");
+  if (STUFFED_DASHES.test(rawFragment)) tags.push("separator-stuffing-dash");
+  if (STUFFED_SLASHES.test(rawFragment)) tags.push("separator-stuffing-slash");
+  return tags;
+}
+
 export function isValidCnpj(value: string): boolean {
   const digits = value.replace(/\D/g, "");
   if (!/^\d{14}$/.test(digits) || /^(\d)\1+$/.test(digits)) return false;
@@ -62,7 +127,7 @@ export function isValidCnpj(value: string): boolean {
   const firstDigit = calculateWeightedDigit(digits.slice(0, 12), firstWeights),
     secondDigit = calculateWeightedDigit(
       `${digits.slice(0, 12)}${firstDigit}`,
-      secondWeights
+      secondWeights,
     );
 
   return digits.endsWith(`${firstDigit}${secondDigit}`);
@@ -122,9 +187,12 @@ export function isValidChineseResidentId(value: string): boolean {
 
   const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2],
     verifiers = ["1", "0", "X", "9", "8", "7", "6", "5", "4", "3", "2"],
-    checksum = Array.from(normalized.slice(0, 17)).reduce((sum, digit, index) => {
-      return sum + Number(digit) * weights[index];
-    }, 0);
+    checksum = Array.from(normalized.slice(0, 17)).reduce(
+      (sum, digit, index) => {
+        return sum + Number(digit) * weights[index];
+      },
+      0,
+    );
 
   return normalized[17] === verifiers[checksum % 11];
 }
@@ -231,23 +299,30 @@ export function isValidPortugueseNif(value: string): boolean {
 
 export function isValidRussianInn(value: string): boolean {
   const digits = value.replace(/\D/g, "");
-  if (!/^\d{10}(\d{2})?$/u.test(digits) || /^(\d)\1+$/.test(digits)) return false;
+  if (!/^\d{10}(\d{2})?$/u.test(digits) || /^(\d)\1+$/.test(digits))
+    return false;
 
   if (digits.length === 10) {
-    const expected = calculateMod11Digit(digits.slice(0, 9), [2, 4, 10, 3, 5, 9, 4, 6, 8]);
+    const expected = calculateMod11Digit(
+      digits.slice(0, 9),
+      [2, 4, 10, 3, 5, 9, 4, 6, 8],
+    );
     return Number(digits[9]) === expected;
   }
 
   const firstExpected = calculateMod11Digit(
       digits.slice(0, 10),
-      [7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
+      [7, 2, 4, 10, 3, 5, 9, 4, 6, 8],
     ),
     secondExpected = calculateMod11Digit(
       digits.slice(0, 11),
-      [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
+      [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8],
     );
 
-  return Number(digits[10]) === firstExpected && Number(digits[11]) === secondExpected;
+  return (
+    Number(digits[10]) === firstExpected &&
+    Number(digits[11]) === secondExpected
+  );
 }
 
 export function isValidRussianSnils(value: string): boolean {
@@ -257,7 +332,8 @@ export function isValidRussianSnils(value: string): boolean {
   const total = Array.from(digits.slice(0, 9)).reduce((sum, digit, index) => {
       return sum + Number(digit) * (9 - index);
     }, 0),
-    rawVerifier = total < 100 ? total : total === 100 || total === 101 ? 0 : total % 101,
+    rawVerifier =
+      total < 100 ? total : total === 100 || total === 101 ? 0 : total % 101,
     verifier = rawVerifier === 100 ? 0 : rawVerifier;
 
   return Number(digits.slice(9)) === verifier;
@@ -267,7 +343,9 @@ export function isValidSpanishDni(value: string): boolean {
   const normalized = value.replace(/\s+/g, "").toUpperCase();
   if (!/^\d{8}[A-Z]$/u.test(normalized)) return false;
 
-  return normalized[8] === calculateSpanishDocumentLetter(normalized.slice(0, 8));
+  return (
+    normalized[8] === calculateSpanishDocumentLetter(normalized.slice(0, 8))
+  );
 }
 
 export function isValidSpanishNie(value: string): boolean {
@@ -283,10 +361,12 @@ export function isValidSpanishNie(value: string): boolean {
 export function looksLikeStructuredAddress(value: string): boolean {
   const normalized = sanitizeCapturedValue(value);
   if (normalized.length < 8 || normalized.length > 120) return false;
-  return /[\d,#-]/.test(normalized) ||
+  return (
+    /[\d,#-]/.test(normalized) ||
     /\b(?:apto|avenida|bairro|bloco|calle|casa|city|drive|estrada|road|rua|st|street)\b/iu.test(
-      normalized
-    );
+      normalized,
+    )
+  );
 }
 
 export function looksLikeStructuredName(value: string): boolean {
@@ -294,8 +374,10 @@ export function looksLikeStructuredName(value: string): boolean {
   if (normalized.length < 5 || normalized.length > 80) return false;
 
   const parts = normalized.split(" ");
-  return parts.length >= 2 &&
-    parts.every(part => /^[\p{L}][\p{L}'-]{0,30}$/u.test(part));
+  return (
+    parts.length >= 2 &&
+    parts.every(part => /^[\p{L}][\p{L}'-]{0,30}$/u.test(part))
+  );
 }
 
 export function looksSecretLike(value: string): boolean {
@@ -330,7 +412,10 @@ export function looksLikeCnpjLikeId(value: string): boolean {
   return /^\d{14}$/u.test(digits) && !/^(\d)\1+$/u.test(digits);
 }
 
-function calculateMod11Digit(value: string, weights: readonly number[]): number {
+function calculateMod11Digit(
+  value: string,
+  weights: readonly number[],
+): number {
   const total = Array.from(value).reduce((sum, digit, index) => {
     return sum + Number(digit) * weights[index];
   }, 0);
@@ -347,7 +432,10 @@ function calculateCpfDigit(value: string, factor: number): number {
   return remainder === 10 ? 0 : remainder;
 }
 
-function calculateWeightedDigit(value: string, weights: readonly number[]): number {
+function calculateWeightedDigit(
+  value: string,
+  weights: readonly number[],
+): number {
   const total = Array.from(value).reduce((sum, digit, index) => {
     return sum + Number(digit) * weights[index];
   }, 0);
@@ -374,4 +462,71 @@ function isValidIsoDateSegment(value: string, shape: "ymd"): boolean {
     date.getUTCMonth() === month - 1 &&
     date.getUTCDate() === day
   );
+}
+
+/**
+ * Generic modular-arithmetic checksum calculator.
+ *
+ * Computes one or more check digits by iteratively applying a weighted sum
+ * modulo {@link modulus}.  Weights are auto-generated as descending sequences
+ * `[factor, factor-1, …, 2]` where `factor` starts at `bodyLength + 1` and
+ * increments for each subsequent check digit.  After each digit is computed it
+ * is appended to the working body so the next iteration incorporates it.
+ *
+ * This covers the CPF/NIF-style pattern used across Latin-American and Iberian
+ * documents whose check digits follow the rule:
+ *
+ * ```
+ * remainder = weightedSum % modulus
+ * digit    = remainder < 2 ? 0 : modulus − remainder
+ * ```
+ *
+ * @example
+ * ```ts
+ * calculateCheckSum("123456789", 11);  // → [0, 9]  (CPF 123.456.789-09)
+ * calculateCheckSum(123456789, 11);    // → [0, 9]  (same, from a number)
+ * ```
+ *
+ * @param state   Digit body — non-digit characters are stripped automatically.
+ * @param modulus Divisor (`modulus` must be > digit count of `state`).
+ * @returns       Computed check digits in order (first → last).
+ */
+export function calculateCheckSum(
+  state: string | number,
+  modulus: number,
+): readonly number[] {
+  let digits =
+    typeof state === "string" ? state.replace(/\D/g, "") : String(state);
+
+  if (!Number.isFinite(modulus) || modulus < 2)
+    throw new Error("modulus must be a finite number >= 2");
+  modulus = Math.trunc(modulus);
+
+  if (digits.length === 0)
+    throw new Error("state must contain at least one digit");
+
+  if (modulus <= digits.length)
+    throw new Error("modulus must be greater than the digit count of state");
+
+  const checkDigitCount = modulus - digits.length;
+  const result: number[] = [];
+
+  for (let d = 0; d < checkDigitCount; d++) {
+    const factor = digits.length + 1;
+    let sum = 0;
+
+    for (let i = 0; i < digits.length; i++) {
+      const digitValue = Number(digits[i]);
+      const weight = factor - i;
+      sum += digitValue * weight;
+    }
+
+    const remainder = sum % modulus;
+    const checkDigit = remainder < 2 ? 0 : modulus - remainder;
+
+    result.push(checkDigit);
+    digits += String(checkDigit);
+  }
+
+  return result;
 }

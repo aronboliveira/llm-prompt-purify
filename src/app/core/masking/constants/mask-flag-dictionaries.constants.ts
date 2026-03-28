@@ -479,6 +479,7 @@ export const LATAM_CEDULA_LABEL_FLAGS = Object.freeze([
 
 export const LATAM_DNI_LABEL_FLAGS = Object.freeze([
   "dni",
+  "dni del responsable",
   "documento de identidad",
   "documento nacional de identidad",
   "numero de dni",
@@ -517,6 +518,7 @@ export const PT_NISS_LABEL_FLAGS = Object.freeze([
 
 export const ES_DNI_LABEL_FLAGS = Object.freeze([
   "dni",
+  "dni del responsable",
   "documento de identidad",
   "documento nacional de identidad",
   "numero de dni",

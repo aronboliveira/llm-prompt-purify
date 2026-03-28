@@ -1,5 +1,5 @@
-const FLEXIBLE_LABEL_JOINER_PATTERN = String.raw`(?:[\s._-]+)`;
-const UNICODE_WORD_CHARACTER_CLASS = String.raw`[\p{L}\p{N}]`;
+const FLEXIBLE_LABEL_JOINER_PATTERN = String.raw`(?:[\s._-]+)`,
+  UNICODE_WORD_CHARACTER_CLASS = String.raw`[\p{L}\p{N}]`;
 
 interface DelimitedPatternOptions {
   bounded?: boolean;
@@ -8,7 +8,9 @@ interface DelimitedPatternOptions {
   quoteWrapped?: boolean;
 }
 
-export function buildFlexibleLabelAlternation(labels: readonly string[]): string {
+export function buildFlexibleLabelAlternation(
+  labels: readonly string[],
+): string {
   return labels
     .map(label => label.trim())
     .filter(Boolean)
@@ -16,27 +18,30 @@ export function buildFlexibleLabelAlternation(labels: readonly string[]): string
     .join("|");
 }
 
-export function buildUnicodeBoundedLabelPattern(labels: readonly string[]): string {
+export function buildUnicodeBoundedLabelPattern(
+  labels: readonly string[],
+): string {
   return wrapWithUnicodeBoundaries(buildFlexibleLabelAlternation(labels));
 }
 
 export function createDelimitedLabelValuePattern(
   labels: readonly string[],
   valuePattern: string,
-  options: DelimitedPatternOptions = {}
+  options: DelimitedPatternOptions = {},
 ): RegExp {
   const delimiterPattern = options.delimiterPattern ?? String.raw`[:=-]`,
     flags = options.flags ?? "giu",
-    labelPattern = options.bounded === false
-      ? `(?:${buildFlexibleLabelAlternation(labels)})`
-      : buildUnicodeBoundedLabelPattern(labels),
+    labelPattern =
+      options.bounded === false
+        ? `(?:${buildFlexibleLabelAlternation(labels)})`
+        : buildUnicodeBoundedLabelPattern(labels),
     wrappedValuePattern = options.quoteWrapped
       ? String.raw`["']?(${valuePattern})["']?`
       : `(${valuePattern})`;
 
   return new RegExp(
     String.raw`${labelPattern}\s*${delimiterPattern}\s*${wrappedValuePattern}`,
-    flags
+    flags,
   );
 }
 

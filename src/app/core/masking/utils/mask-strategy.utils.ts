@@ -81,6 +81,10 @@ const FAKER_CATEGORY_LABELS: Readonly<Record<string, string>> = Object.freeze({
   "cedula-labeled": "CEDULA",
   "dni-labeled": "DNI",
   "ruc-labeled": "RUC",
+  "ruc-global-labeled": "RUC",
+  "rg-global-labeled": "RG",
+  "cep-global-labeled": "CEP",
+  "ein-global-labeled": "EIN",
   "es-dni-labeled": "ES_DNI",
   "es-nie-labeled": "NIE",
 
@@ -262,7 +266,9 @@ export function createMaskForStrategy(
   fakerCounterState?: FakerCounterState,
   polyglotConfig?: PolyglotMaskConfig,
 ): string {
-  if (shouldForceNumericComplianceMask(value, category)) {
+  // Polyglot characters are already maximally foreign and obviously synthetic,
+  // so the numeric compliance guard is unnecessary when polyglot is active.
+  if (shouldForceNumericComplianceMask(value, category) && !polyglotConfig) {
     return createNumericComplianceMask(value);
   }
 
@@ -517,6 +523,7 @@ export function expandCredentialPrefixes(
       locale: match.locale,
       locked: false,
       mask: mangledFull,
+      matchTags: [],
       ruleId: "credential-prefix",
       start: labelStart,
       value: fullMatchText,

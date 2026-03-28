@@ -55,6 +55,7 @@ export interface DetectionRule {
   locale: SupportedLocale;
   patternFactory: () => RegExp;
   priority: number;
+  tagFactory?: (rawMatch: string) => readonly string[];
   validator?: (value: string) => boolean;
   valueGroup?: number;
 }
@@ -112,6 +113,7 @@ export interface ScanMatch {
   confidence: MatchConfidence;
   groupId: MaskGroupId;
   locale: SupportedLocale;
+  matchTags: readonly string[];
   start: number;
   end: number;
   value: string;

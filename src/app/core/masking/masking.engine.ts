@@ -1,19 +1,23 @@
 import { MASKING_RULES } from "./constants/masking-rules.constants";
+import {
+  COUNTRY_PROFILE_DEFINITIONS,
+  LOCALE_NATIVE_FAMILY,
+  LOCALE_NATIVE_WRITING_SYSTEMS,
+} from "./constants/masking.constants";
 import type {
   AdvancedMaskingPreferences,
+  CountryProfileId,
   MaskGroupPreferenceMap,
   MaskingStrategy,
   ScanMatch,
   ScanResult,
   ScanScopeSelection,
-  XmlWrapTag,
 } from "./declarations/masking.types";
 import {
   expandCountryScope,
   filterRulesForScope,
 } from "./utils/country-scope.utils";
 import { collectFuzzyLabelCandidates } from "./utils/fuzzy-label.utils";
-import { createDistinctMask } from "./utils/mask-format.utils";
 import {
   applyEnabledMasks,
   applyGroupPreferences,
@@ -26,19 +30,45 @@ import {
   createMaskForStrategy,
   expandCredentialPrefixes,
   findBlocklistMatches,
-  type FakerCounterState,
   isIgnored,
   wrapInXmlTag,
 } from "./utils/mask-strategy.utils";
 import type { PolyglotMaskConfig } from "./utils/polyglot-mask.utils";
+import type {
+  WritingSystemFamily,
+  WritingSystemSubtype,
+} from "./constants/polyglot-pools.constants";
 
 function buildPolyglotConfig(
   prefs?: AdvancedMaskingPreferences,
+  countryProfileIds?: readonly CountryProfileId[],
 ): PolyglotMaskConfig | undefined {
   if (!prefs?.polyglotMaskEnabled) return undefined;
+
+  // Auto-exclude the native writing systems for all selected country profiles
+  const localeExclusions = new Set<WritingSystemSubtype>();
+  let nativeFamily: WritingSystemFamily | undefined;
+  if (countryProfileIds) {
+    for (const id of countryProfileIds) {
+      const profile = COUNTRY_PROFILE_DEFINITIONS[id];
+      if (!profile) continue;
+      const nativeSubtypes =
+        LOCALE_NATIVE_WRITING_SYSTEMS[profile.languageFamily];
+      if (nativeSubtypes) {
+        for (const subtype of nativeSubtypes) localeExclusions.add(subtype);
+      }
+      // Resolve the locale's native family for cross-category weighting
+      nativeFamily ??= LOCALE_NATIVE_FAMILY[profile.languageFamily];
+    }
+  }
+
   return {
-    enabledFamilies: prefs.polyglotEnabledFamilies as PolyglotMaskConfig["enabledFamilies"],
-    excludedSubtypes: prefs.polyglotExcludedSubtypes as PolyglotMaskConfig["excludedSubtypes"],
+    enabledFamilies:
+      prefs.polyglotEnabledFamilies as PolyglotMaskConfig["enabledFamilies"],
+    excludedSubtypes:
+      prefs.polyglotExcludedSubtypes as PolyglotMaskConfig["excludedSubtypes"],
+    localeExcludedSubtypes: [...localeExclusions],
+    nativeFamily,
   };
 }
 
@@ -77,10 +107,11 @@ export class MaskingEngine {
     scannedAt: string,
     strategy: MaskingStrategy = "random",
     advancedPrefs?: AdvancedMaskingPreferences,
+    countryProfileIds?: readonly CountryProfileId[],
   ): ScanResult {
     const fakerCounter =
         strategy === "faker" ? createFakerCounterState() : undefined,
-      polyglot = buildPolyglotConfig(advancedPrefs),
+      polyglot = buildPolyglotConfig(advancedPrefs, countryProfileIds),
       nextMasks = new Map<string, string>(),
       updatedMatches = matches.map(match => {
         const nextMask =
@@ -109,6 +140,7 @@ export class MaskingEngine {
     matchId: string,
     strategy: MaskingStrategy = "random",
     advancedPrefs?: AdvancedMaskingPreferences,
+    countryProfileIds?: readonly CountryProfileId[],
   ): ScanResult {
     const targetMatch = matches.find(match => match.id === matchId);
     if (!targetMatch)
@@ -117,7 +149,7 @@ export class MaskingEngine {
     // For single match regeneration with faker, create fresh counter (starts at 1)
     const fakerCounter =
         strategy === "faker" ? createFakerCounterState() : undefined,
-      polyglot = buildPolyglotConfig(advancedPrefs),
+      polyglot = buildPolyglotConfig(advancedPrefs, countryProfileIds),
       nextMask = createMaskForStrategy(
         targetMatch.value,
         targetMatch.ruleId,
@@ -146,13 +178,16 @@ export class MaskingEngine {
     const strategy = advancedPrefs?.maskingStrategy ?? "random",
       fakerCounter =
         strategy === "faker" ? createFakerCounterState() : undefined,
-      polyglot = buildPolyglotConfig(advancedPrefs),
+      expandedCountryProfileIds = expandCountryScope(
+        scopeSelection.countryProfileIds,
+      ),
+      polyglot = buildPolyglotConfig(advancedPrefs, expandedCountryProfileIds),
       ignoreList = advancedPrefs?.globalIgnoreList ?? [],
       blocklist = advancedPrefs?.keywordBlocklist ?? [],
       maskTimestamps = advancedPrefs?.maskTimestamps ?? false,
       scopeFilteredRules = filterRulesForScope(MASKING_RULES, {
         ...scopeSelection,
-        countryProfileIds: expandCountryScope(scopeSelection.countryProfileIds),
+        countryProfileIds: expandedCountryProfileIds,
       }),
       // Filter out timestamp rules if maskTimestamps is false
       activeRules = maskTimestamps
@@ -189,6 +224,7 @@ export class MaskingEngine {
           );
         maskByValue.set(candidate.value, mask);
 
+        const rawFragment = sourceText.slice(candidate.start, candidate.end);
         return {
           category: candidate.rule.category,
           confidence: candidate.rule.confidence,
@@ -200,6 +236,7 @@ export class MaskingEngine {
           locale: candidate.rule.locale,
           locked: false,
           mask,
+          matchTags: candidate.rule.tagFactory?.(rawFragment) ?? [],
           ruleId: candidate.rule.id,
           start: candidate.start,
           value: candidate.value,
@@ -211,7 +248,7 @@ export class MaskingEngine {
         .filter(
           hit => !matches.some(m => m.start <= hit.start && m.end >= hit.end),
         )
-        .map((hit, i) => ({
+        .map(hit => ({
           category: "personal" as const,
           confidence: "high" as const,
           enabled: true,
@@ -230,6 +267,7 @@ export class MaskingEngine {
             fakerCounter,
             polyglot,
           ),
+          matchTags: [] as readonly string[],
           ruleId: "blocklist-keyword",
           start: hit.start,
           value: hit.value,
