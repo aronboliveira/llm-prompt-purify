@@ -31,12 +31,12 @@ llm-prompt-purify/
 
 Configured in `tsconfig.json` and `jest.config.js`:
 
-| Alias       | Path                  | Usage                     |
-| ----------- | --------------------- | ------------------------- |
-| `@core/*`   | `src/app/core/*`      | Core services & engines   |
-| `@shared/*` | `src/app/shared/*`    | Shared utilities & styles |
+| Alias         | Path                 | Usage                     |
+| ------------- | -------------------- | ------------------------- |
+| `@core/*`     | `src/app/core/*`     | Core services & engines   |
+| `@shared/*`   | `src/app/shared/*`   | Shared utilities & styles |
 | `@features/*` | `src/app/features/*` | Feature modules           |
-| `@testing/*` | `src/app/testing/*`  | Test fixtures & mocks     |
+| `@testing/*`  | `src/app/testing/*`  | Test fixtures & mocks     |
 
 ### Usage Example
 
@@ -65,14 +65,14 @@ domain/
 
 ## Key Files
 
-| File | Purpose |
-| ---- | ------- |
-| `angular.json` | Angular CLI configuration |
-| `jest.config.js` | Jest test runner config |
-| `playwright.config.ts` | E2E test configuration |
-| `eslint.config.mjs` | ESLint flat config (lax mode) |
-| `tsconfig.json` | TypeScript configuration |
-| `docker-compose.yml` | Local development stack |
+| File                   | Purpose                       |
+| ---------------------- | ----------------------------- |
+| `angular.json`         | Angular CLI configuration     |
+| `jest.config.js`       | Jest test runner config       |
+| `playwright.config.ts` | E2E test configuration        |
+| `eslint.config.mjs`    | ESLint flat config (lax mode) |
+| `tsconfig.json`        | TypeScript configuration      |
+| `docker-compose.yml`   | Local development stack       |
 
 ## Scripts
 
@@ -88,10 +88,10 @@ npm run docker:up   # Start Docker stack
 
 ## Docker Services
 
-| Service  | Port  | Description |
-| -------- | ----- | ----------- |
-| frontend | 44200 | Angular app (nginx) |
-| backend  | 48080 | .NET API |
+| Service  | Port  | Description           |
+| -------- | ----- | --------------------- |
+| frontend | 44200 | Angular app (nginx)   |
+| backend  | 48080 | .NET API              |
 | db       | -     | PostgreSQL (internal) |
 
 ## Core Modules
@@ -118,12 +118,12 @@ masking/
 
 When the "random" strategy is active, users can opt into **polyglot masking** — masks built from characters drawn across four Unicode writing-system families:
 
-| Family       | Scripts included                                      |
-| ------------ | ----------------------------------------------------- |
-| Abugida      | Devanagari, Bengali, Tamil, Telugu, Gujarati, Kannada, Thai |
-| Alphabetic   | Cyrillic, Extended Latin, Armenian, Georgian           |
-| Syllabary    | Katakana, Hiragana, Hangul Jamo, Ethiopic             |
-| Symbol       | Keyboard, Math, Arrows, Geometric, Box-drawing, Misc  |
+| Family     | Scripts included                                            |
+| ---------- | ----------------------------------------------------------- |
+| Abugida    | Devanagari, Bengali, Tamil, Telugu, Gujarati, Kannada, Thai |
+| Alphabetic | Cyrillic, Extended Latin, Armenian, Georgian                |
+| Syllabary  | Katakana, Hiragana, Hangul Jamo, Ethiopic                   |
+| Symbol     | Keyboard, Math, Arrows, Geometric, Box-drawing, Misc        |
 
 Key invariant: **no two consecutive characters may come from the same family**, making it impossible for masked output to form real words in any language. Users can enable/disable families and exclude specific subtypes via the Masking Settings modal.
 
@@ -145,12 +145,14 @@ purification/
 ```
 
 **Threat Types:**
+
 - **XSS**: Script injection, event handlers, javascript: protocol
 - **SQL Injection**: OR-based, UNION SELECT, stacked queries, blind injection
 - **XXE**: External entities, DTD references, XInclude
 - **Path Traversal**: `../` sequences, URL-encoded variants, absolute paths
 
 **Usage:**
+
 ```typescript
 import { ContentPurifier, purifyContent } from "@core/purification";
 
