@@ -1,7 +1,6 @@
 @use "../../../../shared/styles/design" as ui;
 
 @scope (.pane) {
-
   :scope {
     @include ui.surface-card();
     @include ui.entrance-slide(Y, 0.8rem);
@@ -146,7 +145,8 @@
     justify-content: flex-start;
     margin-block-start: 0.5rem;
     padding-block-start: 0.75rem;
-    border-block-start: 1px solid var(--scanner-pane-edge, rgba(11, 38, 61, 0.06));
+    border-block-start: 1px solid
+      var(--scanner-pane-edge, rgba(11, 38, 61, 0.06));
   }
 
   :scope .output {
@@ -154,7 +154,11 @@
 
     background: var(
       --surface-field,
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 252, 254, 0.98))
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98),
+        rgba(248, 252, 254, 0.98)
+      )
     );
     border: 1px solid ui.panel-border(0.12);
     border-radius: ui.panel-radius(0.45);
@@ -253,5 +257,30 @@
       transform: rotate(360deg);
     }
   }
+}
 
+@media (pointer: coarse) {
+  .pane__button {
+    min-block-size: 2.75rem;
+    padding: 0.75rem 1.1rem;
+  }
+
+  .help-trigger {
+    min-block-size: 2.75rem;
+    min-inline-size: 2.75rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .status-pill[data-tone="error"] {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+    }
+
+    .status-pill[data-tone="success"] {
+      background: rgba(45, 212, 191, 0.18);
+      color: #5eead4;
+    }
+  }
 }

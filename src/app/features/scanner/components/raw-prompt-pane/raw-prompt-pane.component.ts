@@ -4,7 +4,7 @@ import {
   inject,
   input,
   output,
-  ViewEncapsulation
+  ViewEncapsulation,
 } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import { FormsModule } from "@angular/forms";
@@ -18,7 +18,7 @@ import { createTrustedHtmlMap } from "@shared/utils/trusted-html.utils";
   standalone: true,
   styleUrl: "./raw-prompt-pane.component.scss",
   templateUrl: "./raw-prompt-pane.component.html",
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class RawPromptPaneComponent {
   readonly #sanitizer = inject(DomSanitizer);
@@ -30,18 +30,39 @@ export class RawPromptPaneComponent {
   );
 
   readonly helpRequested = output<void>();
-  readonly sourceTextChanged = output<string>();
+  readonly sourceTextChanged = output<{
+    value: string;
+    inputType?: string;
+    isComposing?: boolean;
+  }>();
 
   protected readonly icons = createTrustedHtmlMap(
     this.#sanitizer,
     MATERIAL_ICONS,
   );
 
+  /** Tracks the latest InputEvent.inputType for adaptive debounce. */
+  #lastInputType: string | undefined;
+  /** Tracks whether the last InputEvent was during IME composition. */
+  #lastIsComposing = false;
+
+  protected onInput(event: Event): void {
+    const inputEvent = event as InputEvent;
+    if (inputEvent.inputType) {
+      this.#lastInputType = inputEvent.inputType;
+    }
+    this.#lastIsComposing = inputEvent.isComposing ?? false;
+  }
+
   protected requestHelp(): void {
     this.helpRequested.emit();
   }
 
   protected updateSourceText(value: string): void {
-    this.sourceTextChanged.emit(value);
+    const inputType = this.#lastInputType,
+      isComposing = this.#lastIsComposing;
+    this.#lastInputType = undefined;
+    this.#lastIsComposing = false;
+    this.sourceTextChanged.emit({ value, inputType, isComposing });
   }
 }

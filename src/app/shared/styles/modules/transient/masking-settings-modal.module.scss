@@ -100,7 +100,11 @@
     align-items: start;
     background: var(
       --surface-field,
-      linear-gradient(180deg, rgba(248, 252, 251, 0.98), rgba(243, 250, 249, 0.96))
+      linear-gradient(
+        180deg,
+        rgba(248, 252, 251, 0.98),
+        rgba(243, 250, 249, 0.96)
+      )
     );
     border: 1px solid var(--surface-accent-border, rgba(15, 118, 110, 0.14));
     border-radius: ui.panel-radius(0.35);
@@ -117,7 +121,11 @@
   :scope .settings-toggle:hover {
     background: var(
       --surface-accent-hover,
-      linear-gradient(180deg, rgba(240, 248, 246, 0.98), rgba(235, 245, 243, 0.96))
+      linear-gradient(
+        180deg,
+        rgba(240, 248, 246, 0.98),
+        rgba(235, 245, 243, 0.96)
+      )
     );
     border-color: var(--surface-accent-border, rgba(15, 118, 110, 0.22));
   }
@@ -584,5 +592,25 @@
 
   .settings-modal {
     padding: 1rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .settings-modal-backdrop {
+      background: rgba(0, 0, 0, 0.62);
+    }
+
+    .settings-modal {
+      background: var(--surface-bg, #1e293b);
+      border-color: rgba(148, 163, 184, 0.18);
+    }
+
+    .settings-card,
+    .mask-group-toggle,
+    .strategy-radio {
+      background: var(--surface-subtle, #334155);
+      border-color: rgba(148, 163, 184, 0.14);
+    }
   }
 }

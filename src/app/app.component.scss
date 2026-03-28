@@ -1,7 +1,7 @@
 @use "./shared/styles/design" as ui;
 
 @scope (.app-shell) {
-  /* ─── App Shell ───────────────────────────────────────────────────────────── */                                                                               
+  /* ─── App Shell ───────────────────────────────────────────────────────────── */
   :scope {
     /* Keep the scanner workspace on a stable high-contrast light palette. */
     --page-text: #0f172a;
@@ -71,7 +71,7 @@
     padding: 1.25rem 1rem 4rem;
   }
 
-  /* ─── Translator Layout ───────────────────────────────────────────────────── */                                                                               
+  /* ─── Translator Layout ───────────────────────────────────────────────────── */
   :scope .translator {
     display: grid;
     gap: 1rem;
@@ -97,7 +97,7 @@
     animation: pulse-bridge 1s ease-in-out infinite;
   }
 
-  /* ─── Responsive ──────────────────────────────────────────────────────────── */                                                                               
+  /* ─── Responsive ──────────────────────────────────────────────────────────── */
   @media (max-width: 72rem) {
     :scope .translator {
       grid-template-columns: minmax(0, 1fr);
@@ -116,7 +116,45 @@
   }
 }
 
-/* ─── Animations ──────────────────────────────────────────────────────────── */                                                                               
+@media (pointer: coarse) {
+  .app-shell {
+    padding: 1rem 0.75rem 4rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .app-shell {
+      --page-text: #e2e8f0;
+      --text-strong: #f1f5f9;
+      --text-body: #cbd5e1;
+      --text-muted: #94a3b8;
+      --text-placeholder: #64748b;
+      --surface-bg: #0f172a;
+      --surface-elevated: rgba(30, 41, 59, 0.92);
+      --surface-elevated-border: rgba(148, 163, 184, 0.12);
+      --surface-subtle: #1e293b;
+      --surface-subtle-strong: #334155;
+      --panel-border: rgba(148, 163, 184, 0.12);
+      --modal-backdrop: rgba(0, 0, 0, 0.62);
+      color: var(--text-body);
+      background:
+        radial-gradient(
+          circle at top left,
+          rgba(45, 212, 191, 0.12),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at top right,
+          rgba(251, 191, 36, 0.08),
+          transparent 25%
+        ),
+        linear-gradient(180deg, #0f172a, #1a1f2e 58%, #0f172a);
+    }
+  }
+}
+
+/* ─── Animations ──────────────────────────────────────────────────────────── */
 @keyframes pulse-bridge {
   0%,
   100% {

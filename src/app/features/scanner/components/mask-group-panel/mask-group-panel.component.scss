@@ -150,3 +150,25 @@
     }
   }
 }
+
+@media (pointer: coarse) {
+  .mask-toggle,
+  .mask-row__action {
+    min-block-size: 2.75rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .mask-toggle input,
+  .mask-row input {
+    block-size: 1.2rem;
+    inline-size: 1.2rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .mask-row[data-enabled="false"] {
+      background: rgba(120, 80, 20, 0.18);
+    }
+  }
+}

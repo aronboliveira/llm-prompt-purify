@@ -313,8 +313,12 @@ export class AppComponent {
     );
   }
 
-  protected updateSourceText(value: string): void {
-    this.#scanSession.updateSourceText(value);
+  protected updateSourceText(
+    value: string,
+    inputType?: string,
+    isComposing?: boolean,
+  ): void {
+    this.#scanSession.updateSourceText(value, inputType, isComposing);
   }
 
   protected updateXmlWrapEnabled(enabled: boolean): void {
@@ -340,9 +344,7 @@ export class AppComponent {
     this.#scanSession.setPolyglotFamilies(families);
   }
 
-  protected updatePolyglotExcludedSubtypes(
-    subtypes: readonly string[],
-  ): void {
+  protected updatePolyglotExcludedSubtypes(subtypes: readonly string[]): void {
     this.#scanSession.setPolyglotExcludedSubtypes(subtypes);
   }
 

@@ -26,6 +26,7 @@
     class="editor"
     data-testid="source-textarea"
     [ngModel]="sourceText()"
+    (input)="onInput($event)"
     (ngModelChange)="updateSourceText($event)"
     [placeholder]="placeholder()"
     spellcheck="false"

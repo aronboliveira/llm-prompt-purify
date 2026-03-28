@@ -5,6 +5,7 @@
     @include ui.surface-card();
 
     border: 1px solid var(--panel-border);
+    container-type: inline-size;
     display: grid;
     gap: 0.55rem;
     margin-block-end: 1rem;
@@ -104,7 +105,9 @@
     margin-inline-start: 0.1rem;
   }
 
-  :scope .scanner-toolbar__warning[open] .scanner-toolbar__warning-summary::after {
+  :scope
+    .scanner-toolbar__warning[open]
+    .scanner-toolbar__warning-summary::after {
     content: "−";
   }
 
@@ -141,6 +144,23 @@
     :scope .scanner-toolbar__button,
     :scope .scanner-toolbar__button--scope {
       inline-size: 100%;
+    }
+  }
+}
+
+@media (pointer: coarse) {
+  .scanner-toolbar__button {
+    min-block-size: 2.75rem;
+    padding: 0.85rem 1.1rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .scanner-toolbar__warning {
+      background: rgba(251, 191, 36, 0.14);
+      border-color: rgba(251, 191, 36, 0.25);
+      color: #fbbf24;
     }
   }
 }

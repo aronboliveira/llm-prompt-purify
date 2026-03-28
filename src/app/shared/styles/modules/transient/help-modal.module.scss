@@ -80,3 +80,16 @@
     padding: 1rem;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .help-modal-backdrop {
+      background: rgba(0, 0, 0, 0.62);
+    }
+
+    .help-modal {
+      background: var(--surface-bg, #1e293b);
+      border-color: rgba(148, 163, 184, 0.18);
+    }
+  }
+}

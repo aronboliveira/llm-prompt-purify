@@ -5,6 +5,7 @@
     @include ui.surface-card();
 
     border: 1px solid var(--panel-border);
+    container-type: inline-size;
     display: grid;
     gap: 0.85rem;
     padding: 1.1rem;
@@ -36,5 +37,27 @@
 
   :scope .help-trigger {
     @include ui.help-button;
+  }
+
+  @container (max-width: 28rem) {
+    :scope .controls__header {
+      align-items: start;
+      flex-direction: column;
+    }
+  }
+}
+
+@media (pointer: coarse) {
+  .help-trigger {
+    min-block-size: 2.75rem;
+    min-inline-size: 2.75rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .controls {
+      border-color: rgba(148, 163, 184, 0.14);
+    }
   }
 }

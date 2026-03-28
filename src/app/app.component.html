@@ -45,7 +45,9 @@
       [body]="copy.rawBody"
       [sourceText]="vm().sourceText"
       (helpRequested)="openHelp('workflow')"
-      (sourceTextChanged)="updateSourceText($event)"
+      (sourceTextChanged)="
+        updateSourceText($event.value, $event.inputType, $event.isComposing)
+      "
     ></app-raw-prompt-pane>
 
     <div class="translator__bridge" aria-hidden="true">

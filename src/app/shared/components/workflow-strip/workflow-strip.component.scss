@@ -2,6 +2,7 @@
 
 @scope (.workflow-strip) {
   :scope {
+    container-type: inline-size;
     display: grid;
     gap: 0.9rem;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -71,9 +72,47 @@
     opacity: 0.85;
   }
 
+  @container (max-width: 48rem) {
+    :scope {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @container (max-width: 28rem) {
+    :scope {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
   @media (max-width: 48rem) {
     :scope {
       grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}
+
+@media (pointer: coarse) {
+  .workflow-strip__card {
+    padding: 1.75rem 1.15rem 1.1rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .workflow-strip__card[data-state="done"]::before {
+      background: linear-gradient(
+        90deg,
+        rgba(45, 212, 191, 0.9),
+        rgba(45, 212, 191, 0.28)
+      );
+    }
+
+    .workflow-strip__card[data-state="active"]::before {
+      background: linear-gradient(
+        90deg,
+        rgba(251, 191, 36, 0.92),
+        rgba(45, 212, 191, 0.45)
+      );
     }
   }
 }

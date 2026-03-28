@@ -22,3 +22,27 @@
     margin: 0;
   }
 }
+
+@media (pointer: coarse) {
+  .product-header {
+    padding-block-end: 1.25rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    .product-header__title {
+      color: var(--product-title-color, #cbd5e1);
+    }
+
+    .product-header__tagline {
+      color: var(--product-tagline-color, #94a3b8);
+    }
+  }
+}
+
+@media (max-width: 36rem) {
+  .product-header__title {
+    font-size: clamp(1.2rem, 5vw, 1.4rem);
+  }
+}
