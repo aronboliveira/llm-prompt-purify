@@ -41,11 +41,10 @@ export class ProfileExportService {
       },
     };
 
-    const json = JSON.stringify(profile, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const anchor = this.#document.createElement("a");
+    const json = JSON.stringify(profile, null, 2),
+      blob = new Blob([json], { type: "application/json" }),
+      url = URL.createObjectURL(blob),
+      anchor = this.#document.createElement("a");
     anchor.href = url;
     anchor.download = `${PROFILE_FILE_NAME_PREFIX}-${this.#sanitizeFileName(name)}.json`;
     anchor.click();
@@ -97,8 +96,10 @@ export class ProfileExportService {
   }
 
   #validateProfile(data: unknown): MaskingProfile {
+    const INVALID_FORMAT = "Invalid profile format: ";
+
     if (!data || typeof data !== "object") {
-      throw new Error("Invalid profile format: not an object");
+      throw new Error(`${INVALID_FORMAT}not an object`);
     }
 
     const profile = data as Record<string, unknown>;
@@ -108,26 +109,24 @@ export class ProfileExportService {
     }
 
     if (!profile["settings"] || typeof profile["settings"] !== "object") {
-      throw new Error("Invalid profile format: missing settings");
+      throw new Error(`${INVALID_FORMAT}missing settings`);
     }
 
     const settings = profile["settings"] as Record<string, unknown>;
 
     if (!settings["detectionMode"]) {
-      throw new Error("Invalid profile format: missing detectionMode");
+      throw new Error(`${INVALID_FORMAT}missing detectionMode`);
     }
 
     if (!Array.isArray(settings["selectedCountries"])) {
-      throw new Error(
-        "Invalid profile format: selectedCountries must be an array",
-      );
+      throw new Error(`${INVALID_FORMAT}selectedCountries must be an array`);
     }
 
     if (
       !settings["groupPreferences"] ||
       typeof settings["groupPreferences"] !== "object"
     ) {
-      throw new Error("Invalid profile format: missing groupPreferences");
+      throw new Error(`${INVALID_FORMAT}missing groupPreferences`);
     }
 
     return data as MaskingProfile;

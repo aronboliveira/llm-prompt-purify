@@ -199,16 +199,12 @@ export function loadPersistedAdvancedPreferences(): AdvancedMaskingPreferences {
           : DEFAULT_ADVANCED_PREFERENCES.polyglotMaskEnabled,
       polyglotEnabledFamilies: Array.isArray(parsed.polyglotEnabledFamilies)
         ? Object.freeze(
-            parsed.polyglotEnabledFamilies.filter(
-              k => typeof k === "string",
-            ),
+            parsed.polyglotEnabledFamilies.filter(k => typeof k === "string"),
           )
         : DEFAULT_ADVANCED_PREFERENCES.polyglotEnabledFamilies,
       polyglotExcludedSubtypes: Array.isArray(parsed.polyglotExcludedSubtypes)
         ? Object.freeze(
-            parsed.polyglotExcludedSubtypes.filter(
-              k => typeof k === "string",
-            ),
+            parsed.polyglotExcludedSubtypes.filter(k => typeof k === "string"),
           )
         : DEFAULT_ADVANCED_PREFERENCES.polyglotExcludedSubtypes,
     };

@@ -51,22 +51,23 @@ export class KeyboardShortcutsService {
   }
 
   #matchesShortcut(event: KeyboardEvent, shortcut: KeyboardShortcut): boolean {
-    const keyMatch = event.key.toLowerCase() === shortcut.key.toLowerCase();
-    const ctrlMatch = !!shortcut.ctrl === (event.ctrlKey || event.metaKey);
-    const shiftMatch = !!shortcut.shift === event.shiftKey;
-    const altMatch = !!shortcut.alt === event.altKey;
+    const keyMatch = event.key.toLowerCase() === shortcut.key.toLowerCase(),
+      ctrlMatch = !!shortcut.ctrl === (event.ctrlKey || event.metaKey),
+      shiftMatch = !!shortcut.shift === event.shiftKey,
+      altMatch = !!shortcut.alt === event.altKey;
 
     return keyMatch && ctrlMatch && shiftMatch && altMatch;
   }
 
   #isInputFocused(event: KeyboardEvent): boolean {
-    const target = event.target as HTMLElement;
-    const tagName = target.tagName?.toLowerCase();
-    const isEditable = target.isContentEditable;
+    const target = event.target as HTMLElement,
+      tagName = target.tagName?.toLowerCase();
 
     // Allow shortcuts even in inputs for Escape key
     if (event.key === "Escape") return false;
 
-    return tagName === "input" || tagName === "textarea" || isEditable;
+    return (
+      tagName === "input" || tagName === "textarea" || target.isContentEditable
+    );
   }
 }

@@ -15,8 +15,9 @@ export function readForceCountryFromUrl(): readonly CountryProfileId[] | null {
     return null;
 
   try {
-    const params = new URLSearchParams(window.location.search);
-    const forceCountry = params.get("forceCountry");
+    const forceCountry = new URLSearchParams(window.location.search).get(
+      "forceCountry",
+    );
     if (!forceCountry) return null;
 
     const candidates = forceCountry

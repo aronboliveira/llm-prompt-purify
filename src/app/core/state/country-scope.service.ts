@@ -51,12 +51,12 @@ export class CountryScopeService {
   }
 
   setCountryProfiles(countryProfileIds: readonly CountryProfileId[]): boolean {
-    const currentIds = this.#state().countryProfileIds;
     const normalizedIds = normalizeCountryProfileIds(countryProfileIds).length
       ? normalizeCountryProfileIds(countryProfileIds)
       : DEFAULT_COUNTRY_PROFILE_IDS;
 
-    if (this.#hasSameSelection(currentIds, normalizedIds)) return false;
+    if (this.#hasSameSelection(this.#state().countryProfileIds, normalizedIds))
+      return false;
 
     this.#state.update(state => ({
       ...state,

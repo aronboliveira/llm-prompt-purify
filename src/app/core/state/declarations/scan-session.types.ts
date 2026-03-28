@@ -5,10 +5,8 @@ import type {
   DetectionMode,
   MaskGroupPreferenceMap,
   MaskGroupSummary,
-  MaskingStrategy,
   ScanMatch,
   ScanResult,
-  XmlWrapTag,
 } from "../../masking/declarations/masking.types";
 
 export type ScanPhase =
@@ -17,6 +15,13 @@ export type ScanPhase =
   | "masking"
   | "ready"
   | "validating";
+
+export type InputAction =
+  | "typing"
+  | "paste"
+  | "delete"
+  | "composition"
+  | "format";
 
 export interface ScanSessionState {
   advancedPreferences: AdvancedMaskingPreferences;

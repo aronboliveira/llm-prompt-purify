@@ -26,6 +26,7 @@ import {
 import {
   SCAN_PHASE_MESSAGES,
   SCAN_TIMINGS,
+  resolveAdaptiveDebounceMs,
 } from "./constants/scan-session.constants";
 import type {
   ScanPhase,
@@ -249,6 +250,7 @@ export class ScanSessionService {
           result.scannedAt,
           this.#state().advancedPreferences.maskingStrategy,
           this.#state().advancedPreferences,
+          this.#state().countryProfileIds,
         ),
       );
 
@@ -294,6 +296,7 @@ export class ScanSessionService {
           matchId,
           this.#state().advancedPreferences.maskingStrategy,
           this.#state().advancedPreferences,
+          this.#state().countryProfileIds,
         ),
       );
 
@@ -500,7 +503,11 @@ export class ScanSessionService {
     }));
   }
 
-  public updateSourceText(sourceText: string): void {
+  public updateSourceText(
+    sourceText: string,
+    inputType?: string,
+    isComposing?: boolean,
+  ): void {
     const currentState = this.#state();
 
     this.#state.set({
@@ -517,7 +524,8 @@ export class ScanSessionService {
     });
     persistSourceText(sourceText);
 
-    if (sourceText.trim()) this.scheduleRefresh();
+    if (sourceText.trim())
+      this.scheduleRefresh(resolveAdaptiveDebounceMs(inputType, isComposing));
     else this.#cancelRefreshes();
   }
 

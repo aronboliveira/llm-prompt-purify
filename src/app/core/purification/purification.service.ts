@@ -122,8 +122,8 @@ export class ContentPurifier {
     text: string,
     configOverride: Partial<PurificationConfig> = {},
   ): PurificationResult {
-    const config = { ...this.#config, ...configOverride };
-    const threats = this.detect(text);
+    const config = { ...this.#config, ...configOverride },
+      threats = this.detect(text);
 
     let purifiedText = text;
 
