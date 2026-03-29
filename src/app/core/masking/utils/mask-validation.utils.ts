@@ -137,9 +137,7 @@ export function isValidCpf(value: string): boolean {
   const digits = value.replace(/\D/g, "");
   if (!/^\d{11}$/.test(digits) || /^(\d)\1+$/.test(digits)) return false;
 
-  const firstDigit = calculateCpfDigit(digits.slice(0, 9), 10),
-    secondDigit = calculateCpfDigit(`${digits.slice(0, 9)}${firstDigit}`, 11);
-
+  const [firstDigit, secondDigit] = calculateCheckSum(digits.slice(0, 9), 11);
   return digits.endsWith(`${firstDigit}${secondDigit}`);
 }
 
@@ -421,15 +419,6 @@ function calculateMod11Digit(
   }, 0);
 
   return (total % 11) % 10;
-}
-
-function calculateCpfDigit(value: string, factor: number): number {
-  const total = Array.from(value).reduce((sum, digit, index) => {
-    return sum + Number(digit) * (factor - index);
-  }, 0);
-
-  const remainder = (total * 10) % 11;
-  return remainder === 10 ? 0 : remainder;
 }
 
 function calculateWeightedDigit(
