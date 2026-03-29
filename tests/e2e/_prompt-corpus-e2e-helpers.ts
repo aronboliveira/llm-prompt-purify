@@ -267,3 +267,97 @@ export function registerFormalityTests(
     }
   });
 }
+
+// ── Cluster × Formality combination ────────────────────────────────────
+
+export function registerClusterFormalityTests(
+  clusterName: string,
+  roles: readonly string[],
+  formality: (typeof FORMALITIES)[number],
+): void {
+  const samples = corpusExists
+    ? collectSamples(roles, [formality])
+    : [];
+
+  test.describe(`prompt corpus ${clusterName} × ${formality}`, () => {
+    test.skip(!corpusExists, "corpus not generated");
+
+    for (const lang of LANGUAGES) {
+      const subset = samples.filter(s => s.lang === lang);
+      if (subset.length === 0) continue;
+
+      test(`[${lang}] ${clusterName}/${formality} — ${subset.length} samples (${roles.join(", ")})`, async ({
+        page,
+      }) => {
+        test.setTimeout(Math.max(60_000, subset.length * 5_000));
+        await setupPage(page, LANG_SCOPE[lang] ?? "us");
+
+        for (const sample of subset) {
+          await assertMasked(page, sample.text);
+        }
+      });
+    }
+  });
+}
+
+// ── Per-language ───────────────────────────────────────────────────────
+
+export function registerLanguageTests(
+  lang: (typeof LANGUAGES)[number],
+): void {
+  const samples = corpusExists
+    ? collectSamples([...ALL_ROLES], [...FORMALITIES], [lang])
+    : [];
+
+  test.describe(`prompt corpus language: ${lang}`, () => {
+    test.skip(!corpusExists, "corpus not generated");
+
+    for (const formality of FORMALITIES) {
+      const subset = samples.filter(s => s.formality === formality);
+      if (subset.length === 0) continue;
+
+      test(`${formality} — ${subset.length} samples across all roles`, async ({
+        page,
+      }) => {
+        test.setTimeout(Math.max(120_000, subset.length * 5_000));
+        await setupPage(page, LANG_SCOPE[lang] ?? "us");
+
+        for (const sample of subset) {
+          await assertMasked(page, sample.text);
+        }
+      });
+    }
+  });
+}
+
+// ── Per-role ───────────────────────────────────────────────────────────
+
+export function registerRoleTests(role: string): void {
+  const samples = corpusExists
+    ? collectSamples([role])
+    : [];
+
+  test.describe(`prompt corpus role: ${role}`, () => {
+    test.skip(!corpusExists, "corpus not generated");
+
+    for (const lang of LANGUAGES) {
+      for (const formality of FORMALITIES) {
+        const subset = samples.filter(
+          s => s.lang === lang && s.formality === formality,
+        );
+        if (subset.length === 0) continue;
+
+        test(`[${lang}] ${formality} — ${subset.length} samples`, async ({
+          page,
+        }) => {
+          test.setTimeout(Math.max(60_000, subset.length * 5_000));
+          await setupPage(page, LANG_SCOPE[lang] ?? "us");
+
+          for (const sample of subset) {
+            await assertMasked(page, sample.text);
+          }
+        });
+      }
+    }
+  });
+}
