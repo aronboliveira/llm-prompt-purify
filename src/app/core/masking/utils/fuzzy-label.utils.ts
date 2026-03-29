@@ -4,7 +4,11 @@ import {
   FUZZY_LABEL_DELIMITED_LINE_PATTERN,
   FUZZY_LABEL_SPECS,
 } from "../constants/fuzzy-label.constants";
-import type { FuzzyLabelRuleSpec } from "../declarations/fuzzy-label.types";
+import type {
+  DelimitedLine,
+  FuzzyLabelAliasEntry,
+  FuzzyLabelRuleSpec,
+} from "../declarations/fuzzy-label.types";
 import type {
   CandidateMatch,
   DetectionRule,
@@ -28,21 +32,10 @@ const SHORT_LABEL_WHITELIST = new Set([
   "rfc",
 ]);
 
-interface DelimitedLine {
-  normalizedLabel: string;
-  rawValue: string;
-  valueStart: number;
-}
-
-interface FuzzyLabelAliasEntry {
-  normalizedAlias: string;
-  spec: FuzzyLabelRuleSpec;
-}
-
 // Performance: Cache Fuse instances by active rule ID signature
-let cachedFuseKey: string | null = null;
-let cachedFuse: Fuse<FuzzyLabelAliasEntry> | null = null;
-let cachedAliasEntries: readonly FuzzyLabelAliasEntry[] | null = null;
+let cachedFuseKey: string | null = null,
+  cachedFuse: Fuse<FuzzyLabelAliasEntry> | null = null,
+  cachedAliasEntries: readonly FuzzyLabelAliasEntry[] | null = null;
 
 function getFuseMatcher(activeRuleIds: readonly string[]): {
   matcher: Fuse<FuzzyLabelAliasEntry>;

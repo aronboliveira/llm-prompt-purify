@@ -99,21 +99,19 @@ export function looksLikeUsaSsnStructural(value: string): boolean {
 
 // ─── Obfuscation Detection ────────────────────────────────────────────────
 
-const HOMOGLYPH_DOTS = /[·。．]/;
-const HOMOGLYPH_DASHES = /[\u2013\u2014\uFF0D_=~]/;
-const HOMOGLYPH_SLASHES = /[\u2044\u29F8\\]/;
-const STUFFED_DOTS = /\.{2,}/;
-const STUFFED_DASHES = /-{2,}|[\u2013\u2014]{2,}/;
-const STUFFED_SLASHES = /\/{2,}/;
+const OBFUSCATION_TAG_CHECKS: readonly [RegExp, string][] = Object.freeze([
+  [/[·。．]/, "homoglyph-dot"],
+  [/[\u2013\u2014\uFF0D_=~]/, "homoglyph-dash"],
+  [/[\u2044\u29F8\\]/, "homoglyph-slash"],
+  [/\.{2,}/, "separator-stuffing-dot"],
+  [/-{2,}|[\u2013\u2014]{2,}/, "separator-stuffing-dash"],
+  [/\/{2,}/, "separator-stuffing-slash"],
+]);
 
 export function detectObfuscationTags(rawFragment: string): readonly string[] {
   const tags: string[] = [];
-  if (HOMOGLYPH_DOTS.test(rawFragment)) tags.push("homoglyph-dot");
-  if (HOMOGLYPH_DASHES.test(rawFragment)) tags.push("homoglyph-dash");
-  if (HOMOGLYPH_SLASHES.test(rawFragment)) tags.push("homoglyph-slash");
-  if (STUFFED_DOTS.test(rawFragment)) tags.push("separator-stuffing-dot");
-  if (STUFFED_DASHES.test(rawFragment)) tags.push("separator-stuffing-dash");
-  if (STUFFED_SLASHES.test(rawFragment)) tags.push("separator-stuffing-slash");
+  for (const [pattern, tag] of OBFUSCATION_TAG_CHECKS)
+    if (pattern.test(rawFragment)) tags.push(tag);
   return tags;
 }
 

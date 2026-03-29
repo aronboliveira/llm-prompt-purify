@@ -1,6 +1,7 @@
 import type { WorkflowSnippet } from "../declarations/workflow.types";
+import { deepFreeze } from "@shared/utils/deep-freeze.utils";
 
-export const WORKFLOW_SNIPPETS: readonly WorkflowSnippet[] = Object.freeze([
+export const WORKFLOW_SNIPPETS: readonly WorkflowSnippet[] = deepFreeze([
   {
     body: "Choose the country scope you want active, or keep the detector in global-only mode.",
     id: "paste",

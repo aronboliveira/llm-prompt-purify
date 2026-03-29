@@ -1,4 +1,6 @@
-export const WORKSPACE_COPY = Object.freeze({
+import { deepFreeze } from "@shared/utils/deep-freeze.utils";
+
+export const WORKSPACE_COPY = deepFreeze({
   clientsideBody:
     "Masking runs in this browser session. The raw prompt stays local unless you copy text out of the page yourself.",
   clientsideTitle: "Everything stays client-side while you sanitize.",

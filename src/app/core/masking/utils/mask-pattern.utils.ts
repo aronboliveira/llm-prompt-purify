@@ -1,12 +1,7 @@
+import type { DelimitedPatternOptions } from "../declarations/mask-pattern.types";
+
 const FLEXIBLE_LABEL_JOINER_PATTERN = String.raw`(?:[\s._-]+)`,
   UNICODE_WORD_CHARACTER_CLASS = String.raw`[\p{L}\p{N}]`;
-
-interface DelimitedPatternOptions {
-  bounded?: boolean;
-  delimiterPattern?: string;
-  flags?: string;
-  quoteWrapped?: boolean;
-}
 
 export function buildFlexibleLabelAlternation(
   labels: readonly string[],

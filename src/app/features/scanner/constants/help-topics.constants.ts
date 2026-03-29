@@ -1,6 +1,7 @@
 import type { HelpTopic, HelpTopicId } from "../declarations/help-topic.types";
+import { deepFreeze } from "@shared/utils/deep-freeze.utils";
 
-export const HELP_TOPICS: Readonly<Record<HelpTopicId, HelpTopic>> = Object.freeze({
+export const HELP_TOPICS: Readonly<Record<HelpTopicId, HelpTopic>> = deepFreeze({
   clientside: {
     id: "clientside",
     paragraphs: [

@@ -16,6 +16,7 @@ import type {
   WritingSystemFamily,
   WritingSystemSubtype,
 } from "./polyglot-pools.constants";
+import { deepFreeze } from "@shared/utils/deep-freeze.utils";
 
 /**
  * Maps each country language family to the writing-system subtypes that are
@@ -24,7 +25,7 @@ import type {
  */
 export const LOCALE_NATIVE_WRITING_SYSTEMS: Readonly<
   Record<CountryLanguageFamily, readonly WritingSystemSubtype[]>
-> = Object.freeze({
+> = deepFreeze({
   english: ["latin"],
   indic: ["devanagari", "bengali", "gujarati", "kannada", "tamil", "telugu"],
   mandarin: [],
@@ -93,7 +94,7 @@ export const COUNTRY_PROFILE_ORDER: readonly CountryProfileId[] = Object.freeze(
 
 export const COUNTRY_PROFILE_DEFINITIONS: Readonly<
   Record<CountryProfileId, CountryProfileDefinition>
-> = Object.freeze({
+> = deepFreeze({
   ar: {
     description:
       "Shared global rules plus Argentina-focused identifiers such as CUIT and DNI.",
@@ -263,7 +264,7 @@ export const MASK_GROUP_ORDER: readonly MaskGroupId[] = Object.freeze([
 
 export const MASK_GROUP_DEFINITIONS: Readonly<
   Record<MaskGroupId, MaskGroupDefinition>
-> = Object.freeze({
+> = deepFreeze({
   credential: {
     alwaysOnLabel: "Always keep masked",
     description:
@@ -307,12 +308,12 @@ export const MASK_GROUP_DEFINITIONS: Readonly<
   },
 });
 
-export const DEFAULT_GROUP_PREFERENCES: MaskGroupPreferenceMap = Object.freeze({
-  credential: Object.freeze({ alwaysOn: true, enabled: true }),
-  financial: Object.freeze({ alwaysOn: false, enabled: true }),
-  identifier: Object.freeze({ alwaysOn: false, enabled: true }),
-  location: Object.freeze({ alwaysOn: false, enabled: true }),
-  personal: Object.freeze({ alwaysOn: false, enabled: true }),
+export const DEFAULT_GROUP_PREFERENCES: MaskGroupPreferenceMap = deepFreeze({
+  credential: { alwaysOn: true, enabled: true },
+  financial: { alwaysOn: false, enabled: true },
+  identifier: { alwaysOn: false, enabled: true },
+  location: { alwaysOn: false, enabled: true },
+  personal: { alwaysOn: false, enabled: true },
 });
 
 // ─── Masking Strategy ────────────────────────────────────────────────────────
@@ -521,19 +522,14 @@ export const XML_WRAP_TAG_LABELS: Readonly<Record<XmlWrapTag, string>> =
 // ─── Advanced Preferences Defaults ───────────────────────────────────────────
 
 export const DEFAULT_ADVANCED_PREFERENCES: Readonly<AdvancedMaskingPreferences> =
-  Object.freeze({
+  deepFreeze({
     maskingStrategy: "random",
     xmlWrapEnabled: false,
     xmlWrapTag: "document",
     maskTimestamps: false,
-    keywordBlocklist: Object.freeze([]),
-    globalIgnoreList: Object.freeze([]),
+    keywordBlocklist: [],
+    globalIgnoreList: [],
     polyglotMaskEnabled: true,
-    polyglotEnabledFamilies: Object.freeze([
-      "abugida",
-      "alphabetic",
-      "syllabary",
-      "symbol",
-    ]),
-    polyglotExcludedSubtypes: Object.freeze([]),
+    polyglotEnabledFamilies: ["abugida", "alphabetic", "syllabary", "symbol"],
+    polyglotExcludedSubtypes: [],
   });

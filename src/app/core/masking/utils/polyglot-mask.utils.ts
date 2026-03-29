@@ -20,7 +20,10 @@ import type {
   WritingSystemSubtype,
 } from "../constants/polyglot-pools.constants";
 import { ALL_POOLS } from "../constants/polyglot-pools.constants";
-import type { PolyglotMaskConfig } from "../declarations/polyglot-mask.types";
+import type {
+  PolyglotMaskConfig,
+  WeightTier,
+} from "../declarations/polyglot-mask.types";
 
 export type { PolyglotMaskConfig } from "../declarations/polyglot-mask.types";
 
@@ -58,8 +61,6 @@ const SCRIPT_FAMILIES: ReadonlySet<WritingSystemFamily> = new Set([
   "abugida",
   "syllabary",
 ]);
-
-type WeightTier = "digital" | "figure" | "script";
 
 function tierOf(pool: CharacterPool): WeightTier {
   if (DIGITAL_SYMBOL_SUBTYPES.has(pool.subtype)) return "digital";

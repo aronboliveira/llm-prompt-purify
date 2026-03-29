@@ -1,4 +1,5 @@
 import type { DetectionRule } from "../declarations/masking.types";
+import { deepFreeze } from "@shared/utils/deep-freeze.utils";
 import {
   BR_CEP_LABEL_FLAGS,
   BR_CNH_LABEL_FLAGS,
@@ -64,13 +65,13 @@ import {
 // Covers: dot variants (. · 。 ．), dash variants (- – — _ =), slash (/ \ ⁄ ⧸),
 // and optional surrounding whitespace. {1,3} allows repeated separators.
 // Reserved for future `new RegExp()` constructed patterns:
-const _DOT_LIKE = String.raw`[.·。．]`;
-const _DASH_LIKE = String.raw`[-\u2013\u2014_=~*#]`;
-const _SLASH_LIKE = String.raw`[/\\\u2044\u29F8]`;
+const _DOT_LIKE = String.raw`[.·。．]`,
+  _DASH_LIKE = String.raw`[-\u2013\u2014_=~*#]`,
+  _SLASH_LIKE = String.raw`[/\\\u2044\u29F8]`;
 void [_DOT_LIKE, _DASH_LIKE, _SLASH_LIKE];
 import { createDelimitedLabelValuePattern } from "../utils/mask-pattern.utils";
 
-export const MASKING_RULES: readonly DetectionRule[] = Object.freeze([
+export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
   {
     category: "personal",
     coverage: "global",

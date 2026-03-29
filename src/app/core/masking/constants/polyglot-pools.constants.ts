@@ -15,6 +15,7 @@ import type {
   WritingSystemFamily,
   WritingSystemSubtype,
 } from "../declarations/polyglot-pools.types";
+import { deepFreeze } from "@shared/utils/deep-freeze.utils";
 
 export type {
   AbugidaSubtype,
@@ -30,166 +31,166 @@ export type {
 
 // ─── Abugidas ────────────────────────────────────────────────────────────────
 
-const DEVANAGARI: CharacterPool = {
+const DEVANAGARI: CharacterPool = deepFreeze({
   family: "abugida",
   subtype: "devanagari",
   label: "Devanagari",
   chars: "अआइईउऊएऐओऔकखगघचछजझटठडढणतथदधनपफबभमयरलवशषसह",
-};
+});
 
-const BENGALI: CharacterPool = {
+const BENGALI: CharacterPool = deepFreeze({
   family: "abugida",
   subtype: "bengali",
   label: "Bengali",
   chars: "অআইঈউঊএঐওঔকখগঘচছজঝটঠডঢণতথদধনপফবভমযরলশষসহ",
-};
+});
 
-const TAMIL: CharacterPool = {
+const TAMIL: CharacterPool = deepFreeze({
   family: "abugida",
   subtype: "tamil",
   label: "Tamil",
   chars: "அஆஇஈஉஊஎஏஐஒஓஔகஙசஜஞடணதநனபமயரலவழளறன",
-};
+});
 
-const TELUGU: CharacterPool = {
+const TELUGU: CharacterPool = deepFreeze({
   family: "abugida",
   subtype: "telugu",
   label: "Telugu",
   chars: "అఆఇఈఉఊఎఏఐఒఓఔకఖగఘచఛజఝటఠడఢణతథదధనపఫబభమయరలవశషసహ",
-};
+});
 
-const GUJARATI: CharacterPool = {
+const GUJARATI: CharacterPool = deepFreeze({
   family: "abugida",
   subtype: "gujarati",
   label: "Gujarati",
   chars: "અઆઇઈઉઊએઐઓઔકખગઘચછજઝટઠડઢણતથદધનપફબભમયરલવશષસહ",
-};
+});
 
-const KANNADA: CharacterPool = {
+const KANNADA: CharacterPool = deepFreeze({
   family: "abugida",
   subtype: "kannada",
   label: "Kannada",
   chars: "ಅಆಇಈಉಊಎಏಐಒಓಔಕಖಗಘಚಛಜಝಟಠಡಢಣತಥದಧನಪಫಬಭಮಯರಲವಶಷಸಹ",
-};
+});
 
-const THAI: CharacterPool = {
+const THAI: CharacterPool = deepFreeze({
   family: "abugida",
   subtype: "thai",
   label: "Thai",
   chars: "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮ",
-};
+});
 
 // ─── Alphabetics ─────────────────────────────────────────────────────────────
 
-const CYRILLIC: CharacterPool = {
+const CYRILLIC: CharacterPool = deepFreeze({
   family: "alphabetic",
   subtype: "cyrillic",
   label: "Cyrillic",
   chars: "БГДЖЗИЙЛПФЦЧШЩЪЫЬЮЯбгджзийлпфцчшщъыьюя",
-};
+});
 
-const LATIN: CharacterPool = {
+const LATIN: CharacterPool = deepFreeze({
   family: "alphabetic",
   subtype: "latin",
   label: "Extended Latin",
   chars: "ÆÐŁŒŦÞßæðłœŧþƒǝȝȠȤɐɒɔɘɛɜɞɤɥɬɮɰɱɳɵɸʃʄʇʈʊʎʐʑʒʔ",
-};
+});
 
-const ARMENIAN: CharacterPool = {
+const ARMENIAN: CharacterPool = deepFreeze({
   family: "alphabetic",
   subtype: "armenian",
   label: "Armenian",
   chars:
     "ԱԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՍՎՏՐՑՒՓՔՕՖաբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցւփքօֆ",
-};
+});
 
-const GEORGIAN: CharacterPool = {
+const GEORGIAN: CharacterPool = deepFreeze({
   family: "alphabetic",
   subtype: "georgian",
   label: "Georgian",
   chars: "აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ",
-};
+});
 
 // ─── Syllabaries ─────────────────────────────────────────────────────────────
 
-const KATAKANA: CharacterPool = {
+const KATAKANA: CharacterPool = deepFreeze({
   family: "syllabary",
   subtype: "katakana",
   label: "Katakana",
   chars:
     "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン",
-};
+});
 
-const HIRAGANA: CharacterPool = {
+const HIRAGANA: CharacterPool = deepFreeze({
   family: "syllabary",
   subtype: "hiragana",
   label: "Hiragana",
   chars:
     "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわん",
-};
+});
 
-const HANGUL: CharacterPool = {
+const HANGUL: CharacterPool = deepFreeze({
   family: "syllabary",
   subtype: "hangul",
   label: "Hangul Jamo",
   chars:
     "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ",
-};
+});
 
-const ETHIOPIC: CharacterPool = {
+const ETHIOPIC: CharacterPool = deepFreeze({
   family: "syllabary",
   subtype: "ethiopic",
   label: "Ethiopic",
   chars: "ሀሁሂሃሄሆለሉሊላሌሎሐሑሒሓሔሖመሙሚማሜሞረሩሪራሬሮሰሱሲሳሴሶ",
-};
+});
 
 // ─── Symbols ─────────────────────────────────────────────────────────────────
 
-const KEYBOARD_SYMBOLS: CharacterPool = {
+const KEYBOARD_SYMBOLS: CharacterPool = deepFreeze({
   family: "symbol",
   subtype: "keyboard",
   label: "Keyboard Symbols",
   chars: "!@#$%^&*~?§±°¢£¥€¤¦©®™",
-};
+});
 
-const MATH_SYMBOLS: CharacterPool = {
+const MATH_SYMBOLS: CharacterPool = deepFreeze({
   family: "symbol",
   subtype: "math",
   label: "Math Symbols",
   chars: "∀∂∃∅∇∈∉∋∏∑∓∗∘√∝∞∟∠∡∢∣∥∧∨∩∪∫≈≠≡≤≥⊂⊃⊆⊇⊕⊗⊥",
-};
+});
 
-const ARROWS: CharacterPool = {
+const ARROWS: CharacterPool = deepFreeze({
   family: "symbol",
   subtype: "arrows",
   label: "Arrows",
   chars: "←↑→↓↔↕↖↗↘↙↞↟↠↡↢↣⇐⇑⇒⇓⇔⇕⇤⇥⤐⤑⤒⤓⤔⤕⤖⤗",
-};
+});
 
-const GEOMETRIC: CharacterPool = {
+const GEOMETRIC: CharacterPool = deepFreeze({
   family: "symbol",
   subtype: "geometric",
   label: "Geometric Shapes",
   chars: "■□▢▣▤▥▦▧▨▩▪▬▮▰▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◈◉◊○◌◍◎●◐◑◒◓◔◕",
-};
+});
 
-const BOX_DRAWING: CharacterPool = {
+const BOX_DRAWING: CharacterPool = deepFreeze({
   family: "symbol",
   subtype: "box-drawing",
   label: "Box Drawing",
   chars: "─│┌┐└┘├┤┬┴┼╌╍╎╏═║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬",
-};
+});
 
-const MISC_SYMBOLS: CharacterPool = {
+const MISC_SYMBOLS: CharacterPool = deepFreeze({
   family: "symbol",
   subtype: "misc",
   label: "Miscellaneous",
   chars: "☀☁☂☃☄★☆☉☊☋☌☍☎☏☐☑☒☓☚☛☜☝☞☟☠☡☢☣☤☥☦☧☨☩☪☫☬☭☮☯☰☱☲☳☴☵☶☷",
-};
+});
 
 // ─── All Pools by Family ─────────────────────────────────────────────────────
 
-export const ABUGIDA_POOLS: readonly CharacterPool[] = Object.freeze([
+export const ABUGIDA_POOLS: readonly CharacterPool[] = deepFreeze([
   DEVANAGARI,
   BENGALI,
   TAMIL,
@@ -199,21 +200,21 @@ export const ABUGIDA_POOLS: readonly CharacterPool[] = Object.freeze([
   THAI,
 ]);
 
-export const ALPHABETIC_POOLS: readonly CharacterPool[] = Object.freeze([
+export const ALPHABETIC_POOLS: readonly CharacterPool[] = deepFreeze([
   CYRILLIC,
   LATIN,
   ARMENIAN,
   GEORGIAN,
 ]);
 
-export const SYLLABARY_POOLS: readonly CharacterPool[] = Object.freeze([
+export const SYLLABARY_POOLS: readonly CharacterPool[] = deepFreeze([
   KATAKANA,
   HIRAGANA,
   HANGUL,
   ETHIOPIC,
 ]);
 
-export const SYMBOL_POOLS: readonly CharacterPool[] = Object.freeze([
+export const SYMBOL_POOLS: readonly CharacterPool[] = deepFreeze([
   KEYBOARD_SYMBOLS,
   MATH_SYMBOLS,
   ARROWS,
@@ -222,7 +223,7 @@ export const SYMBOL_POOLS: readonly CharacterPool[] = Object.freeze([
   MISC_SYMBOLS,
 ]);
 
-export const ALL_POOLS: readonly CharacterPool[] = Object.freeze([
+export const ALL_POOLS: readonly CharacterPool[] = deepFreeze([
   ...ABUGIDA_POOLS,
   ...ALPHABETIC_POOLS,
   ...SYLLABARY_POOLS,
@@ -230,11 +231,11 @@ export const ALL_POOLS: readonly CharacterPool[] = Object.freeze([
 ]);
 
 export const POOL_BY_SUBTYPE: Readonly<Record<string, CharacterPool>> =
-  Object.freeze(Object.fromEntries(ALL_POOLS.map(p => [p.subtype, p])));
+  deepFreeze(Object.fromEntries(ALL_POOLS.map(p => [p.subtype, p])));
 
 export const POOLS_BY_FAMILY: Readonly<
   Record<WritingSystemFamily, readonly CharacterPool[]>
-> = Object.freeze({
+> = deepFreeze({
   abugida: ABUGIDA_POOLS,
   alphabetic: ALPHABETIC_POOLS,
   syllabary: SYLLABARY_POOLS,

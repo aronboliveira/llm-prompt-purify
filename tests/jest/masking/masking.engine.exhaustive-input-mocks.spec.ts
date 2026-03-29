@@ -140,10 +140,15 @@ function cnpjValid(value: string): boolean {
 
 // Sensitive value patterns mirroring the playwright BrowserLite spec.
 // Each entry pairs a regex with an optional validator function.
-const SENSITIVE_PATTERNS: readonly { re: RegExp; valid?: (s: string) => boolean }[] = [
+const SENSITIVE_PATTERNS: readonly {
+  re: RegExp;
+  valid?: (s: string) => boolean;
+}[] = [
   { re: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/giu },
   { re: /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gu },
-  { re: /\b(?:sk-(?:proj-|live-|test-)?[A-Za-z0-9_-]{20,}|sk_(?:live|test)_[A-Za-z0-9_-]{20,}|SG\.[A-Za-z0-9_-]{20,}|key-[A-Za-z0-9]{20,}|AIza[0-9A-Za-z_-]{30,})\b/gu },
+  {
+    re: /\b(?:sk-(?:proj-|live-|test-)?[A-Za-z0-9_-]{20,}|sk_(?:live|test)_[A-Za-z0-9_-]{20,}|SG\.[A-Za-z0-9_-]{20,}|key-[A-Za-z0-9]{20,}|AIza[0-9A-Za-z_-]{30,})\b/gu,
+  },
   { re: /\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/g },
   { re: /\bAC[a-f0-9]{32}\b/giu },
   { re: /\b(?:\d[ -]?){13,19}\b/g, valid: luhnValid },

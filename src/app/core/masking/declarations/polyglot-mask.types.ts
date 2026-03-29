@@ -3,6 +3,8 @@ import type {
   WritingSystemSubtype,
 } from "./polyglot-pools.types";
 
+export type WeightTier = "digital" | "figure" | "script";
+
 export interface PolyglotMaskConfig {
   /** Which writing-system families are enabled. */
   readonly enabledFamilies: readonly WritingSystemFamily[];
