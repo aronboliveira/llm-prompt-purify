@@ -18,10 +18,30 @@ llm-prompt-purify/
 │   │   └── scanner/      # Main scanner UI
 │   ├── shared/           # Reusable components, utils
 │   └── testing/          # Test fixtures & mocks
+├── tests/                # All test suites
+│   ├── e2e/              # Playwright E2E tests
+│   │   ├── _helpers/     # Shared E2E helpers & registrators
+│   │   ├── io/           # Extreme-IO & high-entropy specs
+│   │   ├── workflow/     # Scan-workflow & visual-demo specs
+│   │   └── corpus/       # Prompt-corpus specs
+│   │       ├── cluster/  # 9 plain + 27 cluster×formality specs
+│   │       ├── formality/# 3 formality-level specs
+│   │       ├── lang/     # 4 per-language specs (en, pt-br, es, zh)
+│   │       └── role/     # 28 per-role specs
+│   ├── jest/             # Jest unit & integration tests
+│   │   ├── corpus/       # Prompt-corpus unit specs
+│   │   │   ├── cluster/  # 9 cluster specs
+│   │   │   └── formality/# 3 formality specs
+│   │   ├── masking/      # Masking engine specs (11 + utils/)
+│   │   ├── mask-safety/  # Mask-safety validation specs
+│   │   ├── feedback/     # Feedback service specs
+│   │   ├── purification/ # Purification engine specs
+│   │   └── state/        # State management specs
+│   ├── python/           # Python test scripts (pytest, Selenium)
+│   └── scripts/          # Shell-based smoke & corpus tests
 ├── backend/              # .NET 8 API
 │   ├── LLMPromptPurify.Api/
 │   └── LLMPromptPurify.Api.Tests/
-├── e2e/                  # Playwright E2E tests
 ├── http/                 # HTTP API test scripts
 ├── docker/               # Docker configs
 └── docs/                 # Documentation
@@ -79,8 +99,8 @@ domain/
 ```bash
 npm start           # Dev server (localhost:4200)
 npm run build       # Production build
-npm test            # Run Jest tests
-npm run test:e2e    # Run Playwright tests
+npm test            # Run Jest tests (44 suites / 4576+ tests)
+npm run test:e2e    # Run all Playwright tests (685 specs)
 npm run lint        # Run ESLint
 npm run lint:fix    # Auto-fix lint issues
 npm run docker:up   # Start Docker stack
@@ -111,7 +131,7 @@ masking/
 ├── utils/               # Luhn generation, mask formatting
 │   └── polyglot-mask.utils.ts       # Polyglot mask generator
 ├── masking.engine.ts    # Main engine class (deterministic, pure)
-└── masking.engine.*.spec.ts # Exhaustive test suite (1400+ tests)
+└── masking.engine.ts    # Main engine class (deterministic, pure)
 ```
 
 #### Polyglot Mask Alphabet

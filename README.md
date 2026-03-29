@@ -48,10 +48,10 @@ npm install
 # Build the extension for Chromium browsers
 npm run build
 
-# Run Unit Tests (Vitest)
+# Run Unit Tests (Jest — 44 suites / 4576+ tests)
 npm test
 
-# Run E2E Tests (Playwright & Cypress via Docker)
+# Run E2E Tests (Playwright — 685 specs)
 npm run test:e2e
 ```
 
@@ -97,7 +97,7 @@ npm install
 # Compilar a extensão (Chromium)
 npm run build
 
-# Rodar testes unitários (Vitest)
+# Rodar testes unitários (Jest)
 npm test
 ```
 

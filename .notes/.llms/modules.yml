@@ -48,7 +48,8 @@ modules:
     owner: testing
     paths:
       - src/**/*.spec.ts
-      - e2e
+      - tests/e2e
+      - tests/jest
     outcome:
       - extensive rule fixtures
       - critical user-flow coverage
