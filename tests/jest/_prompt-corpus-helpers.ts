@@ -149,13 +149,7 @@ export function runRoleFormality(
 
         for (const file of files) {
           const text = readPromptFile(lang, formality, role, length, file);
-          const result = engine.scan(
-            text,
-            groupPrefs,
-            scope,
-            SCAN_DATE,
-            prefs,
-          );
+          const result = engine.scan(text, groupPrefs, scope, SCAN_DATE, prefs);
 
           totalMatches += result.matches.length;
           if (result.maskedText !== text) maskedCount++;

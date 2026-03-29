@@ -1,4 +1,4 @@
-import { calculateCheckSum } from "./mask-validation.utils";
+import { calculateCheckSum } from "@core/masking/utils/mask-validation.utils";
 
 describe("calculateCheckSum", () => {
   describe("CPF check digits (modulus 11)", () => {

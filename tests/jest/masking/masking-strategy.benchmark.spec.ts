@@ -23,11 +23,11 @@ import {
   RandomMaskingStrategy,
   RedactedMaskingStrategy,
   TagMaskingStrategy,
-} from "./strategies";
+} from "@core/masking/strategies";
 import {
   createFakerCounterState,
   createMaskForStrategy,
-} from "./utils/mask-strategy.utils";
+} from "@core/masking/utils/mask-strategy.utils";
 
 describe("MaskingStrategy Performance Benchmarks", () => {
   const ITERATIONS = 10000;

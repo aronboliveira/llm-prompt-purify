@@ -1,16 +1,16 @@
 import {
   DEFAULT_ADVANCED_PREFERENCES,
   DEFAULT_GROUP_PREFERENCES,
-} from "./constants/masking.constants";
-import { MaskingEngine } from "./masking.engine";
-import { buildScanScopeSelection } from "./utils/country-scope.utils";
-import { createGroupPreferenceMap } from "./utils/mask-group.utils";
+} from "@core/masking/constants/masking.constants";
+import { MaskingEngine } from "@core/masking/masking.engine";
+import { buildScanScopeSelection } from "@core/masking/utils/country-scope.utils";
+import { createGroupPreferenceMap } from "@core/masking/utils/mask-group.utils";
 import {
   BRAZILIAN_PORTUGUESE_MASK_FIXTURES,
   GLOBAL_SCOPE_MASK_FIXTURES,
   INTERNATIONAL_MASK_FIXTURES,
   NEGATIVE_LOCALE_MASK_FIXTURES,
-} from "../../testing/constants/locale-mask-fixtures.constants";
+} from "@testing/constants/locale-mask-fixtures.constants";
 
 describe("MaskingEngine", () => {
   const engine = new MaskingEngine(),

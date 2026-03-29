@@ -5,9 +5,9 @@
  * even in structured data formats where word boundaries (\b) fail.
  */
 
-import { DEFAULT_GROUP_PREFERENCES } from "./constants/masking.constants";
-import { MaskingEngine } from "./masking.engine";
-import { buildScanScopeSelection } from "./utils/country-scope.utils";
+import { DEFAULT_GROUP_PREFERENCES } from "@core/masking/constants/masking.constants";
+import { MaskingEngine } from "@core/masking/masking.engine";
+import { buildScanScopeSelection } from "@core/masking/utils/country-scope.utils";
 
 describe("MaskingEngine JSON Context Detection", () => {
   const engine = new MaskingEngine();

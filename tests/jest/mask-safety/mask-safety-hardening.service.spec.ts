@@ -1,10 +1,10 @@
-import type { ScanMatch } from "../masking/declarations/masking.types";
+import type { ScanMatch } from "@core/masking/declarations/masking.types";
 import {
   MASK_SAFETY_DECISIONS,
   MASK_SAFETY_LIMITS,
-} from "./constants/mask-safety.constants";
-import type { MaskSafetyClient } from "./declarations/mask-safety.types";
-import { MaskSafetyHardeningService } from "./mask-safety-hardening.service";
+} from "@core/mask-safety/constants/mask-safety.constants";
+import type { MaskSafetyClient } from "@core/mask-safety/declarations/mask-safety.types";
+import { MaskSafetyHardeningService } from "@core/mask-safety/mask-safety-hardening.service";
 
 describe("MaskSafetyHardeningService", () => {
   it("regenerates supported compromising candidates until the validator says they are safe", async () => {

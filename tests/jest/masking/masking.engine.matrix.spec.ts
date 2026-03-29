@@ -3,7 +3,7 @@
  * Runs every fixture in the matrix/ modules through the engine assertion helpers.
  * Organised by region → rule → positive / negative / boundary.
  */
-import { MaskingEngine } from "./masking.engine";
+import { MaskingEngine } from "@core/masking/masking.engine";
 import {
   assertBoundaryFixture,
   assertNegativeFixture,

@@ -10,15 +10,15 @@ import {
   detectThreats,
   hasThreats,
   purifyContent,
-} from "./purification.service";
-import { containsSqlInjection, detectSqlInjection } from "./utils/sql-detect.utils";
-import { containsXss, detectXssPatterns, encodeHtmlEntities } from "./utils/xss-purify.utils";
-import { containsXxe, detectXxe } from "./utils/xxe-detect.utils";
+} from "@core/purification/purification.service";
+import { containsSqlInjection, detectSqlInjection } from "@core/purification/utils/sql-detect.utils";
+import { containsXss, detectXssPatterns, encodeHtmlEntities } from "@core/purification/utils/xss-purify.utils";
+import { containsXxe, detectXxe } from "@core/purification/utils/xxe-detect.utils";
 import {
   containsPathTraversal,
   detectPathTraversal,
   wouldEscapeBase,
-} from "./utils/path-traversal.utils";
+} from "@core/purification/utils/path-traversal.utils";
 
 describe("ContentPurifier", () => {
   let purifier: ContentPurifier;

@@ -1,7 +1,7 @@
 import {
   detectBrowserCountryProfileIds,
   matchBrowserLocaleToCountryProfileId,
-} from "./country-profile-defaults.utils";
+} from "@core/state/utils/country-profile-defaults.utils";
 
 describe("country-profile-defaults utils", () => {
   it("maps explicit browser locales to the most relevant country profile", () => {

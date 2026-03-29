@@ -4,9 +4,9 @@ import { join } from "node:path";
 import {
   DEFAULT_ADVANCED_PREFERENCES,
   DEFAULT_GROUP_PREFERENCES,
-} from "./constants/masking.constants";
-import { MaskingEngine } from "./masking.engine";
-import { buildScanScopeSelection } from "./utils/country-scope.utils";
+} from "@core/masking/constants/masking.constants";
+import { MaskingEngine } from "@core/masking/masking.engine";
+import { buildScanScopeSelection } from "@core/masking/utils/country-scope.utils";
 
 describe("MaskingEngine input-mock compliance corpus", () => {
   const engine = new MaskingEngine(),

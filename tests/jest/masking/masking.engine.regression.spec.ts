@@ -1,6 +1,6 @@
-import { DEFAULT_GROUP_PREFERENCES } from "./constants/masking.constants";
-import { MaskingEngine } from "./masking.engine";
-import { buildScanScopeSelection } from "./utils/country-scope.utils";
+import { DEFAULT_GROUP_PREFERENCES } from "@core/masking/constants/masking.constants";
+import { MaskingEngine } from "@core/masking/masking.engine";
+import { buildScanScopeSelection } from "@core/masking/utils/country-scope.utils";
 import {
   FUZZY_LABEL_MASK_FIXTURES,
   FUZZY_LABEL_NEGATIVE_FIXTURES,
@@ -9,12 +9,12 @@ import {
   GLOBAL_NEGATIVE_MASK_FIXTURES,
   GLOBAL_PERSONAL_MASK_FIXTURES,
   SCOPE_BOUNDARY_MASK_FIXTURES,
-} from "../../testing/constants/mask-regression-corpus.constants";
+} from "@testing/constants/mask-regression-corpus.constants";
 import {
   assertBoundaryFixture,
   assertNegativeFixture,
   assertPositiveFixture,
-} from "../../testing/utils/masking-engine-assertions.utils";
+} from "@testing/utils/masking-engine-assertions.utils";
 
 describe("MaskingEngine regression corpus", () => {
   const engine = new MaskingEngine();

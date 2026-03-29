@@ -1,12 +1,12 @@
-import { MaskingEngine } from "./masking.engine";
+import { MaskingEngine } from "@core/masking/masking.engine";
 import {
   FUZZY_LABEL_FUZZ_NEGATIVE_FIXTURES,
   FUZZY_LABEL_FUZZ_POSITIVE_FIXTURES,
-} from "../../testing/constants/fuzzy-label-fuzz.constants";
+} from "@testing/constants/fuzzy-label-fuzz.constants";
 import {
   assertNegativeFixture,
   assertPositiveFixture,
-} from "../../testing/utils/masking-engine-assertions.utils";
+} from "@testing/utils/masking-engine-assertions.utils";
 
 describe("MaskingEngine fuzzy label fuzz corpus", () => {
   const engine = new MaskingEngine();

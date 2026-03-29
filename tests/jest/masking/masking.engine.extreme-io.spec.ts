@@ -5,10 +5,10 @@
  * injection vectors, deeply nested data, emoji-heavy text, mixed RTL/LTR,
  * repeated patterns, null-byte injection, max-length single-line, and more.
  */
-import { DEFAULT_GROUP_PREFERENCES } from "./constants/masking.constants";
-import { MaskingEngine } from "./masking.engine";
-import { buildScanScopeSelection } from "./utils/country-scope.utils";
-import { createGroupPreferenceMap } from "./utils/mask-group.utils";
+import { DEFAULT_GROUP_PREFERENCES } from "@core/masking/constants/masking.constants";
+import { MaskingEngine } from "@core/masking/masking.engine";
+import { buildScanScopeSelection } from "@core/masking/utils/country-scope.utils";
+import { createGroupPreferenceMap } from "@core/masking/utils/mask-group.utils";
 
 describe("MaskingEngine extreme I/O variations", () => {
   const engine = new MaskingEngine(),

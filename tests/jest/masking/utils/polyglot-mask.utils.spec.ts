@@ -2,16 +2,16 @@ import {
   generatePolyglotMask,
   createDistinctPolyglotMask,
   DEFAULT_POLYGLOT_CONFIG,
-} from "./polyglot-mask.utils";
-import type { PolyglotMaskConfig } from "./polyglot-mask.utils";
+} from "@core/masking/utils/polyglot-mask.utils";
+import type { PolyglotMaskConfig } from "@core/masking/utils/polyglot-mask.utils";
 import {
   ALL_POOLS,
   POOLS_BY_FAMILY,
-} from "../constants/polyglot-pools.constants";
+} from "@core/masking/constants/polyglot-pools.constants";
 import type {
   WritingSystemFamily,
   WritingSystemSubtype,
-} from "../constants/polyglot-pools.constants";
+} from "@core/masking/constants/polyglot-pools.constants";
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 

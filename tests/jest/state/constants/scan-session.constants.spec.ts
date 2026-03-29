@@ -1,7 +1,7 @@
 import {
   resolveAdaptiveDebounceMs,
   SCAN_TIMINGS,
-} from "./scan-session.constants";
+} from "@core/state/constants/scan-session.constants";
 
 describe("resolveAdaptiveDebounceMs", () => {
   it("returns autoRefreshDebounceMs for undefined inputType", () => {

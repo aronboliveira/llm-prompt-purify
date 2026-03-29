@@ -1,9 +1,9 @@
-import type { ScanMatch } from "../masking/declarations/masking.types";
+import type { ScanMatch } from "@core/masking/declarations/masking.types";
 import type {
   MaskSafetyHardener,
   MaskSafetyHardeningResult,
-} from "../mask-safety/declarations/mask-safety.types";
-import { ScanSessionService } from "./scan-session.service";
+} from "@core/mask-safety/declarations/mask-safety.types";
+import { ScanSessionService } from "@core/state/scan-session.service";
 
 describe("ScanSessionService", () => {
   beforeEach(() => {

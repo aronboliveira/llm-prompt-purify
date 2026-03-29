@@ -1,4 +1,4 @@
-import { ToastCenterService } from "./toast-center.service";
+import { ToastCenterService } from "@core/feedback/toast-center.service";
 
 describe("ToastCenterService", () => {
   beforeEach(() => {
