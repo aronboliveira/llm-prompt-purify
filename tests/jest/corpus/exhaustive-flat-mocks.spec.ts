@@ -7,7 +7,13 @@
  *
  * File format mirrors the codex exhaustive-tests.log for direct comparison.
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 
 import {
@@ -21,13 +27,18 @@ import type { MaskingStrategy } from "@core/masking/declarations/masking.types";
 // ── Config ─────────────────────────────────────────────────────────────
 
 const MOCK_ROOT = join(process.cwd(), ".tmp", "input-mocks");
-const TAG = process.env["REPORT_TAG"] ?? `copilot-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}`;
+const TAG =
+  process.env["REPORT_TAG"] ??
+  `copilot-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}`;
 const REPORT_DIR = join(process.cwd(), ".tmp", "copilot", TAG);
 const LOG_FILE = join(REPORT_DIR, "exhaustive-tests.log");
 
 const LANGS = ["en", "pt-br", "es", "zh"] as const;
 
-const LANG_SCOPES: Record<string, ReturnType<typeof buildScanScopeSelection>[]> = {
+const LANG_SCOPES: Record<
+  string,
+  ReturnType<typeof buildScanScopeSelection>[]
+> = {
   en: [
     buildScanScopeSelection(["us"], "selected-plus-global"),
     buildScanScopeSelection(["us"], "global-only"),
@@ -46,7 +57,12 @@ const LANG_SCOPES: Record<string, ReturnType<typeof buildScanScopeSelection>[]> 
   ],
 };
 
-const STRATEGIES: readonly MaskingStrategy[] = ["random", "tags", "faker", "redacted"];
+const STRATEGIES: readonly MaskingStrategy[] = [
+  "random",
+  "tags",
+  "faker",
+  "redacted",
+];
 
 const SCAN_DATE = "2026-03-29T00:00:00.000Z";
 
@@ -144,7 +160,15 @@ function runFileAcrossModesAndStrategies(
     ? "No changes required."
     : "Enforce numeric compliance placeholders (#) for financial and identifier categories regardless of strategy.";
 
-  return { relPath: entry.relPath, success, failReasons, fix, totalMatches, modesWithMatches, modesTotal };
+  return {
+    relPath: entry.relPath,
+    success,
+    failReasons,
+    fix,
+    totalMatches,
+    modesWithMatches,
+    modesTotal,
+  };
 }
 
 function formatResult(r: FileResult): string {
