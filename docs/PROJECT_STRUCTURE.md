@@ -31,7 +31,9 @@ llm-prompt-purify/
 │   ├── jest/             # Jest unit & integration tests
 │   │   ├── corpus/       # Prompt-corpus unit specs
 │   │   │   ├── cluster/  # 9 cluster specs
-│   │   │   └── formality/# 3 formality specs
+│   │   │   ├── formality/# 3 formality specs
+│   │   │   ├── role/     # 28 per-role specs
+│   │   │   └── lang/     # 4 per-language specs
 │   │   ├── masking/      # Masking engine specs (11 + utils/)
 │   │   ├── mask-safety/  # Mask-safety validation specs
 │   │   ├── feedback/     # Feedback service specs
@@ -99,7 +101,7 @@ domain/
 ```bash
 npm start           # Dev server (localhost:4200)
 npm run build       # Production build
-npm test            # Run Jest tests (44 suites / 4576+ tests)
+npm test            # Run Jest tests (77 suites / 7724 tests)
 npm run test:e2e    # Run all Playwright tests (685 specs)
 npm run lint        # Run ESLint
 npm run lint:fix    # Auto-fix lint issues

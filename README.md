@@ -48,7 +48,7 @@ npm install
 # Build the extension for Chromium browsers
 npm run build
 
-# Run Unit Tests (Jest — 44 suites / 4576+ tests)
+# Run Unit Tests (Jest — 77 suites / 7724 tests)
 npm test
 
 # Run E2E Tests (Playwright — 685 specs)
