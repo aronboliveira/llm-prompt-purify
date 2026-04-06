@@ -93,7 +93,12 @@ import {
   CROSS_SCOPE_GLOBAL_ONLY,
   CROSS_SCOPE_STRESS,
   // ── High Entropy (Edge Cases) ──
+  ADDRESS_FUZZY_POSITIVE,
+  ADDRESS_UNCOMMON_POSITIVE,
   AMBIGUOUS_SEPARATOR_BOUNDARY,
+  CONTEXTUAL_ADDRESS_POSITIVE,
+  DATE_DETECTION_POSITIVE,
+  SINGLE_LINE_ADDRESS_REGRESSION,
   BR_INFORMAL_VARIATIONS,
   BR_TYPO_POSITIVE,
   HIGH_ENTROPY_NEGATIVES,
@@ -379,6 +384,16 @@ describe("MaskingEngine country × rule matrix", () => {
       positives(MALICIOUS_CODE_FIXTURES)(engine));
     describe("unicode edge cases", () => positives(UNICODE_EDGE_CASES)(engine));
     describe("whitespace chaos", () => positives(WHITESPACE_CHAOS)(engine));
+    describe("address uncommon keywords", () =>
+      positives(ADDRESS_UNCOMMON_POSITIVE)(engine));
+    describe("address fuzzy / separator tricks", () =>
+      positives(ADDRESS_FUZZY_POSITIVE)(engine));
+    describe("contextual mid-paragraph addresses", () =>
+      positives(CONTEXTUAL_ADDRESS_POSITIVE)(engine));
+    describe("date detection", () =>
+      positives(DATE_DETECTION_POSITIVE)(engine));
+    describe("single-line address + PII boundary regression", () =>
+      positives(SINGLE_LINE_ADDRESS_REGRESSION)(engine));
     describe("informal variations", () => {
       describe("PT-BR informal", () =>
         positives(BR_INFORMAL_VARIATIONS)(engine));
