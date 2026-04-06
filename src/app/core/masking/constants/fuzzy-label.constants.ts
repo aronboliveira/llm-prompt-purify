@@ -1,6 +1,8 @@
 import type { FuzzyLabelRuleSpec } from "../declarations/fuzzy-label.types";
+import { NEXT_FIELD_BOUNDARY } from "./mask-flag-dictionaries.constants";
 
-export const FUZZY_LABEL_DELIMITED_LINE_PATTERN = /^(\s*[^:=\n\r]{2,64}?)\s*[:=]\s*(.+)$/u;
+export const FUZZY_LABEL_DELIMITED_LINE_PATTERN =
+  /^(\s*[^:=\n\r]{2,64}?)\s*[:=]\s*(.+)$/u;
 
 export const FUZZY_LABEL_SPECS: readonly FuzzyLabelRuleSpec[] = Object.freeze([
   {
@@ -67,7 +69,11 @@ export const FUZZY_LABEL_SPECS: readonly FuzzyLabelRuleSpec[] = Object.freeze([
     ]),
     maxScore: 0.18,
     ruleId: "labeled-address",
-    valuePatternFactory: () => /^[^\n\r]{6,120}$/u,
+    valuePatternFactory: () =>
+      new RegExp(
+        String.raw`^(?:(?!\s+(?:${NEXT_FIELD_BOUNDARY})\s*[:=-])[^\n\r]){6,120}$`,
+        "iu",
+      ),
   },
   {
     aliases: Object.freeze([
@@ -238,6 +244,7 @@ export const FUZZY_LABEL_SPECS: readonly FuzzyLabelRuleSpec[] = Object.freeze([
     ]),
     maxScore: 0.24,
     ruleId: "in-gstin-labeled",
-    valuePatternFactory: () => /^\d{2}[A-Z]{5}\d{4}[A-Z][A-Z0-9][Zz][A-Z0-9]$/iu,
+    valuePatternFactory: () =>
+      /^\d{2}[A-Z]{5}\d{4}[A-Z][A-Z0-9][Zz][A-Z0-9]$/iu,
   },
 ]);

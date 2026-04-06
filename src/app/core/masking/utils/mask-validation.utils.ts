@@ -1,4 +1,212 @@
 import { sanitizeCapturedValue } from "./mask-format.utils";
+import { ALL_ADDRESS_KEYWORDS } from "../constants/address-keywords.constants";
+
+// ─── Fuzzy address keyword matching ─────────────────────────────────────────
+
+/**
+ * Normalize a potential address keyword token by:
+ *  1. Stripping diacritics (NFD + remove combining marks)
+ *  2. Removing non-letter characters between letters (separator tricks)
+ *  3. Lowercasing
+ *
+ * "trave--sa" → "travesa"
+ * "a.v.e.n.i.d.a" → "avenida"
+ * "Praça" → "praca"
+ */
+function normalizeAddressToken(token: string): string {
+  return token
+    .normalize("NFD")
+    .replace(/\p{M}+/gu, "")
+    .replace(/(?<=\p{L})[^\p{L}]+(?=\p{L})/gu, "")
+    .toLowerCase();
+}
+
+/**
+ * Levenshtein edit distance between two strings.
+ * Uses two-row DP for O(min(m,n)) memory.
+ */
+function levenshteinDistance(a: string, b: string): number {
+  if (a === b) return 0;
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+
+  if (a.length > b.length) {
+    const tmp = a;
+    a = b;
+    b = tmp;
+  }
+
+  const m = a.length,
+    n = b.length;
+  let prev = Array.from({ length: m + 1 }, (_, i) => i);
+  let curr = new Array<number>(m + 1);
+
+  for (let j = 1; j <= n; j++) {
+    curr[0] = j;
+    for (let i = 1; i <= m; i++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      curr[i] = Math.min(prev[i] + 1, curr[i - 1] + 1, prev[i - 1] + cost);
+    }
+    const swap = prev;
+    prev = curr;
+    curr = swap;
+  }
+
+  return prev[m];
+}
+
+/** Max edit distance based on keyword length. */
+function maxEditDistance(len: number): number {
+  if (len <= 3) return 0;
+  if (len <= 5) return 1;
+  return 2;
+}
+
+/** Lazily-built set of { normalized } keyword entries. */
+let _normalizedKw: Array<{ normalized: string }> | null = null;
+
+function getNormalizedKeywords(): Array<{ normalized: string }> {
+  if (_normalizedKw) return _normalizedKw;
+  const seen = new Set<string>();
+  _normalizedKw = ALL_ADDRESS_KEYWORDS.map(kw => ({
+    normalized: kw
+      .normalize("NFD")
+      .replace(/\p{M}+/gu, "")
+      .toLowerCase(),
+  })).filter(e => {
+    if (seen.has(e.normalized)) return false;
+    seen.add(e.normalized);
+    return true;
+  });
+  return _normalizedKw;
+}
+
+/**
+ * Common words (month names, prepositions, etc.) that should NEVER be
+ * fuzzy-matched to address keywords even if within edit distance.
+ * Stored normalised (NFD-stripped, lowercase).
+ */
+const FUZZY_EXCLUSIONS = new Set([
+  // English months
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
+  "jan",
+  "feb",
+  "mar",
+  "apr",
+  "jun",
+  "jul",
+  "aug",
+  "sep",
+  "sept",
+  "oct",
+  "nov",
+  "dec",
+  // Portuguese months
+  "janeiro",
+  "fevereiro",
+  "marco",
+  "abril",
+  "maio",
+  "junho",
+  "julho",
+  "agosto",
+  "setembro",
+  "outubro",
+  "novembro",
+  "dezembro",
+  // Spanish months
+  "enero",
+  "febrero",
+  "marzo",
+  "mayo",
+  "junio",
+  "julio",
+  "septiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
+  // Common short words that cause collisions
+  "the",
+  "and",
+  "for",
+  "from",
+  "with",
+  "that",
+  "this",
+  "have",
+  "been",
+  "not",
+  "but",
+  "are",
+  "was",
+  "were",
+  "has",
+  "had",
+  "its",
+  "our",
+  "para",
+  "como",
+  "pero",
+  "esta",
+  "este",
+  "esos",
+  "esas",
+  "com",
+  "por",
+  "mas",
+  "mais",
+  "essa",
+  "esse",
+]);
+
+/**
+ * Check if a raw token (possibly separator-stuffed or misspelled)
+ * fuzzy-matches any known address keyword.
+ */
+export function matchesAnyAddressKeyword(token: string): boolean {
+  const nt = normalizeAddressToken(token);
+  if (nt.length < 2) return false;
+  if (FUZZY_EXCLUSIONS.has(nt)) return false;
+
+  for (const { normalized: kw } of getNormalizedKeywords()) {
+    const maxDist = maxEditDistance(kw.length);
+    if (Math.abs(nt.length - kw.length) > maxDist) continue;
+    if (maxDist === 0) {
+      if (nt === kw) return true;
+    } else if (levenshteinDistance(nt, kw) <= maxDist) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Validator for fuzzy/obfuscated address detection rules.
+ * Returns true when the captured text:
+ *  - contains a number (fundamental address structure)
+ *  - contains at least one word-token that fuzzy-matches an address keyword
+ */
+export function looksLikeFuzzyAddress(value: string): boolean {
+  const normalized = sanitizeCapturedValue(value);
+  if (normalized.length < 6 || normalized.length > 250) return false;
+  if (!/\d/.test(normalized)) return false;
+
+  const tokens = normalized
+    .split(/[\s,]+/)
+    .filter(t => t.length >= 2 && /\p{L}/u.test(t));
+  return tokens.some(t => matchesAnyAddressKeyword(t));
+}
 
 export function isLikelyCreditCard(value: string): boolean {
   const digitsOnly = value.replace(/\D/g, "");
@@ -356,13 +564,24 @@ export function isValidSpanishNie(value: string): boolean {
 
 export function looksLikeStructuredAddress(value: string): boolean {
   const normalized = sanitizeCapturedValue(value);
-  if (normalized.length < 8 || normalized.length > 120) return false;
-  return (
-    /[\d,#-]/.test(normalized) ||
-    /\b(?:apto|avenida|bairro|bloco|calle|casa|city|drive|estrada|road|rua|st|street)\b/iu.test(
+  if (normalized.length < 6 || normalized.length > 200) return false;
+
+  // Fast path: structural indicators (digits, separators)
+  if (/[\d,#-]/.test(normalized)) return true;
+
+  // Fast path: exact keyword match (expanded list)
+  if (
+    /\b(?:acesso|alameda|ala|andador|andar|anel|apartamento|apt[oe]?|avenida|bairro|balão|barracão|beco|bloco|blvd|boulevard|calçadão|callejón|calle|calzada|caminho|camino|carrera|casa|cerrada|circuito|circunvalación|city|colonia|condomínio|conjunto|conj|contorno|costanera|crescent|croft|crossing|dell|departamento|depto|descida|desvio|diagonal|drive|edifício|elevado|entroncamento|escadaria|esplanade|estrada|explanada|fazenda|floor|fraccionamiento|frente|fundos|galpão|gardens|gleba|glorieta|grove|heath|highway|hollow|interior|jardim|jirón|knoll|ladeira|landing|lane|largo|libramiento|ln|logradouro|lote|malecón|manzana|marginal|meadow|mezanino|mews|morro|oficina|overpass|parcela|parque|pasaje|passagem|passarela|paseo|path|pavilhão|periférico|picada|pike|piso|place|plaza|plazoleta|plazuela|point|ponte|praça|privada|prolongación|promenade|quadra|ramal|rampa|residencial|retorno|ribeirão|ridge|road|rodovia|rotatória|rotonda|ronda|row|rua|sala|senda|sendero|servidão|setor|sítio|square|st|street|subida|suite|terrace|torre|township|transversal|travesía|travessa|trevo|trincheira|túnel|turnpike|underpass|urbanización|vale|variante|vereda|vía|viaduto|viela|via|vila|walk|way)\b/iu.test(
       normalized,
     )
-  );
+  )
+    return true;
+
+  // Slow path: fuzzy keyword match (separator tricks, typos, diacritics)
+  const tokens = normalized
+    .split(/[\s,]+/)
+    .filter(t => t.length >= 2 && /\p{L}/u.test(t));
+  return tokens.some(t => matchesAnyAddressKeyword(t));
 }
 
 export function looksLikeStructuredName(value: string): boolean {

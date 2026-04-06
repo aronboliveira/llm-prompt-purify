@@ -16,6 +16,7 @@ import {
   LATAM_CEDULA_LABEL_FLAGS,
   LATAM_DNI_LABEL_FLAGS,
   LATAM_RUC_LABEL_FLAGS,
+  NEXT_FIELD_BOUNDARY,
   PT_NIF_LABEL_FLAGS,
   PT_NISS_LABEL_FLAGS,
   RU_INN_LABEL_FLAGS,
@@ -58,6 +59,7 @@ import {
   looksLikeStructuredName,
   looksSecretLike,
   detectObfuscationTags,
+  looksLikeFuzzyAddress,
 } from "../utils/mask-validation.utils";
 
 // ─── Anti-bypass separator character classes ────────────────────────────────
@@ -69,6 +71,16 @@ const _DOT_LIKE = String.raw`[.·。．]`,
   _DASH_LIKE = String.raw`[-\u2013\u2014_=~*#]`,
   _SLASH_LIKE = String.raw`[/\\\u2044\u29F8]`;
 void [_DOT_LIKE, _DASH_LIKE, _SLASH_LIKE];
+
+// ─── PII field-boundary negative lookahead ──────────────────────────────────
+// NEXT_FIELD_BOUNDARY now imported from mask-flag-dictionaries.constants.ts
+
+/**
+ * Address value pattern that stops at the next PII field label boundary.
+ * Prevents labeled-address from swallowing subsequent SSN/phone/email etc.
+ * on single-line inputs where multiple fields are concatenated.
+ */
+const LABELED_ADDRESS_VALUE = String.raw`(?:(?!\s+(?:${NEXT_FIELD_BOUNDARY})\s*[:=-])[^\n\r]){6,200}`;
 import { createDelimitedLabelValuePattern } from "../utils/mask-pattern.utils";
 
 export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
@@ -835,10 +847,125 @@ export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
     patternFactory: () =>
       createDelimitedLabelValuePattern(
         SHARED_ADDRESS_LABEL_FLAGS,
-        String.raw`[^\n\r]{6,120}`,
+        LABELED_ADDRESS_VALUE,
       ),
-    priority: 42,
+    priority: 95,
     validator: looksLikeStructuredAddress,
+    valueGroup: 1,
+  },
+
+  // ─── Standalone Street Address Detection ─────────────────────────────────────
+  // These rules catch addresses by their structural patterns (street keyword +
+  // number) even when no label keyword precedes them.
+
+  {
+    category: "location",
+    coverage: "global",
+    confidence: "medium",
+    id: "standalone-address-pt",
+    label: "Standalone Brazilian/Portuguese address",
+    locale: "pt-BR",
+    patternFactory: () =>
+      /\b((?:Rua|Avenida|Av\.|Travessa|Estrada|Rodovia|Alameda|Praça|Largo|Logradouro|Viaduto|Beco|Viela|Passagem|Servidão|Acesso|Marginal|Ladeira|Morro|Caminho|Ponte|Passarela|Elevado|Calçadão|Rotatória|Contorno|Túnel|Escadaria|Anel|Trevo|Picada|Ramal|Variante|Paralela|Vereda|Subida|Descida|Rampa|Balão|Entroncamento|Desvio|Trincheira|Córrego|Ribeirão)\s+[\p{L}\p{N}][\p{L}\p{N}\s'.]{2,50},?\s*\d{1,6}(?:\s*[,/]\s*(?:Apartamento|Apto|Apt\.?|Bloco|Bl\.?|Sala|Conj\.?|Conjunto|Lote|Casa|Andar|Cobertura|Fundos|Frente|Sobreloja|Edifício|Torre|Pavilhão|Galpão)\s*\d{1,5})?)/giu,
+    priority: 90,
+    valueGroup: 1,
+  },
+  {
+    category: "location",
+    coverage: "global",
+    confidence: "medium",
+    id: "standalone-address-es",
+    label: "Standalone Spanish address",
+    locale: "es-LatAm",
+    patternFactory: () =>
+      /\b((?:Calle|Cl\.|Avenida|Av\.|Carrera|Cra\.|Boulevard|Blvd\.|Paseo|Vía|Camino|Colonia|Callejón|Pasaje|Sendero|Vereda|Glorieta|Rotonda|Ronda|Travesía|Costanera|Malecón|Explanada|Jirón|Jr\.|Prolongación|Diagonal|Transversal|Calzada|Circuito|Cerrada|Privada|Andador|Periférico|Libramiento|Senda|Autopista|Autovía|Circunvalación|Alameda|Plazuela|Plazoleta)\s+[\p{L}\p{N}][\p{L}\p{N}\s'.]{2,50},?\s*\d{1,6}(?:\s*[,/]\s*(?:Piso|Depto\.?|Departamento|Local|Oficina|Suite|Apt[oe]?\.?|Int\.?|Interior|Lote|Casa|Manzana|Parcela|#)\s*\d{1,5})?)/giu,
+    priority: 90,
+    valueGroup: 1,
+  },
+  {
+    category: "location",
+    coverage: "global",
+    confidence: "medium",
+    id: "standalone-address-en",
+    label: "Standalone English address",
+    locale: "en-US",
+    patternFactory: () =>
+      /\b(\d{1,6}\s+(?:(?:N|S|E|W|NE|NW|SE|SW|North|South|East|West)\s+)?(?:[A-Z][\w'.]+\s+){1,4}(?:Street|St\.?|Avenue|Ave\.?|Boulevard|Blvd\.?|Drive|Dr\.?|Road|Rd\.?|Lane|Ln\.?|Court|Ct\.?|Place|Pl\.?|Way|Circle|Cir\.?|Terrace|Ter\.?|Trail|Trl\.?|Parkway|Pkwy\.?|Highway|Hwy\.?|Alley|Aly\.?|Path|Walk|Row|Crescent|Cres\.?|Close|Mews|Gardens|Grove|Grv\.?|Heath|Rise|Vale|Dell|Croft|Square|Sq\.?|Plaza|Promenade|Esplanade|Bypass|Overpass|Underpass|Pike|Turnpike|Crossing|Xing|Point|Pt\.?|Bend|Cove|Landing|Trace|Ridge|Knoll|Meadow|Hollow)(?:\s*[,#]\s*(?:Apt\.?|Apartment|Suite|Ste\.?|Unit|Floor|Fl\.?|Room|Rm\.?|Building|Bldg\.?|Tower|Wing)\s*[\w-]{1,10})?)/giu,
+    priority: 90,
+    valueGroup: 1,
+  },
+  {
+    category: "location",
+    coverage: "global",
+    confidence: "medium",
+    id: "standalone-address-zh",
+    label: "Standalone Chinese address",
+    locale: "zh-CN",
+    patternFactory: () =>
+      /([\u4e00-\u9fff]{2,8}(?:省|市|区|县|镇|乡|村|路|街|道|巷|弄|号|楼|栋|单元|室|幢)[\u4e00-\u9fff\d]{1,30}(?:(?:省|市|区|县|镇|乡|村|路|街|道|巷|弄|号|楼|栋|单元|室|幢)[\u4e00-\u9fff\d]{0,20}){1,6})/gu,
+    priority: 90,
+    valueGroup: 1,
+  },
+
+  // ─── Fuzzy / Obfuscated Address Detection ────────────────────────────────────
+  // Catches addresses whose keywords are misspelled (typos) or bloated with
+  // separator characters between letters (e.g. "trave--sa", "a.v.e.n.i.d.a").
+  // A broad structural regex captures candidates; the validator normalises
+  // tokens (strips separators, diacritics) and fuzzy-matches against the full
+  // keyword dictionary using Levenshtein edit distance.
+
+  {
+    category: "location",
+    coverage: "global",
+    confidence: "medium",
+    id: "fuzzy-address-keyword-first",
+    label: "Fuzzy address (keyword-first structure)",
+    locale: "shared",
+    patternFactory: () =>
+      /\b([\p{L}](?:[\p{L}]|[-–—_.·。．=~*#/\\]{1,3}[\p{L}]){2,20}\.?\s+[\p{L}][\p{L}\s'.-]{1,45}[,\s]+\d{1,6}(?:\s*[,/]\s*[\p{L}\s.]{2,20}\s*\d{0,5})?)/giu,
+    priority: 82,
+    validator: looksLikeFuzzyAddress,
+    valueGroup: 1,
+  },
+  {
+    category: "location",
+    coverage: "global",
+    confidence: "medium",
+    id: "fuzzy-address-number-first",
+    label: "Fuzzy address (number-first structure)",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(\d{1,6}\s+(?:[\p{L}][\p{L}'.\s-]{1,35}\s+){0,3}[\p{L}](?:[\p{L}]|[-–—_.·。．=~*#/\\]{1,3}[\p{L}]){2,20}\.?(?:\s*[,#]\s*[\p{L}\s.]{2,15}\s*[\w-]{1,10})?)/giu,
+    priority: 82,
+    validator: looksLikeFuzzyAddress,
+    valueGroup: 1,
+  },
+
+  // ─── Postal Code Detection ───────────────────────────────────────────────────
+
+  {
+    category: "location",
+    countryProfileIds: ["us"],
+    coverage: "global",
+    confidence: "medium",
+    id: "us-zip-code",
+    label: "US ZIP code",
+    locale: "en-US",
+    patternFactory: () =>
+      /\b(?:zip(?:\s*code)?|postal\s*code)\s*[:=-]?\s*(\d{5}(?:-\d{4})?)\b/giu,
+    priority: 88,
+    valueGroup: 1,
+  },
+  {
+    category: "location",
+    coverage: "global",
+    confidence: "medium",
+    id: "postal-code-generic",
+    label: "Labeled postal code (generic)",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(?:postal\s*code|código\s*postal|código\s*de\s*area|code\s*postal|postleitzahl|邮编|邮政编码|PLZ)\s*[:=-]?\s*(\d{4,8}(?:[- ]\d{3,4})?)\b/giu,
+    priority: 88,
     valueGroup: 1,
   },
   {
@@ -1639,6 +1766,108 @@ export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
       /\b(?:ruc|registro\s+[uú]nico\s+(?:de\s+)?contribuyentes?)\b[^\n\r\d]{0,12}(\d{11,13})\b/giu,
     priority: 109,
     validator: isValidPeruvianRuc,
+    valueGroup: 1,
+  },
+
+  // ─── Contextual Mid-Paragraph Address Detection ────────────────────────────
+  // Catches addresses introduced by contextual prepositions or verbs in
+  // informal text, e.g. "I live at 42 Oak Street" or "mora na Rua Augusta 123"
+
+  {
+    category: "location",
+    coverage: "global",
+    confidence: "medium",
+    id: "contextual-address-en",
+    label: "Contextual English address (mid-paragraph)",
+    locale: "en-US",
+    patternFactory: () =>
+      /(?:lives?\s+(?:at|on|in)|living\s+(?:at|on|in)|located\s+(?:at|on|in)|resides?\s+(?:at|on|in)|moved?\s+to|address\s+(?:is|at)|come\s+to|go\s+to|send\s+(?:it\s+)?to|ship\s+(?:it\s+)?to|deliver\s+to|meet\s+(?:me\s+)?at|pick\s*(?:me\s*)?up\s+at|stay(?:ing)?\s+at|(?:i'?m|we'?re|they'?re|she'?s|he'?s)\s+at)\s+((?:\d{1,6}\s+)?(?:[A-Z][\w'.]+\s+){1,5}(?:Street|St\.?|Avenue|Ave\.?|Boulevard|Blvd\.?|Drive|Dr\.?|Road|Rd\.?|Lane|Ln\.?|Court|Ct\.?|Place|Pl\.?|Way|Circle|Cir\.?|Terrace|Ter\.?|Trail|Trl\.?|Parkway|Pkwy\.?|Highway|Hwy\.?|Alley|Aly\.?|Path|Walk|Row|Crescent|Cres\.?|Close|Mews|Gardens|Grove|Grv\.?|Square|Sq\.?|Plaza)(?:[,\s]+\d{1,6})?(?:\s*[,#]\s*(?:Apt\.?|Apartment|Suite|Ste\.?|Unit|Floor|Fl\.?|Room|Rm\.?)\s*[\w-]{1,10})?)/giu,
+    priority: 92,
+    valueGroup: 1,
+  },
+  {
+    category: "location",
+    coverage: "global",
+    confidence: "medium",
+    id: "contextual-address-pt",
+    label: "Contextual Portuguese address (mid-paragraph)",
+    locale: "pt-BR",
+    patternFactory: () =>
+      /(?:mora(?:r|va|ndo)?\s+(?:na?|em)|morad[ao]\s+(?:na?|em)|fica\s+(?:na?|em)|endere[cç]o\s+[eé]\s*|localizado?\s+(?:na?|em)|entrega\s+(?:na?|em|para)|envi[ae]\s+(?:para|pra)|mand[ae]\s+(?:para|pra)|v[aá]\s+(?:para|pra|at[eé])|est[aáo](?:mos)?\s+(?:na?|em))\s+((?:Rua|Avenida|Av\.?|Travessa|Estrada|Rodovia|Alameda|Praça|Largo|Logradouro|Viaduto|Beco|Viela|Ladeira|Caminho)\s+[\p{L}\p{N}][\p{L}\p{N}\s'.]{2,50},?\s*\d{1,6}(?:\s*[,/]\s*(?:Apto|Apt\.?|Bloco|Bl\.?|Sala|Conj\.?|Lote|Casa|Andar)\s*\d{1,5})?)/giu,
+    priority: 92,
+    valueGroup: 1,
+  },
+  {
+    category: "location",
+    coverage: "global",
+    confidence: "medium",
+    id: "contextual-address-es",
+    label: "Contextual Spanish address (mid-paragraph)",
+    locale: "es-LatAm",
+    patternFactory: () =>
+      /(?:viv[eio]\s+en|ubica(?:do?|ci[oó]n)\s+en|direc+i[oó]n\s+(?:es|en)\s*|queda\s+en|est[aáo](?:mos)?\s+en|env[ií]a\s+a|mand[ae]\s+a|entreg[ae]\s+en|ven\s+a|llega\s+a)\s+((?:Calle|Cl\.?|Avenida|Av\.?|Carrera|Cra\.?|Boulevard|Blvd\.?|Paseo|Vía|Camino|Colonia|Callejón|Jirón|Jr\.?)\s+[\p{L}\p{N}][\p{L}\p{N}\s'.]{2,50},?\s*\d{1,6}(?:\s*[,/]\s*(?:Piso|Depto\.?|Departamento|Local|Oficina|Suite|Apt[oe]?\.?|Int\.?|Casa)\s*\d{1,5})?)/giu,
+    priority: 92,
+    valueGroup: 1,
+  },
+
+  // ─── Natural Language Date Detection ──────────────────────────────────────
+  // Catches dates expressed in written form: "March 15, 1990", "15 de março",
+  // "born on 03/15/1990", etc.
+
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "date-natural-en",
+    label: "Natural language date (English)",
+    locale: "en-US",
+    patternFactory: () =>
+      /\b((?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4})\b/gi,
+    priority: 84,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "date-natural-en-dmy",
+    label: "Natural language date (English, day-first)",
+    locale: "en-US",
+    patternFactory: () =>
+      /\b(\d{1,2}(?:st|nd|rd|th)?\s+(?:of\s+)?(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?,?\s+\d{4})\b/gi,
+    priority: 84,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "date-natural-pt",
+    label: "Natural language date (Portuguese)",
+    locale: "pt-BR",
+    patternFactory: () =>
+      /\b(\d{1,2}\s+de\s+(?:janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)(?:\s+de\s+\d{4})?)\b/giu,
+    priority: 84,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "date-natural-es",
+    label: "Natural language date (Spanish)",
+    locale: "es-LatAm",
+    patternFactory: () =>
+      /\b(\d{1,2}\s+de\s+(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)(?:\s+de[l]?\s+\d{4})?)\b/giu,
+    priority: 84,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "date-labeled",
+    label: "Labeled date of birth / birthday",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(?:birth\s*(?:day|date)|date\s+of\s+birth|d\.?o\.?b\.?|nascimento|data\s+de\s+nascimento|fecha\s+de\s+nacimiento|cumpleaños|aniversário|生日|出生日期)\s*[:=\-]?\s*(\d{1,2}[/.\-]\d{1,2}[/.\-]\d{2,4}|\d{4}[/.\-]\d{1,2}[/.\-]\d{1,2}|\p{L}+\s+\d{1,2},?\s+\d{4}|\d{1,2}\s+(?:de\s+)?\p{L}+(?:\s+(?:de\s+)?\d{4})?)/giu,
+    priority: 85,
     valueGroup: 1,
   },
 ]);

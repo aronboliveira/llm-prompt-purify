@@ -4,6 +4,7 @@ import {
   FUZZY_LABEL_DELIMITED_LINE_PATTERN,
   FUZZY_LABEL_SPECS,
 } from "../constants/fuzzy-label.constants";
+import { NEXT_FIELD_BOUNDARY } from "../constants/mask-flag-dictionaries.constants";
 import type {
   DelimitedLine,
   FuzzyLabelAliasEntry,
@@ -134,6 +135,13 @@ export function collectFuzzyLabelCandidates(
   });
 }
 
+// Truncate fuzzy values at the next PII field label boundary on the same line.
+// Prevents greedy value capture from swallowing subsequent labeled fields.
+const FUZZY_VALUE_BOUNDARY_RE = new RegExp(
+  String.raw`\s+(?:${NEXT_FIELD_BOUNDARY})\s*[:=-]`,
+  "i",
+);
+
 function collectDelimitedLines(sourceText: string): readonly DelimitedLine[] {
   const lines: DelimitedLine[] = [];
   let cursor = 0;
@@ -141,9 +149,16 @@ function collectDelimitedLines(sourceText: string): readonly DelimitedLine[] {
   for (const lineText of sourceText.split("\n")) {
     const matchedLine = lineText.match(FUZZY_LABEL_DELIMITED_LINE_PATTERN);
     if (matchedLine?.[1] && matchedLine[2]) {
-      const normalizedLabel = normalizeFuzzyLabel(matchedLine[1]),
-        rawValue = matchedLine[2],
-        valueStart = cursor + lineText.indexOf(rawValue);
+      const normalizedLabel = normalizeFuzzyLabel(matchedLine[1]);
+      let rawValue = matchedLine[2];
+
+      // Truncate at next PII field boundary to prevent multi-field blob capture
+      const boundary = rawValue.match(FUZZY_VALUE_BOUNDARY_RE);
+      if (boundary && typeof boundary.index === "number") {
+        rawValue = rawValue.slice(0, boundary.index);
+      }
+
+      const valueStart = cursor + lineText.indexOf(rawValue);
 
       lines.push({
         normalizedLabel,

@@ -526,7 +526,7 @@ export const DEFAULT_ADVANCED_PREFERENCES: Readonly<AdvancedMaskingPreferences> 
     maskingStrategy: "random",
     xmlWrapEnabled: false,
     xmlWrapTag: "document",
-    maskTimestamps: false,
+    maskTimestamps: true,
     keywordBlocklist: [],
     globalIgnoreList: [],
     polyglotMaskEnabled: true,
