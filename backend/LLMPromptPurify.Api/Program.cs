@@ -31,6 +31,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 
+// V-009: HSTS configuração (Strict-Transport-Security para produção)
+builder.Services.AddHsts(options =>
+{
+    options.MaxAge = TimeSpan.FromDays(365);
+    options.IncludeSubDomains = true;
+    options.Preload = true;
+});
+
 // S-011: Add Swagger/OpenAPI documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -60,6 +68,7 @@ builder.Services.AddCors(options =>
 });
 
 // V-001: Configure rate limiting (5 requests/minute per IP for feedback)
+// V-006: Rate limiting adicionado para mask-safety (detectado por Dev/api_rate_limit_test.js)
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -71,6 +80,18 @@ builder.Services.AddRateLimiter(options =>
                 PermitLimit = 5,
                 Window = TimeSpan.FromMinutes(1),
                 SegmentsPerWindow = 2,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+    // V-006: Rate limit para endpoint mask-safety (20 req/min — mais permissivo que feedback)
+    options.AddPolicy("mask-safety", httpContext =>
+        RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1),
+                SegmentsPerWindow = 4,
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 QueueLimit = 0
             }));
@@ -101,6 +122,12 @@ builder.Services.AddSingleton<IDeveloperEmailSender, SmtpDeveloperEmailSender>()
 builder.Services.AddSingleton<FeedbackSubmissionService>();
 builder.Services.AddSingleton<MaskSafetyValidationService>();
 
+// V-008: Suprimir cabeçalho "Server: Kestrel" (detectado por CISO/security_header_scan.sh)
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.AddServerHeader = false;
+});
+
 var app = builder.Build();
 
 app.UseExceptionHandler();
@@ -114,7 +141,14 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "LLM Prompt Purify API v1");
     });
 }
+else
+{
+    // V-009: HSTS em produção (detectado por CISO/gdpr_scanner.py)
+    app.UseHsts();
+}
 
+// V-007: Cabeçalhos de segurança (detectado por CISO/security_header_scan.sh + White-Hat/owasp_header_audit.py)
+app.UseSecurityHeaders();
 app.UseCors();
 app.UseRateLimiter();
 app.UseApiKeyAuthentication(); // V-003: API key validation
@@ -202,7 +236,7 @@ app.MapPost(
 
         return Results.Ok(service.Validate(request));
     }
-);
+).RequireRateLimiting("mask-safety"); // V-006: Rate limiting para mask-safety
 
 app.Run();
 
