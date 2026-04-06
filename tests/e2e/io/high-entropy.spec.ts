@@ -110,18 +110,10 @@ const CUIT_VARIANTS = [
 ] as const;
 
 /** Chilean RUT variants. */
-const RUT_CL_VARIANTS = [
-  "12.345.678-5",
-  "9.876.543-2",
-  "23456789-K",
-] as const;
+const RUT_CL_VARIANTS = ["12.345.678-5", "9.876.543-2", "23456789-K"] as const;
 
 /** EIN variants (US employer ID). */
-const EIN_VARIANTS = [
-  "47-2567754",
-  "12-3456789",
-  "01-0000001",
-] as const;
+const EIN_VARIANTS = ["47-2567754", "12-3456789", "01-0000001"] as const;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -180,9 +172,7 @@ test.describe("high-entropy masking edge cases", () => {
       page,
     }) => {
       await selectCountries(page, ["br"]);
-      const lines = PHONE_BR_VARIANTS.map(
-        (v, i) => `Contato ${i + 1}: ${v}`,
-      );
+      const lines = PHONE_BR_VARIANTS.map((v, i) => `Contato ${i + 1}: ${v}`);
       await page.getByTestId("source-textarea").fill(lines.join("\n"));
       const output = page.getByTestId("masked-output");
       // Assert the core digit sequences are masked
@@ -230,17 +220,13 @@ test.describe("high-entropy masking edge cases", () => {
     });
 
     test("masks credit card number variations", async ({ page }) => {
-      const lines = CREDIT_CARD_VARIANTS.map(
-        (v, i) => `Card #${i + 1}: ${v}`,
-      );
+      const lines = CREDIT_CARD_VARIANTS.map((v, i) => `Card #${i + 1}: ${v}`);
       await fillAndAssertHidden(page, lines.join("\n"), CREDIT_CARD_VARIANTS);
     });
 
     test("masks US phone format variations", async ({ page }) => {
       await selectCountries(page, ["us"]);
-      const lines = PHONE_US_VARIANTS.map(
-        (v, i) => `Phone ${i + 1}: ${v}`,
-      );
+      const lines = PHONE_US_VARIANTS.map((v, i) => `Phone ${i + 1}: ${v}`);
       await page.getByTestId("source-textarea").fill(lines.join("\n"));
       const output = page.getByTestId("masked-output");
       for (const phone of PHONE_US_VARIANTS) {
@@ -303,9 +289,7 @@ test.describe("high-entropy masking edge cases", () => {
     });
 
     test("masks API key variations in code snippets", async ({ page }) => {
-      const lines = API_KEY_VARIANTS.map(
-        v => `const apiKey = "${v}";`,
-      );
+      const lines = API_KEY_VARIANTS.map(v => `const apiKey = "${v}";`);
       await fillAndAssertHidden(page, lines.join("\n"), API_KEY_VARIANTS);
     });
 
@@ -400,8 +384,17 @@ test.describe("high-entropy masking edge cases", () => {
       await expect(output).toContainText("1.234,56");
     });
 
-    test("does NOT mask short postal codes as SSN", async ({ page }) => {
+    test("masks labeled ZIP code as location data", async ({ page }) => {
       await page.getByTestId("source-textarea").fill("ZIP: 12345");
+
+      const output = page.getByTestId("masked-output");
+      await expect(output).not.toContainText("12345");
+    });
+
+    test("does NOT mask bare five-digit number without label", async ({
+      page,
+    }) => {
+      await page.getByTestId("source-textarea").fill("Order 12345 confirmed");
 
       const output = page.getByTestId("masked-output");
       await expect(output).toContainText("12345");
