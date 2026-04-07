@@ -93,6 +93,7 @@
 /* S-005: Dark mode tokens */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    color-scheme: dark;
     --page-text: #e2e8f0;
     --text-strong: #e2e8f0;
     --text-body: #d7e2f1;
@@ -159,6 +160,7 @@
 
 /* S-005: Manual dark mode override */
 :root[data-theme="dark"] {
+  color-scheme: dark;
   --page-text: #e2e8f0;
   --text-strong: #e2e8f0;
   --text-body: #d7e2f1;
@@ -247,8 +249,15 @@ body {
 }
 
 button,
-textarea {
+textarea,
+output {
   font: inherit;
+}
+
+textarea,
+output {
+  background: var(--surface-field);
+  color: var(--text-strong);
 }
 
 textarea {

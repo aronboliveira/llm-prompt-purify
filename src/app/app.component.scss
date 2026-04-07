@@ -135,6 +135,11 @@
       --surface-elevated-border: rgba(148, 163, 184, 0.12);
       --surface-subtle: #1e293b;
       --surface-subtle-strong: #334155;
+      --surface-field: linear-gradient(
+        180deg,
+        rgba(28, 42, 61, 0.96),
+        rgba(23, 36, 54, 0.96)
+      );
       --panel-border: rgba(148, 163, 184, 0.12);
       --modal-backdrop: rgba(0, 0, 0, 0.62);
       color: var(--text-body);
