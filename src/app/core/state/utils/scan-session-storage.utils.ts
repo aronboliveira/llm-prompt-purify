@@ -183,6 +183,22 @@ export function loadPersistedAdvancedPreferences(): AdvancedMaskingPreferences {
         typeof parsed.maskTimestamps === "boolean"
           ? parsed.maskTimestamps
           : DEFAULT_ADVANCED_PREFERENCES.maskTimestamps,
+      maskGitHashes:
+        typeof parsed.maskGitHashes === "boolean"
+          ? parsed.maskGitHashes
+          : DEFAULT_ADVANCED_PREFERENCES.maskGitHashes,
+      maskNetworkPorts:
+        typeof parsed.maskNetworkPorts === "boolean"
+          ? parsed.maskNetworkPorts
+          : DEFAULT_ADVANCED_PREFERENCES.maskNetworkPorts,
+      maskNames:
+        typeof parsed.maskNames === "boolean"
+          ? parsed.maskNames
+          : DEFAULT_ADVANCED_PREFERENCES.maskNames,
+      nameStrategy:
+        parsed.nameStrategy === "alias" || parsed.nameStrategy === "default"
+          ? parsed.nameStrategy
+          : DEFAULT_ADVANCED_PREFERENCES.nameStrategy,
       keywordBlocklist: Array.isArray(parsed.keywordBlocklist)
         ? Object.freeze(
             parsed.keywordBlocklist.filter(k => typeof k === "string"),

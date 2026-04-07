@@ -556,6 +556,11 @@ export class ScanSessionService {
       prefs.keywordBlocklist !== undefined ||
       prefs.globalIgnoreList !== undefined ||
       prefs.maskingStrategy !== undefined ||
+      prefs.maskTimestamps !== undefined ||
+      prefs.maskGitHashes !== undefined ||
+      prefs.maskNetworkPorts !== undefined ||
+      prefs.maskNames !== undefined ||
+      prefs.nameStrategy !== undefined ||
       prefs.polyglotMaskEnabled !== undefined ||
       prefs.polyglotEnabledFamilies !== undefined ||
       prefs.polyglotExcludedSubtypes !== undefined
@@ -596,6 +601,24 @@ export class ScanSessionService {
     this.setAdvancedPreferences({
       polyglotExcludedSubtypes: [...subtypes],
     });
+  }
+
+  public setMaskGitHashes(enabled: boolean): void {
+    this.setAdvancedPreferences({ maskGitHashes: enabled });
+  }
+
+  public setMaskNetworkPorts(enabled: boolean): void {
+    this.setAdvancedPreferences({ maskNetworkPorts: enabled });
+  }
+
+  public setMaskNames(enabled: boolean): void {
+    this.setAdvancedPreferences({ maskNames: enabled });
+  }
+
+  public setNameStrategy(
+    strategy: import("../masking/declarations/masking.types").NameMaskingStrategy,
+  ): void {
+    this.setAdvancedPreferences({ nameStrategy: strategy });
   }
 
   #setPhase(phase: ScanPhase): void {
