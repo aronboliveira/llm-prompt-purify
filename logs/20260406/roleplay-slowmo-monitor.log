@@ -1,0 +1,756 @@
+[2026-04-06 14:02:41] === ROLEPLAY SLOWMO MONITOR STARTED ===
+[2026-04-06 14:02:41] Duration: 7200s | Interval: 60s
+[2026-04-06 14:02:41] Results JSON: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/.tmp/copilot/roleplay-slowmo/roleplay-slowmo-results.json
+[2026-04-06 14:02:41] PS log: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/logs/20260406/roleplay-slowmo-ps.log
+[2026-04-06 14:02:41] --- Snapshot at elapsed=0s (0m) ---
+[2026-04-06 14:02:41] Processes: playwright/chromium=18, node/angular=2
+[2026-04-06 14:02:41] Chromium/Playwright RSS: 2710.0MB
+[2026-04-06 14:02:41] Results: total=0, iterations=0, leaks=0, errors=0
+[2026-04-06 14:02:41] Per-role breakdown:
+
+[2026-04-06 14:02:41] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:03:41] --- Snapshot at elapsed=60s (1m) ---
+[2026-04-06 14:03:41] Processes: playwright/chromium=15, node/angular=2
+[2026-04-06 14:03:41] Chromium/Playwright RSS: 1904.7MB
+[2026-04-06 14:03:41] Results: total=524, iterations=258, leaks=0, errors=517
+[2026-04-06 14:03:41] Per-role breakdown:
+  black-hat: 524 total, 8 ok, 516 fail
+  green-hat: 2 total, 1 ok, 1 fail
+[2026-04-06 14:03:41] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:04:41] --- Snapshot at elapsed=120s (2m) ---
+[2026-04-06 14:04:42] Processes: playwright/chromium=15, node/angular=2
+[2026-04-06 14:04:42] Chromium/Playwright RSS: 2004.0MB
+[2026-04-06 14:04:42] Results: total=822, iterations=407, leaks=0, errors=815
+[2026-04-06 14:04:42] Per-role breakdown:
+  black-hat: 822 total, 8 ok, 814 fail
+  green-hat: 2 total, 1 ok, 1 fail
+[2026-04-06 14:04:42] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:05:42] --- Snapshot at elapsed=180s (3m) ---
+[2026-04-06 14:05:42] Processes: playwright/chromium=15, node/angular=2
+[2026-04-06 14:05:42] Chromium/Playwright RSS: 2066.1MB
+[2026-04-06 14:05:42] Results: total=1016, iterations=503, leaks=0, errors=1007
+[2026-04-06 14:05:42] Per-role breakdown:
+  black-hat: 1014 total, 8 ok, 1006 fail
+  green-hat: 2 total, 1 ok, 1 fail
+[2026-04-06 14:05:42] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:06:42] --- Snapshot at elapsed=240s (4m) ---
+[2026-04-06 14:06:42] Processes: playwright/chromium=15, node/angular=2
+[2026-04-06 14:06:42] Chromium/Playwright RSS: 2128.0MB
+[2026-04-06 14:06:42] Results: total=1174, iterations=582, leaks=0, errors=1165
+[2026-04-06 14:06:42] Per-role breakdown:
+  black-hat: 1172 total, 8 ok, 1164 fail
+  green-hat: 2 total, 1 ok, 1 fail
+[2026-04-06 14:06:42] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:07:42] --- Snapshot at elapsed=300s (5m) ---
+[2026-04-06 14:07:42] Processes: playwright/chromium=15, node/angular=2
+[2026-04-06 14:07:42] Chromium/Playwright RSS: 2172.3MB
+[2026-04-06 14:07:42] Results: total=1306, iterations=648, leaks=0, errors=1297
+[2026-04-06 14:07:42] Per-role breakdown:
+  black-hat: 1304 total, 8 ok, 1296 fail
+  green-hat: 2 total, 1 ok, 1 fail
+[2026-04-06 14:07:42] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:08:42] --- Snapshot at elapsed=360s (6m) ---
+[2026-04-06 14:08:42] Processes: playwright/chromium=15, node/angular=2
+[2026-04-06 14:08:42] Chromium/Playwright RSS: 2211.3MB
+[2026-04-06 14:08:42] Results: total=1424, iterations=707, leaks=0, errors=1415
+[2026-04-06 14:08:42] Per-role breakdown:
+  black-hat: 1422 total, 8 ok, 1414 fail
+  green-hat: 2 total, 1 ok, 1 fail
+[2026-04-06 14:08:42] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:52:31] === ROLEPLAY SLOWMO MONITOR STARTED ===
+[2026-04-06 14:52:31] Duration: 3600s | Interval: 60s
+[2026-04-06 14:52:31] Results JSON: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/.tmp/copilot/roleplay-slowmo/roleplay-slowmo-results.json
+[2026-04-06 14:52:31] PS log: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/logs/20260406/roleplay-slowmo-ps.log
+[2026-04-06 14:52:31] --- Snapshot at elapsed=0s (0m) ---
+[2026-04-06 14:52:31] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 14:52:31] Chromium/Playwright RSS: 1860.1MB
+[2026-04-06 14:52:31] Results: total=0, iterations=0, leaks=0, errors=0
+[2026-04-06 14:52:31] Per-role breakdown:
+
+[2026-04-06 14:52:31] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:53:31] --- Snapshot at elapsed=60s (1m) ---
+[2026-04-06 14:53:31] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 14:53:31] Chromium/Playwright RSS: 1838.7MB
+[2026-04-06 14:53:31] Results: total=0, iterations=0, leaks=0, errors=0
+[2026-04-06 14:53:31] Per-role breakdown:
+
+[2026-04-06 14:53:31] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:54:31] --- Snapshot at elapsed=120s (2m) ---
+[2026-04-06 14:54:31] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 14:54:31] Chromium/Playwright RSS: 1832.4MB
+[2026-04-06 14:54:31] Results: total=0, iterations=0, leaks=0, errors=0
+[2026-04-06 14:54:31] Per-role breakdown:
+
+[2026-04-06 14:54:31] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:55:31] --- Snapshot at elapsed=180s (3m) ---
+[2026-04-06 14:55:31] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 14:55:31] Chromium/Playwright RSS: 1836.8MB
+[2026-04-06 14:55:31] Results: total=0, iterations=0, leaks=0, errors=0
+[2026-04-06 14:55:31] Per-role breakdown:
+
+[2026-04-06 14:55:31] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:56:31] --- Snapshot at elapsed=240s (4m) ---
+[2026-04-06 14:56:31] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 14:56:31] Chromium/Playwright RSS: 1831.1MB
+[2026-04-06 14:56:31] Results: total=0, iterations=0, leaks=0, errors=0
+[2026-04-06 14:56:31] Per-role breakdown:
+
+[2026-04-06 14:56:31] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:57:32] --- Snapshot at elapsed=300s (5m) ---
+[2026-04-06 14:57:32] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 14:57:32] Chromium/Playwright RSS: 1822.7MB
+[2026-04-06 14:57:32] Results: total=0, iterations=0, leaks=0, errors=0
+[2026-04-06 14:57:32] Per-role breakdown:
+
+[2026-04-06 14:57:32] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:58:32] --- Snapshot at elapsed=360s (6m) ---
+[2026-04-06 14:58:32] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 14:58:32] Chromium/Playwright RSS: 1866.1MB
+[2026-04-06 14:58:32] Results: total=0, iterations=0, leaks=0, errors=0
+[2026-04-06 14:58:32] Per-role breakdown:
+
+[2026-04-06 14:58:32] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 14:59:32] --- Snapshot at elapsed=420s (7m) ---
+[2026-04-06 14:59:32] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 14:59:32] Chromium/Playwright RSS: 1833.2MB
+[2026-04-06 14:59:32] Results: total=0, iterations=0, leaks=0, errors=0
+[2026-04-06 14:59:32] Per-role breakdown:
+
+[2026-04-06 14:59:32] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:00:32] --- Snapshot at elapsed=480s (8m) ---
+[2026-04-06 15:00:32] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:00:32] Chromium/Playwright RSS: 1706.7MB
+[2026-04-06 15:00:32] Results: total=49, iterations=1, leaks=0, errors=0
+[2026-04-06 15:00:32] Per-role breakdown:
+  black-hat: 18 total, 18 ok, 0 fail
+  ciso: 5 total, 5 ok, 0 fail
+  dev: 6 total, 6 ok, 0 fail
+  green-hat: 6 total, 6 ok, 0 fail
+  qa: 8 total, 8 ok, 0 fail
+  white-hat: 6 total, 6 ok, 0 fail
+[2026-04-06 15:00:32] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:01:32] --- Snapshot at elapsed=540s (9m) ---
+[2026-04-06 15:01:32] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:01:32] Chromium/Playwright RSS: 1743.6MB
+[2026-04-06 15:01:32] Results: total=49, iterations=1, leaks=0, errors=0
+[2026-04-06 15:01:32] Per-role breakdown:
+  black-hat: 18 total, 18 ok, 0 fail
+  ciso: 5 total, 5 ok, 0 fail
+  dev: 6 total, 6 ok, 0 fail
+  green-hat: 6 total, 6 ok, 0 fail
+  qa: 8 total, 8 ok, 0 fail
+  white-hat: 6 total, 6 ok, 0 fail
+[2026-04-06 15:01:32] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:02:32] --- Snapshot at elapsed=600s (10m) ---
+[2026-04-06 15:02:33] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:02:33] Chromium/Playwright RSS: 1723.8MB
+[2026-04-06 15:02:33] Results: total=49, iterations=1, leaks=0, errors=0
+[2026-04-06 15:02:33] Per-role breakdown:
+  black-hat: 18 total, 18 ok, 0 fail
+  ciso: 5 total, 5 ok, 0 fail
+  dev: 6 total, 6 ok, 0 fail
+  green-hat: 6 total, 6 ok, 0 fail
+  qa: 8 total, 8 ok, 0 fail
+  white-hat: 6 total, 6 ok, 0 fail
+[2026-04-06 15:02:33] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:03:33] --- Snapshot at elapsed=660s (11m) ---
+[2026-04-06 15:03:33] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:03:33] Chromium/Playwright RSS: 1710.8MB
+[2026-04-06 15:03:33] Results: total=49, iterations=1, leaks=0, errors=0
+[2026-04-06 15:03:33] Per-role breakdown:
+  black-hat: 18 total, 18 ok, 0 fail
+  ciso: 5 total, 5 ok, 0 fail
+  dev: 6 total, 6 ok, 0 fail
+  green-hat: 6 total, 6 ok, 0 fail
+  qa: 8 total, 8 ok, 0 fail
+  white-hat: 6 total, 6 ok, 0 fail
+[2026-04-06 15:03:33] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:04:33] --- Snapshot at elapsed=720s (12m) ---
+[2026-04-06 15:04:33] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:04:33] Chromium/Playwright RSS: 1717.4MB
+[2026-04-06 15:04:33] Results: total=49, iterations=1, leaks=0, errors=0
+[2026-04-06 15:04:33] Per-role breakdown:
+  black-hat: 18 total, 18 ok, 0 fail
+  ciso: 5 total, 5 ok, 0 fail
+  dev: 6 total, 6 ok, 0 fail
+  green-hat: 6 total, 6 ok, 0 fail
+  qa: 8 total, 8 ok, 0 fail
+  white-hat: 6 total, 6 ok, 0 fail
+[2026-04-06 15:04:33] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:05:33] --- Snapshot at elapsed=780s (13m) ---
+[2026-04-06 15:05:33] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:05:33] Chromium/Playwright RSS: 1718.7MB
+[2026-04-06 15:05:33] Results: total=49, iterations=1, leaks=0, errors=0
+[2026-04-06 15:05:33] Per-role breakdown:
+  black-hat: 18 total, 18 ok, 0 fail
+  ciso: 5 total, 5 ok, 0 fail
+  dev: 6 total, 6 ok, 0 fail
+  green-hat: 6 total, 6 ok, 0 fail
+  qa: 8 total, 8 ok, 0 fail
+  white-hat: 6 total, 6 ok, 0 fail
+[2026-04-06 15:05:33] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:06:33] --- Snapshot at elapsed=840s (14m) ---
+[2026-04-06 15:06:33] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:06:33] Chromium/Playwright RSS: 1734.4MB
+[2026-04-06 15:06:33] Results: total=49, iterations=1, leaks=0, errors=0
+[2026-04-06 15:06:33] Per-role breakdown:
+  black-hat: 18 total, 18 ok, 0 fail
+  ciso: 5 total, 5 ok, 0 fail
+  dev: 6 total, 6 ok, 0 fail
+  green-hat: 6 total, 6 ok, 0 fail
+  qa: 8 total, 8 ok, 0 fail
+  white-hat: 6 total, 6 ok, 0 fail
+[2026-04-06 15:06:33] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:07:33] --- Snapshot at elapsed=900s (15m) ---
+[2026-04-06 15:07:33] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:07:33] Chromium/Playwright RSS: 1725.7MB
+[2026-04-06 15:07:34] Results: total=49, iterations=1, leaks=0, errors=0
+[2026-04-06 15:07:34] Per-role breakdown:
+  black-hat: 18 total, 18 ok, 0 fail
+  ciso: 5 total, 5 ok, 0 fail
+  dev: 6 total, 6 ok, 0 fail
+  green-hat: 6 total, 6 ok, 0 fail
+  qa: 8 total, 8 ok, 0 fail
+  white-hat: 6 total, 6 ok, 0 fail
+[2026-04-06 15:07:34] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:08:34] --- Snapshot at elapsed=960s (16m) ---
+[2026-04-06 15:08:34] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:08:34] Chromium/Playwright RSS: 1742.4MB
+[2026-04-06 15:08:34] Results: total=98, iterations=2, leaks=0, errors=0
+[2026-04-06 15:08:34] Per-role breakdown:
+  black-hat: 36 total, 36 ok, 0 fail
+  ciso: 10 total, 10 ok, 0 fail
+  dev: 12 total, 12 ok, 0 fail
+  green-hat: 12 total, 12 ok, 0 fail
+  qa: 16 total, 16 ok, 0 fail
+  white-hat: 12 total, 12 ok, 0 fail
+[2026-04-06 15:08:34] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:09:34] --- Snapshot at elapsed=1020s (17m) ---
+[2026-04-06 15:09:34] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:09:34] Chromium/Playwright RSS: 1734.1MB
+[2026-04-06 15:09:34] Results: total=98, iterations=2, leaks=0, errors=0
+[2026-04-06 15:09:34] Per-role breakdown:
+  black-hat: 36 total, 36 ok, 0 fail
+  ciso: 10 total, 10 ok, 0 fail
+  dev: 12 total, 12 ok, 0 fail
+  green-hat: 12 total, 12 ok, 0 fail
+  qa: 16 total, 16 ok, 0 fail
+  white-hat: 12 total, 12 ok, 0 fail
+[2026-04-06 15:09:34] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:10:34] --- Snapshot at elapsed=1080s (18m) ---
+[2026-04-06 15:10:34] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:10:34] Chromium/Playwright RSS: 1716.9MB
+[2026-04-06 15:10:34] Results: total=98, iterations=2, leaks=0, errors=0
+[2026-04-06 15:10:34] Per-role breakdown:
+  black-hat: 36 total, 36 ok, 0 fail
+  ciso: 10 total, 10 ok, 0 fail
+  dev: 12 total, 12 ok, 0 fail
+  green-hat: 12 total, 12 ok, 0 fail
+  qa: 16 total, 16 ok, 0 fail
+  white-hat: 12 total, 12 ok, 0 fail
+[2026-04-06 15:10:34] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:11:34] --- Snapshot at elapsed=1140s (19m) ---
+[2026-04-06 15:11:34] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:11:34] Chromium/Playwright RSS: 1769.5MB
+[2026-04-06 15:11:34] Results: total=98, iterations=2, leaks=0, errors=0
+[2026-04-06 15:11:34] Per-role breakdown:
+  black-hat: 36 total, 36 ok, 0 fail
+  ciso: 10 total, 10 ok, 0 fail
+  dev: 12 total, 12 ok, 0 fail
+  green-hat: 12 total, 12 ok, 0 fail
+  qa: 16 total, 16 ok, 0 fail
+  white-hat: 12 total, 12 ok, 0 fail
+[2026-04-06 15:11:34] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:12:34] --- Snapshot at elapsed=1200s (20m) ---
+[2026-04-06 15:12:34] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:12:34] Chromium/Playwright RSS: 1725.3MB
+[2026-04-06 15:12:34] Results: total=98, iterations=2, leaks=0, errors=0
+[2026-04-06 15:12:34] Per-role breakdown:
+  black-hat: 36 total, 36 ok, 0 fail
+  ciso: 10 total, 10 ok, 0 fail
+  dev: 12 total, 12 ok, 0 fail
+  green-hat: 12 total, 12 ok, 0 fail
+  qa: 16 total, 16 ok, 0 fail
+  white-hat: 12 total, 12 ok, 0 fail
+[2026-04-06 15:12:34] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:13:35] --- Snapshot at elapsed=1260s (21m) ---
+[2026-04-06 15:13:35] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:13:35] Chromium/Playwright RSS: 1775.3MB
+[2026-04-06 15:13:35] Results: total=98, iterations=2, leaks=0, errors=0
+[2026-04-06 15:13:35] Per-role breakdown:
+  black-hat: 36 total, 36 ok, 0 fail
+  ciso: 10 total, 10 ok, 0 fail
+  dev: 12 total, 12 ok, 0 fail
+  green-hat: 12 total, 12 ok, 0 fail
+  qa: 16 total, 16 ok, 0 fail
+  white-hat: 12 total, 12 ok, 0 fail
+[2026-04-06 15:13:35] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:14:35] --- Snapshot at elapsed=1320s (22m) ---
+[2026-04-06 15:14:35] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:14:35] Chromium/Playwright RSS: 1763.1MB
+[2026-04-06 15:14:35] Results: total=98, iterations=2, leaks=0, errors=0
+[2026-04-06 15:14:35] Per-role breakdown:
+  black-hat: 36 total, 36 ok, 0 fail
+  ciso: 10 total, 10 ok, 0 fail
+  dev: 12 total, 12 ok, 0 fail
+  green-hat: 12 total, 12 ok, 0 fail
+  qa: 16 total, 16 ok, 0 fail
+  white-hat: 12 total, 12 ok, 0 fail
+[2026-04-06 15:14:35] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:15:35] --- Snapshot at elapsed=1380s (23m) ---
+[2026-04-06 15:15:35] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:15:35] Chromium/Playwright RSS: 1799.0MB
+[2026-04-06 15:15:35] Results: total=98, iterations=2, leaks=0, errors=0
+[2026-04-06 15:15:35] Per-role breakdown:
+  black-hat: 36 total, 36 ok, 0 fail
+  ciso: 10 total, 10 ok, 0 fail
+  dev: 12 total, 12 ok, 0 fail
+  green-hat: 12 total, 12 ok, 0 fail
+  qa: 16 total, 16 ok, 0 fail
+  white-hat: 12 total, 12 ok, 0 fail
+[2026-04-06 15:15:35] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:16:35] --- Snapshot at elapsed=1440s (24m) ---
+[2026-04-06 15:16:35] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:16:35] Chromium/Playwright RSS: 1780.2MB
+[2026-04-06 15:16:35] Results: total=147, iterations=3, leaks=0, errors=0
+[2026-04-06 15:16:35] Per-role breakdown:
+  black-hat: 54 total, 54 ok, 0 fail
+  ciso: 15 total, 15 ok, 0 fail
+  dev: 18 total, 18 ok, 0 fail
+  green-hat: 18 total, 18 ok, 0 fail
+  qa: 24 total, 24 ok, 0 fail
+  white-hat: 18 total, 18 ok, 0 fail
+[2026-04-06 15:16:35] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:17:35] --- Snapshot at elapsed=1500s (25m) ---
+[2026-04-06 15:17:35] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:17:35] Chromium/Playwright RSS: 1791.2MB
+[2026-04-06 15:17:35] Results: total=147, iterations=3, leaks=0, errors=0
+[2026-04-06 15:17:35] Per-role breakdown:
+  black-hat: 54 total, 54 ok, 0 fail
+  ciso: 15 total, 15 ok, 0 fail
+  dev: 18 total, 18 ok, 0 fail
+  green-hat: 18 total, 18 ok, 0 fail
+  qa: 24 total, 24 ok, 0 fail
+  white-hat: 18 total, 18 ok, 0 fail
+[2026-04-06 15:17:35] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:18:35] --- Snapshot at elapsed=1560s (26m) ---
+[2026-04-06 15:18:36] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:18:36] Chromium/Playwright RSS: 1773.3MB
+[2026-04-06 15:18:36] Results: total=147, iterations=3, leaks=0, errors=0
+[2026-04-06 15:18:36] Per-role breakdown:
+  black-hat: 54 total, 54 ok, 0 fail
+  ciso: 15 total, 15 ok, 0 fail
+  dev: 18 total, 18 ok, 0 fail
+  green-hat: 18 total, 18 ok, 0 fail
+  qa: 24 total, 24 ok, 0 fail
+  white-hat: 18 total, 18 ok, 0 fail
+[2026-04-06 15:18:36] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:19:36] --- Snapshot at elapsed=1620s (27m) ---
+[2026-04-06 15:19:36] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:19:36] Chromium/Playwright RSS: 1767.4MB
+[2026-04-06 15:19:36] Results: total=147, iterations=3, leaks=0, errors=0
+[2026-04-06 15:19:36] Per-role breakdown:
+  black-hat: 54 total, 54 ok, 0 fail
+  ciso: 15 total, 15 ok, 0 fail
+  dev: 18 total, 18 ok, 0 fail
+  green-hat: 18 total, 18 ok, 0 fail
+  qa: 24 total, 24 ok, 0 fail
+  white-hat: 18 total, 18 ok, 0 fail
+[2026-04-06 15:19:36] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:20:36] --- Snapshot at elapsed=1680s (28m) ---
+[2026-04-06 15:20:36] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:20:36] Chromium/Playwright RSS: 1803.3MB
+[2026-04-06 15:20:36] Results: total=147, iterations=3, leaks=0, errors=0
+[2026-04-06 15:20:36] Per-role breakdown:
+  black-hat: 54 total, 54 ok, 0 fail
+  ciso: 15 total, 15 ok, 0 fail
+  dev: 18 total, 18 ok, 0 fail
+  green-hat: 18 total, 18 ok, 0 fail
+  qa: 24 total, 24 ok, 0 fail
+  white-hat: 18 total, 18 ok, 0 fail
+[2026-04-06 15:20:36] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:21:36] --- Snapshot at elapsed=1740s (29m) ---
+[2026-04-06 15:21:36] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:21:36] Chromium/Playwright RSS: 1793.8MB
+[2026-04-06 15:21:36] Results: total=147, iterations=3, leaks=0, errors=0
+[2026-04-06 15:21:36] Per-role breakdown:
+  black-hat: 54 total, 54 ok, 0 fail
+  ciso: 15 total, 15 ok, 0 fail
+  dev: 18 total, 18 ok, 0 fail
+  green-hat: 18 total, 18 ok, 0 fail
+  qa: 24 total, 24 ok, 0 fail
+  white-hat: 18 total, 18 ok, 0 fail
+[2026-04-06 15:21:36] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:22:36] --- Snapshot at elapsed=1800s (30m) ---
+[2026-04-06 15:22:36] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:22:36] Chromium/Playwright RSS: 1754.8MB
+[2026-04-06 15:22:36] Results: total=147, iterations=3, leaks=0, errors=0
+[2026-04-06 15:22:36] Per-role breakdown:
+  black-hat: 54 total, 54 ok, 0 fail
+  ciso: 15 total, 15 ok, 0 fail
+  dev: 18 total, 18 ok, 0 fail
+  green-hat: 18 total, 18 ok, 0 fail
+  qa: 24 total, 24 ok, 0 fail
+  white-hat: 18 total, 18 ok, 0 fail
+[2026-04-06 15:22:36] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:23:36] --- Snapshot at elapsed=1860s (31m) ---
+[2026-04-06 15:23:36] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:23:37] Chromium/Playwright RSS: 1774.1MB
+[2026-04-06 15:23:37] Results: total=147, iterations=3, leaks=0, errors=0
+[2026-04-06 15:23:37] Per-role breakdown:
+  black-hat: 54 total, 54 ok, 0 fail
+  ciso: 15 total, 15 ok, 0 fail
+  dev: 18 total, 18 ok, 0 fail
+  green-hat: 18 total, 18 ok, 0 fail
+  qa: 24 total, 24 ok, 0 fail
+  white-hat: 18 total, 18 ok, 0 fail
+[2026-04-06 15:23:37] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:24:37] --- Snapshot at elapsed=1920s (32m) ---
+[2026-04-06 15:24:37] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:24:37] Chromium/Playwright RSS: 1780.4MB
+[2026-04-06 15:24:37] Results: total=196, iterations=4, leaks=0, errors=0
+[2026-04-06 15:24:37] Per-role breakdown:
+  black-hat: 72 total, 72 ok, 0 fail
+  ciso: 20 total, 20 ok, 0 fail
+  dev: 24 total, 24 ok, 0 fail
+  green-hat: 24 total, 24 ok, 0 fail
+  qa: 32 total, 32 ok, 0 fail
+  white-hat: 24 total, 24 ok, 0 fail
+[2026-04-06 15:24:37] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:25:37] --- Snapshot at elapsed=1980s (33m) ---
+[2026-04-06 15:25:37] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:25:37] Chromium/Playwright RSS: 1799.8MB
+[2026-04-06 15:25:37] Results: total=196, iterations=4, leaks=0, errors=0
+[2026-04-06 15:25:37] Per-role breakdown:
+  black-hat: 72 total, 72 ok, 0 fail
+  ciso: 20 total, 20 ok, 0 fail
+  dev: 24 total, 24 ok, 0 fail
+  green-hat: 24 total, 24 ok, 0 fail
+  qa: 32 total, 32 ok, 0 fail
+  white-hat: 24 total, 24 ok, 0 fail
+[2026-04-06 15:25:37] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:26:37] --- Snapshot at elapsed=2040s (34m) ---
+[2026-04-06 15:26:37] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:26:37] Chromium/Playwright RSS: 1779.5MB
+[2026-04-06 15:26:37] Results: total=196, iterations=4, leaks=0, errors=0
+[2026-04-06 15:26:37] Per-role breakdown:
+  black-hat: 72 total, 72 ok, 0 fail
+  ciso: 20 total, 20 ok, 0 fail
+  dev: 24 total, 24 ok, 0 fail
+  green-hat: 24 total, 24 ok, 0 fail
+  qa: 32 total, 32 ok, 0 fail
+  white-hat: 24 total, 24 ok, 0 fail
+[2026-04-06 15:26:37] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:27:37] --- Snapshot at elapsed=2100s (35m) ---
+[2026-04-06 15:27:37] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:27:37] Chromium/Playwright RSS: 1801.8MB
+[2026-04-06 15:27:37] Results: total=196, iterations=4, leaks=0, errors=0
+[2026-04-06 15:27:37] Per-role breakdown:
+  black-hat: 72 total, 72 ok, 0 fail
+  ciso: 20 total, 20 ok, 0 fail
+  dev: 24 total, 24 ok, 0 fail
+  green-hat: 24 total, 24 ok, 0 fail
+  qa: 32 total, 32 ok, 0 fail
+  white-hat: 24 total, 24 ok, 0 fail
+[2026-04-06 15:27:37] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:28:37] --- Snapshot at elapsed=2160s (36m) ---
+[2026-04-06 15:28:37] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:28:37] Chromium/Playwright RSS: 1795.1MB
+[2026-04-06 15:28:38] Results: total=196, iterations=4, leaks=0, errors=0
+[2026-04-06 15:28:38] Per-role breakdown:
+  black-hat: 72 total, 72 ok, 0 fail
+  ciso: 20 total, 20 ok, 0 fail
+  dev: 24 total, 24 ok, 0 fail
+  green-hat: 24 total, 24 ok, 0 fail
+  qa: 32 total, 32 ok, 0 fail
+  white-hat: 24 total, 24 ok, 0 fail
+[2026-04-06 15:28:38] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:29:38] --- Snapshot at elapsed=2220s (37m) ---
+[2026-04-06 15:29:38] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:29:38] Chromium/Playwright RSS: 1807.9MB
+[2026-04-06 15:29:38] Results: total=196, iterations=4, leaks=0, errors=0
+[2026-04-06 15:29:38] Per-role breakdown:
+  black-hat: 72 total, 72 ok, 0 fail
+  ciso: 20 total, 20 ok, 0 fail
+  dev: 24 total, 24 ok, 0 fail
+  green-hat: 24 total, 24 ok, 0 fail
+  qa: 32 total, 32 ok, 0 fail
+  white-hat: 24 total, 24 ok, 0 fail
+[2026-04-06 15:29:38] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:30:38] --- Snapshot at elapsed=2280s (38m) ---
+[2026-04-06 15:30:38] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:30:38] Chromium/Playwright RSS: 1826.0MB
+[2026-04-06 15:30:38] Results: total=196, iterations=4, leaks=0, errors=0
+[2026-04-06 15:30:38] Per-role breakdown:
+  black-hat: 72 total, 72 ok, 0 fail
+  ciso: 20 total, 20 ok, 0 fail
+  dev: 24 total, 24 ok, 0 fail
+  green-hat: 24 total, 24 ok, 0 fail
+  qa: 32 total, 32 ok, 0 fail
+  white-hat: 24 total, 24 ok, 0 fail
+[2026-04-06 15:30:38] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:31:38] --- Snapshot at elapsed=2340s (39m) ---
+[2026-04-06 15:31:38] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:31:38] Chromium/Playwright RSS: 2460.4MB
+[2026-04-06 15:31:38] Results: total=196, iterations=4, leaks=0, errors=0
+[2026-04-06 15:31:38] Per-role breakdown:
+  black-hat: 72 total, 72 ok, 0 fail
+  ciso: 20 total, 20 ok, 0 fail
+  dev: 24 total, 24 ok, 0 fail
+  green-hat: 24 total, 24 ok, 0 fail
+  qa: 32 total, 32 ok, 0 fail
+  white-hat: 24 total, 24 ok, 0 fail
+[2026-04-06 15:31:38] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:32:38] --- Snapshot at elapsed=2400s (40m) ---
+[2026-04-06 15:32:38] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:32:38] Chromium/Playwright RSS: 1944.7MB
+[2026-04-06 15:32:38] Results: total=245, iterations=5, leaks=0, errors=0
+[2026-04-06 15:32:38] Per-role breakdown:
+  black-hat: 90 total, 90 ok, 0 fail
+  ciso: 25 total, 25 ok, 0 fail
+  dev: 30 total, 30 ok, 0 fail
+  green-hat: 30 total, 30 ok, 0 fail
+  qa: 40 total, 40 ok, 0 fail
+  white-hat: 30 total, 30 ok, 0 fail
+[2026-04-06 15:32:38] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:33:38] --- Snapshot at elapsed=2460s (41m) ---
+[2026-04-06 15:33:38] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:33:38] Chromium/Playwright RSS: 1896.4MB
+[2026-04-06 15:33:39] Results: total=245, iterations=5, leaks=0, errors=0
+[2026-04-06 15:33:39] Per-role breakdown:
+  black-hat: 90 total, 90 ok, 0 fail
+  ciso: 25 total, 25 ok, 0 fail
+  dev: 30 total, 30 ok, 0 fail
+  green-hat: 30 total, 30 ok, 0 fail
+  qa: 40 total, 40 ok, 0 fail
+  white-hat: 30 total, 30 ok, 0 fail
+[2026-04-06 15:33:39] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:34:39] --- Snapshot at elapsed=2520s (42m) ---
+[2026-04-06 15:34:39] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:34:39] Chromium/Playwright RSS: 1972.1MB
+[2026-04-06 15:34:39] Results: total=245, iterations=5, leaks=0, errors=0
+[2026-04-06 15:34:39] Per-role breakdown:
+  black-hat: 90 total, 90 ok, 0 fail
+  ciso: 25 total, 25 ok, 0 fail
+  dev: 30 total, 30 ok, 0 fail
+  green-hat: 30 total, 30 ok, 0 fail
+  qa: 40 total, 40 ok, 0 fail
+  white-hat: 30 total, 30 ok, 0 fail
+[2026-04-06 15:34:39] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:35:39] --- Snapshot at elapsed=2580s (43m) ---
+[2026-04-06 15:35:39] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:35:39] Chromium/Playwright RSS: 1919.2MB
+[2026-04-06 15:35:39] Results: total=245, iterations=5, leaks=0, errors=0
+[2026-04-06 15:35:39] Per-role breakdown:
+  black-hat: 90 total, 90 ok, 0 fail
+  ciso: 25 total, 25 ok, 0 fail
+  dev: 30 total, 30 ok, 0 fail
+  green-hat: 30 total, 30 ok, 0 fail
+  qa: 40 total, 40 ok, 0 fail
+  white-hat: 30 total, 30 ok, 0 fail
+[2026-04-06 15:35:39] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:36:39] --- Snapshot at elapsed=2640s (44m) ---
+[2026-04-06 15:36:39] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:36:39] Chromium/Playwright RSS: 1919.6MB
+[2026-04-06 15:36:39] Results: total=245, iterations=5, leaks=0, errors=0
+[2026-04-06 15:36:39] Per-role breakdown:
+  black-hat: 90 total, 90 ok, 0 fail
+  ciso: 25 total, 25 ok, 0 fail
+  dev: 30 total, 30 ok, 0 fail
+  green-hat: 30 total, 30 ok, 0 fail
+  qa: 40 total, 40 ok, 0 fail
+  white-hat: 30 total, 30 ok, 0 fail
+[2026-04-06 15:36:39] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:37:39] --- Snapshot at elapsed=2700s (45m) ---
+[2026-04-06 15:37:39] Processes: playwright/chromium=16, node/angular=2
+[2026-04-06 15:37:39] Chromium/Playwright RSS: 1938.5MB
+[2026-04-06 15:37:39] Results: total=245, iterations=5, leaks=0, errors=0
+[2026-04-06 15:37:39] Per-role breakdown:
+  black-hat: 90 total, 90 ok, 0 fail
+  ciso: 25 total, 25 ok, 0 fail
+  dev: 30 total, 30 ok, 0 fail
+  green-hat: 30 total, 30 ok, 0 fail
+  qa: 40 total, 40 ok, 0 fail
+  white-hat: 30 total, 30 ok, 0 fail
+[2026-04-06 15:37:39] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:38:39] --- Snapshot at elapsed=2760s (46m) ---
+[2026-04-06 15:38:39] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:38:39] Chromium/Playwright RSS: 1983.6MB
+[2026-04-06 15:38:40] Results: total=245, iterations=5, leaks=0, errors=0
+[2026-04-06 15:38:40] Per-role breakdown:
+  black-hat: 90 total, 90 ok, 0 fail
+  ciso: 25 total, 25 ok, 0 fail
+  dev: 30 total, 30 ok, 0 fail
+  green-hat: 30 total, 30 ok, 0 fail
+  qa: 40 total, 40 ok, 0 fail
+  white-hat: 30 total, 30 ok, 0 fail
+[2026-04-06 15:38:40] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:39:40] --- Snapshot at elapsed=2820s (47m) ---
+[2026-04-06 15:39:40] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:39:40] Chromium/Playwright RSS: 2039.9MB
+[2026-04-06 15:39:40] Results: total=245, iterations=5, leaks=0, errors=0
+[2026-04-06 15:39:40] Per-role breakdown:
+  black-hat: 90 total, 90 ok, 0 fail
+  ciso: 25 total, 25 ok, 0 fail
+  dev: 30 total, 30 ok, 0 fail
+  green-hat: 30 total, 30 ok, 0 fail
+  qa: 40 total, 40 ok, 0 fail
+  white-hat: 30 total, 30 ok, 0 fail
+[2026-04-06 15:39:40] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:40:40] --- Snapshot at elapsed=2880s (48m) ---
+[2026-04-06 15:40:40] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:40:40] Chromium/Playwright RSS: 2072.3MB
+[2026-04-06 15:40:40] Results: total=294, iterations=6, leaks=0, errors=1
+[2026-04-06 15:40:40] Per-role breakdown:
+  black-hat: 108 total, 107 ok, 1 fail
+  ciso: 30 total, 30 ok, 0 fail
+  dev: 36 total, 36 ok, 0 fail
+  green-hat: 36 total, 36 ok, 0 fail
+  qa: 48 total, 48 ok, 0 fail
+  white-hat: 36 total, 36 ok, 0 fail
+[2026-04-06 15:40:40] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:41:40] --- Snapshot at elapsed=2940s (49m) ---
+[2026-04-06 15:41:40] Processes: playwright/chromium=19, node/angular=2
+[2026-04-06 15:41:40] Chromium/Playwright RSS: 2106.7MB
+[2026-04-06 15:41:40] Results: total=294, iterations=6, leaks=0, errors=1
+[2026-04-06 15:41:40] Per-role breakdown:
+  black-hat: 108 total, 107 ok, 1 fail
+  ciso: 30 total, 30 ok, 0 fail
+  dev: 36 total, 36 ok, 0 fail
+  green-hat: 36 total, 36 ok, 0 fail
+  qa: 48 total, 48 ok, 0 fail
+  white-hat: 36 total, 36 ok, 0 fail
+[2026-04-06 15:41:40] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:42:40] --- Snapshot at elapsed=3000s (50m) ---
+[2026-04-06 15:42:40] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:42:40] Chromium/Playwright RSS: 2054.8MB
+[2026-04-06 15:42:43] Results: total=294, iterations=6, leaks=0, errors=1
+[2026-04-06 15:42:43] Per-role breakdown:
+  black-hat: 108 total, 107 ok, 1 fail
+  ciso: 30 total, 30 ok, 0 fail
+  dev: 36 total, 36 ok, 0 fail
+  green-hat: 36 total, 36 ok, 0 fail
+  qa: 48 total, 48 ok, 0 fail
+  white-hat: 36 total, 36 ok, 0 fail
+[2026-04-06 15:42:43] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:43:43] --- Snapshot at elapsed=3060s (51m) ---
+[2026-04-06 15:43:43] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:43:43] Chromium/Playwright RSS: 2114.1MB
+[2026-04-06 15:43:43] Results: total=294, iterations=6, leaks=0, errors=1
+[2026-04-06 15:43:43] Per-role breakdown:
+  black-hat: 108 total, 107 ok, 1 fail
+  ciso: 30 total, 30 ok, 0 fail
+  dev: 36 total, 36 ok, 0 fail
+  green-hat: 36 total, 36 ok, 0 fail
+  qa: 48 total, 48 ok, 0 fail
+  white-hat: 36 total, 36 ok, 0 fail
+[2026-04-06 15:43:43] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:44:43] --- Snapshot at elapsed=3120s (52m) ---
+[2026-04-06 15:44:43] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:44:43] Chromium/Playwright RSS: 2155.4MB
+[2026-04-06 15:44:43] Results: total=294, iterations=6, leaks=0, errors=1
+[2026-04-06 15:44:43] Per-role breakdown:
+  black-hat: 108 total, 107 ok, 1 fail
+  ciso: 30 total, 30 ok, 0 fail
+  dev: 36 total, 36 ok, 0 fail
+  green-hat: 36 total, 36 ok, 0 fail
+  qa: 48 total, 48 ok, 0 fail
+  white-hat: 36 total, 36 ok, 0 fail
+[2026-04-06 15:44:43] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:45:43] --- Snapshot at elapsed=3180s (53m) ---
+[2026-04-06 15:45:43] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:45:43] Chromium/Playwright RSS: 2114.5MB
+[2026-04-06 15:45:43] Results: total=294, iterations=6, leaks=0, errors=1
+[2026-04-06 15:45:43] Per-role breakdown:
+  black-hat: 108 total, 107 ok, 1 fail
+  ciso: 30 total, 30 ok, 0 fail
+  dev: 36 total, 36 ok, 0 fail
+  green-hat: 36 total, 36 ok, 0 fail
+  qa: 48 total, 48 ok, 0 fail
+  white-hat: 36 total, 36 ok, 0 fail
+[2026-04-06 15:45:43] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:46:43] --- Snapshot at elapsed=3240s (54m) ---
+[2026-04-06 15:46:43] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:46:43] Chromium/Playwright RSS: 2108.4MB
+[2026-04-06 15:46:43] Results: total=294, iterations=6, leaks=0, errors=1
+[2026-04-06 15:46:43] Per-role breakdown:
+  black-hat: 108 total, 107 ok, 1 fail
+  ciso: 30 total, 30 ok, 0 fail
+  dev: 36 total, 36 ok, 0 fail
+  green-hat: 36 total, 36 ok, 0 fail
+  qa: 48 total, 48 ok, 0 fail
+  white-hat: 36 total, 36 ok, 0 fail
+[2026-04-06 15:46:43] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:47:44] --- Snapshot at elapsed=3300s (55m) ---
+[2026-04-06 15:47:44] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:47:44] Chromium/Playwright RSS: 2149.2MB
+[2026-04-06 15:47:44] Results: total=294, iterations=6, leaks=0, errors=1
+[2026-04-06 15:47:44] Per-role breakdown:
+  black-hat: 108 total, 107 ok, 1 fail
+  ciso: 30 total, 30 ok, 0 fail
+  dev: 36 total, 36 ok, 0 fail
+  green-hat: 36 total, 36 ok, 0 fail
+  qa: 48 total, 48 ok, 0 fail
+  white-hat: 36 total, 36 ok, 0 fail
+[2026-04-06 15:47:44] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:48:44] --- Snapshot at elapsed=3360s (56m) ---
+[2026-04-06 15:48:44] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:48:44] Chromium/Playwright RSS: 2116.6MB
+[2026-04-06 15:48:44] Results: total=343, iterations=7, leaks=0, errors=1
+[2026-04-06 15:48:44] Per-role breakdown:
+  black-hat: 126 total, 125 ok, 1 fail
+  ciso: 35 total, 35 ok, 0 fail
+  dev: 42 total, 42 ok, 0 fail
+  green-hat: 42 total, 42 ok, 0 fail
+  qa: 56 total, 56 ok, 0 fail
+  white-hat: 42 total, 42 ok, 0 fail
+[2026-04-06 15:48:44] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:49:44] --- Snapshot at elapsed=3420s (57m) ---
+[2026-04-06 15:49:44] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:49:44] Chromium/Playwright RSS: 2130.1MB
+[2026-04-06 15:49:44] Results: total=343, iterations=7, leaks=0, errors=1
+[2026-04-06 15:49:44] Per-role breakdown:
+  black-hat: 126 total, 125 ok, 1 fail
+  ciso: 35 total, 35 ok, 0 fail
+  dev: 42 total, 42 ok, 0 fail
+  green-hat: 42 total, 42 ok, 0 fail
+  qa: 56 total, 56 ok, 0 fail
+  white-hat: 42 total, 42 ok, 0 fail
+[2026-04-06 15:49:44] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:50:44] --- Snapshot at elapsed=3480s (58m) ---
+[2026-04-06 15:50:44] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:50:44] Chromium/Playwright RSS: 2134.9MB
+[2026-04-06 15:50:44] Results: total=343, iterations=7, leaks=0, errors=1
+[2026-04-06 15:50:44] Per-role breakdown:
+  black-hat: 126 total, 125 ok, 1 fail
+  ciso: 35 total, 35 ok, 0 fail
+  dev: 42 total, 42 ok, 0 fail
+  green-hat: 42 total, 42 ok, 0 fail
+  qa: 56 total, 56 ok, 0 fail
+  white-hat: 42 total, 42 ok, 0 fail
+[2026-04-06 15:50:44] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:51:44] --- Snapshot at elapsed=3540s (59m) ---
+[2026-04-06 15:51:44] Processes: playwright/chromium=17, node/angular=2
+[2026-04-06 15:51:44] Chromium/Playwright RSS: 2151.7MB
+[2026-04-06 15:51:45] Results: total=343, iterations=7, leaks=0, errors=1
+[2026-04-06 15:51:45] Per-role breakdown:
+  black-hat: 126 total, 125 ok, 1 fail
+  ciso: 35 total, 35 ok, 0 fail
+  dev: 42 total, 42 ok, 0 fail
+  green-hat: 42 total, 42 ok, 0 fail
+  qa: 56 total, 56 ok, 0 fail
+  white-hat: 42 total, 42 ok, 0 fail
+[2026-04-06 15:51:45] HTML report: /mnt/sda2/home/aronboliveira/Desktop/programming/LLMPromptPurify/llm-prompt-purify/playwright-report (2.2M)
+[2026-04-06 15:52:45] === MONITOR COMPLETE after 3600s ===
+[2026-04-06 15:52:45] === FINAL SUMMARY ===
+Total results: 363
+Iterations: 8
+Leaks: 0
+Errors: 1
+Success rate: 99.7%
+  black-hat: 133/134 passed (99%)
+  ciso: 35/35 passed (100%)
+  dev: 42/42 passed (100%)
+  green-hat: 48/48 passed (100%)
+  qa: 62/62 passed (100%)
+  white-hat: 42/42 passed (100%)
