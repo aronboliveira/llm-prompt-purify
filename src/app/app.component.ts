@@ -17,6 +17,7 @@ import type {
   DetectionMode,
   MaskGroupId,
   MaskingStrategy,
+  NameMaskingStrategy,
   XmlWrapTag,
 } from "./core/masking/declarations/masking.types";
 import {
@@ -302,6 +303,22 @@ export class AppComponent {
 
   protected updateKeywordBlocklist(keywords: readonly string[]): void {
     this.#scanSession.updateKeywordBlocklist(keywords);
+  }
+
+  protected updateMaskGitHashes(enabled: boolean): void {
+    this.#scanSession.setMaskGitHashes(enabled);
+  }
+
+  protected updateMaskNetworkPorts(enabled: boolean): void {
+    this.#scanSession.setMaskNetworkPorts(enabled);
+  }
+
+  protected updateMaskNames(enabled: boolean): void {
+    this.#scanSession.setMaskNames(enabled);
+  }
+
+  protected updateNameStrategy(strategy: NameMaskingStrategy): void {
+    this.#scanSession.setNameStrategy(strategy);
   }
 
   protected updateMaskingStrategy(strategy: MaskingStrategy): void {
