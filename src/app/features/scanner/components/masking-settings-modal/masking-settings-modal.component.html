@@ -374,6 +374,101 @@
         }
       </fieldset>
 
+      <!-- ── Optional pattern toggles ─────────────────────── -->
+
+      <fieldset class="settings-fieldset">
+        <legend class="settings-fieldset__legend">
+          Optional pattern detection
+        </legend>
+        <p class="settings-fieldset__description">
+          These pattern types are disabled by default because they can produce
+          false positives in certain codebases. Enable them if your prompts
+          contain sensitive git hashes or network port numbers.
+        </p>
+
+        <label class="settings-toggle">
+          <input
+            type="checkbox"
+            data-testid="mask-git-hashes-toggle"
+            [checked]="advancedPreferences().maskGitHashes"
+            (change)="onMaskGitHashesToggle($event)"
+          />
+          <span class="settings-toggle__copy">
+            <span class="settings-toggle__title">Mask git hashes</span>
+            <span class="settings-toggle__body">
+              Detect and mask full (40-char) and abbreviated (7–12 char) git
+              commit SHA-1 hashes, including labeled variants like
+              <code>commit: abc1234</code>.
+            </span>
+          </span>
+        </label>
+
+        <label class="settings-toggle">
+          <input
+            type="checkbox"
+            data-testid="mask-network-ports-toggle"
+            [checked]="advancedPreferences().maskNetworkPorts"
+            (change)="onMaskNetworkPortsToggle($event)"
+          />
+          <span class="settings-toggle__copy">
+            <span class="settings-toggle__title">Mask network ports</span>
+            <span class="settings-toggle__body">
+              Detect and mask network port numbers in labeled form (<code
+                >port: 5432</code
+              >) and host:port notation (<code>db.internal:5432</code>).
+            </span>
+          </span>
+        </label>
+
+        <label class="settings-toggle">
+          <input
+            type="checkbox"
+            data-testid="mask-names-toggle"
+            [checked]="advancedPreferences().maskNames"
+            (change)="onMaskNamesToggle($event)"
+          />
+          <span class="settings-toggle__copy">
+            <span class="settings-toggle__title">Mask person names</span>
+            <span class="settings-toggle__body">
+              Detect and mask person names using per-locale dictionaries (EN,
+              PT-BR, PT-PT, ES, ZH, RU, IN) and contextual cues like
+              <code>Dear</code>, <code>Prezado</code>, <code>Sr.</code>.
+            </span>
+          </span>
+        </label>
+
+        @if (advancedPreferences().maskNames) {
+          <div class="name-strategy-picker">
+            <label
+              class="name-strategy-picker__label"
+              for="name-strategy-select"
+            >
+              Name replacement style
+            </label>
+            <select
+              class="name-strategy-picker__select"
+              data-testid="name-strategy-select"
+              id="name-strategy-select"
+              [value]="advancedPreferences().nameStrategy"
+              (change)="onNameStrategyChange($event)"
+            >
+              <option
+                value="alias"
+                [selected]="advancedPreferences().nameStrategy === 'alias'"
+              >
+                Alias (initials + counter: AB1, AG2)
+              </option>
+              <option
+                value="default"
+                [selected]="advancedPreferences().nameStrategy === 'default'"
+              >
+                Use global masking strategy
+              </option>
+            </select>
+          </div>
+        }
+      </fieldset>
+
       <!-- ── Info cards ───────────────────────────────────── -->
 
       <div class="settings-card-grid">

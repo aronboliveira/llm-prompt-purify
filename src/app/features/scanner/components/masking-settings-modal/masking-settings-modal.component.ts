@@ -31,6 +31,7 @@ import type {
   MaskGroupId,
   MaskGroupPreferenceMap,
   MaskingStrategy,
+  NameMaskingStrategy,
   XmlWrapTag,
 } from "@core/masking/declarations/masking.types";
 import { MATERIAL_ICONS } from "@shared/constants/material-icons.constants";
@@ -61,6 +62,10 @@ export class MaskingSettingsModalComponent {
     keywordBlocklist: [],
     maskingStrategy: "random",
     maskTimestamps: false,
+    maskGitHashes: false,
+    maskNetworkPorts: false,
+    maskNames: false,
+    nameStrategy: "alias",
     polyglotMaskEnabled: true,
     polyglotEnabledFamilies: ["abugida", "alphabetic", "syllabary", "symbol"],
     polyglotExcludedSubtypes: [],
@@ -88,7 +93,11 @@ export class MaskingSettingsModalComponent {
   }>();
   readonly helpRequested = output<void>();
   readonly keywordBlocklistChanged = output<readonly string[]>();
+  readonly maskGitHashesChanged = output<boolean>();
+  readonly maskNamesChanged = output<boolean>();
+  readonly maskNetworkPortsChanged = output<boolean>();
   readonly maskingStrategyChanged = output<MaskingStrategy>();
+  readonly nameStrategyChanged = output<NameMaskingStrategy>();
   readonly polyglotEnabledChanged = output<boolean>();
   readonly polyglotFamiliesChanged = output<readonly string[]>();
   readonly polyglotExcludedSubtypesChanged = output<readonly string[]>();
@@ -246,5 +255,29 @@ export class MaskingSettingsModalComponent {
 
   protected openHelp(): void {
     this.helpRequested.emit();
+  }
+
+  protected onMaskGitHashesToggle(event: Event): void {
+    const inputElement = event.target;
+    if (!(inputElement instanceof HTMLInputElement)) return;
+    this.maskGitHashesChanged.emit(inputElement.checked);
+  }
+
+  protected onMaskNetworkPortsToggle(event: Event): void {
+    const inputElement = event.target;
+    if (!(inputElement instanceof HTMLInputElement)) return;
+    this.maskNetworkPortsChanged.emit(inputElement.checked);
+  }
+
+  protected onMaskNamesToggle(event: Event): void {
+    const inputElement = event.target;
+    if (!(inputElement instanceof HTMLInputElement)) return;
+    this.maskNamesChanged.emit(inputElement.checked);
+  }
+
+  protected onNameStrategyChange(event: Event): void {
+    const selectElement = event.target;
+    if (!(selectElement instanceof HTMLSelectElement)) return;
+    this.nameStrategyChanged.emit(selectElement.value as NameMaskingStrategy);
   }
 }
