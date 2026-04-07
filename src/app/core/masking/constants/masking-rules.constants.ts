@@ -1,6 +1,25 @@
 import type { DetectionRule } from "../declarations/masking.types";
 import { deepFreeze } from "@shared/utils/deep-freeze.utils";
 import {
+  ALL_FIRST_NAMES,
+  ALL_LAST_NAMES,
+  EN_US_FIRST_NAMES,
+  EN_US_LAST_NAMES,
+  ES_FIRST_NAMES,
+  ES_LAST_NAMES,
+  IN_FIRST_NAMES,
+  IN_LAST_NAMES,
+  NAME_CONTEXT_PREFIXES,
+  PT_BR_FIRST_NAMES,
+  PT_BR_LAST_NAMES,
+  PT_PT_FIRST_NAMES,
+  PT_PT_LAST_NAMES,
+  RU_FIRST_NAMES,
+  RU_LAST_NAMES,
+  ZH_CN_FIRST_NAMES,
+  ZH_CN_LAST_NAMES,
+} from "./name-dictionaries.constants";
+import {
   BR_CEP_LABEL_FLAGS,
   BR_CNH_LABEL_FLAGS,
   BR_PIS_PASEP_LABEL_FLAGS,
@@ -1661,6 +1680,164 @@ export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
     priority: 45,
   },
 
+  // ─── Git Hash Patterns (conditional on advancedPrefs.maskGitHashes) ─────────
+
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "high",
+    id: "git-hash-full",
+    label: "Full git commit SHA-1",
+    locale: "shared",
+    patternFactory: () => /\b[0-9a-f]{40}\b/g,
+    priority: 60,
+    validator: isLikelyGitHash,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "git-hash-short",
+    label: "Short git commit hash",
+    locale: "shared",
+    patternFactory: () => /\b[0-9a-f]{7,12}\b/g,
+    priority: 40,
+    validator: isLikelyShortGitHash,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "high",
+    id: "git-hash-labeled",
+    label: "Labeled git commit hash",
+    locale: "shared",
+    patternFactory: () =>
+      /\b(?:commit|sha|rev(?:ision)?|hash|ref)\s*[:=\-]?\s*([0-9a-f]{7,40})\b/gi,
+    priority: 85,
+    valueGroup: 1,
+  },
+
+  // ─── Network Port Patterns (conditional on advancedPrefs.maskNetworkPorts) ──
+
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "high",
+    id: "network-port-labeled",
+    label: "Labeled network port",
+    locale: "shared",
+    patternFactory: () => /\b(?:port|porta|puerto)\s*[:=\-#]?\s*(\d{1,5})\b/gi,
+    priority: 80,
+    validator: isValidPort,
+    valueGroup: 1,
+  },
+  {
+    category: "identifier",
+    coverage: "global",
+    confidence: "medium",
+    id: "network-port-host",
+    label: "Host:port notation",
+    locale: "shared",
+    patternFactory: () => /(?:[\w.-]+):(\d{1,5})(?=\s|$|[,;)\]}"'])/g,
+    priority: 55,
+    validator: isValidPort,
+    valueGroup: 1,
+  },
+
+  // ─── Global labeled variants (keyword-gated, zero FP risk) ──────────────────
+
+  // ─── Name Detection Rules (conditional on advancedPrefs.maskNames) ──────────
+
+  {
+    category: "personal",
+    coverage: "global",
+    confidence: "medium",
+    id: "name-standalone-en",
+    label: "Person name (EN)",
+    locale: "en-US",
+    patternFactory: () => STANDALONE_NAME_PATTERN,
+    priority: 35,
+    validator: isLikelyPersonName_EN,
+  },
+  {
+    category: "personal",
+    coverage: "global",
+    confidence: "medium",
+    id: "name-standalone-pt-br",
+    label: "Person name (PT-BR)",
+    locale: "pt-BR",
+    patternFactory: () => STANDALONE_NAME_PATTERN,
+    priority: 35,
+    validator: isLikelyPersonName_PT_BR,
+  },
+  {
+    category: "personal",
+    coverage: "global",
+    confidence: "medium",
+    id: "name-standalone-pt-pt",
+    label: "Person name (PT-PT)",
+    locale: "pt-PT",
+    patternFactory: () => STANDALONE_NAME_PATTERN,
+    priority: 35,
+    validator: isLikelyPersonName_PT_PT,
+  },
+  {
+    category: "personal",
+    coverage: "global",
+    confidence: "medium",
+    id: "name-standalone-es",
+    label: "Person name (ES)",
+    locale: "es-ES",
+    patternFactory: () => STANDALONE_NAME_PATTERN,
+    priority: 35,
+    validator: isLikelyPersonName_ES,
+  },
+  {
+    category: "personal",
+    coverage: "global",
+    confidence: "medium",
+    id: "name-standalone-zh",
+    label: "Person name (ZH)",
+    locale: "zh-CN",
+    patternFactory: () => STANDALONE_NAME_PATTERN_ZH,
+    priority: 35,
+    validator: isLikelyPersonName_ZH,
+  },
+  {
+    category: "personal",
+    coverage: "global",
+    confidence: "medium",
+    id: "name-standalone-ru",
+    label: "Person name (RU)",
+    locale: "ru-RU",
+    patternFactory: () => STANDALONE_NAME_PATTERN,
+    priority: 35,
+    validator: isLikelyPersonName_RU,
+  },
+  {
+    category: "personal",
+    coverage: "global",
+    confidence: "medium",
+    id: "name-standalone-in",
+    label: "Person name (IN)",
+    locale: "en-IN",
+    patternFactory: () => STANDALONE_NAME_PATTERN,
+    priority: 35,
+    validator: isLikelyPersonName_IN,
+  },
+  {
+    category: "personal",
+    coverage: "global",
+    confidence: "medium",
+    id: "name-contextual",
+    label: "Person name (contextual)",
+    locale: "shared",
+    patternFactory: () => CONTEXTUAL_NAME_PATTERN,
+    priority: 38,
+    validator: looksLikeStructuredName,
+    valueGroup: 1,
+  },
+
   // ─── Global labeled variants (keyword-gated, zero FP risk) ──────────────────
 
   {
@@ -1952,4 +2129,168 @@ function isValidIpv6(value: string): boolean {
   const groups = value.split(":");
   if (groups.length < 3 || groups.length > 8) return false;
   return groups.every(g => g.length <= 4);
+}
+
+/**
+ * Validator for full 40-char git hashes — reject all-zero or all-same-char.
+ */
+function isLikelyGitHash(value: string): boolean {
+  if (/^(.)\1+$/.test(value)) return false;
+  if (value === "0".repeat(40)) return false;
+  return true;
+}
+
+/**
+ * Validator for short git hashes — must contain at least one digit AND
+ * at least one letter to avoid matching pure numbers or hex color codes.
+ */
+function isLikelyShortGitHash(value: string): boolean {
+  return /\d/.test(value) && /[a-f]/i.test(value);
+}
+
+/**
+ * Validator for network port numbers — must be 1..65535.
+ */
+function isValidPort(value: string): boolean {
+  const num = parseInt(value, 10);
+  return !isNaN(num) && num >= 1 && num <= 65535;
+}
+
+// ─── Standalone Name Detection ──────────────────────────────────────────────
+
+/**
+ * Matches 2–5 capitalized words separated by whitespace (standard Latin names).
+ * Each word starts with an uppercase letter followed by lowercase or accented chars.
+ */
+const STANDALONE_NAME_PATTERN =
+  /\b((?:\p{Lu}\p{Ll}{1,20})\s+(?:\p{Lu}\p{Ll}{1,20})(?:\s+\p{Lu}\p{Ll}{1,20}){0,3})\b/gu;
+
+/**
+ * Matches 2–3 word pinyin names (first letter may not always be capitalized).
+ * More lenient for ZH transliterations.
+ */
+const STANDALONE_NAME_PATTERN_ZH =
+  /\b([A-Z]\w{1,8}\s+[A-Z]\w{1,8}(?:\s+[A-Z]\w{1,8})?)\b/g;
+
+/**
+ * Context-driven name pattern: a preceding keyword (like "Dear", "Prezado",
+ * "Sr.") followed by a capitalized word sequence.
+ */
+const CONTEXTUAL_NAME_PATTERN = new RegExp(
+  `(?:^|[\\s,;:])(?:${NAME_CONTEXT_PREFIXES.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\s+(\\p{Lu}\\p{Ll}{1,20}(?:\\s+\\p{Lu}\\p{Ll}{1,20}){0,4})(?=[\\s,;:.!?]|$)`,
+  "giu",
+);
+
+/**
+ * Common English words that look like names but aren't.
+ * Prevents false positives for phrases like "New York", "San Francisco", etc.
+ */
+const NAME_FALSE_POSITIVES = new Set([
+  "the",
+  "this",
+  "that",
+  "these",
+  "those",
+  "with",
+  "from",
+  "will",
+  "have",
+  "been",
+  "being",
+  "just",
+  "more",
+  "some",
+  "what",
+  "when",
+  "where",
+  "which",
+  "about",
+  "also",
+  "only",
+  "very",
+  "much",
+  "such",
+  "like",
+  "than",
+  "new",
+  "old",
+  "san",
+  "santa",
+  "saint",
+  "los",
+  "las",
+  "del",
+  "von",
+  "van",
+  "mac",
+  "port",
+]);
+
+/**
+ * Returns true if the value looks like a person name and at least one part
+ * is found in the given locale dictionaries.
+ */
+function isLikelyPersonNameForLocale(
+  value: string,
+  firstNames: ReadonlySet<string>,
+  lastNames: ReadonlySet<string>,
+): boolean {
+  const parts = value.trim().split(/\s+/);
+  if (parts.length < 2 || parts.length > 5) return false;
+  if (value.length < 4 || value.length > 80) return false;
+
+  // Reject if any part is a common false-positive word
+  if (parts.some(p => NAME_FALSE_POSITIVES.has(p.toLowerCase()))) return false;
+
+  const lowerParts = parts.map(p => p.toLowerCase());
+
+  // At least one part must be in the dictionary
+  const hasFirst = lowerParts.some(p => firstNames.has(p));
+  const hasLast = lowerParts.some(p => lastNames.has(p));
+
+  return hasFirst || hasLast;
+}
+
+function isLikelyPersonName_EN(value: string): boolean {
+  return isLikelyPersonNameForLocale(
+    value,
+    EN_US_FIRST_NAMES,
+    EN_US_LAST_NAMES,
+  );
+}
+
+function isLikelyPersonName_PT_BR(value: string): boolean {
+  return isLikelyPersonNameForLocale(
+    value,
+    PT_BR_FIRST_NAMES,
+    PT_BR_LAST_NAMES,
+  );
+}
+
+function isLikelyPersonName_PT_PT(value: string): boolean {
+  return isLikelyPersonNameForLocale(
+    value,
+    PT_PT_FIRST_NAMES,
+    PT_PT_LAST_NAMES,
+  );
+}
+
+function isLikelyPersonName_ES(value: string): boolean {
+  return isLikelyPersonNameForLocale(value, ES_FIRST_NAMES, ES_LAST_NAMES);
+}
+
+function isLikelyPersonName_ZH(value: string): boolean {
+  return isLikelyPersonNameForLocale(
+    value,
+    ZH_CN_FIRST_NAMES,
+    ZH_CN_LAST_NAMES,
+  );
+}
+
+function isLikelyPersonName_RU(value: string): boolean {
+  return isLikelyPersonNameForLocale(value, RU_FIRST_NAMES, RU_LAST_NAMES);
+}
+
+function isLikelyPersonName_IN(value: string): boolean {
+  return isLikelyPersonNameForLocale(value, IN_FIRST_NAMES, IN_LAST_NAMES);
 }
