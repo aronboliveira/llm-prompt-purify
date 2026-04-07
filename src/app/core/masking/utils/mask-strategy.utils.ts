@@ -28,7 +28,41 @@ export function createTagMask(ruleId: string, category: MatchCategory): string {
     RULE_TAG_MAP[ruleId] ?? CATEGORY_TAG_LABELS[category] ?? "REDACTED";
   return `<${tagName}>`;
 }
+// ─── Name Alias Strategy ─────────────────────────────────────────────────────
 
+/**
+ * Builds initials from a person name string.
+ * Takes the first Unicode letter of each whitespace-separated word.
+ * Example: "Aron Barbosa" → "AB", "Maria Clara Souza" → "MCS"
+ */
+function extractInitials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(part => {
+      const firstLetter = part.match(/\p{L}/u);
+      return firstLetter ? firstLetter[0].toUpperCase() : "";
+    })
+    .join("");
+}
+
+/**
+ * Creates an alias mask for a person name using initials + counter.
+ * Example: "Aron Barbosa" → "AB1", "Aroldo Geraldo" → "AG2"
+ *
+ * The counter ensures unique aliases even when names share the same initials.
+ * Same values always get the same alias within a scan session via maskByValue.
+ */
+export function createNameAliasMask(
+  value: string,
+  counterState?: FakerCounterState,
+): string {
+  const initials = extractInitials(value) || "NN";
+  const counter = counterState
+    ? getNextCounter(counterState, `NAME_ALIAS_${initials}`)
+    : 1;
+  return `${initials}${counter}`;
+}
 // ─── Faker Strategy ──────────────────────────────────────────────────────────
 
 /**
@@ -43,6 +77,14 @@ const FAKER_CATEGORY_LABELS: Readonly<Record<string, string>> = Object.freeze({
   "email-address": "EMAIL",
   "labeled-phone": "PHONE",
   "labeled-name": "NAME",
+  "name-standalone-en": "NAME",
+  "name-standalone-pt-br": "NAME",
+  "name-standalone-pt-pt": "NAME",
+  "name-standalone-es": "NAME",
+  "name-standalone-zh": "NAME",
+  "name-standalone-ru": "NAME",
+  "name-standalone-in": "NAME",
+  "name-contextual": "NAME",
   "labeled-address": "ADDRESS",
   "labeled-passport": "PASSPORT",
   "credit-card": "CREDIT_CARD",
@@ -246,6 +288,19 @@ function shouldForceNumericComplianceMask(
 
 // ─── Strategy Dispatcher ─────────────────────────────────────────────────────
 
+import type { NameMaskingStrategy } from "../declarations/masking.types";
+
+/**
+ * Returns true when the rule ID originates from a name detection rule.
+ */
+function isNameRule(ruleId: string): boolean {
+  return (
+    ruleId === "labeled-name" ||
+    ruleId.startsWith("name-standalone-") ||
+    ruleId === "name-contextual"
+  );
+}
+
 /**
  * Creates a mask for a given value according to the selected strategy.
  *
@@ -256,6 +311,7 @@ function shouldForceNumericComplianceMask(
  * @param previousMask - For "random" strategy, avoids generating the same mask
  * @param fakerCounterState - For "faker" strategy, tracks category counters
  * @param polyglotConfig - For "random" strategy with polyglot enabled
+ * @param nameStrategy - When set to "alias", name rules use initials+counter
  */
 export function createMaskForStrategy(
   value: string,
@@ -265,7 +321,13 @@ export function createMaskForStrategy(
   previousMask?: string,
   fakerCounterState?: FakerCounterState,
   polyglotConfig?: PolyglotMaskConfig,
+  nameStrategy?: NameMaskingStrategy,
 ): string {
+  // Name alias intercept — initials+counter when alias strategy is active
+  if (nameStrategy === "alias" && isNameRule(ruleId)) {
+    return createNameAliasMask(value, fakerCounterState);
+  }
+
   // Polyglot characters are already maximally foreign and obviously synthetic,
   // so the numeric compliance guard is unnecessary when polyglot is active.
   if (shouldForceNumericComplianceMask(value, category) && !polyglotConfig) {
