@@ -109,9 +109,12 @@ export class MaskingEngine {
     advancedPrefs?: AdvancedMaskingPreferences,
     countryProfileIds?: readonly CountryProfileId[],
   ): ScanResult {
-    const fakerCounter =
-        strategy === "faker" ? createFakerCounterState() : undefined,
+    const needsCounter =
+        strategy === "faker" ||
+        (advancedPrefs?.maskNames && advancedPrefs?.nameStrategy === "alias"),
+      fakerCounter = needsCounter ? createFakerCounterState() : undefined,
       polyglot = buildPolyglotConfig(advancedPrefs, countryProfileIds),
+      nameStrategy = advancedPrefs?.nameStrategy ?? "alias",
       nextMasks = new Map<string, string>(),
       updatedMatches = matches.map(match => {
         const nextMask =
@@ -124,6 +127,7 @@ export class MaskingEngine {
             nextMasks.get(match.value),
             fakerCounter,
             polyglot,
+            nameStrategy,
           );
 
         nextMasks.set(match.value, nextMask);
@@ -146,10 +150,13 @@ export class MaskingEngine {
     if (!targetMatch)
       return this.rebuild(sourceText, matches, scannedAt, advancedPrefs);
 
-    // For single match regeneration with faker, create fresh counter (starts at 1)
-    const fakerCounter =
-        strategy === "faker" ? createFakerCounterState() : undefined,
+    // For single match regeneration, create fresh counter (starts at 1)
+    const needsCounter =
+        strategy === "faker" ||
+        (advancedPrefs?.maskNames && advancedPrefs?.nameStrategy === "alias"),
+      fakerCounter = needsCounter ? createFakerCounterState() : undefined,
       polyglot = buildPolyglotConfig(advancedPrefs, countryProfileIds),
+      nameStrategy = advancedPrefs?.nameStrategy ?? "alias",
       nextMask = createMaskForStrategy(
         targetMatch.value,
         targetMatch.ruleId,
@@ -158,6 +165,7 @@ export class MaskingEngine {
         targetMatch.mask,
         fakerCounter,
         polyglot,
+        nameStrategy,
       ),
       updatedMatches = matches.map(match =>
         match.value === targetMatch.value
@@ -176,8 +184,10 @@ export class MaskingEngine {
     advancedPrefs?: AdvancedMaskingPreferences,
   ): ScanResult {
     const strategy = advancedPrefs?.maskingStrategy ?? "random",
-      fakerCounter =
-        strategy === "faker" ? createFakerCounterState() : undefined,
+      needsCounter =
+        strategy === "faker" ||
+        (advancedPrefs?.maskNames && advancedPrefs?.nameStrategy === "alias"),
+      fakerCounter = needsCounter ? createFakerCounterState() : undefined,
       expandedCountryProfileIds = expandCountryScope(
         scopeSelection.countryProfileIds,
       ),
@@ -185,14 +195,28 @@ export class MaskingEngine {
       ignoreList = advancedPrefs?.globalIgnoreList ?? [],
       blocklist = advancedPrefs?.keywordBlocklist ?? [],
       maskTimestamps = advancedPrefs?.maskTimestamps ?? false,
+      maskGitHashes = advancedPrefs?.maskGitHashes ?? false,
+      maskNetworkPorts = advancedPrefs?.maskNetworkPorts ?? false,
+      maskNames = advancedPrefs?.maskNames ?? false,
+      nameStrategy = advancedPrefs?.nameStrategy ?? "alias",
       scopeFilteredRules = filterRulesForScope(MASKING_RULES, {
         ...scopeSelection,
         countryProfileIds: expandedCountryProfileIds,
       }),
-      // Filter out timestamp rules if maskTimestamps is false
-      activeRules = maskTimestamps
-        ? scopeFilteredRules
-        : scopeFilteredRules.filter(rule => !rule.id.startsWith("timestamp-")),
+      // Filter out opt-in rules when their toggle is off
+      activeRules = scopeFilteredRules.filter(rule => {
+        if (!maskTimestamps && rule.id.startsWith("timestamp-")) return false;
+        if (!maskGitHashes && rule.id.startsWith("git-hash-")) return false;
+        if (!maskNetworkPorts && rule.id.startsWith("network-port-"))
+          return false;
+        if (
+          !maskNames &&
+          (rule.id.startsWith("name-standalone-") ||
+            rule.id === "name-contextual")
+        )
+          return false;
+        return true;
+      }),
       regexCandidates = activeRules.flatMap(rule => {
         return Array.from(sourceText.matchAll(rule.patternFactory()))
           .map(match => extractCandidateMatch(match, rule))
@@ -221,6 +245,7 @@ export class MaskingEngine {
             undefined,
             fakerCounter,
             polyglot,
+            nameStrategy,
           );
         maskByValue.set(candidate.value, mask);
 
