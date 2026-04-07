@@ -151,6 +151,14 @@ export interface ScanScopeSelection {
 export type MaskingStrategy = "random" | "tags" | "faker" | "redacted";
 
 /**
+ * Controls how detected person names are replaced when name masking is active.
+ *
+ * - `alias`   – initials + counter (e.g. "Aron Barbosa" → AB1, "Aroldo Geraldo" → AG2)
+ * - `default` – uses whichever MaskingStrategy is globally selected
+ */
+export type NameMaskingStrategy = "alias" | "default";
+
+/**
  * Predefined XML wrapper tag names the user can choose from when
  * enabling the "Wrap output in XML" setting.
  */
@@ -181,6 +189,32 @@ export interface AdvancedMaskingPreferences {
    * Default: false
    */
   maskTimestamps: boolean;
+
+  /**
+   * Whether to mask git commit hashes (40-char and abbreviated 7–8 char SHA-1).
+   * Default: false
+   */
+  maskGitHashes: boolean;
+
+  /**
+   * Whether to mask network port numbers (labeled or in host:port notation).
+   * Default: false
+   */
+  maskNetworkPorts: boolean;
+
+  /**
+   * Whether to detect and mask person names (labeled + dictionary-based).
+   * Default: false
+   */
+  maskNames: boolean;
+
+  /**
+   * How detected person names are replaced.
+   * - `alias`: initials + counter (AB1, AG2, etc.)
+   * - `default`: uses the globally selected masking strategy
+   * Default: "alias"
+   */
+  nameStrategy: NameMaskingStrategy;
 
   /**
    * Words / patterns the user wants **always** masked regardless of

@@ -482,6 +482,25 @@ export const RULE_TAG_MAP: Readonly<Record<string, string>> = Object.freeze({
   "date-dmy": "DATE",
   "timestamp-iso8601": "TIMESTAMP",
   "timestamp-datetime": "TIMESTAMP",
+
+  /* git hashes */
+  "git-hash-full": "GIT_HASH",
+  "git-hash-short": "GIT_HASH",
+  "git-hash-labeled": "GIT_HASH",
+
+  /* network ports */
+  "network-port-labeled": "PORT",
+  "network-port-host": "PORT",
+
+  /* person names */
+  "name-standalone-en": "NAME",
+  "name-standalone-pt-br": "NAME",
+  "name-standalone-pt-pt": "NAME",
+  "name-standalone-es": "NAME",
+  "name-standalone-zh": "NAME",
+  "name-standalone-ru": "NAME",
+  "name-standalone-in": "NAME",
+  "name-contextual": "NAME",
 });
 
 /**
@@ -527,6 +546,10 @@ export const DEFAULT_ADVANCED_PREFERENCES: Readonly<AdvancedMaskingPreferences> 
     xmlWrapEnabled: false,
     xmlWrapTag: "document",
     maskTimestamps: true,
+    maskGitHashes: false,
+    maskNetworkPorts: false,
+    maskNames: false,
+    nameStrategy: "alias",
     keywordBlocklist: [],
     globalIgnoreList: [],
     polyglotMaskEnabled: true,
