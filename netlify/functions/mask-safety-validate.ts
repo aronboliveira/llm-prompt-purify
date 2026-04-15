@@ -25,7 +25,7 @@ function jsonResponse(body: unknown, status: number): Response {
 }
 
 function evaluateCandidate(
-  candidate: MaskSafetyValidationItemRequest
+  candidate: MaskSafetyValidationItemRequest,
 ): MaskSafetyValidationItemResponse {
   const candidateValue = candidate.candidateValue?.trim() ?? "";
   const ruleId = candidate.ruleId?.trim() ?? "";
@@ -70,7 +70,7 @@ function evaluateCandidate(
 
 export default async function handler(
   request: Request,
-  _context: Context
+  _context: Context,
 ): Promise<Response> {
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -94,7 +94,7 @@ export default async function handler(
           candidates: ["The candidates field must be an array."],
         },
       },
-      422
+      422,
     );
   }
 
@@ -107,7 +107,7 @@ export default async function handler(
           ],
         },
       },
-      422
+      422,
     );
   }
 

@@ -50,7 +50,7 @@ function buildBody(entry: FeedbackEntry): string {
 }
 
 async function sendEmail(
-  entry: FeedbackEntry
+  entry: FeedbackEntry,
 ): Promise<{ status: "emailed" | "stored-only"; error: string | null }> {
   const host = process.env.SMTP_HOST;
   const port = parseInt(process.env.SMTP_PORT ?? "587", 10);
@@ -94,7 +94,7 @@ async function sendEmail(
 
 export default async function handler(
   request: Request,
-  _context: Context
+  _context: Context,
 ): Promise<Response> {
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });

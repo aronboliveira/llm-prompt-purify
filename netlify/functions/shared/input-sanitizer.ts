@@ -11,7 +11,7 @@ export function sanitize(input: string | undefined | null): string | null {
 
 export function sanitizeAndTrim(
   input: string | undefined | null,
-  defaultValue = ""
+  defaultValue = "",
 ): string {
   if (!input || !input.trim()) return defaultValue;
   return sanitize(input.trim()) ?? defaultValue;

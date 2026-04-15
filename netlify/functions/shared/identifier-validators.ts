@@ -5,7 +5,7 @@ function digitsOnly(value: string): string {
 }
 
 function hasRepeatedDigits(digits: string): boolean {
-  return digits.length > 0 && digits.split("").every((d) => d === digits[0]);
+  return digits.length > 0 && digits.split("").every(d => d === digits[0]);
 }
 
 export function isLikelyCreditCard(value: string): boolean {
@@ -60,10 +60,7 @@ export function isValidArgentineCuit(value: string): boolean {
 }
 
 export function isValidChileanRut(value: string): boolean {
-  const normalized = value
-    .replace(/\./g, "")
-    .replace(/-/g, "")
-    .toUpperCase();
+  const normalized = value.replace(/\./g, "").replace(/-/g, "").toUpperCase();
   if (!/^\d{7,8}[0-9K]$/.test(normalized)) return false;
 
   const verifier = normalized[normalized.length - 1];
@@ -120,7 +117,7 @@ export function isValidCnpj(value: string): boolean {
   const firstDigit = calculateWeightedDigit(digits.slice(0, 12), firstWeights);
   const secondDigit = calculateWeightedDigit(
     digits.slice(0, 12) + String(firstDigit),
-    secondWeights
+    secondWeights,
   );
   return digits.endsWith(`${firstDigit}${secondDigit}`);
 }
@@ -157,7 +154,7 @@ export function isValidCpf(value: string): boolean {
   const firstDigit = calculateCpfDigit(digits.slice(0, 9), 10);
   const secondDigit = calculateCpfDigit(
     digits.slice(0, 9) + String(firstDigit),
-    11
+    11,
   );
   return digits.endsWith(`${firstDigit}${secondDigit}`);
 }
@@ -192,8 +189,7 @@ export function isValidIndianAadhaar(value: string): boolean {
   let checksum = 0;
   const reversed = digits.split("").reverse();
   for (let i = 0; i < reversed.length; i++)
-    checksum =
-      mult[checksum][perm[i % 8][reversed[i].charCodeAt(0) - 48]];
+    checksum = mult[checksum][perm[i % 8][reversed[i].charCodeAt(0) - 48]];
 
   return checksum === 0;
 }
@@ -240,8 +236,7 @@ export function isValidPortugueseNif(value: string): boolean {
   if (!"125689".includes(digits[0])) return false;
 
   let total = 0;
-  for (let i = 0; i < 8; i++)
-    total += (digits.charCodeAt(i) - 48) * (9 - i);
+  for (let i = 0; i < 8; i++) total += (digits.charCodeAt(i) - 48) * (9 - i);
 
   const r = 11 - (total % 11);
   const verifier = r >= 10 ? 0 : r;
@@ -263,18 +258,18 @@ export function isValidRussianInn(value: string): boolean {
   if (digits.length === 10) {
     const expected = calculateMod11Digit(
       digits.slice(0, 9),
-      [2, 4, 10, 3, 5, 9, 4, 6, 8]
+      [2, 4, 10, 3, 5, 9, 4, 6, 8],
     );
     return digits.charCodeAt(9) - 48 === expected;
   }
 
   const first = calculateMod11Digit(
     digits.slice(0, 10),
-    [7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
+    [7, 2, 4, 10, 3, 5, 9, 4, 6, 8],
   );
   const second = calculateMod11Digit(
     digits.slice(0, 11),
-    [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8]
+    [3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8],
   );
   return (
     digits.charCodeAt(10) - 48 === first &&
@@ -287,8 +282,7 @@ export function isValidRussianSnils(value: string): boolean {
   if (digits.length !== 11 || hasRepeatedDigits(digits)) return false;
 
   let total = 0;
-  for (let i = 0; i < 9; i++)
-    total += (digits.charCodeAt(i) - 48) * (9 - i);
+  for (let i = 0; i < 9; i++) total += (digits.charCodeAt(i) - 48) * (9 - i);
 
   let rawVerifier: number;
   if (total < 100) rawVerifier = total;
@@ -307,7 +301,9 @@ function calculateSpanishDocumentLetter(value: string): string {
 export function isValidSpanishDni(value: string): boolean {
   const normalized = value.replace(/\s/g, "").toUpperCase();
   if (!/^\d{8}[A-Z]$/.test(normalized)) return false;
-  return normalized[8] === calculateSpanishDocumentLetter(normalized.slice(0, 8));
+  return (
+    normalized[8] === calculateSpanishDocumentLetter(normalized.slice(0, 8))
+  );
 }
 
 export function isValidSpanishNie(value: string): boolean {

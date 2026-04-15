@@ -1,47 +1,11 @@
+# develop-ts: API is handled by Netlify serverless functions.
+# Use `netlify dev` locally to serve both the Angular app and functions together.
+# This compose file is retained for spinning up only the frontend container
+# when you need a production-like nginx build without the Netlify CLI.
 services:
-  db:
-    image: mongo:7.0
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
-      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-llm_prompt_purify}
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/llm_prompt_purify --quiet
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - feedback-db:/data/db
-
-  backend:
-    build:
-      context: .
-      dockerfile: backend/LLMPromptPurify.Api/Dockerfile
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__FeedbackDatabase: mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-password}@db:27017/${MONGO_DATABASE:-llm_prompt_purify}?authSource=admin
-      DeveloperEmail__EnableSsl: ${SMTP_ENABLE_SSL:-true}
-      DeveloperEmail__Host: ${SMTP_HOST:-smtp.gmail.com}
-      DeveloperEmail__Password: ${SMTP_PASSWORD:-}
-      DeveloperEmail__Port: ${SMTP_PORT:-587}
-      DeveloperEmail__RecipientEmail: ${DEVELOPER_EMAIL_TO:-aronprogramador@gmail.com}
-      DeveloperEmail__SenderEmail: ${SMTP_SENDER_EMAIL:-}
-      DeveloperEmail__Username: ${SMTP_USERNAME:-}
-    ports:
-      - "48080:8080"
-
   frontend:
     build:
       context: .
       dockerfile: docker/frontend.Dockerfile
-    depends_on:
-      backend:
-        condition: service_started
     ports:
       - "44200:80"
-
-volumes:
-  feedback-db:

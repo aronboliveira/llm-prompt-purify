@@ -1,7 +1,4 @@
-import type {
-  FeedbackSubmissionRequest,
-  ValidationErrors,
-} from "./types.js";
+import type { FeedbackSubmissionRequest, ValidationErrors } from "./types.js";
 
 const KNOWN_CATEGORIES = new Set([
   "general-feedback",
@@ -13,7 +10,7 @@ const KNOWN_CATEGORIES = new Set([
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function validateFeedbackRequest(
-  request: FeedbackSubmissionRequest
+  request: FeedbackSubmissionRequest,
 ): ValidationErrors {
   const errors: Record<string, string[]> = {};
 
@@ -54,13 +51,12 @@ export function validateFeedbackRequest(
     addError("rating", "Appraisals need a 1 to 5 rating.");
   }
 
-  const emailRequired =
-    request.wantsReply || category === "contact-developers";
+  const emailRequired = request.wantsReply || category === "contact-developers";
 
   if (emailRequired && !request.email?.trim()) {
     addError(
       "email",
-      "Add an email address when you want the developers to reply."
+      "Add an email address when you want the developers to reply.",
     );
   } else if (request.email?.trim() && !EMAIL_RE.test(request.email.trim())) {
     addError("email", "Use a valid email address.");
@@ -69,7 +65,7 @@ export function validateFeedbackRequest(
   if (category === "contact-developers" && !request.subject?.trim()) {
     addError(
       "subject",
-      "Add a subject for messages directed to the developers."
+      "Add a subject for messages directed to the developers.",
     );
   }
 
