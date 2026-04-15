@@ -1,0 +1,90 @@
+# Backend deployment — image tag is substituted by CI/CD via envsubst or kustomize
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: llm-prompt-purify
+  labels:
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/part-of: llm-prompt-purify
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: backend
+    spec:
+      containers:
+        - name: backend
+          # ${ACR_REGISTRY}/${ACR_BACKEND_IMAGE}:${IMAGE_TAG} — replaced by CI
+          image: llmpromptpurify.azurecr.io/llmpromptpurify/backend:${IMAGE_TAG}
+          ports:
+            - containerPort: 8080
+              name: http
+          envFrom:
+            - configMapRef:
+                name: backend-config
+          env:
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: MONGO_INITDB_ROOT_USERNAME
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: MONGO_INITDB_ROOT_PASSWORD
+            - name: DeveloperEmail__Host
+              valueFrom:
+                secretKeyRef:
+                  name: email-credentials
+                  key: SMTP_HOST
+            - name: DeveloperEmail__Port
+              valueFrom:
+                secretKeyRef:
+                  name: email-credentials
+                  key: SMTP_PORT
+            - name: DeveloperEmail__Username
+              valueFrom:
+                secretKeyRef:
+                  name: email-credentials
+                  key: SMTP_USERNAME
+            - name: DeveloperEmail__Password
+              valueFrom:
+                secretKeyRef:
+                  name: email-credentials
+                  key: SMTP_PASSWORD
+            - name: DeveloperEmail__SenderEmail
+              valueFrom:
+                secretKeyRef:
+                  name: email-credentials
+                  key: SMTP_SENDER_EMAIL
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

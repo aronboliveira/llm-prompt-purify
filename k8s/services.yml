@@ -1,0 +1,48 @@
+# ── ClusterIP services (internal) ──
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: llm-prompt-purify
+  labels:
+    app.kubernetes.io/name: mongo
+spec:
+  clusterIP: None          # headless — StatefulSet DNS
+  selector:
+    app.kubernetes.io/name: mongo
+  ports:
+    - port: 27017
+      targetPort: 27017
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: llm-prompt-purify
+  labels:
+    app.kubernetes.io/name: backend
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: backend
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: llm-prompt-purify
+  labels:
+    app.kubernetes.io/name: frontend
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP

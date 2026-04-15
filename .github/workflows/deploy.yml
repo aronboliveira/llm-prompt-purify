@@ -1,0 +1,125 @@
+name: Deploy to Azure (AKS)
+
+# ──────────────────────────────────────────────────────────────
+# DEPLOY TRIGGERS — commented out for now.
+# Uncomment when Azure resources (ACR + AKS) are provisioned.
+# ──────────────────────────────────────────────────────────────
+# on:
+#   push:
+#     branches: [main]
+#   workflow_dispatch:
+
+# Until triggers are enabled, this workflow can only be run manually
+# from the Actions tab via "Run workflow" (workflow_dispatch).
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  NODE_VERSION: "22"
+  DOTNET_VERSION: "8.0.x"
+  # ── Azure Container Registry ──
+  # TODO: Replace with real values once ACR is provisioned
+  ACR_REGISTRY: llmpromptpurify.azurecr.io
+  ACR_FRONTEND_IMAGE: llmpromptpurify/frontend
+  ACR_BACKEND_IMAGE: llmpromptpurify/backend
+  # ── AKS ──
+  AKS_CLUSTER_NAME: llmpromptpurify-aks
+  AKS_RESOURCE_GROUP: llmpromptpurify-rg
+  K8S_NAMESPACE: llm-prompt-purify
+
+permissions:
+  id-token: write   # OIDC for Azure login
+  contents: read
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Build & push container images to ACR
+  # ──────────────────────────────────────────────
+  build-and-push:
+    name: Build & push images
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute image tag
+        id: meta
+        run: echo "tag=sha-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      # ── Azure login (OIDC) ──
+      # TODO: Configure federated credentials in Entra ID
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: ACR login
+        run: az acr login --name ${{ env.ACR_REGISTRY }}
+
+      - name: Build & push frontend
+        run: |
+          docker build \
+            -f docker/frontend.Dockerfile \
+            -t ${{ env.ACR_REGISTRY }}/${{ env.ACR_FRONTEND_IMAGE }}:${{ steps.meta.outputs.tag }} \
+            -t ${{ env.ACR_REGISTRY }}/${{ env.ACR_FRONTEND_IMAGE }}:latest \
+            .
+          docker push ${{ env.ACR_REGISTRY }}/${{ env.ACR_FRONTEND_IMAGE }} --all-tags
+
+      - name: Build & push backend
+        run: |
+          docker build \
+            -f backend/LLMPromptPurify.Api/Dockerfile \
+            -t ${{ env.ACR_REGISTRY }}/${{ env.ACR_BACKEND_IMAGE }}:${{ steps.meta.outputs.tag }} \
+            -t ${{ env.ACR_REGISTRY }}/${{ env.ACR_BACKEND_IMAGE }}:latest \
+            .
+          docker push ${{ env.ACR_REGISTRY }}/${{ env.ACR_BACKEND_IMAGE }} --all-tags
+
+  # ──────────────────────────────────────────────
+  # Deploy to AKS
+  # ──────────────────────────────────────────────
+  deploy:
+    name: Deploy to AKS (${{ inputs.environment || 'staging' }})
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment: ${{ inputs.environment || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set AKS context
+        uses: azure/aks-set-context@v4
+        with:
+          cluster-name: ${{ env.AKS_CLUSTER_NAME }}
+          resource-group: ${{ env.AKS_RESOURCE_GROUP }}
+
+      - name: Deploy manifests
+        run: |
+          export IMAGE_TAG="${{ needs.build-and-push.outputs.image-tag }}"
+          envsubst < k8s/backend-deployment.yml | kubectl apply -f -
+          envsubst < k8s/frontend-deployment.yml | kubectl apply -f -
+          kubectl apply -f k8s/mongo-statefulset.yml
+          kubectl apply -f k8s/services.yml
+          kubectl apply -f k8s/ingress.yml
+
+      - name: Wait for rollout
+        run: |
+          kubectl -n ${{ env.K8S_NAMESPACE }} rollout status deployment/frontend --timeout=120s
+          kubectl -n ${{ env.K8S_NAMESPACE }} rollout status deployment/backend --timeout=120s

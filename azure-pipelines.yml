@@ -1,0 +1,189 @@
+# ──────────────────────────────────────────────────────────────
+# Azure DevOps Pipeline — CI + CD for LLM Prompt Purify (C# branch)
+#
+# DEPLOY TRIGGERS: Commented out. Enable once Azure resources exist.
+# ──────────────────────────────────────────────────────────────
+
+# trigger:
+#   branches:
+#     include:
+#       - develop-cs
+#       - main
+
+# pr:
+#   branches:
+#     include:
+#       - develop-cs
+#       - main
+
+# Until triggers are enabled, pipelines must be run manually.
+trigger: none
+pr: none
+
+variables:
+  nodeVersion: "22"
+  dotnetVersion: "8.0.x"
+  # ACR — replace with real values
+  acrServiceConnection: "llmpromptpurify-acr"
+  acrRegistry: "llmpromptpurify.azurecr.io"
+  frontendImage: "llmpromptpurify/frontend"
+  backendImage: "llmpromptpurify/backend"
+  # AKS — replace with real values
+  aksServiceConnection: "llmpromptpurify-aks"
+  aksResourceGroup: "llmpromptpurify-rg"
+  aksClusterName: "llmpromptpurify-aks"
+  k8sNamespace: "llm-prompt-purify"
+  imageTag: "$(Build.SourceVersion)"
+
+pool:
+  vmImage: "ubuntu-latest"
+
+stages:
+  # ════════════════════════════════════════════
+  # Stage 1: Build & Test
+  # ════════════════════════════════════════════
+  - stage: Build
+    displayName: "Build & Test"
+    jobs:
+      # ── Frontend ──
+      - job: Frontend
+        displayName: "Frontend (lint, test, build)"
+        steps:
+          - task: UseNode@1
+            inputs:
+              version: $(nodeVersion)
+
+          - script: npm ci
+            displayName: "npm ci"
+
+          - script: npx eslint .
+            displayName: "Lint"
+
+          - script: npx jest --ci --coverage --runInBand
+            displayName: "Jest unit tests"
+
+          - script: npx ng build --configuration production
+            displayName: "Angular production build"
+
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testResultsFormat: "JUnit"
+              testResultsFiles: "**/junit.xml"
+              searchFolder: "$(System.DefaultWorkingDirectory)"
+
+          - publish: dist/llm-prompt-purify/browser
+            artifact: frontend-dist
+            displayName: "Publish frontend artifact"
+
+      # ── Backend ──
+      - job: Backend
+        displayName: "Backend (.NET build & test)"
+        steps:
+          - task: UseDotNet@2
+            inputs:
+              packageType: sdk
+              version: $(dotnetVersion)
+
+          - script: dotnet restore LLMPromptPurify.sln
+            displayName: "Restore"
+
+          - script: dotnet build LLMPromptPurify.sln --no-restore -c Release
+            displayName: "Build"
+
+          - script: dotnet test LLMPromptPurify.sln --no-build -c Release --logger "trx;LogFileName=test-results.trx"
+            displayName: "Test"
+
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testResultsFormat: "VSTest"
+              testResultsFiles: "**/test-results.trx"
+
+  # ════════════════════════════════════════════
+  # Stage 2: Containerize
+  # ════════════════════════════════════════════
+  - stage: Containerize
+    displayName: "Build & Push Images"
+    dependsOn: Build
+    # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    condition: succeeded() # Always build images on successful CI — push is separate
+    jobs:
+      - job: DockerBuild
+        displayName: "Build container images"
+        steps:
+          - task: Docker@2
+            displayName: "Build frontend image"
+            inputs:
+              containerRegistry: $(acrServiceConnection)
+              repository: $(frontendImage)
+              command: build
+              Dockerfile: docker/frontend.Dockerfile
+              buildContext: "$(System.DefaultWorkingDirectory)"
+              tags: |
+                $(imageTag)
+                latest
+
+          - task: Docker@2
+            displayName: "Build backend image"
+            inputs:
+              containerRegistry: $(acrServiceConnection)
+              repository: $(backendImage)
+              command: build
+              Dockerfile: backend/LLMPromptPurify.Api/Dockerfile
+              buildContext: "$(System.DefaultWorkingDirectory)"
+              tags: |
+                $(imageTag)
+                latest
+
+          # ── Push — commented out until ACR is provisioned ──
+          # - task: Docker@2
+          #   displayName: "Push frontend image"
+          #   inputs:
+          #     containerRegistry: $(acrServiceConnection)
+          #     repository: $(frontendImage)
+          #     command: push
+          #     tags: |
+          #       $(imageTag)
+          #       latest
+
+          # - task: Docker@2
+          #   displayName: "Push backend image"
+          #   inputs:
+          #     containerRegistry: $(acrServiceConnection)
+          #     repository: $(backendImage)
+          #     command: push
+          #     tags: |
+          #       $(imageTag)
+          #       latest
+
+  # ════════════════════════════════════════════
+  # Stage 3: Deploy to AKS
+  # ════════════════════════════════════════════
+  # - stage: Deploy
+  #   displayName: "Deploy to AKS"
+  #   dependsOn: Containerize
+  #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  #   jobs:
+  #     - deployment: DeployToAKS
+  #       displayName: "Deploy to AKS cluster"
+  #       environment: production
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - task: KubernetesManifest@1
+  #                 displayName: "Deploy manifests"
+  #                 inputs:
+  #                   action: deploy
+  #                   kubernetesServiceConnection: $(aksServiceConnection)
+  #                   namespace: $(k8sNamespace)
+  #                   manifests: |
+  #                     k8s/backend-deployment.yml
+  #                     k8s/frontend-deployment.yml
+  #                     k8s/mongo-statefulset.yml
+  #                     k8s/services.yml
+  #                     k8s/ingress.yml
+  #                   containers: |
+  #                     $(acrRegistry)/$(frontendImage):$(imageTag)
+  #                     $(acrRegistry)/$(backendImage):$(imageTag)

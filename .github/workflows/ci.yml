@@ -1,0 +1,154 @@
+name: CI — Build, Lint & Test
+
+on:
+  push:
+    branches: [develop-cs, main]
+  pull_request:
+    branches: [develop-cs, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+  DOTNET_VERSION: "8.0.x"
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Frontend: lint + Jest + Angular build
+  # ──────────────────────────────────────────────
+  frontend:
+    name: Frontend (lint, test, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npx eslint .
+
+      - name: Jest unit tests
+        run: npx jest --ci --coverage --runInBand
+
+      - name: Angular production build
+        run: npx ng build --configuration production
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: coverage/
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/llm-prompt-purify/browser/
+
+  # ──────────────────────────────────────────────
+  # Backend: .NET build + xUnit tests
+  # ──────────────────────────────────────────────
+  backend:
+    name: Backend (.NET build & test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore LLMPromptPurify.sln
+
+      - name: Build
+        run: dotnet build LLMPromptPurify.sln --no-restore -c Release
+
+      - name: Test
+        run: dotnet test LLMPromptPurify.sln --no-build -c Release --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: "**/TestResults/*.trx"
+
+  # ──────────────────────────────────────────────
+  # Playwright E2E (excluding slow-mo endurance)
+  # ──────────────────────────────────────────────
+  e2e:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
+    services:
+      mongo:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "echo 'db.runCommand(\"ping\").ok' | mongosh localhost:27017/test --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Start backend
+        run: |
+          cd backend/LLMPromptPurify.Api
+          dotnet run --urls "http://127.0.0.1:5185" &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:5185/api/health > /dev/null 2>&1 && break
+            sleep 2
+          done
+
+      - name: Run Playwright tests
+        run: npx playwright test --grep-invert="slow.?mo" --reporter=list,html
+        env:
+          CI: "true"
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: .tmp/project-overhaul/playwright-report/
+
+  # ──────────────────────────────────────────────
+  # Docker images build (no push — validation only)
+  # ──────────────────────────────────────────────
+  docker:
+    name: Docker image build
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build frontend image
+        run: docker build -f docker/frontend.Dockerfile -t llm-prompt-purify-frontend:ci .
+
+      - name: Build backend image
+        run: docker build -f backend/LLMPromptPurify.Api/Dockerfile -t llm-prompt-purify-backend:ci .
