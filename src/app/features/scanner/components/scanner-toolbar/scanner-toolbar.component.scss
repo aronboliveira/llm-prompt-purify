@@ -155,12 +155,55 @@
   }
 }
 
+/* ─── Dark-mode hardening ───────────────────────────────────────────── */
+/* Covers both system-preference AND manual data-theme toggle paths     */
+
+@mixin _scanner-toolbar-dark {
+  .scanner-toolbar__button {
+    background: var(--help-trigger-bg, #23374d);
+    border-color: var(--help-trigger-border, rgba(148, 163, 184, 0.36));
+    color: var(--page-text, #e2e8f0);
+  }
+
+  .scanner-toolbar__button:hover:not(:disabled) {
+    background: var(--help-trigger-bg-hover, #2a415a);
+    border-color: var(--surface-accent-border, rgba(45, 212, 191, 0.35));
+  }
+
+  .scanner-toolbar__button--scope {
+    background: var(--surface-accent, rgba(20, 58, 63, 0.9));
+    border-color: var(--surface-accent-border, rgba(45, 212, 191, 0.35));
+  }
+
+  .scanner-toolbar__button--settings {
+    border-color: var(--panel-border, rgba(255, 255, 255, 0.08));
+  }
+
+  .scanner-toolbar__button-label {
+    color: var(--text-muted, #b2c0d2);
+  }
+
+  .scanner-toolbar__button-value {
+    color: var(--page-text, #e2e8f0);
+  }
+
+  .scanner-toolbar__summary {
+    color: var(--text-muted, #b2c0d2);
+  }
+
+  .scanner-toolbar__warning {
+    background: rgba(251, 191, 36, 0.14);
+    border-color: rgba(251, 191, 36, 0.25);
+    color: #fbbf24;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .scanner-toolbar__warning {
-      background: rgba(251, 191, 36, 0.14);
-      border-color: rgba(251, 191, 36, 0.25);
-      color: #fbbf24;
-    }
+    @include _scanner-toolbar-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _scanner-toolbar-dark;
 }

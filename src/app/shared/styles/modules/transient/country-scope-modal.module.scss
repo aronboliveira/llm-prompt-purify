@@ -202,24 +202,44 @@
   }
 }
 
+/* ─── Dark-mode hardening ───────────────────────────────────────────── */
+
+@mixin _country-modal-dark {
+  .country-modal-backdrop {
+    background: rgba(0, 0, 0, 0.62);
+  }
+
+  .country-modal {
+    background: var(--surface-bg, #1e293b);
+    border-color: rgba(148, 163, 184, 0.18);
+  }
+
+  .country-card {
+    background: var(--surface-subtle, #334155);
+    border-color: rgba(148, 163, 184, 0.14);
+  }
+
+  .country-card[data-selected="true"] {
+    border-color: rgba(45, 212, 191, 0.35);
+  }
+
+  .country-card__title {
+    color: var(--page-text, #e2e8f0);
+  }
+
+  .country-card__meta,
+  .country-card__description,
+  .country-modal__body-copy {
+    color: var(--text-muted, #b2c0d2);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .country-modal-backdrop {
-      background: rgba(0, 0, 0, 0.62);
-    }
-
-    .country-modal {
-      background: var(--surface-bg, #1e293b);
-      border-color: rgba(148, 163, 184, 0.18);
-    }
-
-    .country-card {
-      background: var(--surface-subtle, #334155);
-      border-color: rgba(148, 163, 184, 0.14);
-    }
-
-    .country-card[data-selected="true"] {
-      border-color: rgba(45, 212, 191, 0.35);
-    }
+    @include _country-modal-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _country-modal-dark;
 }

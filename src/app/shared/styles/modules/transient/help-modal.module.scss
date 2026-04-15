@@ -81,15 +81,36 @@
   }
 }
 
+@mixin _help-modal-dark {
+  .help-modal-backdrop {
+    background: rgba(0, 0, 0, 0.62);
+  }
+
+  .help-modal {
+    background: var(--surface-bg, #1e293b);
+    border-color: rgba(148, 163, 184, 0.18);
+    color: #e2e8f0;
+  }
+
+  .help-modal__icon {
+    background: rgba(45, 212, 191, 0.12);
+  }
+
+  .help-modal h2 {
+    color: #f1f5f9;
+  }
+
+  .help-modal p {
+    color: #b2c0d2;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .help-modal-backdrop {
-      background: rgba(0, 0, 0, 0.62);
-    }
-
-    .help-modal {
-      background: var(--surface-bg, #1e293b);
-      border-color: rgba(148, 163, 184, 0.18);
-    }
+    @include _help-modal-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _help-modal-dark;
 }

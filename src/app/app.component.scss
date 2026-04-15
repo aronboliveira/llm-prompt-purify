@@ -122,41 +122,49 @@
   }
 }
 
+@mixin _app-shell-dark {
+  .app-shell {
+    --page-text: #e2e8f0;
+    --text-strong: #f1f5f9;
+    --text-body: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-placeholder: #64748b;
+    --surface-bg: #0f172a;
+    --surface-elevated: rgba(30, 41, 59, 0.92);
+    --surface-elevated-border: rgba(148, 163, 184, 0.12);
+    --surface-subtle: #1e293b;
+    --surface-subtle-strong: #334155;
+    --surface-field: linear-gradient(
+      180deg,
+      rgba(28, 42, 61, 0.96),
+      rgba(23, 36, 54, 0.96)
+    );
+    --panel-border: rgba(148, 163, 184, 0.12);
+    --modal-backdrop: rgba(0, 0, 0, 0.62);
+    color: var(--text-body);
+    background:
+      radial-gradient(
+        circle at top left,
+        rgba(45, 212, 191, 0.12),
+        transparent 28%
+      ),
+      radial-gradient(
+        circle at top right,
+        rgba(251, 191, 36, 0.08),
+        transparent 25%
+      ),
+      linear-gradient(180deg, #0f172a, #1a1f2e 58%, #0f172a);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .app-shell {
-      --page-text: #e2e8f0;
-      --text-strong: #f1f5f9;
-      --text-body: #cbd5e1;
-      --text-muted: #94a3b8;
-      --text-placeholder: #64748b;
-      --surface-bg: #0f172a;
-      --surface-elevated: rgba(30, 41, 59, 0.92);
-      --surface-elevated-border: rgba(148, 163, 184, 0.12);
-      --surface-subtle: #1e293b;
-      --surface-subtle-strong: #334155;
-      --surface-field: linear-gradient(
-        180deg,
-        rgba(28, 42, 61, 0.96),
-        rgba(23, 36, 54, 0.96)
-      );
-      --panel-border: rgba(148, 163, 184, 0.12);
-      --modal-backdrop: rgba(0, 0, 0, 0.62);
-      color: var(--text-body);
-      background:
-        radial-gradient(
-          circle at top left,
-          rgba(45, 212, 191, 0.12),
-          transparent 28%
-        ),
-        radial-gradient(
-          circle at top right,
-          rgba(251, 191, 36, 0.08),
-          transparent 25%
-        ),
-        linear-gradient(180deg, #0f172a, #1a1f2e 58%, #0f172a);
-    }
+    @include _app-shell-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _app-shell-dark;
 }
 
 /* ─── Animations ──────────────────────────────────────────────────────────── */

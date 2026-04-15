@@ -92,13 +92,21 @@
   }
 }
 
+@mixin _hero-section-dark {
+  .hero__notice {
+    background: var(--surface-subtle-strong, rgba(30, 41, 59, 0.94));
+    border-color: var(--surface-accent-border, rgba(45, 212, 191, 0.18));
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .hero__notice {
-      background: var(--surface-subtle-strong, rgba(30, 41, 59, 0.94));
-      border-color: var(--surface-accent-border, rgba(45, 212, 191, 0.18));
-    }
+    @include _hero-section-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _hero-section-dark;
 }
 
 @media (max-width: 36rem) {

@@ -595,22 +595,45 @@
   }
 }
 
+/* ─── Dark-mode hardening ───────────────────────────────────────────── */
+
+@mixin _settings-modal-dark {
+  .settings-modal-backdrop {
+    background: rgba(0, 0, 0, 0.62);
+  }
+
+  .settings-modal {
+    background: var(--surface-bg, #1e293b);
+    border-color: rgba(148, 163, 184, 0.18);
+  }
+
+  .settings-card,
+  .mask-group-toggle,
+  .strategy-radio,
+  .polyglot-family-card {
+    background: var(--surface-subtle, #334155);
+    border-color: rgba(148, 163, 184, 0.14);
+  }
+
+  .settings-toggle {
+    background: var(--surface-field, linear-gradient(180deg, rgba(28, 42, 61, 0.96), rgba(23, 36, 54, 0.96)));
+    border-color: var(--surface-accent-border, rgba(45, 212, 191, 0.35));
+  }
+
+  .settings-textarea,
+  .xml-tag-picker__select {
+    background: var(--surface-bg, #1e293b);
+    border-color: var(--surface-accent-border, rgba(45, 212, 191, 0.35));
+    color: var(--text-strong, #e2e8f0);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .settings-modal-backdrop {
-      background: rgba(0, 0, 0, 0.62);
-    }
-
-    .settings-modal {
-      background: var(--surface-bg, #1e293b);
-      border-color: rgba(148, 163, 184, 0.18);
-    }
-
-    .settings-card,
-    .mask-group-toggle,
-    .strategy-radio {
-      background: var(--surface-subtle, #334155);
-      border-color: rgba(148, 163, 184, 0.14);
-    }
+    @include _settings-modal-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _settings-modal-dark;
 }

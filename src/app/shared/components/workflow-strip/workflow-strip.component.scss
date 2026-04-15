@@ -97,22 +97,30 @@
   }
 }
 
+@mixin _workflow-strip-dark {
+  .workflow-strip__card[data-state="done"]::before {
+    background: linear-gradient(
+      90deg,
+      rgba(45, 212, 191, 0.9),
+      rgba(45, 212, 191, 0.28)
+    );
+  }
+
+  .workflow-strip__card[data-state="active"]::before {
+    background: linear-gradient(
+      90deg,
+      rgba(251, 191, 36, 0.92),
+      rgba(45, 212, 191, 0.45)
+    );
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .workflow-strip__card[data-state="done"]::before {
-      background: linear-gradient(
-        90deg,
-        rgba(45, 212, 191, 0.9),
-        rgba(45, 212, 191, 0.28)
-      );
-    }
-
-    .workflow-strip__card[data-state="active"]::before {
-      background: linear-gradient(
-        90deg,
-        rgba(251, 191, 36, 0.92),
-        rgba(45, 212, 191, 0.45)
-      );
-    }
+    @include _workflow-strip-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _workflow-strip-dark;
 }

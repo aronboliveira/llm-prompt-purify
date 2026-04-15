@@ -54,10 +54,18 @@
   }
 }
 
+@mixin _controls-panel-dark {
+  .controls {
+    border-color: rgba(148, 163, 184, 0.14);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .controls {
-      border-color: rgba(148, 163, 184, 0.14);
-    }
+    @include _controls-panel-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _controls-panel-dark;
 }

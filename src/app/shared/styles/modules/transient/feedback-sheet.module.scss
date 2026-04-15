@@ -335,16 +335,88 @@
   }
 }
 
+@mixin _feedback-dark {
+  .feedback-trigger {
+    background: var(--surface-bg, #1e293b);
+    border-color: rgba(148, 163, 184, 0.14);
+    color: #e2e8f0;
+  }
+
+  .feedback-backdrop {
+    background: rgba(0, 0, 0, 0.62);
+  }
+
+  .feedback-sheet {
+    background: var(--surface-bg, #1e293b);
+    border-color: rgba(148, 163, 184, 0.18);
+    color: #e2e8f0;
+  }
+
+  .feedback-sheet h2 {
+    color: #f1f5f9;
+  }
+
+  .feedback-sheet__icon {
+    background: rgba(45, 212, 191, 0.12);
+  }
+
+  .feedback-sheet__eyebrow,
+  .feedback-sheet__body,
+  .feedback-field__hint,
+  .feedback-field__meta,
+  .feedback-toggle__body {
+    color: #b2c0d2;
+  }
+
+  .feedback-field__label,
+  .feedback-rating legend,
+  .feedback-toggle__title {
+    color: #e2e8f0;
+  }
+
+  .feedback-field__control {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(148, 163, 184, 0.18);
+    color: #e2e8f0;
+  }
+
+  .feedback-field__error {
+    color: #fca5a5;
+  }
+
+  .feedback-field__required {
+    color: #2dd4bf;
+  }
+
+  .feedback-rating__option {
+    background: rgba(30, 41, 59, 0.65);
+    color: #b2c0d2;
+  }
+
+  .feedback-rating__option[data-state="active"] {
+    background: linear-gradient(135deg, #0f766e, #115e59);
+    color: #f8fffe;
+  }
+
+  .feedback-toggle {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(148, 163, 184, 0.14);
+  }
+
+  .feedback-button--secondary {
+    background: rgba(30, 41, 59, 0.65);
+    color: #e2e8f0;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .feedback-sheet__icon {
-      background: rgba(45, 212, 191, 0.12);
-    }
-
-    .feedback-field__error {
-      color: #fca5a5;
-    }
+    @include _feedback-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _feedback-dark;
 }
 
 @media (max-width: 56rem) {

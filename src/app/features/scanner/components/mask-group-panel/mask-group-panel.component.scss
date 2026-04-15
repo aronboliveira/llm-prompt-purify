@@ -165,10 +165,18 @@
   }
 }
 
+@mixin _mask-group-panel-dark {
+  .mask-row[data-enabled="false"] {
+    background: rgba(120, 80, 20, 0.18);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .mask-row[data-enabled="false"] {
-      background: rgba(120, 80, 20, 0.18);
-    }
+    @include _mask-group-panel-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _mask-group-panel-dark;
 }

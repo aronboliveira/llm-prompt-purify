@@ -97,16 +97,38 @@
   }
 }
 
+@mixin _toast-dark {
+  .toast {
+    background: var(--surface-bg, #1e293b);
+    border-color: rgba(148, 163, 184, 0.14);
+    color: #e2e8f0;
+  }
+
+  .toast__body {
+    color: #b2c0d2;
+  }
+
+  .toast[data-tone="success"] {
+    border-color: rgba(45, 212, 191, 0.3);
+  }
+
+  .toast[data-tone="error"] {
+    border-color: rgba(252, 165, 165, 0.35);
+  }
+
+  .toast[data-tone="info"] {
+    border-color: rgba(148, 163, 184, 0.35);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .toast[data-tone="error"] {
-      border-color: rgba(252, 165, 165, 0.35);
-    }
-
-    .toast[data-tone="info"] {
-      border-color: rgba(148, 163, 184, 0.35);
-    }
+    @include _toast-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _toast-dark;
 }
 
 @media (max-width: 40rem) {

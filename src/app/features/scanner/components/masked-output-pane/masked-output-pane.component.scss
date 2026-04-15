@@ -271,16 +271,24 @@
   }
 }
 
+@mixin _masked-output-dark {
+  .status-pill[data-tone="error"] {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+  }
+
+  .status-pill[data-tone="success"] {
+    background: rgba(45, 212, 191, 0.18);
+    color: #5eead4;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    .status-pill[data-tone="error"] {
-      background: rgba(239, 68, 68, 0.2);
-      color: #fca5a5;
-    }
-
-    .status-pill[data-tone="success"] {
-      background: rgba(45, 212, 191, 0.18);
-      color: #5eead4;
-    }
+    @include _masked-output-dark;
   }
+}
+
+:root[data-theme="dark"] {
+  @include _masked-output-dark;
 }
