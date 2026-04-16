@@ -189,6 +189,10 @@ describeIfMocks("Exhaustive flat-mock test runner", () => {
   const entries = mockExists ? collectFlatMocks() : [];
   const results: FileResult[] = [];
 
+  it("mock corpus is available", () => {
+    expect(mockExists).toBe(true);
+  });
+
   afterAll(() => {
     if (results.length === 0) return;
     mkdirSync(REPORT_DIR, { recursive: true });

@@ -616,9 +616,7 @@ export class ScanSessionService {
     this.setAdvancedPreferences({ maskNames: enabled });
   }
 
-  public setNameStrategy(
-    strategy: NameMaskingStrategy,
-  ): void {
+  public setNameStrategy(strategy: NameMaskingStrategy): void {
     this.setAdvancedPreferences({ nameStrategy: strategy });
   }
 

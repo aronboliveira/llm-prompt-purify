@@ -65,12 +65,12 @@ export default [
       ],
 
       // Code style - minimal enforcement
-      "eqeqeq": ["warn", "smart"],
-      "curly": "off",
-      "semi": "off",
-      "quotes": "off",
+      eqeqeq: ["warn", "smart"],
+      curly: "off",
+      semi: "off",
+      quotes: "off",
       "comma-dangle": "off",
-      "indent": "off",
+      indent: "off",
       "max-len": "off",
     },
   },

@@ -1,4 +1,4 @@
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import {
@@ -30,7 +30,10 @@ const SCOPE_BY_LANGUAGE: Readonly<Record<MockLanguage, readonly CountryProfileId
 const REPORT_DATE = "20260323";
 const REPORT_ISO = "2026-03-23T00:00:00.000Z";
 
-describe("MaskingEngine exhaustive corpus report", () => {
+const mockRoot = join(process.cwd(), ".tmp", "input-mocks");
+const describeIfMocks = existsSync(mockRoot) ? describe : describe.skip;
+
+describeIfMocks("MaskingEngine exhaustive corpus report", () => {
   const engine = new MaskingEngine();
 
   it(`writes exhaustive per-file report to .tmp/codex/reports-${REPORT_DATE}/exhaustive-tests.log`, () => {

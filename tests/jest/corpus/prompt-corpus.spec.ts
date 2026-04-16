@@ -16,6 +16,10 @@ const LENGTHS = ["short", "medium", "long"] as const;
 const describeIfCorpus = corpusExists ? describe : describe.skip;
 
 describeIfCorpus("MaskingEngine prompt-mocks corpus", () => {
+  it("corpus is available", () => {
+    expect(corpusExists).toBe(true);
+  });
+
   for (const lang of LANGUAGES) {
     describe(`[${lang}]`, () => {
       const scope = SCOPES[lang];

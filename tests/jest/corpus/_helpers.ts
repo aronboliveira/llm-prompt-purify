@@ -137,12 +137,14 @@ export function runRoleFormality(
   roles: readonly string[],
 ): void {
   const scope = SCOPES[lang];
+  let hasTests = false;
 
   for (const role of roles) {
     for (const length of LENGTHS) {
       const files = readPromptFiles(lang, formality, role, length);
       if (files.length === 0) continue;
 
+      hasTests = true;
       it(`${role}/${length} — detects PII in ${files.length} prompts`, () => {
         let totalMatches = 0;
         let maskedCount = 0;
@@ -159,5 +161,9 @@ export function runRoleFormality(
         expect(maskedCount).toBeGreaterThan(0);
       });
     }
+  }
+
+  if (!hasTests) {
+    it("corpus files not generated — skipped", () => {});
   }
 }

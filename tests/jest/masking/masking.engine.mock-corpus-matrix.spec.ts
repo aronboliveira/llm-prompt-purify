@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import {
@@ -21,8 +21,15 @@ const CORPUS_CONFIG: readonly CorpusLanguageConfig[] = [
   { language: "pt-br", selectedScopes: ["br", "pt"] },
 ];
 
-describe("MaskingEngine full input-mock corpus matrix", () => {
+const mockRoot = join(process.cwd(), ".tmp", "input-mocks");
+const describeIfMocks = existsSync(mockRoot) ? describe : describe.skip;
+
+describeIfMocks("MaskingEngine full input-mock corpus matrix", () => {
   const engine = new MaskingEngine();
+
+  it("mock corpus is available", () => {
+    expect(existsSync(mockRoot)).toBe(true);
+  });
 
   for (const config of CORPUS_CONFIG) {
     it(`${config.language}: selected-plus-global masks every mock across all strategies`, () => {
@@ -148,7 +155,9 @@ describe("MaskingEngine full input-mock corpus matrix", () => {
 function readLanguageFiles(
   language: CorpusLanguageConfig["language"],
 ): readonly string[] {
-  return readdirSync(join(process.cwd(), ".tmp", "input-mocks", language))
+  const dir = join(process.cwd(), ".tmp", "input-mocks", language);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
     .filter(file => file.endsWith(".txt"))
     .sort((left, right) => left.localeCompare(right));
 }
