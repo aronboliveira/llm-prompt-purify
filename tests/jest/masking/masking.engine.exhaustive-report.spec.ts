@@ -1,4 +1,10 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 
 import {
@@ -19,13 +25,14 @@ interface ExhaustiveResultEntry {
   compliant: 0 | 1;
 }
 
-const SCOPE_BY_LANGUAGE: Readonly<Record<MockLanguage, readonly CountryProfileId[]>> =
-  Object.freeze({
-    en: ["us"],
-    es: ["cl", "latam-es"],
-    "pt-br": ["br"],
-    zh: ["cn"],
-  });
+const SCOPE_BY_LANGUAGE: Readonly<
+  Record<MockLanguage, readonly CountryProfileId[]>
+> = Object.freeze({
+  en: ["us"],
+  es: ["cl", "latam-es"],
+  "pt-br": ["br"],
+  zh: ["cn"],
+});
 
 const REPORT_DATE = "20260323";
 const REPORT_ISO = "2026-03-23T00:00:00.000Z";
@@ -38,7 +45,12 @@ describeIfMocks("MaskingEngine exhaustive corpus report", () => {
 
   it(`writes exhaustive per-file report to .tmp/codex/reports-${REPORT_DATE}/exhaustive-tests.log`, () => {
     const mockRoot = join(process.cwd(), ".tmp", "input-mocks"),
-      reportDir = join(process.cwd(), ".tmp", "codex", `reports-${REPORT_DATE}`),
+      reportDir = join(
+        process.cwd(),
+        ".tmp",
+        "codex",
+        `reports-${REPORT_DATE}`,
+      ),
       reportPath = join(reportDir, "exhaustive-tests.log"),
       reportEntries: Record<string, ExhaustiveResultEntry> = {};
 
@@ -88,13 +100,12 @@ describeIfMocks("MaskingEngine exhaustive corpus report", () => {
 
             for (const match of result.matches) {
               if (result.maskedText.includes(match.value)) {
-                reasons.push(
-                  `leak (${mode}/${strategy}): ${match.ruleId}`,
-                );
+                reasons.push(`leak (${mode}/${strategy}): ${match.ruleId}`);
               }
 
               if (
-                (match.category === "financial" || match.category === "identifier") &&
+                (match.category === "financial" ||
+                  match.category === "identifier") &&
                 /\d/u.test(match.value) &&
                 !/#/u.test(match.mask)
               ) {
@@ -129,7 +140,9 @@ describeIfMocks("MaskingEngine exhaustive corpus report", () => {
       .map(key => {
         const entry = reportEntries[key];
         const failReason =
-          entry.fail_reason === 0 ? "0" : `"${escapeQuotes(entry.fail_reason)}"`;
+          entry.fail_reason === 0
+            ? "0"
+            : `"${escapeQuotes(entry.fail_reason)}"`;
 
         return `${key}: { success: ${entry.success}; fail_reason: ${failReason}; fix: "${escapeQuotes(entry.fix)}"; compliant: ${entry.compliant} }`;
       });
@@ -172,7 +185,9 @@ function proposeFix(reasons: readonly string[]): string {
       "Adjust overlap resolution or match span selection so masked output never keeps the matched raw value.",
     );
   }
-  if (reasons.some(reason => reason.startsWith("numeric-placeholder-missing"))) {
+  if (
+    reasons.some(reason => reason.startsWith("numeric-placeholder-missing"))
+  ) {
     fixes.push(
       "Enforce numeric compliance placeholders (#) for financial and identifier categories regardless of strategy.",
     );
@@ -193,5 +208,10 @@ function escapeQuotes(value: string): string {
 }
 
 function isSupportedLanguage(language: string): language is MockLanguage {
-  return language === "en" || language === "es" || language === "pt-br" || language === "zh";
+  return (
+    language === "en" ||
+    language === "es" ||
+    language === "pt-br" ||
+    language === "zh"
+  );
 }

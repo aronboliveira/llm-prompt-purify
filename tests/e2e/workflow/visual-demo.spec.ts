@@ -127,9 +127,12 @@ User Profile:
 
     await textarea.click();
     // Include email to ensure masking triggers, then add phone
-    await page.keyboard.type("Contato: email test@example.com, cel (21) 98765-4321", {
-      delay: CHAR_DELAY,
-    });
+    await page.keyboard.type(
+      "Contato: email test@example.com, cel (21) 98765-4321",
+      {
+        delay: CHAR_DELAY,
+      },
+    );
 
     await page.waitForTimeout(2000);
     // Email should be masked, phone should also be masked with BR scope
@@ -153,7 +156,9 @@ User Profile:
     await page.waitForTimeout(500);
 
     await textarea.click();
-    await page.keyboard.type("New email: second@test.com", { delay: CHAR_DELAY });
+    await page.keyboard.type("New email: second@test.com", {
+      delay: CHAR_DELAY,
+    });
     await page.waitForTimeout(2000);
     await expect(output).not.toContainText("second@test.com");
   });
@@ -165,7 +170,9 @@ User Profile:
     await textarea.click();
 
     // Type safe content first
-    await page.keyboard.type("Hello, this is safe content. ", { delay: CHAR_DELAY });
+    await page.keyboard.type("Hello, this is safe content. ", {
+      delay: CHAR_DELAY,
+    });
     await page.waitForTimeout(1500); // Let debounce fire
 
     // Now add sensitive content
