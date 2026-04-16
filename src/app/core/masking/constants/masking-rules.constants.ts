@@ -1,8 +1,6 @@
 import type { DetectionRule } from "../declarations/masking.types";
 import { deepFreeze } from "@shared/utils/deep-freeze.utils";
 import {
-  ALL_FIRST_NAMES,
-  ALL_LAST_NAMES,
   EN_US_FIRST_NAMES,
   EN_US_LAST_NAMES,
   ES_FIRST_NAMES,
