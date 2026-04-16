@@ -1,6 +1,7 @@
 import { computed, Inject, inject, Injectable, signal } from "@angular/core";
 
 import type { MaskSafetyHardener } from "../mask-safety/declarations/mask-safety.types";
+import type { NameMaskingStrategy } from "../masking/declarations/masking.types";
 import { MaskSafetyHardeningService } from "../mask-safety/mask-safety-hardening.service";
 import {
   COUNTRY_PROFILE_DEFINITIONS,
@@ -616,7 +617,7 @@ export class ScanSessionService {
   }
 
   public setNameStrategy(
-    strategy: import("../masking/declarations/masking.types").NameMaskingStrategy,
+    strategy: NameMaskingStrategy,
   ): void {
     this.setAdvancedPreferences({ nameStrategy: strategy });
   }
