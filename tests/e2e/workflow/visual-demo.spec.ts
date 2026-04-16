@@ -16,6 +16,7 @@ const COPY_BTN = '[data-testid="copy-button"]';
 const CHAR_DELAY = 50;
 
 test.describe("Visual Demo: Watch Masking in Real-Time", () => {
+  test.slow(); // character-by-character typing is inherently slow
   test.beforeEach(async ({ page }) => {
     // Mock backend API
     await page.route("**/api/mask-safety/validate", async route => {

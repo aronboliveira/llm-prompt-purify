@@ -336,7 +336,8 @@ export function registerRoleTests(role: string): void {
         test(`[${lang}] ${formality} — ${subset.length} samples`, async ({
           page,
         }) => {
-          test.setTimeout(Math.max(60_000, subset.length * 5_000));
+          test.slow(); // visual / slowMo configs need extra time
+          test.setTimeout(Math.max(120_000, subset.length * 15_000));
           await setupPage(page, LANG_SCOPE[lang] ?? "us");
 
           for (const sample of subset) {

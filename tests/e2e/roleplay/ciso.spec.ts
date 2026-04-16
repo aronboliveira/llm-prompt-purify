@@ -9,7 +9,10 @@
  */
 import { expect, test, type Page } from "@playwright/test";
 
-const BACKEND_URL = "http://127.0.0.1:5185";
+import {
+  BACKEND_URL,
+  isBackendReachable,
+} from "../_helpers/backend-api.helpers";
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -46,6 +49,10 @@ async function fillAndGetMasked(page: Page, input: string): Promise<string> {
 /* ------------------------------------------------------------------ */
 
 test.describe("CISO — OWASP Compliance Headers", () => {
+  test.beforeAll(async () => {
+    test.skip(!(await isBackendReachable()), "backend API not reachable");
+  });
+
   const REQUIRED_HEADERS = [
     { name: "x-content-type-options", expected: "nosniff" },
     { name: "x-frame-options", expected: /DENY|SAMEORIGIN/i },
@@ -87,6 +94,10 @@ test.describe("CISO — OWASP Compliance Headers", () => {
 /* ------------------------------------------------------------------ */
 
 test.describe("CISO — PCI-DSS CSP Audit", () => {
+  test.beforeAll(async () => {
+    test.skip(!(await isBackendReachable()), "backend API not reachable");
+  });
+
   test("CSP does not allow unsafe-eval (PCI-DSS Req 6.4)", async ({
     request,
   }) => {
@@ -168,6 +179,10 @@ test.describe("CISO — LGPD/GDPR Data Masking through UI", () => {
 /* ------------------------------------------------------------------ */
 
 test.describe("CISO — Error Response Audit", () => {
+  test.beforeAll(async () => {
+    test.skip(!(await isBackendReachable()), "backend API not reachable");
+  });
+
   test("API error responses do not contain stack traces", async ({
     request,
   }) => {

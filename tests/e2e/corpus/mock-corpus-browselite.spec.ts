@@ -593,10 +593,10 @@ function escapeQuotes(value: string): string {
 /* ------------------------------------------------------------------ */
 
 /* Skip during normal `playwright test` runs — only run when explicitly
-   targeted or when BROWSELITE_RUN=1 is set.                          */
+   targeted via BROWSELITE_RUN=1.                                     */
 test.skip(
-  () => !process.env["BROWSELITE_RUN"] && !process.env["SLOW_MO"],
-  "BrowserLite spec skipped — set BROWSELITE_RUN=1 or SLOW_MO to enable",
+  () => !process.env["BROWSELITE_RUN"],
+  "BrowserLite spec skipped — set BROWSELITE_RUN=1 to enable",
 );
 
 test.describe.configure({ mode: "serial" });

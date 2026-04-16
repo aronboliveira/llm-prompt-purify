@@ -774,8 +774,8 @@ function generateReport(results: readonly RoleplayResult[]): string {
 /* ------------------------------------------------------------------ */
 
 test.skip(
-  () => !process.env["SLOWMO_RUN"] && !process.env["SLOW_MO"],
-  "Roleplay slowmo spec skipped — set SLOWMO_RUN=1 or SLOW_MO to enable",
+  () => !process.env["SLOWMO_RUN"],
+  "Roleplay slowmo spec skipped — set SLOWMO_RUN=1 to enable",
 );
 
 test.describe.configure({ mode: "serial" });

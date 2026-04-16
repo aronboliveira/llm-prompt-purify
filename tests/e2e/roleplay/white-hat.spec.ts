@@ -8,7 +8,10 @@
  */
 import { expect, test, type Page } from "@playwright/test";
 
-const BACKEND_URL = "http://127.0.0.1:5185";
+import {
+  BACKEND_URL,
+  isBackendReachable,
+} from "../_helpers/backend-api.helpers";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                         */
@@ -118,6 +121,10 @@ test.describe("White Hat — XSS Payload Neutralization", () => {
 /* ------------------------------------------------------------------ */
 
 test.describe("White Hat — CSP & Header Audit", () => {
+  test.beforeAll(async () => {
+    test.skip(!(await isBackendReachable()), "backend API not reachable");
+  });
+
   test("Content-Security-Policy header is present and well-formed", async ({
     request,
   }) => {

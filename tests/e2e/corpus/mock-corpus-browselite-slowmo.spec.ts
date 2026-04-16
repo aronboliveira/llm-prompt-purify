@@ -551,10 +551,10 @@ function generateSlowMoReport(results: readonly SlowMoResult[]): string {
 /* ------------------------------------------------------------------ */
 
 /* Skip during normal `playwright test` runs — only run when explicitly
-   targeted via the visual config or when SLOWMO_RUN=1 is set.         */
+   targeted via SLOWMO_RUN=1.                                          */
 test.skip(
-  () => !process.env["SLOWMO_RUN"] && !process.env["SLOW_MO"],
-  "Slowmo spec skipped — set SLOWMO_RUN=1 or SLOW_MO to enable",
+  () => !process.env["SLOWMO_RUN"],
+  "Slowmo spec skipped — set SLOWMO_RUN=1 to enable",
 );
 
 test.describe.configure({ mode: "serial" });

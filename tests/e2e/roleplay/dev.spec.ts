@@ -7,7 +7,10 @@
  */
 import { expect, test, type Page } from "@playwright/test";
 
-const BACKEND_URL = "http://127.0.0.1:5185";
+import {
+  BACKEND_URL,
+  isBackendReachable,
+} from "../_helpers/backend-api.helpers";
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -94,6 +97,10 @@ test.describe("Dev — Secret & Credential Detection", () => {
 /* ------------------------------------------------------------------ */
 
 test.describe("Dev — API Response Security Headers", () => {
+  test.beforeAll(async () => {
+    test.skip(!(await isBackendReachable()), "backend API not reachable");
+  });
+
   test("health endpoint returns proper security headers", async ({
     request,
   }) => {
