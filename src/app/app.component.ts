@@ -338,6 +338,46 @@ export class AppComponent {
     this.#scanSession.updateSourceText(value, inputType, isComposing);
   }
 
+  protected onSourceFileLoaded(payload: {
+    fileName: string;
+    text: string;
+    threatCount: number;
+    threatTypes: readonly string[];
+  }): void {
+    this.#scanSession.updateSourceText(payload.text);
+
+    if (payload.threatCount > 0) {
+      const types = payload.threatTypes.join(", ");
+      this.#toastCenter.push(
+        `Loaded "${payload.fileName}" and stripped ${payload.threatCount} suspicious pattern(s) (${types}) before scanning.`,
+        "File loaded with sanitization",
+        "info",
+      );
+    } else {
+      this.#toastCenter.push(
+        `Loaded "${payload.fileName}" into the raw prompt.`,
+        "File loaded",
+        "success",
+      );
+    }
+  }
+
+  protected onSourceFileRejected(payload: { message: string }): void {
+    this.#toastCenter.push(payload.message, "File rejected", "error");
+  }
+
+  protected onPasteThreatDetected(payload: {
+    threatCount: number;
+    threatTypes: readonly string[];
+  }): void {
+    const types = payload.threatTypes.join(", ");
+    this.#toastCenter.push(
+      `Pasted text contains ${payload.threatCount} suspicious pattern(s) (${types}). Nothing was sent off-device, but review before scanning.`,
+      "Suspicious paste detected",
+      "info",
+    );
+  }
+
   protected updateXmlWrapEnabled(enabled: boolean): void {
     this.#scanSession.setXmlWrapEnabled(enabled);
     this.#toastCenter.push(

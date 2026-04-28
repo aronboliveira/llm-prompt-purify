@@ -4,7 +4,6 @@
   [attr.data-state]="
     vm().isScanning ? 'scanning' : vm().hasResult ? 'ready' : 'idle'
   "
-  [style.--selected-country-count]="vm().selectedCountryProfiles.length"
 >
   <app-feedback-sheet></app-feedback-sheet>
 
@@ -48,6 +47,9 @@
       (sourceTextChanged)="
         updateSourceText($event.value, $event.inputType, $event.isComposing)
       "
+      (fileLoaded)="onSourceFileLoaded($event)"
+      (fileRejected)="onSourceFileRejected($event)"
+      (pasteThreatDetected)="onPasteThreatDetected($event)"
     ></app-raw-prompt-pane>
 
     <div class="translator__bridge" aria-hidden="true">
