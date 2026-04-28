@@ -1,5 +1,6 @@
 import type { Config, Context } from "@netlify/functions";
 import { VALIDATORS } from "./shared/identifier-validators.js";
+import { checkRateLimit, rateLimitResponse } from "./shared/rate-limiter.js";
 import type {
   MaskSafetyValidationItemRequest,
   MaskSafetyValidationItemResponse,
@@ -8,6 +9,9 @@ import type {
 } from "./shared/types.js";
 
 const MAX_BATCH = 128;
+
+// 60 validations per minute per IP; minimum 500 ms gap (called in retry loops).
+const RATE_LIMIT = { limit: 60, windowMs: 60 * 1_000, throttleMs: 500 } as const;
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin":
@@ -78,6 +82,11 @@ export default async function handler(
 
   if (request.method !== "POST") {
     return jsonResponse({ error: "Method not allowed" }, 405);
+  }
+
+  const rateLimit = checkRateLimit(request, RATE_LIMIT);
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit, CORS_HEADERS);
   }
 
   let body: MaskSafetyValidationRequest;

@@ -3,11 +3,15 @@ import * as nodemailer from "nodemailer";
 import { randomUUID } from "node:crypto";
 import { validateFeedbackRequest } from "./shared/feedback-validator.js";
 import { sanitize, sanitizeAndTrim } from "./shared/input-sanitizer.js";
+import { checkRateLimit, rateLimitResponse } from "./shared/rate-limiter.js";
 import type {
   FeedbackEntry,
   FeedbackSubmissionRequest,
   FeedbackSubmissionResponse,
 } from "./shared/types.js";
+
+// 5 submissions per 15 minutes per IP; minimum 8 s gap between calls.
+const RATE_LIMIT = { limit: 5, windowMs: 15 * 60 * 1_000, throttleMs: 8_000 } as const;
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin":
@@ -102,6 +106,11 @@ export default async function handler(
 
   if (request.method !== "POST") {
     return jsonResponse({ error: "Method not allowed" }, 405);
+  }
+
+  const rateLimit = checkRateLimit(request, RATE_LIMIT);
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit, CORS_HEADERS);
   }
 
   let body: FeedbackSubmissionRequest;
