@@ -1,8 +1,5 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-# Backups
-.backup/
-
 # Compiled output
 /dist
 /tmp
@@ -25,7 +22,7 @@ yarn-error.log
 
 # Visual Studio Code
 .vscode/
-.history/*
+.history/
 
 # Miscellaneous
 /.angular/cache
@@ -75,5 +72,10 @@ playwright-report/trace/
 # Mobile (lives on its own branch)
 /mobile/
 
-# Black-hat roleplay scripts (defensive testing only — never committed)
-**/black-hat/
+# Miscellaneous
+nohup.out
+.codex
+.claude/
+.vscode/
+utils/.llms/
+.backup/
