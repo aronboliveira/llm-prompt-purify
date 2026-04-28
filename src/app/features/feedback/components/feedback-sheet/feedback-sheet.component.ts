@@ -17,6 +17,7 @@ import {
   FEEDBACK_MESSAGE_MAX,
   FEEDBACK_RATING_OPTIONS,
 } from "@core/feedback/constants/feedback.constants";
+import { ClientRateLimitError } from "@core/utils/client-rate-limiter";
 import type {
   FeedbackDraft,
   FeedbackFieldErrorMap,
@@ -142,7 +143,24 @@ export class FeedbackSheetComponent {
       this.#draft.set(DEFAULT_FEEDBACK_DRAFT);
       this.close();
     } catch (error) {
-      if (
+      if (error instanceof ClientRateLimitError) {
+        const secs = Math.ceil(error.retryAfterMs / 1_000);
+        this.#toastCenter.push(
+          `You have submitted feedback too quickly. Please wait ${secs}s before trying again.`,
+          "Slow down",
+          "info",
+        );
+      } else if (
+        error instanceof HttpErrorResponse &&
+        error.status === 429
+      ) {
+        const retryAfter = Number(error.headers.get("Retry-After") ?? 60);
+        this.#toastCenter.push(
+          `The server is receiving too many requests from this location. Try again in ${retryAfter}s.`,
+          "Too many requests",
+          "info",
+        );
+      } else if (
         error instanceof HttpErrorResponse &&
         this.#hasValidationErrors(error.error)
       ) {
