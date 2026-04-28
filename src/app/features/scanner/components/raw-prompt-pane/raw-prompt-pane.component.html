@@ -20,6 +20,33 @@
 
   <p class="pane__body">{{ body() }}</p>
 
+  <div class="pane__toolbar">
+    <button
+      aria-label="Load a .txt or .log file into the prompt"
+      class="load-file-trigger"
+      data-testid="load-file-trigger"
+      type="button"
+      (click)="triggerFileLoad()"
+    >
+      <span
+        aria-hidden="true"
+        class="load-file-trigger__icon"
+        [innerHTML]="icons.upload"
+      ></span>
+      <span class="load-file-trigger__label">Load .txt / .log</span>
+    </button>
+    <input
+      #fileInput
+      aria-hidden="true"
+      class="load-file-input"
+      data-testid="load-file-input"
+      tabindex="-1"
+      type="file"
+      [accept]="fileAccept"
+      (change)="onFileSelected($event)"
+    />
+  </div>
+
   <label class="sr-only" for="sourceText">Raw version</label>
   <textarea
     id="sourceText"
@@ -27,6 +54,7 @@
     data-testid="source-textarea"
     [ngModel]="sourceText()"
     (input)="onInput($event)"
+    (paste)="onPaste($event)"
     (ngModelChange)="updateSourceText($event)"
     [placeholder]="placeholder()"
     spellcheck="false"
