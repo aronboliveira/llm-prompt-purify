@@ -19,6 +19,7 @@ import {
 } from "@core/feedback/constants/feedback.constants";
 import { ClientRateLimitError } from "@core/utils/client-rate-limiter";
 import type {
+  FeedbackDeliveryStatus,
   FeedbackDraft,
   FeedbackFieldErrorMap,
   FeedbackFieldId,
@@ -132,12 +133,12 @@ export class FeedbackSheetComponent {
         this.#toRequest(this.#draft()),
       );
       this.#toastCenter.push(
-        response.deliveryStatus === "emailed"
-          ? "The note was stored and forwarded to the developers."
-          : "The note was stored, but email forwarding is not configured in this environment.",
+        this.#resolveSubmitToastBody(response.deliveryStatus),
         response.deliveryStatus === "emailed"
           ? "Feedback sent"
-          : "Feedback stored",
+          : response.deliveryStatus === "queued"
+            ? "Feedback queued"
+            : "Feedback not delivered",
         response.deliveryStatus === "emailed" ? "success" : "info",
       );
       this.#draft.set(DEFAULT_FEEDBACK_DRAFT);
@@ -240,6 +241,18 @@ export class FeedbackSheetComponent {
       },
       {},
     );
+  }
+
+  #resolveSubmitToastBody(deliveryStatus: FeedbackDeliveryStatus): string {
+    if (deliveryStatus === "emailed") {
+      return "The note was stored and forwarded to the developers.";
+    }
+
+    if (deliveryStatus === "queued") {
+      return "The note was stored in the retry outbox and will be emailed when delivery succeeds.";
+    }
+
+    return "The note was validated, but this environment has no durable outbox or email delivery configured.";
   }
 
   #toRequest(draft: FeedbackDraft): FeedbackSubmissionRequest {

@@ -10,10 +10,12 @@ export interface FeedbackSubmissionRequest {
 
 export interface FeedbackSubmissionResponse {
   createdAtUtc: string;
-  deliveryStatus: string;
+  deliveryStatus: FeedbackDeliveryStatus;
   id: string;
   message: string;
 }
+
+export type FeedbackDeliveryStatus = "emailed" | "not-delivered" | "queued";
 
 export interface FeedbackEntry {
   id: string;
@@ -26,7 +28,7 @@ export interface FeedbackEntry {
   subject: string | null;
   wantsReply: boolean;
   createdAtUtc: string;
-  deliveryStatus: "emailed" | "stored-only";
+  deliveryStatus: FeedbackDeliveryStatus;
   deliveryError: string | null;
 }
 

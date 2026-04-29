@@ -4,7 +4,7 @@ export type FeedbackCategoryId =
   | "contact-developers"
   | "general-feedback";
 
-export type FeedbackDeliveryStatus = "emailed" | "stored-only";
+export type FeedbackDeliveryStatus = "emailed" | "not-delivered" | "queued";
 
 export type FeedbackFieldId =
   | "category"

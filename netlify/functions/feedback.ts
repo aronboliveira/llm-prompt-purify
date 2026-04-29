@@ -1,7 +1,11 @@
 import type { Config, Context } from "@netlify/functions";
-import * as nodemailer from "nodemailer";
 import { randomUUID } from "node:crypto";
 import { validateFeedbackRequest } from "./shared/feedback-validator.js";
+import {
+  createFeedbackOutboxEntry,
+  recordFeedbackEmailResult,
+} from "./shared/feedback-outbox.js";
+import { sendFeedbackEmail } from "./shared/feedback-mailer.js";
 import { sanitize, sanitizeAndTrim } from "./shared/input-sanitizer.js";
 import { checkRateLimit, rateLimitResponse } from "./shared/rate-limiter.js";
 import type {
@@ -26,74 +30,6 @@ function jsonResponse(body: unknown, status: number): Response {
     status,
     headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
   });
-}
-
-function buildSubject(entry: FeedbackEntry): string {
-  const prefix = `[${entry.category}]`;
-  return entry.subject
-    ? `${prefix} ${entry.subject}`
-    : `${prefix} New LLM Prompt Purify feedback`;
-}
-
-function buildBody(entry: FeedbackEntry): string {
-  return [
-    "A new feedback submission was received from the LLM Prompt Purify web app.",
-    "",
-    `Submission ID: ${entry.id}`,
-    `Category: ${entry.category}`,
-    `Rating: ${entry.rating ?? "none"}`,
-    `Wants reply: ${entry.wantsReply}`,
-    `Name: ${entry.name ?? "anonymous"}`,
-    `Email: ${entry.email ?? "not provided"}`,
-    `Subject: ${entry.subject ?? "none"}`,
-    `Submitted at (UTC): ${entry.createdAtUtc}`,
-    "",
-    "Message:",
-    entry.message,
-  ].join("\n");
-}
-
-async function sendEmail(
-  entry: FeedbackEntry,
-): Promise<{ status: "emailed" | "stored-only"; error: string | null }> {
-  const host = process.env.SMTP_HOST;
-  const port = parseInt(process.env.SMTP_PORT ?? "587", 10);
-  const user = process.env.SMTP_USERNAME;
-  const pass = process.env.SMTP_PASSWORD;
-  const recipient = process.env.DEVELOPER_EMAIL_TO;
-  const sender = process.env.SMTP_SENDER_EMAIL || user;
-
-  if (!host || !user || !pass || !recipient) {
-    return {
-      status: "stored-only",
-      error: "SMTP is not configured for developer email delivery.",
-    };
-  }
-
-  const transport = nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-  });
-
-  const mailOptions: nodemailer.SendMailOptions = {
-    from: sender,
-    to: recipient,
-    subject: buildSubject(entry),
-    text: buildBody(entry),
-    ...(entry.email ? { replyTo: entry.email } : {}),
-  };
-
-  try {
-    await transport.sendMail(mailOptions);
-    return { status: "emailed", error: null };
-  } catch (err) {
-    return {
-      status: "stored-only",
-      error: err instanceof Error ? err.message : String(err),
-    };
-  }
 }
 
 export default async function handler(
@@ -147,12 +83,22 @@ export default async function handler(
     subject: normalized.subject?.trim() || null,
     wantsReply: normalized.wantsReply,
     createdAtUtc: now,
-    deliveryStatus: "stored-only",
+    deliveryStatus: "queued",
     deliveryError: null,
   };
 
-  const dispatch = await sendEmail(entry);
-  entry.deliveryStatus = dispatch.status;
+  const outbox = await createFeedbackOutboxEntry(entry),
+    dispatch = await sendFeedbackEmail(entry);
+  if (outbox.status === "stored") {
+    await recordFeedbackEmailResult(entry, dispatch);
+  }
+
+  entry.deliveryStatus =
+    dispatch.status === "emailed"
+      ? "emailed"
+      : outbox.status === "stored"
+        ? "queued"
+        : "not-delivered";
   entry.deliveryError = dispatch.error;
 
   const response: FeedbackSubmissionResponse = {
@@ -161,8 +107,12 @@ export default async function handler(
     id: entry.id,
     message:
       entry.deliveryStatus === "emailed"
-        ? "Feedback saved and emailed to the developers."
-        : "Feedback saved, but the developer email could not be delivered from this environment.",
+        ? outbox.status === "stored"
+          ? "Feedback saved and emailed to the developers."
+          : "Feedback emailed to the developers."
+        : entry.deliveryStatus === "queued"
+          ? "Feedback saved to the outbox and queued for email retry."
+          : "Feedback validated, but no durable outbox or email delivery is configured.",
   };
 
   return jsonResponse(response, 201);
