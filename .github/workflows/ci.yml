@@ -34,7 +34,7 @@ jobs:
         run: npm run lint
 
       - name: Unit tests (Jest)
-        run: npm test -- --ci --coverage --maxWorkers=2
+        run: npm test -- --ci --coverage
 
       - name: Upload coverage artifact
         if: always()
