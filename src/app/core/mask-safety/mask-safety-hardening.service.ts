@@ -22,6 +22,7 @@ import type { ScanMatch } from "../masking/declarations/masking.types";
 @Injectable({ providedIn: "root" })
 export class MaskSafetyHardeningService implements MaskSafetyHardener {
   readonly #maskSafetyClient: MaskSafetyClient;
+  #lastValidationCallAt = 0;
 
   public constructor(
     @Inject(MaskSafetyApiService) maskSafetyClient?: MaskSafetyClient
@@ -138,14 +139,29 @@ export class MaskSafetyHardeningService implements MaskSafetyHardener {
       buildValidationCandidates(candidateGroups),
       MASK_SAFETY_LIMITS.batchSize
     );
-    const validationResponses = await Promise.all(
-      validationCandidateChunks.map(validationCandidates => {
-        return this.#maskSafetyClient.validate({
+    const validationResponses = [];
+    for (const validationCandidates of validationCandidateChunks) {
+      await this.#waitForValidationSlot();
+      validationResponses.push(
+        await this.#maskSafetyClient.validate({
           candidates: validationCandidates,
-        });
-      })
-    );
+        })
+      );
+    }
 
     return validationResponses.flatMap(validationResponse => validationResponse.results);
+  }
+
+  async #waitForValidationSlot(): Promise<void> {
+    const elapsedMs = Date.now() - this.#lastValidationCallAt,
+      waitMs = this.#lastValidationCallAt
+        ? Math.max(0, MASK_SAFETY_LIMITS.requestThrottleMs - elapsedMs)
+        : 0;
+
+    if (waitMs > 0) {
+      await new Promise<void>(resolve => setTimeout(resolve, waitMs));
+    }
+
+    this.#lastValidationCallAt = Date.now();
   }
 }

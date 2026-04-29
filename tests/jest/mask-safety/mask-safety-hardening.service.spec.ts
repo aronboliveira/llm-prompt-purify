@@ -58,8 +58,10 @@ describe("MaskSafetyHardeningService", () => {
   });
 
   it("falls back to an invalidated candidate after exhausting the retry budget", async () => {
-    let validationCallCount = 0;
-    const client: MaskSafetyClient = {
+    jest.useFakeTimers();
+    try {
+      let validationCallCount = 0;
+      const client: MaskSafetyClient = {
         validate: jest.fn(async request => {
           validationCallCount += 1;
           return {
@@ -80,17 +82,27 @@ describe("MaskSafetyHardeningService", () => {
           };
         }),
       },
-      service = new MaskSafetyHardeningService(client),
-      initialMask = "GB29NWBK60161331926819",
-      result = await service.hardenMatches([
-        createMatch("financial:0", "iban", initialMask),
-      ]);
+        service = new MaskSafetyHardeningService(client),
+        initialMask = "GB29NWBK60161331926819",
+        resultPromise = service.hardenMatches([
+          createMatch("financial:0", "iban", initialMask),
+        ]);
 
-    expect(validationCallCount).toBe(
-      MASK_SAFETY_LIMITS.maxAttemptsPerCandidate + 1,
-    );
-    expect(result.matches[0].mask).not.toBe(initialMask);
+      await jest.advanceTimersByTimeAsync(
+        MASK_SAFETY_LIMITS.requestThrottleMs *
+          (MASK_SAFETY_LIMITS.maxAttemptsPerCandidate + 1),
+      );
+      const result = await resultPromise;
+
+      expect(validationCallCount).toBe(
+        MASK_SAFETY_LIMITS.maxAttemptsPerCandidate + 1,
+      );
+      expect(result.matches[0].mask).not.toBe(initialMask);
+    } finally {
+      jest.useRealTimers();
+    }
   });
+
 });
 
 function createMatch(id: string, ruleId: string, mask: string): ScanMatch {

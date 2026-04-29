@@ -7,4 +7,5 @@ export const MASK_SAFETY_DECISIONS = Object.freeze({
 export const MASK_SAFETY_LIMITS = Object.freeze({
   batchSize: 128,
   maxAttemptsPerCandidate: 12,
+  requestThrottleMs: 500,
 });
