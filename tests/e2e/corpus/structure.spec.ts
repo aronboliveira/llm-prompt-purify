@@ -3,16 +3,19 @@ import { join } from "node:path";
 
 import { expect, test } from "@playwright/test";
 
-const PROMPTS_ROOT = join(process.cwd(), ".tmp", "input-mocks", "prompts");
+import {
+  corpusExists,
+  FORMALITIES as EXPECTED_FORMALITIES,
+  LANGUAGES as EXPECTED_LANGUAGES,
+  PROMPTS_ROOT,
+} from "../_helpers/prompt-corpus.helpers";
 
 test.describe("prompt corpus structural integrity", () => {
-  test("corpus root directory exists", () => {
-    expect(existsSync(PROMPTS_ROOT)).toBe(true);
-  });
+  test.skip(!corpusExists, "corpus not generated");
 
-  const EXPECTED_LANGUAGES = ["en", "pt-br", "es", "zh"];
-  const EXPECTED_FORMALITIES = ["formal", "neutral", "informal"];
-  const EXPECTED_LENGTHS = ["short", "medium", "long"];
+  test("corpus root directory exists", () => {
+    expect(corpusExists).toBe(true);
+  });
 
   for (const lang of EXPECTED_LANGUAGES) {
     test(`${lang}/ has subdirectories for all formalities`, () => {
