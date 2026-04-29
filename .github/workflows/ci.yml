@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jest-coverage
-          path: coverage/
+          path: .tmp/project-overhaul/jest-coverage/
           retention-days: 7
 
   build:
@@ -101,5 +101,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: playwright-report/
+          path: |
+            .tmp/project-overhaul/playwright-report/
+            playwright-report/
           retention-days: 7
