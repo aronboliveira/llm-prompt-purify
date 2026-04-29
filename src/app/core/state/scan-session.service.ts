@@ -19,11 +19,8 @@ import type {
   ScanResult,
   XmlWrapTag,
 } from "../masking/declarations/masking.types";
-import { MaskingEngine } from "../masking/masking.engine";
-import {
-  buildScanScopeSelection,
-  normalizeCountryProfileIds,
-} from "../masking/utils/country-scope.utils";
+import { normalizeCountryProfileIds } from "../masking/utils/country-scope.utils";
+import { ScanEngineService } from "./scan-engine.service";
 import {
   SCAN_PHASE_MESSAGES,
   SCAN_TIMINGS,
@@ -60,7 +57,7 @@ import { waitFor } from "./utils/timing.utils";
 
 @Injectable({ providedIn: "root" })
 export class ScanSessionService {
-  readonly #engine = new MaskingEngine();
+  readonly #engine: ScanEngineService;
   readonly #maskSafetyHardener: MaskSafetyHardener;
   #queuedRefreshTimer: ReturnType<typeof setTimeout> | null = null;
   #refreshRequestId = 0;
@@ -79,7 +76,9 @@ export class ScanSessionService {
 
   public constructor(
     @Inject(MaskSafetyHardeningService) maskSafetyHardener?: MaskSafetyHardener,
+    @Inject(ScanEngineService) scanEngine?: ScanEngineService,
   ) {
+    this.#engine = scanEngine ?? new ScanEngineService();
     this.#maskSafetyHardener =
       maskSafetyHardener ?? inject(MaskSafetyHardeningService);
   }
@@ -181,16 +180,17 @@ export class ScanSessionService {
     }));
 
     try {
-      const localResult = this.#engine.scan(
-        sourceText,
-        currentState.groupPreferences,
-        buildScanScopeSelection(
-          currentState.countryProfileIds,
-          currentState.detectionMode,
-        ),
+      const localScan = this.#engine.scan(
+        {
+          advancedPreferences: currentState.advancedPreferences,
+          countryProfileIds: currentState.countryProfileIds,
+          detectionMode: currentState.detectionMode,
+          groupPreferences: currentState.groupPreferences,
+          sourceText,
+        },
         scannedAt,
-        currentState.advancedPreferences,
       );
+      const localResult = isPromiseLike(localScan) ? await localScan : localScan;
       this.#setPhase("validating");
 
       const [result] = await Promise.all([
@@ -232,7 +232,8 @@ export class ScanSessionService {
   }
 
   public async regenerateAllMasks(): Promise<void> {
-    const result = this.#state().result;
+    const currentState = this.#state(),
+      result = currentState.result;
     if (!result) return;
 
     this.#state.update(state => ({
@@ -245,14 +246,10 @@ export class ScanSessionService {
 
     try {
       const nextResult = await this.#hardenResult(
-        this.#engine.regenerateAll(
-          result.sourceText,
-          result.matches,
-          result.scannedAt,
-          this.#state().advancedPreferences.maskingStrategy,
-          this.#state().advancedPreferences,
-          this.#state().countryProfileIds,
-        ),
+        this.#engine.regenerateAll(result, {
+          advancedPreferences: currentState.advancedPreferences,
+          countryProfileIds: currentState.countryProfileIds,
+        }),
       );
 
       this.#state.update(state => ({
@@ -277,7 +274,8 @@ export class ScanSessionService {
   }
 
   public async regenerateMatch(matchId: string): Promise<void> {
-    const result = this.#state().result;
+    const currentState = this.#state(),
+      result = currentState.result;
     if (!result) return;
 
     this.#state.update(state => ({
@@ -290,15 +288,10 @@ export class ScanSessionService {
 
     try {
       const nextResult = await this.#hardenResult(
-        this.#engine.regenerateMatch(
-          result.sourceText,
-          result.matches,
-          result.scannedAt,
-          matchId,
-          this.#state().advancedPreferences.maskingStrategy,
-          this.#state().advancedPreferences,
-          this.#state().countryProfileIds,
-        ),
+        this.#engine.regenerateMatch(result, matchId, {
+          advancedPreferences: currentState.advancedPreferences,
+          countryProfileIds: currentState.countryProfileIds,
+        }),
       );
 
       this.#state.update(state => ({
@@ -662,4 +655,8 @@ function hasSameCountrySelection(
   return leftCountryProfileIds.every((countryProfileId, index) => {
     return countryProfileId === rightCountryProfileIds[index];
   });
+}
+
+function isPromiseLike<T>(value: Promise<T> | T): value is Promise<T> {
+  return !!value && typeof (value as Promise<T>).then === "function";
 }
