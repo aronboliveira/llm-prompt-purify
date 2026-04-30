@@ -22,7 +22,7 @@ yarn-error.log
 
 # Visual Studio Code
 .vscode/
-.history/
+.history/*
 
 # Miscellaneous
 /.angular/cache
@@ -33,6 +33,10 @@ yarn-error.log
 /libpeerconnection.log
 testem.log
 /typings
+.env.docker.example
+.codex
+.claude/
+utils/.llms/
 
 # System files
 .DS_Store
@@ -51,6 +55,9 @@ Thumbs.db
 .env.docker
 .sct/
 .sct/**
+.backup/
+.angular/
+.history/
 
 # Python
 .venv/
@@ -66,16 +73,10 @@ __pycache__/
 .vs/
 
 # Playwright reports & artifacts
+playwright-report/
 playwright-report/data/
 playwright-report/trace/
 
 # Mobile (lives on its own branch)
 /mobile/
 
-# Miscellaneous
-nohup.out
-.codex
-.claude/
-.vscode/
-utils/.llms/
-.backup/
