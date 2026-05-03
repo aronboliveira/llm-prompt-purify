@@ -91,10 +91,28 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Start Netlify dev (functions + SPA)
+        run: |
+          cat > .env << 'EOF'
+          ALLOWED_ORIGIN=http://127.0.0.1:8888
+          FEEDBACK_RETRY_SECRET=ci-test-secret
+          DEVELOPER_EMAIL_TO=dev@example.com
+          SMTP_HOST=smtp.example.com
+          SMTP_USERNAME=ci
+          SMTP_PASSWORD=dummy
+          EOF
+          npx netlify dev --port 8888 &
+          # Wait for the server to accept connections
+          for i in $(seq 1 60); do
+            curl -s http://127.0.0.1:8888/api/health && break
+            sleep 2
+          done
+
       - name: Run Playwright tests
         run: npm run test:e2e
         env:
           CI: "true"
+          PLAYWRIGHT_BASE_URL: "http://127.0.0.1:8888"
 
       - name: Upload Playwright report
         if: always()
@@ -105,3 +123,28 @@ jobs:
             .tmp/project-overhaul/playwright-report/
             playwright-report/
           retention-days: 7
+
+  corpus-checks:
+    name: Python & Shell Corpus Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Python dependencies
+        run: pip install -r tests/python/requirements.txt
+
+      - name: Python corpus tests
+        run: python -m pytest tests/python/ -v --timeout=60
+
+      - name: Shell corpus checks
+        run: |
+          for script in tests/scripts/*.sh; do
+            echo "Running $script"
+            bash "$script" || exit 1
+          done
