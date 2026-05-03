@@ -7,9 +7,14 @@ import {
 } from "./shared/feedback-outbox.js";
 import { sendFeedbackEmail } from "./shared/feedback-mailer.js";
 import { sanitize, sanitizeAndTrim } from "./shared/input-sanitizer.js";
+import {
+  corsHeaders,
+  apiHeaders,
+  json,
+  preflight,
+  rateLimit,
+} from "./shared/response-helpers.js";
 import { logFunctionEvent } from "./shared/logger.js";
-import { checkRateLimit, rateLimitResponse } from "./shared/rate-limiter.js";
-import { SECURITY_HEADERS } from "./shared/security-headers.js";
 import type {
   FeedbackEntry,
   FeedbackSubmissionRequest,
@@ -17,56 +22,29 @@ import type {
 } from "./shared/types.js";
 
 const FN = "feedback";
-
-// 5 submissions per 15 minutes per IP; minimum 8 s gap between calls.
-const RATE_LIMIT = { limit: 5, windowMs: 15 * 60 * 1_000, throttleMs: 8_000 } as const;
-
-const CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Origin":
-    process.env["ALLOWED_ORIGIN"] ?? "https://llm-prompt-purify.netlify.app",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Max-Age": "86400",
-};
-
-const RESPONSE_HEADERS: Record<string, string> = {
-  ...SECURITY_HEADERS,
-  ...CORS_HEADERS,
-};
-
-function jsonResponse(body: unknown, status: number): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...RESPONSE_HEADERS, "Content-Type": "application/json" },
-  });
-}
+const RATE_LIMIT = { limit: 5, windowMs: 15 * 60_000, throttleMs: 8_000 } as const;
 
 export default async function handler(
   request: Request,
   _context: Context,
 ): Promise<Response> {
-  if (request.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: RESPONSE_HEADERS });
-  }
+  const headers = apiHeaders(corsHeaders());
+
+  const preflightResponse = preflight(request, headers);
+  if (preflightResponse) return preflightResponse;
 
   if (request.method !== "POST") {
-    return jsonResponse({ error: "Method not allowed" }, 405);
+    return json({ error: "Method not allowed" }, 405, headers);
   }
 
-  const rateLimit = checkRateLimit(request, RATE_LIMIT);
-  if (!rateLimit.allowed) {
-    logFunctionEvent(FN, "rate_limited", "warn", {
-      ip: rateLimit.ip,
-      retryAfter: rateLimit.retryAfter,
-    });
-    return rateLimitResponse(rateLimit, RESPONSE_HEADERS);
-  }
+  const limited = rateLimit(FN, request, RATE_LIMIT, headers);
+  if (limited) return limited;
 
   let body: FeedbackSubmissionRequest;
   try {
     body = (await request.json()) as FeedbackSubmissionRequest;
   } catch {
-    return jsonResponse({ error: "Invalid JSON body" }, 400);
+    return json({ error: "Invalid JSON body" }, 400, headers);
   }
 
   const normalized: FeedbackSubmissionRequest = {
@@ -84,7 +62,7 @@ export default async function handler(
     logFunctionEvent(FN, "validation_failed", "info", {
       fields: Object.keys(errors),
     });
-    return jsonResponse({ errors }, 422);
+    return json({ errors }, 422, headers);
   }
 
   const now = new Date().toISOString();
@@ -103,8 +81,8 @@ export default async function handler(
     deliveryError: null,
   };
 
-  const outbox = await createFeedbackOutboxEntry(entry),
-    dispatch = await sendFeedbackEmail(entry);
+  const outbox = await createFeedbackOutboxEntry(entry);
+  const dispatch = await sendFeedbackEmail(entry);
   if (outbox.status === "stored") {
     await recordFeedbackEmailResult(entry, dispatch);
   }
@@ -120,9 +98,7 @@ export default async function handler(
   logFunctionEvent(
     FN,
     "submission_processed",
-    dispatch.status === "failed" && outbox.status === "failed"
-      ? "error"
-      : "info",
+    dispatch.status === "failed" && outbox.status === "failed" ? "error" : "info",
     {
       feedbackId: entry.id,
       category: entry.category,
@@ -148,7 +124,7 @@ export default async function handler(
           : "Feedback validated, but no durable outbox or email delivery is configured.",
   };
 
-  return jsonResponse(response, 201);
+  return json(response, 201, headers);
 }
 
 export const config: Config = {

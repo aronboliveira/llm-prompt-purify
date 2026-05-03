@@ -1,8 +1,12 @@
 import type { Config, Context } from "@netlify/functions";
 import { VALIDATORS } from "./shared/identifier-validators.js";
-import { logFunctionEvent } from "./shared/logger.js";
-import { checkRateLimit, rateLimitResponse } from "./shared/rate-limiter.js";
-import { SECURITY_HEADERS } from "./shared/security-headers.js";
+import {
+  corsHeaders,
+  apiHeaders,
+  json,
+  preflight,
+  rateLimit,
+} from "./shared/response-helpers.js";
 import type {
   MaskSafetyValidationItemRequest,
   MaskSafetyValidationItemResponse,
@@ -12,29 +16,7 @@ import type {
 
 const FN = "mask-safety-validate";
 const MAX_BATCH = 128;
-
-// 60 validations per minute per IP; minimum 500 ms gap (called in retry loops).
-const RATE_LIMIT = { limit: 60, windowMs: 60 * 1_000, throttleMs: 500 } as const;
-
-const CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Origin":
-    process.env.ALLOWED_ORIGIN ?? "https://llm-prompt-purify.netlify.app",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Max-Age": "86400",
-};
-
-const RESPONSE_HEADERS: Record<string, string> = {
-  ...SECURITY_HEADERS,
-  ...CORS_HEADERS,
-};
-
-function jsonResponse(body: unknown, status: number): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...RESPONSE_HEADERS, "Content-Type": "application/json" },
-  });
-}
+const RATE_LIMIT = { limit: 60, windowMs: 60_000, throttleMs: 500 } as const;
 
 function evaluateCandidate(
   candidate: MaskSafetyValidationItemRequest,
@@ -84,43 +66,35 @@ export default async function handler(
   request: Request,
   _context: Context,
 ): Promise<Response> {
-  if (request.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: RESPONSE_HEADERS });
-  }
+  const headers = apiHeaders(corsHeaders());
+
+  const preflightResponse = preflight(request, headers);
+  if (preflightResponse) return preflightResponse;
 
   if (request.method !== "POST") {
-    return jsonResponse({ error: "Method not allowed" }, 405);
+    return json({ error: "Method not allowed" }, 405, headers);
   }
 
-  const rateLimit = checkRateLimit(request, RATE_LIMIT);
-  if (!rateLimit.allowed) {
-    logFunctionEvent(FN, "rate_limited", "warn", {
-      ip: rateLimit.ip,
-      retryAfter: rateLimit.retryAfter,
-    });
-    return rateLimitResponse(rateLimit, RESPONSE_HEADERS);
-  }
+  const limited = rateLimit(FN, request, RATE_LIMIT, headers);
+  if (limited) return limited;
 
   let body: MaskSafetyValidationRequest;
   try {
     body = (await request.json()) as MaskSafetyValidationRequest;
   } catch {
-    return jsonResponse({ error: "Invalid JSON body" }, 400);
+    return json({ error: "Invalid JSON body" }, 400, headers);
   }
 
   if (!Array.isArray(body.candidates)) {
-    return jsonResponse(
-      {
-        errors: {
-          candidates: ["The candidates field must be an array."],
-        },
-      },
+    return json(
+      { errors: { candidates: ["The candidates field must be an array."] } },
       422,
+      headers,
     );
   }
 
   if (body.candidates.length > MAX_BATCH) {
-    return jsonResponse(
+    return json(
       {
         errors: {
           candidates: [
@@ -129,12 +103,12 @@ export default async function handler(
         },
       },
       422,
+      headers,
     );
   }
 
   const results = body.candidates.slice(0, MAX_BATCH).map(evaluateCandidate);
-  const response: MaskSafetyValidationResponse = { results };
-  return jsonResponse(response, 200);
+  return json({ results } satisfies MaskSafetyValidationResponse, 200, headers);
 }
 
 export const config: Config = {
