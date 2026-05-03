@@ -88,3 +88,6 @@ playwright-report/trace/
 # Mobile (lives on its own branch)
 /mobile/
 
+
+# Local Netlify folder
+.netlify
