@@ -37,17 +37,97 @@ const RETRY_LIMIT = 25;
 const LOCK_TTL_SECONDS = 120;
 const RETRY_BACKOFF_SECONDS = [60, 300, 900, 3_600, 10_800, 21_600, 43_200];
 
+interface Migration {
+  readonly version: number;
+  readonly name: string;
+  readonly sql: string;
+}
+
+const MIGRATIONS: readonly Migration[] = [
+  {
+    version: 1,
+    name: "create_schema_migrations",
+    sql: `
+      CREATE TABLE IF NOT EXISTS schema_migrations (
+        version  integer PRIMARY KEY,
+        name     text    NOT NULL,
+        applied_at_utc timestamptz NOT NULL DEFAULT now()
+      );
+    `,
+  },
+  {
+    version: 2,
+    name: "create_feedback_outbox",
+    sql: `
+      CREATE TABLE IF NOT EXISTS feedback_register (
+        id uuid PRIMARY KEY,
+        category text NOT NULL,
+        email text,
+        message text NOT NULL,
+        name text,
+        rating integer,
+        source text NOT NULL,
+        subject text,
+        wants_reply boolean NOT NULL DEFAULT false,
+        delivery_status text NOT NULL CHECK (delivery_status IN ('pending', 'emailed', 'failed')),
+        delivery_error text,
+        attempts integer NOT NULL DEFAULT 0,
+        next_attempt_at timestamptz,
+        locked_until_at timestamptz,
+        created_at_utc timestamptz NOT NULL,
+        updated_at_utc timestamptz NOT NULL DEFAULT now(),
+        emailed_at_utc timestamptz,
+        expires_at_utc timestamptz NOT NULL DEFAULT (now() + interval '${REGISTER_TTL_DAYS} days')
+      );
+
+      CREATE TABLE IF NOT EXISTS feedback_ledger (
+        event_id bigserial PRIMARY KEY,
+        feedback_id uuid NOT NULL,
+        event_type text NOT NULL,
+        delivery_status text NOT NULL,
+        event_error text,
+        metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
+        created_at_utc timestamptz NOT NULL DEFAULT now()
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_feedback_register_due
+        ON feedback_register (next_attempt_at)
+        WHERE delivery_status = 'pending';
+
+      CREATE INDEX IF NOT EXISTS idx_feedback_register_expires
+        ON feedback_register (expires_at_utc);
+
+      CREATE INDEX IF NOT EXISTS idx_feedback_ledger_feedback
+        ON feedback_ledger (feedback_id, created_at_utc);
+    `,
+  },
+];
+
 let pool: Pool | null | undefined;
 let schemaReady: Promise<void> | null = null;
 
 function buildPoolConfig(connectionString: string): PoolConfig {
-  const isLocalDatabase = /(?:localhost|127\.0\.0\.1)/.test(connectionString),
-    ssl =
-      process.env.DATABASE_SSL === "false" || isLocalDatabase
-        ? false
-        : { rejectUnauthorized: false };
+  const isLocalDatabase = /(?:localhost|127\.0\.0\.1)/.test(connectionString);
+  const sslDisabled = process.env.DATABASE_SSL === "false" || isLocalDatabase;
 
-  return { connectionString, max: 3, ssl };
+  if (sslDisabled) {
+    return { connectionString, max: 3, ssl: false };
+  }
+
+  const sslConfig: NonNullable<PoolConfig["ssl"]> = {
+    rejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== "false",
+  };
+
+  const ca = process.env.DATABASE_SSL_CA;
+  if (ca) {
+    try {
+      sslConfig.ca = JSON.parse(ca) as string;
+    } catch {
+      sslConfig.ca = ca;
+    }
+  }
+
+  return { connectionString, max: 3, ssl: sslConfig };
 }
 
 function getPool(): Pool | null {
@@ -65,48 +145,35 @@ function getPool(): Pool | null {
 
 async function ensureSchema(activePool: Pool): Promise<void> {
   if (process.env.FEEDBACK_OUTBOX_AUTO_MIGRATE === "false") return;
-  schemaReady ??= activePool.query(`
-    CREATE TABLE IF NOT EXISTS feedback_register (
-      id uuid PRIMARY KEY,
-      category text NOT NULL,
-      email text,
-      message text NOT NULL,
-      name text,
-      rating integer,
-      source text NOT NULL,
-      subject text,
-      wants_reply boolean NOT NULL DEFAULT false,
-      delivery_status text NOT NULL CHECK (delivery_status IN ('pending', 'emailed', 'failed')),
-      delivery_error text,
-      attempts integer NOT NULL DEFAULT 0,
-      next_attempt_at timestamptz,
-      locked_until_at timestamptz,
-      created_at_utc timestamptz NOT NULL,
-      updated_at_utc timestamptz NOT NULL DEFAULT now(),
-      emailed_at_utc timestamptz,
-      expires_at_utc timestamptz NOT NULL DEFAULT (now() + interval '${REGISTER_TTL_DAYS} days')
-    );
-
-    CREATE TABLE IF NOT EXISTS feedback_ledger (
-      event_id bigserial PRIMARY KEY,
-      feedback_id uuid NOT NULL,
-      event_type text NOT NULL,
-      delivery_status text NOT NULL,
-      event_error text,
-      metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
-      created_at_utc timestamptz NOT NULL DEFAULT now()
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_feedback_register_due
-      ON feedback_register (next_attempt_at)
-      WHERE delivery_status = 'pending';
-
-    CREATE INDEX IF NOT EXISTS idx_feedback_register_expires
-      ON feedback_register (expires_at_utc);
-
-    CREATE INDEX IF NOT EXISTS idx_feedback_ledger_feedback
-      ON feedback_ledger (feedback_id, created_at_utc);
-  `).then(() => undefined);
+  schemaReady ??= (async () => {
+    const client = await activePool.connect();
+    try {
+      // Migration v1 (schema_migrations table) must run first so we can track
+      // future migrations, but it uses IF NOT EXISTS so it is safe even if
+      // a prior function run already created the table.
+      for (const migration of MIGRATIONS) {
+        const { rows } = await client.query<{ version: number }>(
+          "SELECT version FROM schema_migrations WHERE version = $1",
+          [migration.version],
+        );
+        if (rows.length > 0) continue;
+        try {
+          await client.query("BEGIN");
+          await client.query(migration.sql);
+          await client.query(
+            "INSERT INTO schema_migrations (version, name) VALUES ($1, $2)",
+            [migration.version, migration.name],
+          );
+          await client.query("COMMIT");
+        } catch (err) {
+          await client.query("ROLLBACK");
+          throw err;
+        }
+      }
+    } finally {
+      client.release();
+    }
+  })();
 
   await schemaReady;
 }

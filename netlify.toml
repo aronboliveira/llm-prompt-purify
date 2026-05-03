@@ -5,6 +5,28 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# ── Deploy contexts ──────────────────────────────────────────
+# Production: the default context (main branch). Uses real SMTP,
+# database, and secret values set in the Netlify UI.
+#
+# Deploy Preview (PRs): auto-deployed previews use a separate
+# env-var scope. Set preview-safe values in the Netlify UI under
+# Site settings → Environment variables → Deploy Previews.
+#
+# Branch deploys (e.g. develop-ts): use the "Branch deploys"
+# scope in the Netlify UI. Never share production SMTP or
+# database credentials with branch/preview contexts.
+#
+# Recommended per-context env-var strategy:
+#   Production:    real SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD,
+#                  DATABASE_URL, FEEDBACK_RETRY_SECRET
+#   Deploy Preview: SMTP_HOST=localhost, DATABASE_URL= (empty),
+#                   FEEDBACK_RETRY_SECRET=preview-dummy
+#   Branch deploys: same as Deploy Preview (no real outbox)
+#
+# Netlify UI path: Site settings → Environment variables
+#   → "Production" / "Deploy Previews" / "Branch deploys"
+
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
@@ -43,7 +65,7 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
     Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
-    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; manifest-src 'self'; worker-src 'self'"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data: https://*.netlify.app https://cdn.jsdelivr.net https://unpkg.com; font-src 'self' https://cdn.jsdelivr.net https://unpkg.com; connect-src 'self' https://*.netlify.app https://*.netlify.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'; manifest-src 'self'; worker-src 'self'"
 
 [[headers]]
   for = "/manifest.webmanifest"

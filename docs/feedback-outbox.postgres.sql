@@ -1,3 +1,9 @@
+CREATE TABLE IF NOT EXISTS schema_migrations (
+  version  integer PRIMARY KEY,
+  name     text    NOT NULL,
+  applied_at_utc timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS feedback_register (
   id uuid PRIMARY KEY,
   category text NOT NULL,

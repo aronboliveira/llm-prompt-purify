@@ -1,14 +1,28 @@
 /**
  * IP-based in-process rate limiter for Netlify serverless functions.
  *
+ * --- Durability note ---
+ * This rate limiter stores state in an in-memory Map that resets on every cold
+ * start and does not coordinate across parallel function instances. Netlify
+ * serverless functions can run multiple concurrent containers under load, so
+ * the effective rate limit may be higher than configured.
+ *
+ * This best-effort approach is acceptable for moderate-traffic deployments. For
+ * production workloads that require durable, cross-instance rate limiting,
+ * connect an external store such as Upstash Redis (@upstash/redis with
+ * @upstash/ratelimit) or an edge-backed counter. The function interface
+ * (checkRateLimit / rateLimitResponse) is intentionally narrow so the
+ * implementation can be swapped without touching call sites.
+ *
+ * --- Mechanics ---
  * Each IP entry tracks:
- *   - firstSeenAt  — when this IP was first registered; entry is deleted after 24 h.
- *   - windowStart  — start of the current sliding rate-limit window.
- *   - count        — requests accepted in the current window.
+ *   - firstSeenAt   — when this IP was first registered; entry is deleted after 24 h.
+ *   - windowStart   — start of the current sliding rate-limit window.
+ *   - count         — requests accepted in the current window.
  *   - lastAllowedAt — timestamp of the last accepted request (throttle guard).
  *
  * State persists across warm invocations of the same function container.
- * A cold start resets everything, which is acceptable for best-effort limiting.
+ * A cold start resets everything.
  *
  * Two housekeeping routines run on every request:
  *   - Per-entry TTL: if an entry is older than 24 h it is deleted immediately.
