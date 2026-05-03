@@ -1,6 +1,8 @@
 import type { Config, Context } from "@netlify/functions";
 import { VALIDATORS } from "./shared/identifier-validators.js";
+import { logFunctionEvent } from "./shared/logger.js";
 import { checkRateLimit, rateLimitResponse } from "./shared/rate-limiter.js";
+import { SECURITY_HEADERS } from "./shared/security-headers.js";
 import type {
   MaskSafetyValidationItemRequest,
   MaskSafetyValidationItemResponse,
@@ -8,6 +10,7 @@ import type {
   MaskSafetyValidationResponse,
 } from "./shared/types.js";
 
+const FN = "mask-safety-validate";
 const MAX_BATCH = 128;
 
 // 60 validations per minute per IP; minimum 500 ms gap (called in retry loops).
@@ -21,10 +24,15 @@ const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Max-Age": "86400",
 };
 
+const RESPONSE_HEADERS: Record<string, string> = {
+  ...SECURITY_HEADERS,
+  ...CORS_HEADERS,
+};
+
 function jsonResponse(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+    headers: { ...RESPONSE_HEADERS, "Content-Type": "application/json" },
   });
 }
 
@@ -77,7 +85,7 @@ export default async function handler(
   _context: Context,
 ): Promise<Response> {
   if (request.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: CORS_HEADERS });
+    return new Response(null, { status: 204, headers: RESPONSE_HEADERS });
   }
 
   if (request.method !== "POST") {
@@ -86,7 +94,11 @@ export default async function handler(
 
   const rateLimit = checkRateLimit(request, RATE_LIMIT);
   if (!rateLimit.allowed) {
-    return rateLimitResponse(rateLimit, CORS_HEADERS);
+    logFunctionEvent(FN, "rate_limited", "warn", {
+      ip: rateLimit.ip,
+      retryAfter: rateLimit.retryAfter,
+    });
+    return rateLimitResponse(rateLimit, RESPONSE_HEADERS);
   }
 
   let body: MaskSafetyValidationRequest;

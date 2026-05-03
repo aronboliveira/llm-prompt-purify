@@ -1,6 +1,9 @@
 import type { Config, Context } from "@netlify/functions";
+import { logFunctionEvent } from "./shared/logger.js";
 import { checkRateLimit, rateLimitResponse } from "./shared/rate-limiter.js";
 import { SECURITY_HEADERS } from "./shared/security-headers.js";
+
+const FN = "health";
 
 // 30 health checks per minute per IP; no throttle (polling clients are expected).
 const RATE_LIMIT = { limit: 30, windowMs: 60 * 1_000, throttleMs: 0 } as const;
@@ -21,6 +24,10 @@ export default async function handler(
 ): Promise<Response> {
   const rateLimit = checkRateLimit(request, RATE_LIMIT);
   if (!rateLimit.allowed) {
+    logFunctionEvent(FN, "rate_limited", "warn", {
+      ip: rateLimit.ip,
+      retryAfter: rateLimit.retryAfter,
+    });
     return rateLimitResponse(rateLimit, RESPONSE_HEADERS);
   }
 

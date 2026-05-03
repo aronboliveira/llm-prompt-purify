@@ -1,5 +1,8 @@
 import * as nodemailer from "nodemailer";
+import { logFunctionEvent } from "./logger.js";
 import type { FeedbackEntry } from "./types.js";
+
+const FN = "feedback-mailer";
 
 export interface FeedbackEmailDispatchResult {
   readonly status: "emailed" | "failed";
@@ -42,6 +45,9 @@ export async function sendFeedbackEmail(
     sender = process.env.SMTP_SENDER_EMAIL || user;
 
   if (!host || !user || !pass || !recipient) {
+    logFunctionEvent(FN, "smtp_not_configured", "warn", {
+      feedbackId: entry.id,
+    });
     return {
       status: "failed",
       error: "SMTP is not configured for developer email delivery.",
@@ -64,11 +70,17 @@ export async function sendFeedbackEmail(
 
   try {
     await transport.sendMail(mailOptions);
+    logFunctionEvent(FN, "smtp_sent", "info", { feedbackId: entry.id });
     return { status: "emailed", error: null };
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    logFunctionEvent(FN, "smtp_failed", "error", {
+      feedbackId: entry.id,
+      error: message,
+    });
     return {
       status: "failed",
-      error: error instanceof Error ? error.message : String(error),
+      error: message,
     };
   }
 }

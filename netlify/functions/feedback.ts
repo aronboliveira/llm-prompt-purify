@@ -7,6 +7,7 @@ import {
 } from "./shared/feedback-outbox.js";
 import { sendFeedbackEmail } from "./shared/feedback-mailer.js";
 import { sanitize, sanitizeAndTrim } from "./shared/input-sanitizer.js";
+import { logFunctionEvent } from "./shared/logger.js";
 import { checkRateLimit, rateLimitResponse } from "./shared/rate-limiter.js";
 import { SECURITY_HEADERS } from "./shared/security-headers.js";
 import type {
@@ -14,6 +15,8 @@ import type {
   FeedbackSubmissionRequest,
   FeedbackSubmissionResponse,
 } from "./shared/types.js";
+
+const FN = "feedback";
 
 // 5 submissions per 15 minutes per IP; minimum 8 s gap between calls.
 const RATE_LIMIT = { limit: 5, windowMs: 15 * 60 * 1_000, throttleMs: 8_000 } as const;
@@ -52,6 +55,10 @@ export default async function handler(
 
   const rateLimit = checkRateLimit(request, RATE_LIMIT);
   if (!rateLimit.allowed) {
+    logFunctionEvent(FN, "rate_limited", "warn", {
+      ip: rateLimit.ip,
+      retryAfter: rateLimit.retryAfter,
+    });
     return rateLimitResponse(rateLimit, RESPONSE_HEADERS);
   }
 
@@ -74,6 +81,9 @@ export default async function handler(
 
   const errors = validateFeedbackRequest(normalized);
   if (Object.keys(errors).length > 0) {
+    logFunctionEvent(FN, "validation_failed", "info", {
+      fields: Object.keys(errors),
+    });
     return jsonResponse({ errors }, 422);
   }
 
@@ -106,6 +116,23 @@ export default async function handler(
         ? "queued"
         : "not-delivered";
   entry.deliveryError = dispatch.error;
+
+  logFunctionEvent(
+    FN,
+    "submission_processed",
+    dispatch.status === "failed" && outbox.status === "failed"
+      ? "error"
+      : "info",
+    {
+      feedbackId: entry.id,
+      category: entry.category,
+      outboxStatus: outbox.status,
+      smtpStatus: dispatch.status,
+      deliveryStatus: entry.deliveryStatus,
+      outboxError: outbox.error,
+      smtpError: dispatch.error,
+    },
+  );
 
   const response: FeedbackSubmissionResponse = {
     createdAtUtc: entry.createdAtUtc,
