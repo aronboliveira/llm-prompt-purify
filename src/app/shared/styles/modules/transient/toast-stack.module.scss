@@ -30,15 +30,17 @@
     @include ui.entrance-slide(Y, 0.75rem);
     @include transient.reduced-motion;
 
-    align-items: start;
-    display: grid;
-    gap: 0.8rem;
-    grid-template-columns: minmax(0, 1fr) auto;
-    padding: 0.95rem 1rem;
-    pointer-events: auto;
-    transition:
-      opacity 180ms ease,
-      transform 180ms ease;
+    & {
+      align-items: start;
+      display: grid;
+      gap: 0.8rem;
+      grid-template-columns: minmax(0, 1fr) auto;
+      padding: 0.95rem 1rem;
+      pointer-events: auto;
+      transition:
+        opacity 180ms ease,
+        transform 180ms ease;
+    }
   }
 
   :scope .toast[data-tone="success"] {

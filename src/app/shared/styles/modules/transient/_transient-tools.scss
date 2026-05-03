@@ -7,11 +7,13 @@
 }
 
 @mixin interactive-lift($distance: 1px, $transition: 180ms) {
-  transition:
-    background-color $transition ease,
-    border-color $transition ease,
-    opacity $transition ease,
-    transform $transition ease;
+  & {
+    transition:
+      background-color $transition ease,
+      border-color $transition ease,
+      opacity $transition ease,
+      transform $transition ease;
+  }
 
   &:hover {
     transform: translateY(-$distance);

@@ -10,11 +10,13 @@
 
 @scope (.settings-modal-backdrop) {
   :scope .settings-modal {
-    @include modal.modal-shell(48rem);
     @include transient.contained-shell(1.5rem, 85vh);
+    @include modal.modal-shell(48rem);
 
-    display: grid;
-    gap: 1.25rem;
+    & {
+      display: grid;
+      gap: 1.25rem;
+    }
   }
 
   :scope .settings-modal__header,
@@ -36,8 +38,10 @@
   :scope .settings-modal__icon {
     @include ui.icon-embed(1.4rem);
 
-    color: ui.accent();
-    flex-shrink: 0;
+    & {
+      color: ui.accent();
+      flex-shrink: 0;
+    }
   }
 
   :scope .settings-modal__body-copy,
@@ -60,15 +64,17 @@
     @include transient.interactive-lift(1px);
     @include transient.reduced-motion;
 
-    background: var(
-      --btn-secondary-bg,
-      linear-gradient(180deg, #f0f7f9 0%, #e8f4f6 100%)
-    );
-    border: 1px solid var(--btn-secondary-border, rgba(15, 118, 110, 0.15));
-    border-radius: 0.5rem;
-    color: var(--btn-secondary-text, #1e293b);
-    font-weight: 600;
-    padding: 0.5rem 1rem;
+    & {
+      background: var(
+        --btn-secondary-bg,
+        linear-gradient(180deg, #f0f7f9 0%, #e8f4f6 100%)
+      );
+      border: 1px solid var(--btn-secondary-border, rgba(15, 118, 110, 0.15));
+      border-radius: 0.5rem;
+      color: var(--btn-secondary-text, #1e293b);
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+    }
   }
 
   :scope .settings-fieldset {
@@ -97,25 +103,27 @@
     @include ui.focus-ring();
     @include transient.reduced-motion;
 
-    align-items: start;
-    background: var(
-      --surface-field,
-      linear-gradient(
-        180deg,
-        rgba(248, 252, 251, 0.98),
-        rgba(243, 250, 249, 0.96)
-      )
-    );
-    border: 1px solid var(--surface-accent-border, rgba(15, 118, 110, 0.14));
-    border-radius: ui.panel-radius(0.35);
-    cursor: pointer;
-    display: grid;
-    gap: 0.75rem;
-    grid-template-columns: auto minmax(0, 1fr);
-    padding: 0.875rem 1rem;
-    transition:
-      border-color 0.15s ease,
-      background 0.15s ease;
+    & {
+      align-items: start;
+      background: var(
+        --surface-field,
+        linear-gradient(
+          180deg,
+          rgba(248, 252, 251, 0.98),
+          rgba(243, 250, 249, 0.96)
+        )
+      );
+      border: 1px solid var(--surface-accent-border, rgba(15, 118, 110, 0.14));
+      border-radius: ui.panel-radius(0.35);
+      cursor: pointer;
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: auto minmax(0, 1fr);
+      padding: 0.875rem 1rem;
+      transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
+    }
   }
 
   :scope .settings-toggle:hover {
@@ -163,19 +171,21 @@
     @include ui.focus-ring();
     @include transient.reduced-motion;
 
-    align-items: start;
-    background: var(--surface-bg, #fff);
-    border: 1px solid var(--panel-border, rgba(11, 38, 61, 0.1));
-    border-radius: ui.panel-radius(0.3);
-    cursor: pointer;
-    display: grid;
-    gap: 0.625rem;
-    grid-template-columns: auto minmax(0, 1fr);
-    padding: 0.75rem;
-    transition:
-      border-color 0.15s ease,
-      background 0.15s ease,
-      box-shadow 0.15s ease;
+    & {
+      align-items: start;
+      background: var(--surface-bg, #fff);
+      border: 1px solid var(--panel-border, rgba(11, 38, 61, 0.1));
+      border-radius: ui.panel-radius(0.3);
+      cursor: pointer;
+      display: grid;
+      gap: 0.625rem;
+      grid-template-columns: auto minmax(0, 1fr);
+      padding: 0.75rem;
+      transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease;
+    }
   }
 
   :scope .mask-group-toggle:hover {
@@ -206,8 +216,10 @@
   :scope .mask-group-toggle__icon {
     @include ui.icon-embed(1.1rem);
 
-    color: ui.accent();
-    margin-block-start: 0.0625rem;
+    & {
+      color: ui.accent();
+      margin-block-start: 0.0625rem;
+    }
   }
 
   :scope .mask-group-toggle__text {
@@ -328,7 +340,9 @@
   :scope .help-trigger {
     @include ui.help-button;
 
-    font-size: 0.8125rem;
+    & {
+      font-size: 0.8125rem;
+    }
   }
 
   /* ── Masking strategy radio grid ────────────────────────── */
@@ -343,19 +357,21 @@
     @include ui.focus-ring();
     @include transient.reduced-motion;
 
-    align-items: start;
-    background: var(--surface-bg, #fff);
-    border: 1px solid var(--panel-border, rgba(11, 38, 61, 0.1));
-    border-radius: ui.panel-radius(0.3);
-    cursor: pointer;
-    display: grid;
-    gap: 0.625rem;
-    grid-template-columns: auto minmax(0, 1fr);
-    padding: 0.75rem;
-    transition:
-      border-color 0.15s ease,
-      background 0.15s ease,
-      box-shadow 0.15s ease;
+    & {
+      align-items: start;
+      background: var(--surface-bg, #fff);
+      border: 1px solid var(--panel-border, rgba(11, 38, 61, 0.1));
+      border-radius: ui.panel-radius(0.3);
+      cursor: pointer;
+      display: grid;
+      gap: 0.625rem;
+      grid-template-columns: auto minmax(0, 1fr);
+      padding: 0.75rem;
+      transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease;
+    }
   }
 
   :scope .strategy-radio:hover {

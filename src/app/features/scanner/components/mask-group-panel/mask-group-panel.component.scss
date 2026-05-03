@@ -9,11 +9,13 @@
   :scope .mask-fieldset {
     @include ui.surface-card(0.58, 0.08);
 
-    border: 1px solid ui.panel-border();
-    display: grid;
-    gap: 0.85rem;
-    margin: 0;
-    padding: 1rem;
+    & {
+      border: 1px solid ui.panel-border();
+      display: grid;
+      gap: 0.85rem;
+      margin: 0;
+      padding: 1rem;
+    }
   }
 
   :scope .mask-fieldset[data-state="disabled"] {
@@ -56,12 +58,14 @@
   :scope .mask-toggle {
     @include ui.focus-ring();
 
-    align-items: center;
-    color: var(--ink, #1e293b);
-    cursor: pointer;
-    display: inline-flex;
-    gap: 0.55rem;
-    font-weight: 500;
+    & {
+      align-items: center;
+      color: var(--ink, #1e293b);
+      cursor: pointer;
+      display: inline-flex;
+      gap: 0.55rem;
+      font-weight: 500;
+    }
   }
 
   :scope .mask-toggle--subtle {
@@ -81,11 +85,13 @@
   :scope .mask-row {
     @include ui.focus-ring(rgba(15, 118, 110, 0.24));
 
-    background: ui.subtle-bg();
-    border: 1px solid ui.panel-border();
-    border-radius: ui.panel-radius(0.25);
-    padding: 0.8rem 0.9rem;
-    position: relative;
+    & {
+      background: ui.subtle-bg();
+      border: 1px solid ui.panel-border();
+      border-radius: ui.panel-radius(0.25);
+      padding: 0.8rem 0.9rem;
+      position: relative;
+    }
   }
 
   :scope .mask-row[data-enabled="false"] {
@@ -117,17 +123,19 @@
   :scope .mask-row__action {
     @include ui.focus-ring();
 
-    align-items: center;
-    background: #eff6f8;
-    border: 1px solid ui.panel-border();
-    border-radius: 999px;
-    color: ui.ink();
-    cursor: pointer;
-    display: inline-flex;
-    font: inherit;
-    font-weight: 700;
-    gap: 0.45rem;
-    padding: 0.55rem 0.8rem;
+    & {
+      align-items: center;
+      background: #eff6f8;
+      border: 1px solid ui.panel-border();
+      border-radius: 999px;
+      color: ui.ink();
+      cursor: pointer;
+      display: inline-flex;
+      font: inherit;
+      font-weight: 700;
+      gap: 0.45rem;
+      padding: 0.55rem 0.8rem;
+    }
   }
 
   :scope .mask-row__action:hover:not(:disabled) {

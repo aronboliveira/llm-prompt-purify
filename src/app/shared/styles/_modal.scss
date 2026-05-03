@@ -14,14 +14,16 @@
   @include ui.surface-card(1.1, 0.18);
   @include ui.entrance-slide(Y, 1rem);
 
-  margin: 0 auto;
-  max-inline-size: $max-width;
-  padding: 1.25rem;
-  transform: translateY(0);
-  transition:
-    opacity 160ms ease,
-    transform 160ms ease;
-  width: min(100%, $max-width);
+  & {
+    margin: 0 auto;
+    max-inline-size: $max-width;
+    padding: 1.25rem;
+    transform: translateY(0);
+    transition:
+      opacity 160ms ease,
+      transform 160ms ease;
+    width: min(100%, $max-width);
+  }
 }
 
 @mixin modal-close-button {

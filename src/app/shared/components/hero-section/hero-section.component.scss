@@ -2,15 +2,17 @@
 
 @scope (.hero) {
   :scope {
-    @include ui.entrance-slide(Y, 1rem);
     @include ui.surface-card();
+    @include ui.entrance-slide(Y, 1rem);
 
-    border: 1px solid var(--panel-border);
-    display: grid;
-    gap: 1rem;
-    margin-block-end: 1rem;
-    overflow: clip;
-    padding: 1.3rem;
+    & {
+      border: 1px solid var(--panel-border);
+      display: grid;
+      gap: 1rem;
+      margin-block-end: 1rem;
+      overflow: clip;
+      padding: 1.3rem;
+    }
   }
 
   :scope .hero__body {
@@ -81,7 +83,9 @@
   :scope .help-trigger {
     @include ui.help-button;
 
-    justify-self: end;
+    & {
+      justify-self: end;
+    }
   }
 }
 

@@ -4,11 +4,13 @@
   :scope {
     @include ui.surface-card();
 
-    border: 1px solid var(--panel-border);
-    container-type: inline-size;
-    display: grid;
-    gap: 0.85rem;
-    padding: 1.1rem;
+    & {
+      border: 1px solid var(--panel-border);
+      container-type: inline-size;
+      display: grid;
+      gap: 0.85rem;
+      padding: 1.1rem;
+    }
   }
 
   :scope .controls__header {

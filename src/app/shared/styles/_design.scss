@@ -88,27 +88,29 @@
 @mixin help-button {
   @include focus-ring();
 
-  align-items: center;
-  appearance: none;
-  background: var(--help-trigger-bg, #eef6f8);
-  border: 1px solid var(--help-trigger-border, rgba(15, 118, 110, 0.15));
-  border-radius: var(--radius-pill, 999px);
-  box-shadow: none;
-  block-size: var(--help-trigger-size, 23px);
-  color: var(--help-trigger-color, #1e293b);
-  cursor: pointer;
-  display: inline-flex;
-  font: inherit;
-  font-weight: 700;
-  inline-size: var(--help-trigger-size, 23px);
-  justify-content: center;
-  line-height: 0;
-  outline: none;
-  padding: 0 0 0.5px;
-  transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease,
-    transform 0.15s ease;
+  & {
+    align-items: center;
+    appearance: none;
+    background: var(--help-trigger-bg, #eef6f8);
+    border: 1px solid var(--help-trigger-border, rgba(15, 118, 110, 0.15));
+    border-radius: var(--radius-pill, 999px);
+    box-shadow: none;
+    block-size: var(--help-trigger-size, 23px);
+    color: var(--help-trigger-color, #1e293b);
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-weight: 700;
+    inline-size: var(--help-trigger-size, 23px);
+    justify-content: center;
+    line-height: 0;
+    outline: none;
+    padding: 0 0 0.5px;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      transform 0.15s ease;
+  }
 
   &:hover {
     background: var(--help-trigger-bg-hover, #e0f2ef);
@@ -122,16 +124,18 @@
   .help-trigger__icon {
     @include icon-embed(var(--help-trigger-icon-size, 1rem));
 
-    align-items: center;
-    block-size: 100%;
-    display: inline-flex;
-    inline-size: 100%;
-    justify-content: center;
-    line-height: 0;
-    pointer-events: none;
+    & {
+      align-items: center;
+      block-size: 100%;
+      display: inline-flex;
+      inline-size: 100%;
+      justify-content: center;
+      line-height: 0;
+      pointer-events: none;
 
-    :is(svg) {
-      margin: 0;
+      :is(svg) {
+        margin: 0;
+      }
     }
   }
 }
@@ -139,14 +143,16 @@
 @mixin close-button($padding: 0.7rem 1rem) {
   @include focus-ring();
 
-  background: var(--surface-subtle, #eff5f8);
-  border: none;
-  border-radius: var(--radius-pill, 999px);
-  color: ink();
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-  padding: $padding;
+  & {
+    background: var(--surface-subtle, #eff5f8);
+    border: none;
+    border-radius: var(--radius-pill, 999px);
+    color: ink();
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    padding: $padding;
+  }
 }
 
 @mixin entrance-slide($axis: Y, $distance: 1rem) {

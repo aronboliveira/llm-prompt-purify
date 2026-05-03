@@ -12,23 +12,25 @@
 }
 
 .feedback-trigger {
-  @include ui.focus-ring();
   @include ui.surface-card(0.7, 0.12);
+  @include ui.focus-ring();
   @include transient.interactive-lift(1px);
   @include transient.reduced-motion;
 
-  align-items: center;
-  border: 1px solid rgba(11, 38, 61, 0.08);
-  color: #0f172a;
-  cursor: pointer;
-  display: inline-flex;
-  gap: 0.55rem;
-  inset-block-start: 1.15rem;
-  inset-inline-end: 1.15rem;
-  padding: 0.72rem 0.95rem;
-  position: fixed;
-  position-try-options: --feedback-trigger-fallback;
-  z-index: transient.overlay-z(5);
+  & {
+    align-items: center;
+    border: 1px solid rgba(11, 38, 61, 0.08);
+    color: #0f172a;
+    cursor: pointer;
+    display: inline-flex;
+    gap: 0.55rem;
+    inset-block-start: 1.15rem;
+    inset-inline-end: 1.15rem;
+    padding: 0.72rem 0.95rem;
+    position: fixed;
+    position-try-options: --feedback-trigger-fallback;
+    z-index: transient.overlay-z(5);
+  }
 }
 
 .feedback-trigger__icon {
@@ -50,18 +52,20 @@
     @include ui.entrance-slide(X, 1rem);
     @include transient.reduced-motion;
 
-    block-size: min(100vh - 2rem, 52rem);
-    container-type: inline-size;
-    display: grid;
-    gap: 1rem;
-    inset-block-start: 1rem;
-    inset-inline-end: 1rem;
-    max-inline-size: 31rem;
-    overflow: auto;
-    padding: 1.2rem;
-    position: absolute;
-    position-try-options: --feedback-sheet-fallback;
-    width: min(calc(100vw - 2rem), 31rem);
+    & {
+      block-size: min(100vh - 2rem, 52rem);
+      container-type: inline-size;
+      display: grid;
+      gap: 1rem;
+      inset-block-start: 1rem;
+      inset-inline-end: 1rem;
+      max-inline-size: 31rem;
+      overflow: auto;
+      padding: 1.2rem;
+      position: absolute;
+      position-try-options: --feedback-sheet-fallback;
+      width: min(calc(100vw - 2rem), 31rem);
+    }
   }
 
   :scope .feedback-sheet__header,
@@ -86,10 +90,12 @@
   :scope .feedback-sheet__icon {
     @include ui.icon-embed(1.05rem);
 
-    background: #edf9f6;
-    border-radius: 999px;
-    color: ui.accent();
-    padding: 0.7rem;
+    & {
+      background: #edf9f6;
+      border-radius: 999px;
+      color: ui.accent();
+      padding: 0.7rem;
+    }
   }
 
   :scope .feedback-sheet__eyebrow,
@@ -156,12 +162,14 @@
   :scope .feedback-rating__option {
     @include ui.focus-ring();
 
-    appearance: none;
-    border: none;
-    border-radius: 999px;
-    cursor: pointer;
-    font: inherit;
-    font-weight: 700;
+    & {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
   }
 
   :scope .feedback-sheet__close,
@@ -214,13 +222,15 @@
   :scope .feedback-field__control {
     @include ui.focus-ring();
 
-    appearance: none;
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid ui.panel-border(0.12);
-    border-radius: ui.panel-radius(0.45);
-    color: ui.ink();
-    font: inherit;
-    padding: 0.85rem 0.95rem;
+    & {
+      appearance: none;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid ui.panel-border(0.12);
+      border-radius: ui.panel-radius(0.45);
+      color: ui.ink();
+      font: inherit;
+      padding: 0.85rem 0.95rem;
+    }
   }
 
   :scope .feedback-field__control--textarea {
@@ -270,11 +280,13 @@
   :scope .feedback-toggle {
     @include ui.focus-ring();
 
-    align-items: start;
-    background: rgba(245, 249, 251, 0.96);
-    border: 1px solid ui.panel-border();
-    border-radius: ui.panel-radius(0.45);
-    padding: 0.95rem 1rem;
+    & {
+      align-items: start;
+      background: rgba(245, 249, 251, 0.96);
+      border: 1px solid ui.panel-border();
+      border-radius: ui.panel-radius(0.45);
+      padding: 0.95rem 1rem;
+    }
   }
 
   :scope .feedback-toggle input {

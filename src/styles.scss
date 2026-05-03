@@ -1,3 +1,12 @@
+/* ─── Popup/Overlay Module Styles ───────────────────────────────────────────── */
+/* These styles are imported globally for dynamically mounted elements */
+
+@use "./app/shared/styles/modules/transient/feedback-sheet.module";
+@use "./app/shared/styles/modules/transient/help-modal.module";
+@use "./app/shared/styles/modules/transient/country-scope-modal.module";
+@use "./app/shared/styles/modules/transient/masking-settings-modal.module";
+@use "./app/shared/styles/modules/transient/toast-stack.module";
+
 :root {
   color-scheme: light;
   font-family: "Trebuchet MS", "Avenir Next", sans-serif;
@@ -267,12 +276,3 @@ textarea {
 ::selection {
   background: var(--mask-highlight);
 }
-
-/* ─── Popup/Overlay Module Styles ───────────────────────────────────────────── */
-/* These styles are imported globally for dynamically mounted elements */
-
-@import "./app/shared/styles/modules/transient/feedback-sheet.module";
-@import "./app/shared/styles/modules/transient/help-modal.module";
-@import "./app/shared/styles/modules/transient/country-scope-modal.module";
-@import "./app/shared/styles/modules/transient/masking-settings-modal.module";
-@import "./app/shared/styles/modules/transient/toast-stack.module";

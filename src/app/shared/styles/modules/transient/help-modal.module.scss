@@ -10,11 +10,13 @@
 
 @scope (.help-modal-backdrop) {
   :scope .help-modal {
-    @include modal.modal-shell(42rem);
     @include transient.contained-shell(1.25rem, 82vh);
+    @include modal.modal-shell(42rem);
 
-    display: grid;
-    gap: 0.9rem;
+    & {
+      display: grid;
+      gap: 0.9rem;
+    }
   }
 
   :scope .help-modal__header,
@@ -29,10 +31,12 @@
   :scope .help-modal__icon {
     @include ui.icon-embed();
 
-    background: var(--accent-soft, rgba(15, 118, 110, 0.1));
-    border-radius: 999px;
-    color: ui.accent();
-    padding: 0.55rem;
+    & {
+      background: var(--accent-soft, rgba(15, 118, 110, 0.1));
+      border-radius: 999px;
+      color: ui.accent();
+      padding: 0.55rem;
+    }
   }
 
   :scope .help-modal__body {

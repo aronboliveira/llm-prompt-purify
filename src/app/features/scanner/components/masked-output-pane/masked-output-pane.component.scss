@@ -5,14 +5,16 @@
     @include ui.surface-card();
     @include ui.entrance-slide(Y, 0.8rem);
 
-    border: 1px solid var(--panel-border);
-    container-type: inline-size;
-    display: grid;
-    gap: 0.75rem;
-    grid-template-rows: auto auto 1fr auto auto;
-    min-block-size: 100%;
-    padding: 1rem 1.1rem;
-    position: relative;
+    & {
+      border: 1px solid var(--panel-border);
+      container-type: inline-size;
+      display: grid;
+      gap: 0.75rem;
+      grid-template-rows: auto auto 1fr auto auto;
+      min-block-size: 100%;
+      padding: 1rem 1.1rem;
+      position: relative;
+    }
   }
 
   :scope.pane--masked::before {
@@ -57,27 +59,29 @@
   :scope .pane__button {
     @include ui.focus-ring();
 
-    align-items: center;
-    background: var(
-      --btn-secondary-bg,
-      linear-gradient(180deg, #f0f7f9 0%, #e8f4f6 100%)
-    );
-    border: 1px solid var(--btn-secondary-border, rgba(15, 118, 110, 0.18));
-    border-radius: 0.5rem;
-    color: var(--btn-secondary-text, #1e293b);
-    cursor: pointer;
-    display: inline-flex;
-    font: inherit;
-    font-size: 0.875rem;
-    font-weight: 600;
-    gap: 0.5rem;
-    justify-content: center;
-    line-height: 1.4;
-    padding: 0.625rem 1rem;
-    transition:
-      background 0.15s ease,
-      border-color 0.15s ease,
-      box-shadow 0.15s ease;
+    & {
+      align-items: center;
+      background: var(
+        --btn-secondary-bg,
+        linear-gradient(180deg, #f0f7f9 0%, #e8f4f6 100%)
+      );
+      border: 1px solid var(--btn-secondary-border, rgba(15, 118, 110, 0.18));
+      border-radius: 0.5rem;
+      color: var(--btn-secondary-text, #1e293b);
+      cursor: pointer;
+      display: inline-flex;
+      font: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      gap: 0.5rem;
+      justify-content: center;
+      line-height: 1.4;
+      padding: 0.625rem 1rem;
+      transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+    }
   }
 
   :scope .pane__button:hover:not(:disabled) {

@@ -5,14 +5,16 @@
     @include ui.surface-card();
     @include ui.entrance-slide(Y, 0.8rem);
 
-    border: 1px solid var(--panel-border);
-    container-type: inline-size;
-    display: grid;
-    gap: 0.75rem;
-    grid-template-rows: auto auto 1fr;
-    min-block-size: 100%;
-    padding: 1rem 1.1rem;
-    position: relative;
+    & {
+      border: 1px solid var(--panel-border);
+      container-type: inline-size;
+      display: grid;
+      gap: 0.75rem;
+      grid-template-rows: auto auto 1fr;
+      min-block-size: 100%;
+      padding: 1rem 1.1rem;
+      position: relative;
+    }
   }
 
   :scope.pane--raw::before {
@@ -65,23 +67,25 @@
     @include ui.mono-font;
     @include ui.focus-ring();
 
-    background: var(
-      --surface-field,
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.98),
-        rgba(248, 252, 254, 0.98)
-      )
-    );
-    border: 1px solid ui.panel-border(0.12);
-    border-radius: ui.panel-radius(0.45);
-    color: var(--text-strong, #1e293b);
-    font-size: 0.92rem;
-    line-height: 1.7;
-    min-block-size: 24rem;
-    padding: 0.9rem 1rem;
-    resize: vertical;
-    width: 100%;
+    & {
+      background: var(
+        --surface-field,
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.98),
+          rgba(248, 252, 254, 0.98)
+        )
+      );
+      border: 1px solid ui.panel-border(0.12);
+      border-radius: ui.panel-radius(0.45);
+      color: var(--text-strong, #1e293b);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      min-block-size: 24rem;
+      padding: 0.9rem 1rem;
+      resize: vertical;
+      width: 100%;
+    }
   }
 
   :scope .editor::placeholder {
@@ -103,19 +107,21 @@
   :scope .load-file-trigger {
     @include ui.focus-ring();
 
-    align-items: center;
-    background: var(--surface-subtle, #eff5f8);
-    border: 1px solid var(--surface-accent-border, rgba(15, 118, 110, 0.18));
-    border-radius: 999px;
-    color: var(--accent-primary, #0f766e);
-    cursor: pointer;
-    display: inline-flex;
-    font-size: 0.78rem;
-    font-weight: 600;
-    gap: 0.4rem;
-    line-height: 1;
-    padding: 0.4rem 0.7rem;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    & {
+      align-items: center;
+      background: var(--surface-subtle, #eff5f8);
+      border: 1px solid var(--surface-accent-border, rgba(15, 118, 110, 0.18));
+      border-radius: 999px;
+      color: var(--accent-primary, #0f766e);
+      cursor: pointer;
+      display: inline-flex;
+      font-size: 0.78rem;
+      font-weight: 600;
+      gap: 0.4rem;
+      line-height: 1;
+      padding: 0.4rem 0.7rem;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
   }
 
   :scope .load-file-trigger:hover {

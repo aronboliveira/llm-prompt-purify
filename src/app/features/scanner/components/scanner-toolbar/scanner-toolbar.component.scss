@@ -23,17 +23,19 @@
   :scope .scanner-toolbar__button {
     @include ui.focus-ring();
 
-    align-items: center;
-    background: var(--help-trigger-bg, #eef6f8);
-    border: 1px solid var(--help-trigger-border, rgba(15, 118, 110, 0.15));
-    border-radius: 999px;
-    color: ui.ink();
-    cursor: pointer;
-    display: inline-flex;
-    font: inherit;
-    font-weight: 700;
-    gap: 0.55rem;
-    padding: 0.75rem 1rem;
+    & {
+      align-items: center;
+      background: var(--help-trigger-bg, #eef6f8);
+      border: 1px solid var(--help-trigger-border, rgba(15, 118, 110, 0.15));
+      border-radius: 999px;
+      color: ui.ink();
+      cursor: pointer;
+      display: inline-flex;
+      font: inherit;
+      font-weight: 700;
+      gap: 0.55rem;
+      padding: 0.75rem 1rem;
+    }
   }
 
   :scope .scanner-toolbar__button:hover:not(:disabled) {
@@ -84,8 +86,10 @@
     @include ui.warning-banner(0.65rem 0.8rem);
     @include ui.entrance-slide(Y, -0.4rem);
 
-    display: grid;
-    gap: 0.45rem;
+    & {
+      display: grid;
+      gap: 0.45rem;
+    }
   }
 
   :scope .scanner-toolbar__warning-summary {

@@ -10,11 +10,13 @@
 
 @scope (.country-modal-backdrop) {
   :scope .country-modal {
-    @include modal.modal-shell(56rem);
     @include transient.contained-shell(1.5rem, 85vh);
+    @include modal.modal-shell(56rem);
 
-    display: grid;
-    gap: 1rem;
+    & {
+      display: grid;
+      gap: 1rem;
+    }
   }
 
   :scope .country-modal__header,
@@ -96,19 +98,21 @@
     @include ui.focus-ring();
     @include transient.reduced-motion;
 
-    background: var(--surface-subtle-strong, rgba(248, 251, 253, 0.92));
-    border: 1px solid var(--panel-border, rgba(11, 38, 61, 0.08));
-    border-radius: ui.panel-radius(0.45);
-    cursor: pointer;
-    display: grid;
-    gap: 0.75rem;
-    grid-template-columns: auto auto minmax(0, 1fr);
-    padding: 0.95rem 1rem;
-    position: relative;
-    transition:
-      border-color 160ms ease,
-      background-color 160ms ease,
-      box-shadow 160ms ease;
+    & {
+      background: var(--surface-subtle-strong, rgba(248, 251, 253, 0.92));
+      border: 1px solid var(--panel-border, rgba(11, 38, 61, 0.08));
+      border-radius: ui.panel-radius(0.45);
+      cursor: pointer;
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: auto auto minmax(0, 1fr);
+      padding: 0.95rem 1rem;
+      position: relative;
+      transition:
+        border-color 160ms ease,
+        background-color 160ms ease,
+        box-shadow 160ms ease;
+    }
   }
 
   :scope .country-card[data-selected="true"] {
