@@ -17,11 +17,10 @@ import { MATERIAL_ICONS } from "@shared/constants/material-icons.constants";
 import { createTrustedHtmlMap } from "@shared/utils/trusted-html.utils";
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
-  selector: "app-country-scope-modal",
-  standalone: true,
-  templateUrl: "./country-scope-modal.component.html",
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule],
+    selector: "app-country-scope-modal",
+    templateUrl: "./country-scope-modal.component.html"
 })
 export class CountryScopeModalComponent {
   readonly #sanitizer = inject(DomSanitizer);

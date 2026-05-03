@@ -7,11 +7,10 @@ import { createTrustedHtmlMap } from "@shared/utils/trusted-html.utils";
 import type { HelpTopic } from "../../declarations/help-topic.types";
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
-  selector: "app-help-modal",
-  standalone: true,
-  templateUrl: "./help-modal.component.html",
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule],
+    selector: "app-help-modal",
+    templateUrl: "./help-modal.component.html"
 })
 export class HelpModalComponent {
   readonly #sanitizer = inject(DomSanitizer);

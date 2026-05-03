@@ -17,13 +17,12 @@ import { MATERIAL_ICONS } from "@shared/constants/material-icons.constants";
 import { createTrustedHtmlMap } from "@shared/utils/trusted-html.utils";
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MaskGroupPanelComponent],
-  selector: "app-controls-panel",
-  standalone: true,
-  styleUrl: "./controls-panel.component.scss",
-  templateUrl: "./controls-panel.component.html",
-  encapsulation: ViewEncapsulation.None
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [MaskGroupPanelComponent],
+    selector: "app-controls-panel",
+    styleUrl: "./controls-panel.component.scss",
+    templateUrl: "./controls-panel.component.html",
+    encapsulation: ViewEncapsulation.None
 })
 export class ControlsPanelComponent {
   readonly #sanitizer = inject(DomSanitizer);

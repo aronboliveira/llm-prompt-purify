@@ -50,28 +50,27 @@ import { MATERIAL_ICONS } from "./shared/constants/material-icons.constants";
 import { createTrustedHtmlMap } from "./shared/utils/trusted-html.utils";
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    CommonModule,
-    ControlsPanelComponent,
-    CountryScopeModalComponent,
-    FeedbackSheetComponent,
-    FormsModule,
-    HelpModalComponent,
-    HeroSectionComponent,
-    MaskedOutputPaneComponent,
-    MaskingSettingsModalComponent,
-    ProductHeaderComponent,
-    RawPromptPaneComponent,
-    ScannerToolbarComponent,
-    ToastStackComponent,
-    WorkflowStripComponent,
-  ],
-  selector: "app-root",
-  standalone: true,
-  styleUrl: "./app.component.scss",
-  templateUrl: "./app.component.html",
-  encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [
+        CommonModule,
+        ControlsPanelComponent,
+        CountryScopeModalComponent,
+        FeedbackSheetComponent,
+        FormsModule,
+        HelpModalComponent,
+        HeroSectionComponent,
+        MaskedOutputPaneComponent,
+        MaskingSettingsModalComponent,
+        ProductHeaderComponent,
+        RawPromptPaneComponent,
+        ScannerToolbarComponent,
+        ToastStackComponent,
+        WorkflowStripComponent,
+    ],
+    selector: "app-root",
+    styleUrl: "./app.component.scss",
+    templateUrl: "./app.component.html",
+    encapsulation: ViewEncapsulation.None
 })
 export class AppComponent {
   readonly #activeHelpTopic = signal<HelpTopic | null>(null);

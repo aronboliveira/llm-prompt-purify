@@ -46,11 +46,10 @@ const MASK_GROUP_ICONS: Record<MaskGroupId, keyof typeof MATERIAL_ICONS> = {
 };
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
-  selector: "app-masking-settings-modal",
-  standalone: true,
-  templateUrl: "./masking-settings-modal.component.html",
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule],
+    selector: "app-masking-settings-modal",
+    templateUrl: "./masking-settings-modal.component.html"
 })
 export class MaskingSettingsModalComponent {
   readonly #sanitizer = inject(DomSanitizer);

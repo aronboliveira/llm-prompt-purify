@@ -11,13 +11,12 @@ import { type SafeHtml } from "@angular/platform-browser";
 import type { StatusTone } from "../../declarations/mask-control.types";
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
-  selector: "app-masked-output-pane",
-  standalone: true,
-  styleUrl: "./masked-output-pane.component.scss",
-  templateUrl: "./masked-output-pane.component.html",
-  encapsulation: ViewEncapsulation.None
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule],
+    selector: "app-masked-output-pane",
+    styleUrl: "./masked-output-pane.component.scss",
+    templateUrl: "./masked-output-pane.component.html",
+    encapsulation: ViewEncapsulation.None
 })
 export class MaskedOutputPaneComponent {
   readonly title = input.required<string>();

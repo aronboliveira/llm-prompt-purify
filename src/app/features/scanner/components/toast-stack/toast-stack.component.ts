@@ -4,11 +4,10 @@ import { CommonModule } from "@angular/common";
 import type { ToastMessage } from "@core/feedback/declarations/toast.types";
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
-  selector: "app-toast-stack",
-  standalone: true,
-  templateUrl: "./toast-stack.component.html",
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule],
+    selector: "app-toast-stack",
+    templateUrl: "./toast-stack.component.html"
 })
 export class ToastStackComponent {
   readonly dismissed = output<string>();

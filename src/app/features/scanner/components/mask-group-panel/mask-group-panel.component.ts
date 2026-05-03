@@ -12,12 +12,11 @@ import { createTrustedHtmlMap } from "@shared/utils/trusted-html.utils";
 import { buildMaskControlSections, formatMaskControlValue } from "../../utils/mask-control.utils";
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule],
-  selector: "app-mask-group-panel",
-  standalone: true,
-  styleUrl: "./mask-group-panel.component.scss",
-  templateUrl: "./mask-group-panel.component.html",
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule],
+    selector: "app-mask-group-panel",
+    styleUrl: "./mask-group-panel.component.scss",
+    templateUrl: "./mask-group-panel.component.html"
 })
 export class MaskGroupPanelComponent {
   readonly #sanitizer = inject(DomSanitizer);

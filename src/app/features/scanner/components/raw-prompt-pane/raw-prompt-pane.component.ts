@@ -36,13 +36,12 @@ export interface PasteThreatEvent {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule],
-  selector: "app-raw-prompt-pane",
-  standalone: true,
-  styleUrl: "./raw-prompt-pane.component.scss",
-  templateUrl: "./raw-prompt-pane.component.html",
-  encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [FormsModule],
+    selector: "app-raw-prompt-pane",
+    styleUrl: "./raw-prompt-pane.component.scss",
+    templateUrl: "./raw-prompt-pane.component.html",
+    encapsulation: ViewEncapsulation.None
 })
 export class RawPromptPaneComponent {
   readonly #sanitizer = inject(DomSanitizer);
