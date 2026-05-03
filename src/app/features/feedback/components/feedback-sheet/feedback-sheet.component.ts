@@ -35,11 +35,10 @@ import { MATERIAL_ICONS } from "@shared/constants/material-icons.constants";
 import { createTrustedHtmlMap } from "@shared/utils/trusted-html.utils";
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule],
-  selector: "app-feedback-sheet",
-  standalone: true,
-  templateUrl: "./feedback-sheet.component.html",
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [CommonModule, FormsModule],
+    selector: "app-feedback-sheet",
+    templateUrl: "./feedback-sheet.component.html"
 })
 export class FeedbackSheetComponent {
   readonly #feedbackApi = inject(FeedbackApiService);
@@ -49,6 +48,7 @@ export class FeedbackSheetComponent {
   readonly #fieldErrors = signal<FeedbackFieldErrorMap>({});
   readonly #isOpen = signal(false);
   readonly #isSubmitting = signal(false);
+  #previousFocus: Element | null = null;
 
   protected readonly categoryOptions = FEEDBACK_CATEGORY_OPTIONS;
   protected readonly categoryHelper = computed(() => {
@@ -84,6 +84,8 @@ export class FeedbackSheetComponent {
   protected close(): void {
     this.#isOpen.set(false);
     this.#fieldErrors.set({});
+    if (this.#previousFocus instanceof HTMLElement) this.#previousFocus.focus();
+    this.#previousFocus = null;
   }
 
   protected closeOnBackdrop(event: MouseEvent): void {
@@ -93,6 +95,39 @@ export class FeedbackSheetComponent {
 
   protected open(): void {
     this.#isOpen.set(true);
+    this.#previousFocus = document.activeElement;
+    requestAnimationFrame(() => {
+      const closeBtn = document.querySelector<HTMLButtonElement>(
+        ".feedback-sheet__close",
+      );
+      if (closeBtn) closeBtn.focus();
+    });
+  }
+
+  protected onKeydown(event: KeyboardEvent): void {
+    if (event.key !== "Tab" || !this.#isOpen()) return;
+
+    const sheet = document.querySelector<HTMLElement>(".feedback-sheet");
+    if (!sheet) return;
+
+    const focusable = Array.from(
+      sheet.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), select:not([disabled]), input:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
+      ),
+    );
+    if (!focusable.length) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const current = document.activeElement;
+
+    if (event.shiftKey && current === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && current === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 
   protected setCategory(value: string): void {

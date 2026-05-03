@@ -1,4 +1,2 @@
 User-agent: *
 Allow: /
-
-Sitemap: https://llm-prompt-purify.netlify.app/sitemap.xml

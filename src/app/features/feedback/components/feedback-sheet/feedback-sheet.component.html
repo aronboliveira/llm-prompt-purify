@@ -9,7 +9,7 @@
 </button>
 
 @if (isOpen()) {
-  <div class="feedback-backdrop" role="presentation" (click)="closeOnBackdrop($event)">
+  <div class="feedback-backdrop" role="presentation" (click)="closeOnBackdrop($event)" (keydown)="onKeydown($event)">
     <aside class="feedback-sheet" aria-labelledby="feedback-sheet-title" aria-modal="true" role="dialog">
       <header class="feedback-sheet__header">
         <div class="feedback-sheet__title-wrap">
@@ -36,11 +36,24 @@
           <span aria-hidden="true">ℹ️</span>
           <span>Storage and privacy note</span>
         </summary>
-        <p class="feedback-sheet__body">
-          This note can be stored in the retry outbox and, when SMTP is
-          configured, forwarded to the developers. Keep raw secrets out of the
-          message even here.
-        </p>
+        <div class="feedback-sheet__body">
+          <p>
+            This feedback form sends your name, email, category, and message to
+            the project maintainers. When a database is configured, feedback is
+            stored in a PostgreSQL outbox and retained for <strong>30 days</strong>.
+            When SMTP is configured, the content is forwarded to the developers
+            by email.
+          </p>
+          <p>
+            You can submit feedback without providing your name or email. The
+            email address is used only for the reply-to header when you request
+            a developer response and is not shared, sold, or used for marketing.
+          </p>
+          <p>
+            No prompt text processed by the scanner ever leaves your browser.
+            This app uses no tracking, analytics, or third-party cookies.
+          </p>
+        </div>
       </details>
 
       <form class="feedback-form" novalidate (ngSubmit)="submit()">

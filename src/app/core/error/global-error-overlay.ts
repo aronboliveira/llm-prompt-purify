@@ -7,6 +7,7 @@ interface ErrorEntry {
 }
 
 const queue: ErrorEntry[] = [];
+let savedFocus: Element | null = null;
 
 function isBrowser(): boolean {
   return typeof window !== "undefined" && typeof document !== "undefined";
@@ -147,6 +148,8 @@ function buildOverlay(): HTMLElement {
   dismiss.addEventListener("click", () => {
     backdrop.remove();
     queue.length = 0;
+    if (savedFocus instanceof HTMLElement) savedFocus.focus();
+    savedFocus = null;
   });
 
   const reload = document.createElement("button");
@@ -179,6 +182,8 @@ function buildOverlay(): HTMLElement {
     if (event.target === backdrop) {
       backdrop.remove();
       queue.length = 0;
+      if (savedFocus instanceof HTMLElement) savedFocus.focus();
+      savedFocus = null;
     }
   });
 
@@ -254,8 +259,11 @@ export function showGlobalErrorOverlay(title: string, error: unknown): void {
 
   let overlay = document.getElementById(OVERLAY_ID);
   if (!overlay) {
+    savedFocus = document.activeElement;
     overlay = buildOverlay();
     document.body.appendChild(overlay);
+    const dismiss = overlay.querySelector<HTMLButtonElement>("button");
+    if (dismiss) dismiss.focus();
   }
   renderEntries(overlay);
 }

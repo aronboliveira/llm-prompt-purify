@@ -8,6 +8,8 @@ import {
   installGlobalErrorListeners,
 } from "./app/core/error/install-window-listeners";
 
+document.documentElement.lang = navigator.language || "en";
+
 installGlobalErrorListeners();
 
 bootstrapApplication(AppComponent, appConfig).catch(error =>
