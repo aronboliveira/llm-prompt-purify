@@ -115,3 +115,32 @@ npx netlify dev
 `netlify dev` reads environment variables from a local `.env` file. Copy
 [.env.docker.example](.env.docker.example) as a template, but rename SMTP
 values for local testing — never commit the resulting `.env`.
+
+## 6. Docker (local nginx container)
+
+The Docker setup in [docker/](docker/) builds a production Angular bundle and
+serves it through nginx. It is **not** a full local stack — the nginx config
+proxies `/api/*` to the live Netlify deployment:
+
+```
+proxy_pass https://llm-prompt-purify.netlify.app;
+```
+
+This means API calls from the Docker container always hit the production
+Netlify functions, not local ones. The SMTP and database credentials used
+are whatever is configured in the production Netlify environment variables.
+
+To point the Docker container at a local `netlify dev` instance instead,
+override the upstream in `docker/nginx.conf` or mount a custom config:
+
+```nginx
+# Replace the proxy_pass line:
+proxy_pass http://host.docker.internal:8888;
+```
+
+Then start `npx netlify dev --port 8888` on the host before running the
+container. The `.env` file in the project root will be used for function
+environment variables.
+
+If you do not need API calls at all from Docker, remove or comment out the
+`location /api/` block in `docker/nginx.conf`.
