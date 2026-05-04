@@ -1582,7 +1582,7 @@ export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
     label: "JSON secret with suffixed key",
     locale: "shared",
     patternFactory: () =>
-      /(?:["'](?:password|contraseña|contrasena|senha|secret|api[-_]?key|token|private[-_]?key|access[-_]?key|master[-_]?password|admin[-_]?password|root[-_]?password|db[-_]?password|database[-_]?password|encryption[-_]?key|client[-_]?secret|auth[-_]?token|clave|chave[-_]?secreta|chave[-_]?api)[-_\w]*["']\s*[:=]\s*["'])([^\s"']{8,})(?=["'])/giu,
+      /(?:["'](?:password|contraseña|contrasena|senha|secret|api[-_]?key|token|private[-_]?key|access[-_]?key|master[-_]?password|admin[-_]?password|root[-_]?password|db[-_]?password|database[-_]?password|encryption[-_]?key|client[-_]?secret|auth[-_]?token|clave|chave[-_]?secreta|chave[-_]?api|密码|秘密|密钥|令牌|凭证|пароль|секрет|ключ|токен|पासवर्ड|सीक्रेट|गुप्त|टोकन)[-_\w]*["']\s*[:=]\s*["'])([^\s"']{8,})(?=["'])/giu,
     priority: 116,
     validator: looksSecretLike,
     valueGroup: 1,
