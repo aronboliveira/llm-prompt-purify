@@ -635,9 +635,10 @@
   .settings-card:hover,
   .settings-card:focus-visible,
   .settings-card:focus-within,
-  .mask-group-toggle:hover,
-  .mask-group-toggle:focus-visible,
-  .mask-group-toggle:focus-within,
+  .settings-modal .mask-group-toggle:hover,
+  .settings-modal .mask-group-toggle:focus-visible,
+  .settings-modal .mask-group-toggle:focus-within,
+  .settings-modal .mask-group-toggle:has(input:checked),
   .strategy-radio:hover,
   .strategy-radio:focus-visible,
   .strategy-radio:focus-within,
@@ -670,6 +671,13 @@
   .settings-toggle {
     background: rgb(22 45 66 / 94%);
     border-color: rgba(45, 212, 191, 0.35);
+  }
+
+  .settings-modal .settings-toggle:hover,
+  .settings-modal .settings-toggle:focus-visible,
+  .settings-modal .settings-toggle:focus-within {
+    background: #14444e;
+    border-color: rgba(45, 212, 191, 0.45);
   }
 
   .settings-textarea,

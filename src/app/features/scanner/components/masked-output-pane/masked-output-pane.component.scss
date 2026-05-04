@@ -276,6 +276,11 @@
 }
 
 @mixin _masked-output-dark {
+  .output__overlay {
+    background: rgb(22 45 66 / 86%);
+    color: #e2e8f0;
+  }
+
   .status-pill[data-tone="error"] {
     background: rgba(239, 68, 68, 0.2);
     color: #fca5a5;
