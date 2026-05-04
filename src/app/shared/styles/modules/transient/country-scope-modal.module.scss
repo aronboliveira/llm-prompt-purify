@@ -214,28 +214,36 @@
   }
 
   .country-modal {
-    background: var(--surface-bg, #1e293b);
+    background: rgb(22 45 66 / 94%);
     border-color: rgba(148, 163, 184, 0.18);
   }
 
   .country-card {
-    background: var(--surface-subtle, #334155);
+    background: rgb(22 45 66 / 94%);
     border-color: rgba(148, 163, 184, 0.14);
+    transition: background-color 0.18s ease, border-color 0.18s ease;
+  }
+
+  .country-card:hover,
+  .country-card:focus-visible,
+  .country-card:focus-within {
+    background: #14444e;
+    border-color: rgba(45, 212, 191, 0.45);
   }
 
   .country-card[data-selected="true"] {
-    background: var(--surface-selected, rgba(22, 70, 70, 0.82));
+    background: #14444e;
     border-color: rgba(45, 212, 191, 0.45);
   }
 
   .country-card__title {
-    color: var(--page-text, #e2e8f0);
+    color: #e2e8f0;
   }
 
   .country-card__meta,
   .country-card__description,
   .country-modal__body-copy {
-    color: var(--text-muted, #b2c0d2);
+    color: #b2c0d2;
   }
 }
 
