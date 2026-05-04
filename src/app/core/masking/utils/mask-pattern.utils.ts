@@ -75,19 +75,67 @@ function wrapWithUnicodeBoundaries(pattern: string): string {
  * validator to catch simple passwords and connection strings that the stricter
  * label-based rules would miss.
  */
+/**
+ * Builds a regex that matches config-file-style secret assignments.
+ *
+ * Matches patterns common in .env, .yaml, .toml, docker-compose, k8s configs,
+ * cloud provider secrets, and password-manager exports where keys use
+ * underscore/hyphen/dot separators with secret-related words.
+ *
+ * Single-word keywords (password, secret, token, etc.) require a word-char
+ * PREFIX before the keyword — this prevents matching bare prose like
+ * "password: abc". Multi-word keywords (api key, database url, etc.) have
+ * no prefix requirement since the multi-word structure itself signals a
+ * config-file context.
+ *
+ * Examples matched:
+ *   SMTP_PASSWORD=value       (SMTP_ prefix + password)
+ *   DATABASE_URL=postgresql://u:p@h/db  (database + url, multi-word)
+ *   POSTGRES_PASSWORD=postgres
+ *   db-secret: abc123
+ *   app.token = "some-token"
+ *
+ * Examples NOT matched:
+ *   password: abc             (bare single-word, no prefix)
+ *   token=internal            (bare single-word, no prefix)
+ */
 export function buildConfigSecretAssignmentPattern(
   keywords: readonly string[],
 ): RegExp {
-  const escaped = keywords
-    .map(k => k.trim())
-    .filter(Boolean)
-    .map(k => k.split(/\s+/u).map(escapeRegexLiteral).join(String.raw`[\s._-]+`));
+  const singleWord: string[] = [];
+  const multiWord: string[] = [];
 
-  const alternation = escaped.join("|");
+  for (const k of keywords) {
+    const trimmed = k.trim();
+    if (!trimmed) continue;
+    if (trimmed.includes(" ")) {
+      multiWord.push(trimmed);
+    } else {
+      singleWord.push(trimmed);
+    }
+  }
+
+  const escapeAlt = (words: string[]) =>
+    words
+      .map(w => w.split(/\s+/u).map(escapeRegexLiteral).join(String.raw`[\s._-]+`))
+      .join("|");
+
+  const patterns: string[] = [];
+  if (singleWord.length > 0) {
+    patterns.push(
+      String.raw`[\w._-]+?(?:${escapeAlt(singleWord)})`,
+    );
+  }
+  if (multiWord.length > 0) {
+    patterns.push(
+      String.raw`[\w._-]*?(?:${escapeAlt(multiWord)})`,
+    );
+  }
+
   const keySuffix = String.raw`[\w._-]*`;
 
   return new RegExp(
-    String.raw`(?:^|[\s;{}])[\w._-]*?(?:${alternation})${keySuffix}\s*[:=]\s*["']?(\S*)["']?(?:$|[\s;{}])`,
+    String.raw`(?:^|[\s;{}])(?:${patterns.join("|")})${keySuffix}\s*[:=]\s*["']?(\S*)["']?(?:$|[\s;{}])`,
     "gimu",
   );
 }
