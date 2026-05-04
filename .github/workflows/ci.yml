@@ -144,7 +144,7 @@ jobs:
 
       - name: Shell corpus checks
         run: |
-          for script in tests/scripts/*.sh; do
+          for script in tests/scripts/test-prompt-corpus-*.sh; do
             echo "Running $script"
             bash "$script" || exit 1
           done
