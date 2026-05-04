@@ -221,7 +221,8 @@ export class MaskingEngine {
         return Array.from(sourceText.matchAll(rule.patternFactory()))
           .map(match => extractCandidateMatch(match, rule))
           .filter((match): match is NonNullable<typeof match> => {
-            if (!match?.value) return false;
+            if (!match) return false;
+            if (!match.value && !rule.allowEmptyValue) return false;
             // Skip values in the global ignore list
             if (isIgnored(match.value, ignoreList)) return false;
             return rule.validator ? rule.validator(match.value) : true;

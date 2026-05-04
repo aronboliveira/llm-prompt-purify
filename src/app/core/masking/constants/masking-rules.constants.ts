@@ -121,7 +121,9 @@ const HARDCODED_CONFIG_SECRET_KEYS: readonly string[] = Object.freeze([
   String.raw`(?:DB|DATABASE)[-_]?(?:PASS(?:WORD)?|PWD)`,
   String.raw`(?:DB|DATABASE)[-_]?URL`,
   String.raw`(?:DB|DATABASE)[-_]?HOST`,
+  String.raw`(?:DB|DATABASE)[-_]?PORT`,
   String.raw`(?:DB|DATABASE)[-_]?USER(?:NAME)?`,
+  String.raw`(?:DB|DATABASE)[-_]?DATABASE`,
   // ── Redis / Cache ──
   String.raw`REDIS[_]?(?:PASS(?:WORD)?|PWD)`,
   String.raw`REDIS[_]?URL`,
@@ -182,13 +184,14 @@ export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
     id: "hardcoded-config-secret",
     label: "Hardcoded config secret key",
     locale: "shared",
+    allowEmptyValue: true,
     patternFactory: () =>
       new RegExp(
         // Matches KEY=VALUE where KEY is a well-known config secret name.
         // Uses word/line boundaries to avoid partial matches inside longer keys.
         String.raw`(?:^|[\s;{}])(?:` +
         HARDCODED_CONFIG_SECRET_KEYS.join("|") +
-        String.raw`)\s*[:=]\s*["']?(\S*)["']?(?:$|[\s;{}])`,
+        String.raw`)\s*[:=][\t ]*["']?(\S*)["']?(?:$|[\s;{}])`,
         "gimu",
       ),
     priority: 122,
@@ -1695,6 +1698,7 @@ export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
     id: "config-secret-assignment",
     label: "Config-file secret assignment",
     locale: "shared",
+    allowEmptyValue: true,
     patternFactory: () =>
       buildConfigSecretAssignmentPattern(SECRET_ASSIGNMENT_FLAGS),
     priority: 115,

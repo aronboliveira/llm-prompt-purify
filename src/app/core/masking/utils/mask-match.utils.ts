@@ -76,7 +76,7 @@ export function extractCandidateMatch(
   }
 
   const capturedValue = sanitizeCapturedValue(match[rule.valueGroup] ?? "");
-  if (!capturedValue) return null;
+  if (!capturedValue && !rule.allowEmptyValue) return null;
 
   const relativeIndex = match[0].indexOf(capturedValue);
   if (relativeIndex < 0) return null;

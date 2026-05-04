@@ -46,6 +46,7 @@ export type SupportedLocale =
   | "zh-CN";
 
 export interface DetectionRule {
+  allowEmptyValue?: boolean;
   category: MatchCategory;
   confidence: MatchConfidence;
   countryProfileIds?: readonly CountryProfileId[];

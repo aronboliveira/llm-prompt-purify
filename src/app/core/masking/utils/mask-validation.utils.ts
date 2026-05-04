@@ -610,22 +610,30 @@ export function looksSecretLike(value: string): boolean {
 /**
  * Validator for config-file secret assignments (.env, yaml, toml, etc.).
  * More lenient than looksSecretLike — accepts placeholder/dummy values,
- * empty assignments, and values >= 8 chars. Rejects only obviously
- * non-secret values (short, single-character-class) that would produce
- * false positives with multi-word keywords like "chave de api".
+ * empty assignments, common config values, and values >= 8 chars.
+ * Rejects only obviously non-secret short values (e.g., "interna", "hello")
+ * that would produce false positives with multi-word keywords.
  */
 export function looksLikeConfigSecret(value: string): boolean {
   const normalized = sanitizeCapturedValue(value);
   if (normalized.length === 0) return true;
   if (
-    /^(?:null|nil|dummy|empty|undefined|none|na|n\/a|false|true|yes|no|1|0|off|local|localhost|127\.0\.0\.1)$/i.test(
+    /^(?:null|nil|dummy|empty|undefined|none|na|n\/a|false|true|yes|no|1|0|off|on|local|localhost|127\.0\.0\.1)$/i.test(
       normalized,
     )
   )
     return true;
   if (normalized.length >= 8) return true;
-  const classes = [/\d/.test(normalized), /[a-z]/.test(normalized), /[A-Z]/.test(normalized), /[^A-Za-z0-9]/.test(normalized)].filter(Boolean).length;
-  return classes >= 2;
+  const classes = [
+    /\d/.test(normalized),
+    /[a-z]/.test(normalized),
+    /[A-Z]/.test(normalized),
+    /[^A-Za-z0-9]/.test(normalized),
+  ].filter(Boolean).length;
+  if (classes >= 2) return true;
+  // Short lowercase-only values that are common config defaults
+  if (/^(?:root|admin|postgres|mysql|mongo|redis|guest|user|dev|test|prod|stage)$/i.test(normalized)) return true;
+  return false;
 }
 
 export function looksLikeBrazilianVoterId(value: string): boolean {
