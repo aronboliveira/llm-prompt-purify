@@ -1,7 +1,7 @@
-<section class="pane pane--raw">
+<section class="pane pane--raw" aria-labelledby="raw-pane-title">
   <div class="pane__header">
     <div class="pane__title-wrap">
-      <h2>{{ title() }}</h2>
+      <h2 id="raw-pane-title">{{ title() }}</h2>
       <button
         aria-label="Help"
         class="help-trigger"
@@ -19,6 +19,19 @@
   </div>
 
   <p class="pane__body">{{ body() }}</p>
+
+  <label class="sr-only" for="sourceText">Raw version</label>
+  <textarea
+    id="sourceText"
+    class="editor"
+    data-testid="source-textarea"
+    [ngModel]="sourceText()"
+    (input)="onInput($event)"
+    (paste)="onPaste($event)"
+    (ngModelChange)="updateSourceText($event)"
+    [placeholder]="placeholder()"
+    spellcheck="false"
+  ></textarea>
 
   <div class="pane__toolbar">
     <button
@@ -46,17 +59,4 @@
       (change)="onFileSelected($event)"
     />
   </div>
-
-  <label class="sr-only" for="sourceText">Raw version</label>
-  <textarea
-    id="sourceText"
-    class="editor"
-    data-testid="source-textarea"
-    [ngModel]="sourceText()"
-    (input)="onInput($event)"
-    (paste)="onPaste($event)"
-    (ngModelChange)="updateSourceText($event)"
-    [placeholder]="placeholder()"
-    spellcheck="false"
-  ></textarea>
 </section>
