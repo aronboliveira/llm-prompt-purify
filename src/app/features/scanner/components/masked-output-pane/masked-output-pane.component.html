@@ -41,13 +41,7 @@
     "
     aria-live="polite"
   >
-    <span class="output__text">
-      @if (hasResult()) {
-        {{ maskedText() }}
-      } @else {
-        {{ emptyPlaceholder() }}
-      }
-    </span>
+    <span class="output__text">@if (hasResult()) {{{ maskedText() }}} @else {{{ emptyPlaceholder() }}}</span>
 
     @if (isScanning()) {
       <span class="output__overlay">

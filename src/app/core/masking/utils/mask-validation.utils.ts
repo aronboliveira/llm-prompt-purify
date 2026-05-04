@@ -607,6 +607,27 @@ export function looksSecretLike(value: string): boolean {
   return [hasDigit, hasLower, hasSymbol, hasUpper].filter(Boolean).length >= 2;
 }
 
+/**
+ * Validator for config-file secret assignments (.env, yaml, toml, etc.).
+ * More lenient than looksSecretLike — accepts placeholder/dummy values,
+ * empty assignments, and values >= 8 chars. Rejects only obviously
+ * non-secret values (short, single-character-class) that would produce
+ * false positives with multi-word keywords like "chave de api".
+ */
+export function looksLikeConfigSecret(value: string): boolean {
+  const normalized = sanitizeCapturedValue(value);
+  if (normalized.length === 0) return true;
+  if (
+    /^(?:null|nil|dummy|empty|undefined|none|na|n\/a|false|true|yes|no|1|0|off|local|localhost|127\.0\.0\.1)$/i.test(
+      normalized,
+    )
+  )
+    return true;
+  if (normalized.length >= 8) return true;
+  const classes = [/\d/.test(normalized), /[a-z]/.test(normalized), /[A-Z]/.test(normalized), /[^A-Za-z0-9]/.test(normalized)].filter(Boolean).length;
+  return classes >= 2;
+}
+
 export function looksLikeBrazilianVoterId(value: string): boolean {
   const digits = value.replace(/\D/g, "");
   return /^\d{12}$/u.test(digits) && !/^(\d)\1+$/u.test(digits);

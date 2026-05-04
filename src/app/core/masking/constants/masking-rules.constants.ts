@@ -75,6 +75,7 @@ import {
   looksLikeStructuredAddress,
   looksLikeStructuredName,
   looksSecretLike,
+  looksLikeConfigSecret,
   detectObfuscationTags,
   looksLikeFuzzyAddress,
 } from "../utils/mask-validation.utils";
@@ -1604,6 +1605,7 @@ export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
     patternFactory: () =>
       buildConfigSecretAssignmentPattern(SECRET_ASSIGNMENT_FLAGS),
     priority: 115,
+    validator: looksLikeConfigSecret,
     valueGroup: 1,
   },
 
