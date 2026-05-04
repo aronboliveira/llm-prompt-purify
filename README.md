@@ -41,24 +41,24 @@ unless you choose to submit optional feedback through the feedback form.
 
 ## Architecture
 
-| Layer | Technology |
-| ----- | ---------- |
-| Frontend | Angular 18 (standalone components, signals, OnPush) |
-| Hosting | Netlify (static SPA) |
-| API / backend | Netlify serverless functions (Node.js 22, TypeScript) |
-| Outbox database | PostgreSQL (optional — enables durable feedback retry) |
-| Email delivery | Nodemailer via SMTP |
-| Tests | Jest (unit), Playwright (E2E), pytest (corpus), shell scripts |
-| CI | GitHub Actions |
+| Layer           | Technology                                                    |
+| --------------- | ------------------------------------------------------------- |
+| Frontend        | Angular 18 (standalone components, signals, OnPush)           |
+| Hosting         | Netlify (static SPA)                                          |
+| API / backend   | Netlify serverless functions (Node.js 22, TypeScript)         |
+| Outbox database | PostgreSQL (optional — enables durable feedback retry)        |
+| Email delivery  | Nodemailer via SMTP                                           |
+| Tests           | Jest (unit), Playwright (E2E), pytest (corpus), shell scripts |
+| CI              | GitHub Actions                                                |
 
 ### API Endpoints
 
-| Path | Methods | Description |
-| ---- | ------- | ----------- |
-| `/api/health` | GET | Health check |
-| `/api/feedback` | POST, OPTIONS | Submit feedback (validates, stores to outbox, emails) |
-| `/api/feedback-retry` | GET, POST | Scheduled retry of pending feedback (requires `FEEDBACK_RETRY_SECRET`) |
-| `/api/mask-safety/validate` | POST, OPTIONS | Batch validation of masked candidates against API-backed rules |
+| Path                        | Methods       | Description                                                            |
+| --------------------------- | ------------- | ---------------------------------------------------------------------- |
+| `/api/health`               | GET           | Health check                                                           |
+| `/api/feedback`             | POST, OPTIONS | Submit feedback (validates, stores to outbox, emails)                  |
+| `/api/feedback-retry`       | GET, POST     | Scheduled retry of pending feedback (requires `FEEDBACK_RETRY_SECRET`) |
+| `/api/mask-safety/validate` | POST, OPTIONS | Batch validation of masked candidates against API-backed rules         |
 
 Full API contracts are in [docs/API.md](docs/API.md).
 
