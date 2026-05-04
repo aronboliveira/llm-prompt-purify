@@ -101,7 +101,100 @@ void [_DOT_LIKE, _DASH_LIKE, _SLASH_LIKE];
 const LABELED_ADDRESS_VALUE = String.raw`(?:(?!\s+(?:${NEXT_FIELD_BOUNDARY})\s*[:=-])[^\n\r]){6,200}`;
 import { buildConfigSecretAssignmentPattern, createDelimitedLabelValuePattern } from "../utils/mask-pattern.utils";
 
+/**
+ * Well-known webserver, firewall, cloud-provider, and platform config keys
+ * whose values must always be masked regardless of pattern or entropy.
+ *
+ * These are hard-matched by the `hardcoded-config-secret` rule (priority 122)
+ * to catch standardized .env keys that the keyword-based fallback rules
+ * might miss (e.g., short/dummy values, unusual delimiter spacing, etc.).
+ *
+ * Format: each entry must match the FULL exact key name (anchored by
+ * word boundaries or line start). Entries are regex-escaped automatically.
+ */
+const HARDCODED_CONFIG_SECRET_KEYS: readonly string[] = Object.freeze([
+  // ── Framework / Application ──
+  String.raw`APP[_]?(?:KEY|SECRET)`,
+  String.raw`APP[_-]?ENCRYPTION[_-]?KEY`,
+  String.raw`APP[_-]?TOKEN`,
+  // ── Database ──
+  String.raw`(?:DB|DATABASE)[-_]?(?:PASS(?:WORD)?|PWD)`,
+  String.raw`(?:DB|DATABASE)[-_]?URL`,
+  String.raw`(?:DB|DATABASE)[-_]?HOST`,
+  String.raw`(?:DB|DATABASE)[-_]?USER(?:NAME)?`,
+  // ── Redis / Cache ──
+  String.raw`REDIS[_]?(?:PASS(?:WORD)?|PWD)`,
+  String.raw`REDIS[_]?URL`,
+  String.raw`REDIS[_]?HOST`,
+  String.raw`CACHE[_]?PASS(?:WORD)?`,
+  // ── Mail / SMTP ──
+  String.raw`(?:MAIL|SMTP|EMAIL)[-_]?(?:PASS(?:WORD)?|PWD)`,
+  String.raw`(?:MAIL|SMTP)[-_]?USER(?:NAME)?`,
+  String.raw`MAIL[_]?DRIVER`,
+  // ── AWS ──
+  String.raw`AWS[_]?(?:ACCESS[_-]?KEY[_-]?ID|SECRET[_-]?ACCESS[_-]?KEY|SESSION[_-]?TOKEN)`,
+  String.raw`AWS[_]?ACCOUNT[_-]?ID`,
+  // ── Google Cloud / Firebase ──
+  String.raw`(?:GOOGLE|GCLOUD|FIREBASE|GCP)[-_]?(?:KEY|SECRET|TOKEN|CREDENTIALS)`,
+  // ── Azure ──
+  String.raw`AZURE[_]?(?:KEY|SECRET|TOKEN|CONNECTION[_-]?STRING)`,
+  // ── Pusher / WebSockets ──
+  String.raw`PUSHER[_]?APP[_]?(?:KEY|SECRET|CLUSTER|ID)`,
+  // ── Payments ──
+  String.raw`STRIPE[_]?(?:KEY|SECRET|TOKEN|WEBHOOK[_-]?SECRET)`,
+  String.raw`PAYPAL[_]?(?:KEY|SECRET|CLIENT[_-]?ID|TOKEN)`,
+  // ── Authentication / OAuth ──
+  String.raw`(?:JWT|AUTH|OAUTH|SESSION|COOKIE)[-_]?(?:SECRET|KEY|TOKEN)`,
+  String.raw`(?:CLIENT|OAUTH)[-_]?SECRET`,
+  String.raw`ENCRYPTION[_]?KEY`,
+  String.raw`SIGNING[_]?KEY`,
+  // ── API / Integration keys ──
+  String.raw`(?:API|REST|GRAPHQL)[-_]?(?:KEY|SECRET|TOKEN)`,
+  String.raw`(?:GITHUB|GITLAB|BITBUCKET)[-_]?(?:TOKEN|KEY|SECRET)`,
+  String.raw`SLACK[_]?(?:TOKEN|WEBHOOK|SECRET|SIGNING[_-]?SECRET)`,
+  String.raw`DISCORD[_]?(?:TOKEN|WEBHOOK|SECRET)`,
+  String.raw`TWILIO[_]?(?:AUTH[_-]?TOKEN|SID|SECRET|KEY)`,
+  String.raw`(?:SENDGRID|MAILGUN|MAILCHIMP)[-_]?(?:API[_-]?KEY|SECRET|TOKEN)`,
+  // ── Docker / Container ──
+  String.raw`(?:DOCKER|K8S|KUBERNETES)[-_]?(?:PASS(?:WORD)?|SECRET|TOKEN|KEY)`,
+  String.raw`REGISTRY[_]?(?:PASS(?:WORD)?|SECRET)`,
+  // ── Monitoring / Logging ──
+  String.raw`(?:SENTRY|DATADOG|NEW[_-]?RELIC)[-_]?(?:KEY|SECRET|TOKEN|DSN)`,
+  String.raw`(?:LOGGLY|PAPERTRAIL|ELASTIC)[-_]?(?:KEY|TOKEN|SECRET)`,
+  // ── Network / Firewall ──
+  String.raw`(?:SSH|SSL|TLS|CERT)[-_]?(?:KEY|PRIVATE[_-]?KEY|PASS(?:WORD)?|SECRET)`,
+  String.raw`(?:NGINX|APACHE|TRAEFIK|HAPROXY)[-_]?(?:PASS(?:WORD)?|SECRET|KEY|TOKEN)`,
+  // ── Custom app secrets (this project's own keys) ──
+  String.raw`FEEDBACK[_]?RETRY[_]?SECRET`,
+  String.raw`BACKEND[_]?PORT`,
+]);
+
 export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
+  // ─── Hardcoded webserver/firewall/cloud config secret keys ──────────────────
+  // Well-known KEY=VALUE patterns that must ALWAYS mask their values.
+  // These are highest-priority to catch standardized config keys before
+  // the pattern-based rules can false-negative on them.
+
+  {
+    category: "credential",
+    coverage: "global",
+    confidence: "high",
+    id: "hardcoded-config-secret",
+    label: "Hardcoded config secret key",
+    locale: "shared",
+    patternFactory: () =>
+      new RegExp(
+        // Matches KEY=VALUE where KEY is a well-known config secret name.
+        // Uses word/line boundaries to avoid partial matches inside longer keys.
+        String.raw`(?:^|[\s;{}])(?:` +
+        HARDCODED_CONFIG_SECRET_KEYS.join("|") +
+        String.raw`)\s*[:=]\s*["']?(\S*)["']?(?:$|[\s;{}])`,
+        "gimu",
+      ),
+    priority: 122,
+    validator: looksLikeConfigSecret,
+    valueGroup: 1,
+  },
   {
     category: "personal",
     coverage: "global",

@@ -1,6 +1,7 @@
 import { ContentPurifier } from "@core/purification/purification.service";
 import type { ThreatType } from "@core/purification/declarations/purification.types";
 import {
+  ENV_FILENAME_RE,
   SOURCE_FILE_ALLOWED_EXTENSIONS,
   SOURCE_FILE_ALLOWED_MIME_TYPES,
   SOURCE_FILE_MAX_BYTES,
@@ -42,6 +43,7 @@ const PURIFIER = new ContentPurifier({
 const BINARY_BYTE_THRESHOLD = 0.02;
 
 function hasAllowedExtension(name: string): boolean {
+  if (ENV_FILENAME_RE.test(name)) return true;
   const lower = name.toLowerCase();
   return SOURCE_FILE_ALLOWED_EXTENSIONS.some(ext => lower.endsWith(ext));
 }
