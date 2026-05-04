@@ -135,7 +135,7 @@ export function buildConfigSecretAssignmentPattern(
   const keySuffix = String.raw`[\w._-]*`;
 
   return new RegExp(
-    String.raw`(?:^|[\s;{}])(?:${patterns.join("|")})${keySuffix}\s*[:=]\s*["']?(\S*)["']?(?:$|[\s;{}])`,
+    String.raw`(?:^|[\s;{}])(?:${patterns.join("|")})${keySuffix}\s*[:=]\s*["']?(\S{8,}|)["']?(?:$|[\s;{}])`,
     "gimu",
   );
 }
