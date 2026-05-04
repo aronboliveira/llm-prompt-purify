@@ -183,6 +183,80 @@ export const ES_SECRET_ASSIGNMENT_FLAGS = Object.freeze([
   "token de actualizacion",
 ]);
 
+// ─── Chinese (ZH) ─────────────────────────────────────────────────────
+
+export const ZH_SECRET_ASSIGNMENT_FLAGS = Object.freeze([
+  "密码",
+  "密码",
+  "密码短语",
+  "秘密",
+  "密钥",
+  "api密钥",
+  "api 密钥",
+  "令牌",
+  "访问令牌",
+  "访问凭证",
+  "授权令牌",
+  "私钥",
+  "加密密钥",
+  "客户端秘密",
+  "连接字符串",
+  "数据库密码",
+  "ssh密钥",
+  "签名密钥",
+  "凭证",
+  "鉴权",
+]);
+
+// ─── Russian (RU) ─────────────────────────────────────────────────────
+
+export const RU_SECRET_ASSIGNMENT_FLAGS = Object.freeze([
+  "пароль",
+  "парольная фраза",
+  "секрет",
+  "секретный ключ",
+  "секрет api",
+  "api ключ",
+  "api-ключ",
+  "токен",
+  "токен доступа",
+  "ключ доступа",
+  "авторизационный токен",
+  "приватный ключ",
+  "закрытый ключ",
+  "ключ шифрования",
+  "клиентский секрет",
+  "строка подключения",
+  "строка соединения",
+  "пароль базы данных",
+  "ssh ключ",
+  "ключ подписи",
+  "учетные данные",
+]);
+
+// ─── Hindi (HI) ───────────────────────────────────────────────────────
+
+export const HI_SECRET_ASSIGNMENT_FLAGS = Object.freeze([
+  "पासवर्ड",
+  "पासफ्रेज़",
+  "सीक्रेट",
+  "गुप्त कुंजी",
+  "गुप्त",
+  "api कुंजी",
+  "api की",
+  "टोकन",
+  "एक्सेस टोकन",
+  "पहुंच कुंजी",
+  "निजी कुंजी",
+  "एन्क्रिप्शन कुंजी",
+  "क्लाइंट सीक्रेट",
+  "कनेक्शन स्ट्रिंग",
+  "डेटाबेस पासवर्ड",
+  "ssh कुंजी",
+  "साइनिंग की",
+  "प्रमाण पत्र",
+]);
+
 export const SHARED_PHONE_LABEL_FLAGS = Object.freeze([
   "cel",
   "celular",
@@ -593,6 +667,9 @@ export const SECRET_ASSIGNMENT_FLAGS = Object.freeze([
   ...PT_BR_SECRET_ASSIGNMENT_FLAGS,
   ...PT_PT_SECRET_ASSIGNMENT_FLAGS,
   ...ES_SECRET_ASSIGNMENT_FLAGS,
+  ...ZH_SECRET_ASSIGNMENT_FLAGS,
+  ...RU_SECRET_ASSIGNMENT_FLAGS,
+  ...HI_SECRET_ASSIGNMENT_FLAGS,
 ]);
 
 export const SHARED_IP_LABEL_FLAGS = Object.freeze([
