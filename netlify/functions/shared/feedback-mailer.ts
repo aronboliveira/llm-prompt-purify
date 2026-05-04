@@ -3,10 +3,16 @@ import { logFunctionEvent } from "./logger.js";
 import type { FeedbackEntry } from "./types.js";
 
 const FN = "feedback-mailer";
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DEFAULT_SENDER = "aron.b.96@gmail.com";
 
 export interface FeedbackEmailDispatchResult {
   readonly status: "emailed" | "failed";
   readonly error: string | null;
+}
+
+function isValidEmail(email: unknown): email is string {
+  return typeof email === "string" && email.trim().length > 0 && EMAIL_RE.test(email.trim());
 }
 
 function buildSubject(entry: FeedbackEntry): string {
@@ -16,8 +22,12 @@ function buildSubject(entry: FeedbackEntry): string {
     : `${prefix} New LLM Prompt Purify feedback`;
 }
 
-function buildBody(entry: FeedbackEntry): string {
+function buildBody(entry: FeedbackEntry, anonymous: boolean): string {
+  const header = anonymous
+    ? "[Sender is anonymous — no email address was provided]\n"
+    : "";
   return [
+    header,
     "A new feedback submission was received from the LLM Prompt Purify web app.",
     "",
     `Submission ID: ${entry.id}`,
@@ -41,8 +51,7 @@ export async function sendFeedbackEmail(
     port = parseInt(process.env.SMTP_PORT ?? "587", 10),
     user = process.env.SMTP_USERNAME,
     pass = process.env.SMTP_PASSWORD,
-    recipient = process.env.DEVELOPER_EMAIL_TO,
-    sender = process.env.SMTP_SENDER_EMAIL || user;
+    recipient = process.env.DEVELOPER_EMAIL_TO;
 
   if (!host || !user || !pass || !recipient) {
     logFunctionEvent(FN, "smtp_not_configured", "warn", {
@@ -54,6 +63,13 @@ export async function sendFeedbackEmail(
     };
   }
 
+  const userEmail = entry.email?.trim();
+  const hasValidEmail = isValidEmail(userEmail);
+  const senderName = hasValidEmail
+    ? entry.name?.trim() || userEmail!
+    : "LLM Prompt Purify";
+  const senderAddress = user ?? DEFAULT_SENDER;
+
   const transport = nodemailer.createTransport({
       auth: { pass, user },
       host,
@@ -61,11 +77,11 @@ export async function sendFeedbackEmail(
       secure: port === 465,
     }),
     mailOptions: nodemailer.SendMailOptions = {
-      from: sender,
+      from: `"${senderName}" <${senderAddress}>`,
       subject: buildSubject(entry),
-      text: buildBody(entry),
+      text: buildBody(entry, !hasValidEmail),
       to: recipient,
-      ...(entry.email ? { replyTo: entry.email } : {}),
+      ...(hasValidEmail ? { replyTo: userEmail } : {}),
     };
 
   try {

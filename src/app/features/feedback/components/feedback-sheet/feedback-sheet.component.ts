@@ -97,9 +97,7 @@ export class FeedbackSheetComponent {
     this.#isOpen.set(true);
     this.#previousFocus = document.activeElement;
     requestAnimationFrame(() => {
-      const closeBtn = document.querySelector<HTMLButtonElement>(
-        ".feedback-sheet__close",
-      );
+      const closeBtn = document.getElementById("feedback-sheet-close") as HTMLButtonElement | null;
       if (closeBtn) closeBtn.focus();
     });
   }
@@ -107,7 +105,7 @@ export class FeedbackSheetComponent {
   protected onKeydown(event: KeyboardEvent): void {
     if (event.key !== "Tab" || !this.#isOpen()) return;
 
-    const sheet = document.querySelector<HTMLElement>(".feedback-sheet");
+    const sheet = document.getElementById("feedback-sheet");
     if (!sheet) return;
 
     const focusable = Array.from(

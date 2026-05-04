@@ -1,4 +1,5 @@
 <button
+  id="feedback-trigger"
   class="feedback-trigger"
   data-testid="feedback-trigger"
   type="button"
@@ -9,10 +10,10 @@
 </button>
 
 @if (isOpen()) {
-  <div class="feedback-backdrop" role="presentation" (click)="closeOnBackdrop($event)" (keydown)="onKeydown($event)">
-    <aside class="feedback-sheet" aria-labelledby="feedback-sheet-title" aria-modal="true" role="dialog">
-      <header class="feedback-sheet__header">
-        <div class="feedback-sheet__title-wrap">
+  <div id="feedback-backdrop" class="feedback-backdrop" role="presentation" (click)="closeOnBackdrop($event)" (keydown)="onKeydown($event)">
+    <aside id="feedback-sheet" class="feedback-sheet" aria-labelledby="feedback-sheet-title" aria-modal="true" role="dialog">
+      <header id="feedback-sheet-header" class="feedback-sheet__header">
+        <div id="feedback-sheet-title-wrap" class="feedback-sheet__title-wrap">
           <span aria-hidden="true" class="feedback-sheet__icon" [innerHTML]="icons.feedback"></span>
           <div>
             <p class="feedback-sheet__eyebrow">Optional</p>
@@ -21,6 +22,7 @@
         </div>
 
         <button
+          id="feedback-sheet-close"
           aria-label="Close feedback form"
           class="feedback-sheet__close"
           [disabled]="isSubmitting()"
@@ -31,7 +33,7 @@
         </button>
       </header>
 
-      <details class="feedback-sheet__notice">
+      <details id="feedback-privacy-notice" class="feedback-sheet__notice">
         <summary class="feedback-sheet__notice-summary">
           <span aria-hidden="true">ℹ️</span>
           <span>Storage and privacy note</span>
@@ -39,10 +41,8 @@
         <div class="feedback-sheet__body">
           <p>
             This feedback form sends your name, email, category, and message to
-            the project maintainers. When a database is configured, feedback is
-            stored in a PostgreSQL outbox and retained for <strong>30 days</strong>.
-            When SMTP is configured, the content is forwarded to the developers
-            by email.
+            the project maintainers by email. Your feedback is not stored in a
+            database and is retained only in the developer inbox.
           </p>
           <p>
             You can submit feedback without providing your name or email. The
@@ -56,11 +56,12 @@
         </div>
       </details>
 
-      <form class="feedback-form" novalidate (ngSubmit)="submit()">
-        <label class="feedback-field">
+      <form id="feedback-form" class="feedback-form" novalidate (ngSubmit)="submit()">
+        <label id="feedback-category-field" class="feedback-field">
           <span class="feedback-field__label">Kind of feedback</span>
           <select
-            class="feedback-field__control"
+            id="feedback-category"
+            class="feedback-field__control feedback-field__control--select"
             data-testid="feedback-category"
             [ngModel]="draft().category"
             name="feedbackCategory"
@@ -70,18 +71,19 @@
               <option [value]="option.id">{{ option.label }}</option>
             }
           </select>
-          <span class="feedback-field__hint">{{ categoryHelper() }}</span>
+          <span id="feedback-category-hint" class="feedback-field__hint">{{ categoryHelper() }}</span>
           @if (fieldErrors().category; as categoryError) {
-            <span class="feedback-field__error">{{ categoryError }}</span>
+            <span id="feedback-category-error" class="feedback-field__error">{{ categoryError }}</span>
           }
         </label>
 
         @if (isAppraisal()) {
-          <fieldset class="feedback-rating">
+          <fieldset id="feedback-rating-fieldset" class="feedback-rating">
             <legend class="feedback-field__label">Appraisal rating</legend>
-            <div class="feedback-rating__options">
+            <div id="feedback-rating-options" class="feedback-rating__options">
               @for (rating of ratingOptions; track rating) {
                 <button
+                  id="feedback-rating-{{ rating }}"
                   class="feedback-rating__option"
                   [attr.data-state]="draft().rating === rating ? 'active' : 'idle'"
                   type="button"
@@ -92,16 +94,17 @@
               }
             </div>
             @if (fieldErrors().rating; as ratingError) {
-              <span class="feedback-field__error">{{ ratingError }}</span>
+              <span id="feedback-rating-error" class="feedback-field__error">{{ ratingError }}</span>
             }
           </fieldset>
         }
 
-        <div class="feedback-form__split">
-          <label class="feedback-field">
+        <div id="feedback-form-name-email" class="feedback-form__split">
+          <label id="feedback-name-field" class="feedback-field">
             <span class="feedback-field__label">Name</span>
             <input
-              class="feedback-field__control"
+              id="feedback-name"
+              class="feedback-field__control feedback-field__control--text"
               data-testid="feedback-name"
               [ngModel]="draft().name"
               maxlength="80"
@@ -111,16 +114,17 @@
               (ngModelChange)="updateTextField('name', $event)"
             />
             @if (fieldErrors().name; as nameError) {
-              <span class="feedback-field__error">{{ nameError }}</span>
+              <span id="feedback-name-error" class="feedback-field__error">{{ nameError }}</span>
             }
           </label>
 
-          <label class="feedback-field">
+          <label id="feedback-email-field" class="feedback-field">
             <span class="feedback-field__label">
               Email @if (needsEmail()) { <span class="feedback-field__required">Required</span> }
             </span>
             <input
-              class="feedback-field__control"
+              id="feedback-email"
+              class="feedback-field__control feedback-field__control--email"
               data-testid="feedback-email"
               [ngModel]="draft().email"
               maxlength="160"
@@ -130,17 +134,18 @@
               (ngModelChange)="updateTextField('email', $event)"
             />
             @if (fieldErrors().email; as emailError) {
-              <span class="feedback-field__error">{{ emailError }}</span>
+              <span id="feedback-email-error" class="feedback-field__error">{{ emailError }}</span>
             }
           </label>
         </div>
 
-        <label class="feedback-field">
+        <label id="feedback-subject-field" class="feedback-field">
           <span class="feedback-field__label">
             Subject @if (needsSubject()) { <span class="feedback-field__required">Required</span> }
           </span>
           <input
-            class="feedback-field__control"
+            id="feedback-subject"
+            class="feedback-field__control feedback-field__control--text"
             data-testid="feedback-subject"
             [ngModel]="draft().subject"
             maxlength="160"
@@ -150,13 +155,14 @@
             (ngModelChange)="updateTextField('subject', $event)"
           />
           @if (fieldErrors().subject; as subjectError) {
-            <span class="feedback-field__error">{{ subjectError }}</span>
+            <span id="feedback-subject-error" class="feedback-field__error">{{ subjectError }}</span>
           }
         </label>
 
-        <label class="feedback-field feedback-field--textarea">
+        <label id="feedback-message-field" class="feedback-field feedback-field--textarea">
           <span class="feedback-field__label">Message</span>
           <textarea
+            id="feedback-message"
             class="feedback-field__control feedback-field__control--textarea"
             data-testid="feedback-message"
             [ngModel]="draft().message"
@@ -166,17 +172,19 @@
             rows="7"
             (ngModelChange)="updateTextField('message', $event)"
           ></textarea>
-          <span class="feedback-field__meta">
+          <span id="feedback-message-meta" class="feedback-field__meta">
             <span>Max {{ maxMessageLength }} characters</span>
             <span>{{ remainingCharacters() }} left</span>
           </span>
           @if (fieldErrors().message; as messageError) {
-            <span class="feedback-field__error">{{ messageError }}</span>
+            <span id="feedback-message-error" class="feedback-field__error">{{ messageError }}</span>
           }
         </label>
 
-        <label class="feedback-toggle">
+        <label id="feedback-wants-reply-toggle" class="feedback-toggle">
           <input
+            id="feedback-wants-reply"
+            class="feedback-toggle__input"
             type="checkbox"
             [checked]="draft().wantsReply"
             (change)="toggleReply($event)"
@@ -190,8 +198,9 @@
           </span>
         </label>
 
-        <div class="feedback-form__actions">
+        <div id="feedback-form-actions" class="feedback-form__actions">
           <button
+            id="feedback-cancel"
             class="feedback-button feedback-button--secondary"
             [disabled]="isSubmitting()"
             type="button"
@@ -200,6 +209,7 @@
             Cancel
           </button>
           <button
+            id="feedback-submit"
             class="feedback-button feedback-button--primary"
             data-testid="feedback-submit"
             [disabled]="isSubmitting()"
