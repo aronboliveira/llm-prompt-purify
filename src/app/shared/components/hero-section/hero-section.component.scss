@@ -73,6 +73,7 @@
     color: ui.ink();
     display: block;
     font-weight: 700;
+    margin-top: 1px;
   }
 
   :scope .hero__notice-body {
@@ -82,7 +83,10 @@
 
   :scope .help-trigger {
     @include ui.help-button;
-
+    min-width: 23px;
+    max-width: 23px;
+    min-height: 23px;
+    max-height: 23px;
     & {
       justify-self: end;
     }
