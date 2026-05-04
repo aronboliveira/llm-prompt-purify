@@ -56,3 +56,38 @@ function escapeRegexLiteral(value: string): string {
 function wrapWithUnicodeBoundaries(pattern: string): string {
   return String.raw`(?<!${UNICODE_WORD_CHARACTER_CLASS})(?:${pattern})(?!${UNICODE_WORD_CHARACTER_CLASS})`;
 }
+
+/**
+ * Builds a regex that matches config-file-style secret assignments.
+ *
+ * Matches patterns common in .env, .yaml, .toml, docker-compose, k8s configs,
+ * cloud provider secrets, and password-manager exports where keys use
+ * underscore/hyphen/dot separators with secret-related words.
+ *
+ * Examples matched:
+ *   SMTP_PASSWORD=value
+ *   POSTGRES_PASSWORD=postgres
+ *   db-secret: abc123
+ *   app.token = "some-token"
+ *   DATABASE_URL=postgresql://user:pass@host/db
+ *
+ * Uses a lenient value pattern (1+ non-whitespace chars) with no character-class
+ * validator to catch simple passwords and connection strings that the stricter
+ * label-based rules would miss.
+ */
+export function buildConfigSecretAssignmentPattern(
+  keywords: readonly string[],
+): RegExp {
+  const escaped = keywords
+    .map(k => k.trim())
+    .filter(Boolean)
+    .map(k => k.split(/\s+/u).map(escapeRegexLiteral).join(String.raw`[\s._-]+`));
+
+  const alternation = escaped.join("|");
+  const keySuffix = String.raw`[\w._-]*`;
+
+  return new RegExp(
+    String.raw`(?:^|[\s;{}])[\w._-]*?(?:${alternation})${keySuffix}\s*[:=]\s*["']?(\S*)["']?(?:$|[\s;{}])`,
+    "gimu",
+  );
+}

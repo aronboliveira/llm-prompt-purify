@@ -98,7 +98,7 @@ void [_DOT_LIKE, _DASH_LIKE, _SLASH_LIKE];
  * on single-line inputs where multiple fields are concatenated.
  */
 const LABELED_ADDRESS_VALUE = String.raw`(?:(?!\s+(?:${NEXT_FIELD_BOUNDARY})\s*[:=-])[^\n\r]){6,200}`;
-import { createDelimitedLabelValuePattern } from "../utils/mask-pattern.utils";
+import { buildConfigSecretAssignmentPattern, createDelimitedLabelValuePattern } from "../utils/mask-pattern.utils";
 
 export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
   {
@@ -1585,6 +1585,25 @@ export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
       /(?:["'](?:password|contraseña|contrasena|senha|secret|api[-_]?key|token|private[-_]?key|access[-_]?key|master[-_]?password|admin[-_]?password|root[-_]?password|db[-_]?password|database[-_]?password|encryption[-_]?key|client[-_]?secret|auth[-_]?token|clave|chave[-_]?secreta|chave[-_]?api)[-_\w]*["']\s*[:=]\s*["'])([^\s"']{8,})(?=["'])/giu,
     priority: 116,
     validator: looksSecretLike,
+    valueGroup: 1,
+  },
+
+  // ─── Config-file secret assignments (.env, .yaml, .toml, docker-compose, etc.) ───
+  // Matches KEY=VALUE patterns where KEY contains secret-related words with
+  // underscore/hyphen/dot prefixes (e.g. SMTP_PASSWORD, db-secret, app.token).
+  // More lenient validator than the label-based rules above — catches simple
+  // passwords, connection strings, and empty values common in config files.
+
+  {
+    category: "credential",
+    coverage: "global",
+    confidence: "high",
+    id: "config-secret-assignment",
+    label: "Config-file secret assignment",
+    locale: "shared",
+    patternFactory: () =>
+      buildConfigSecretAssignmentPattern(SECRET_ASSIGNMENT_FLAGS),
+    priority: 115,
     valueGroup: 1,
   },
 
