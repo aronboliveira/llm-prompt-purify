@@ -97,11 +97,12 @@
     box-shadow: none;
     block-size: var(--help-trigger-size, 23px);
     color: var(--help-trigger-color, #1e293b);
+    contain: strict;
     cursor: pointer;
     display: inline-flex;
     font: inherit;
     font-weight: 700;
-    inline-size: var(--help-trigger-size, 23px);
+    inline-size: 20px;
     justify-content: center;
     line-height: 0;
     outline: none;
@@ -131,6 +132,7 @@
       inline-size: 100%;
       justify-content: center;
       line-height: 0;
+      margin-left: 0;
       pointer-events: none;
 
       :is(svg) {
