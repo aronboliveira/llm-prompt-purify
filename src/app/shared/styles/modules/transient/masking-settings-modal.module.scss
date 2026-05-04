@@ -619,7 +619,7 @@
   }
 
   .settings-modal {
-    background: var(--surface-bg, #1e293b);
+    background: rgb(22 45 66 / 94%);
     border-color: rgba(148, 163, 184, 0.18);
   }
 
@@ -627,39 +627,56 @@
   .mask-group-toggle,
   .strategy-radio,
   .polyglot-family-card {
-    background: var(--surface-subtle, #334155);
+    background: rgb(22 45 66 / 94%);
     border-color: rgba(148, 163, 184, 0.14);
+    transition: background-color 0.18s ease, border-color 0.18s ease;
+  }
+
+  .settings-card:hover,
+  .settings-card:focus-visible,
+  .settings-card:focus-within,
+  .mask-group-toggle:hover,
+  .mask-group-toggle:focus-visible,
+  .mask-group-toggle:focus-within,
+  .strategy-radio:hover,
+  .strategy-radio:focus-visible,
+  .strategy-radio:focus-within,
+  .polyglot-family-card:hover,
+  .polyglot-family-card:focus-visible,
+  .polyglot-family-card:focus-within {
+    background: #14444e;
+    border-color: rgba(45, 212, 191, 0.45);
   }
 
   .settings-card h3,
   .settings-toggle__title,
   .settings-fieldset__legend,
   .strategy-radio__title {
-    color: var(--page-text, #e2e8f0);
+    color: #e2e8f0;
   }
 
   .settings-card p,
   .settings-toggle__body,
   .strategy-radio__body {
-    color: var(--text-muted, #b2c0d2);
+    color: #b2c0d2;
   }
 
   .strategy-radio--selected,
   .strategy-radio:has(input:checked) {
-    background: var(--surface-selected, rgba(22, 70, 70, 0.82));
-    border-color: var(--surface-selected-border, rgba(45, 212, 191, 0.45));
+    background: #14444e;
+    border-color: rgba(45, 212, 191, 0.45);
   }
 
   .settings-toggle {
-    background: var(--surface-field, linear-gradient(180deg, rgba(28, 42, 61, 0.96), rgba(23, 36, 54, 0.96)));
-    border-color: var(--surface-accent-border, rgba(45, 212, 191, 0.35));
+    background: rgb(22 45 66 / 94%);
+    border-color: rgba(45, 212, 191, 0.35);
   }
 
   .settings-textarea,
   .xml-tag-picker__select {
-    background: var(--surface-bg, #1e293b);
-    border-color: var(--surface-accent-border, rgba(45, 212, 191, 0.35));
-    color: var(--text-strong, #e2e8f0);
+    background: rgb(22 45 66 / 94%);
+    border-color: rgba(45, 212, 191, 0.35);
+    color: #e2e8f0;
   }
 }
 
