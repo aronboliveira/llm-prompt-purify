@@ -224,7 +224,8 @@
   }
 
   .country-card[data-selected="true"] {
-    border-color: rgba(45, 212, 191, 0.35);
+    background: var(--surface-selected, rgba(22, 70, 70, 0.82));
+    border-color: rgba(45, 212, 191, 0.45);
   }
 
   .country-card__title {
