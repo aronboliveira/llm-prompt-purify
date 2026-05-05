@@ -177,6 +177,19 @@
   .mask-row[data-enabled="false"] {
     background: rgba(120, 80, 20, 0.18);
   }
+
+  .mask-row__action {
+    background: rgb(22 45 66 / 94%);
+    border-color: rgba(148, 163, 184, 0.36);
+    color: #e2e8f0;
+    transition: background-color 0.18s ease, border-color 0.18s ease;
+  }
+
+  .mask-row__action:hover:not(:disabled),
+  .mask-row__action:focus-visible {
+    background: #14444e;
+    border-color: rgba(45, 212, 191, 0.35);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
