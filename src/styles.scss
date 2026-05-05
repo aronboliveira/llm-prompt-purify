@@ -276,3 +276,12 @@ textarea {
 ::selection {
   background: var(--mask-highlight);
 }
+
+.help-trigger {
+  width: 22.5px;
+  min-width: 22.5px;
+  max-width: 22.5px;
+  &__icon {
+    transform: translate(-0.5px, -0.5px);
+  }
+}
