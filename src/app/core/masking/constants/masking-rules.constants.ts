@@ -124,6 +124,11 @@ const HARDCODED_CONFIG_SECRET_KEYS: readonly string[] = Object.freeze([
   String.raw`(?:DB|DATABASE)[-_]?PORT`,
   String.raw`(?:DB|DATABASE)[-_]?USER(?:NAME)?`,
   String.raw`(?:DB|DATABASE)[-_]?DATABASE`,
+  // ── RDBMS-specific (PostgreSQL, MySQL, MariaDB, etc.) ──
+  String.raw`(?:POSTGRES|POSTGRESQL|PSQL|PGSQL)[-_]?(?:PASS(?:WORD)?|PWD|DB|DATABASE|USER|HOST|PORT|URL)`,
+  String.raw`(?:MYSQL|MARIADB|MARIA)[-_]?(?:PASS(?:WORD)?|PWD|DB|DATABASE|USER|HOST|PORT|URL|ROOT[_]?PASS(?:WORD)?)`,
+  String.raw`(?:MONGO|MONGODB)[-_]?(?:PASS(?:WORD)?|PWD|DB|DATABASE|USER|HOST|PORT|URL|URI)`,
+  String.raw`(?:SQLITE|SQLITE3|SQLSERVER|MSSQL|ORACLE)[-_]?(?:PASS(?:WORD)?|PWD|DB|DATABASE|USER|HOST|PORT)`,
   // ── Redis / Cache ──
   String.raw`REDIS[_]?(?:PASS(?:WORD)?|PWD)`,
   String.raw`REDIS[_]?URL`,
@@ -165,7 +170,8 @@ const HARDCODED_CONFIG_SECRET_KEYS: readonly string[] = Object.freeze([
   String.raw`(?:LOGGLY|PAPERTRAIL|ELASTIC)[-_]?(?:KEY|TOKEN|SECRET)`,
   // ── Network / Firewall ──
   String.raw`(?:SSH|SSL|TLS|CERT)[-_]?(?:KEY|PRIVATE[_-]?KEY|PASS(?:WORD)?|SECRET)`,
-  String.raw`(?:NGINX|APACHE|TRAEFIK|HAPROXY)[-_]?(?:PASS(?:WORD)?|SECRET|KEY|TOKEN)`,
+  String.raw`(?:NGINX|NGX|HTTPD|APACHE|TRAEFIK|HAPROXY|CADDY|TOMCAT|JBOSS)[-_]?(?:PASS(?:WORD)?|SECRET|KEY|TOKEN|AUTH)`,
+  String.raw`(?:PFSENSE|UFW|IPTABLES|FIREWALL|FIREWALLD)[-_]?(?:PASS(?:WORD)?|SECRET|KEY|TOKEN)`,
   // ── Custom app secrets (this project's own keys) ──
   String.raw`FEEDBACK[_]?RETRY[_]?SECRET`,
   String.raw`BACKEND[_]?PORT`,

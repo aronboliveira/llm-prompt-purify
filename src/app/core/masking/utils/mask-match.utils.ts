@@ -78,7 +78,15 @@ export function extractCandidateMatch(
   const capturedValue = sanitizeCapturedValue(match[rule.valueGroup] ?? "");
   if (!capturedValue && !rule.allowEmptyValue) return null;
 
-  const relativeIndex = match[0].indexOf(capturedValue);
+  let relativeIndex: number;
+  if (capturedValue.length === 0 && rule.allowEmptyValue) {
+    // Empty value: place mask at end of full match (after the delimiter).
+    // Avoids `indexOf("")` returning 0 and anchoring the mask at the key start.
+    relativeIndex = match[0].length;
+  } else {
+    relativeIndex = match[0].indexOf(capturedValue);
+  }
+
   if (relativeIndex < 0) return null;
 
   const start = match.index + relativeIndex;
