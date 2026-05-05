@@ -514,10 +514,7 @@ function escapeRegex(str: string): string {
 // ─── Credential Prefix Mangling ──────────────────────────────────────────────
 
 /** Rule IDs whose label/prefix should be mangled alongside the value. */
-const CREDENTIAL_PREFIX_RULE_IDS = new Set([
-  "secret-assignment",
-  "keyed-secret-assignment",
-]);
+const CREDENTIAL_PREFIX_RULE_IDS = new Set<string>([]);
 
 /**
  * Mangles a credential label such as `senha_master` → `XXXXX_YYYYYY`,

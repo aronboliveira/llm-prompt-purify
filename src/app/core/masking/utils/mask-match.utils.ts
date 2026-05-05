@@ -113,8 +113,14 @@ export function resolveOverlaps(
   const resolved: CandidateMatch[] = [];
   for (const candidate of sorted) {
     const previous = resolved.at(-1);
-    if (!previous || candidate.start >= previous.end) {
+    if (!previous || candidate.start > previous.end) {
       resolved.push(candidate);
+      continue;
+    }
+    // Deduplicate zero-length masks at the same position
+    if (candidate.start === previous.end && candidate.start === candidate.end && previous.start === previous.end) {
+      if (candidate.rule.priority > previous.rule.priority)
+        resolved[resolved.length - 1] = candidate;
       continue;
     }
 

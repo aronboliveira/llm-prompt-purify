@@ -35,7 +35,7 @@ export function createDelimitedLabelValuePattern(
       : `(${valuePattern})`;
 
   return new RegExp(
-    String.raw`${labelPattern}\s*${delimiterPattern}\s*${wrappedValuePattern}`,
+    String.raw`${labelPattern}\s*${delimiterPattern}[\t ]*${wrappedValuePattern}`,
     flags,
   );
 }
