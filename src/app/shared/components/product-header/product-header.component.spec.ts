@@ -55,4 +55,17 @@ describe("ProductHeaderComponent", () => {
     const titleEl = element.querySelector(".product-header__title");
     expect(titleEl?.textContent).toContain("🔒");
   });
+
+  it("should render the github link with correct attributes", () => {
+    fixture.detectChanges();
+
+    const githubLink = element.querySelector(".product-header__github") as HTMLAnchorElement;
+    expect(githubLink).toBeTruthy();
+    expect(githubLink.href).toBe("https://github.com/aronboliveira/llm-prompt-purify");
+    expect(githubLink.getAttribute("target")).toBe("_blank");
+    expect(githubLink.getAttribute("rel")).toContain("noreferrer");
+    expect(githubLink.getAttribute("rel")).toContain("noopener");
+    expect(githubLink.getAttribute("rel")).toContain("external");
+    expect(githubLink.querySelector("svg")).toBeTruthy();
+  });
 });
