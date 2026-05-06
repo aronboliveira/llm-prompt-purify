@@ -6,7 +6,10 @@ import {
 describe("country-profile-defaults utils", () => {
   it("maps explicit browser locales to the most relevant country profile", () => {
     expect(matchBrowserLocaleToCountryProfileId("pt-BR")).toBe("br");
+    expect(matchBrowserLocaleToCountryProfileId("pt")).toBe("br");
+    expect(matchBrowserLocaleToCountryProfileId("PT")).toBe("br");
     expect(matchBrowserLocaleToCountryProfileId("pt-PT")).toBe("pt");
+    expect(matchBrowserLocaleToCountryProfileId("PT-PT")).toBe("pt");
     expect(matchBrowserLocaleToCountryProfileId("es-ES")).toBe("es");
     expect(matchBrowserLocaleToCountryProfileId("es-419")).toBe("latam-es");
     expect(matchBrowserLocaleToCountryProfileId("zh-CN")).toBe("cn");

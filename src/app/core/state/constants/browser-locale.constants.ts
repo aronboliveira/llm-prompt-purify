@@ -2,8 +2,8 @@ import type { BrowserLocaleMapping } from "../declarations/browser-locale.types"
 
 export const BROWSER_LOCALE_MAPPINGS: readonly BrowserLocaleMapping[] =
   Object.freeze([
-    { countryProfileId: "br", pattern: /^pt-br$/iu },
-    { countryProfileId: "pt", pattern: /^pt(?:-pt)?$/iu },
+    { countryProfileId: "br", pattern: /^pt(?:-br)?$/iu },
+    { countryProfileId: "pt", pattern: /^pt-pt$/iu },
     { countryProfileId: "us", pattern: /^en-us$/iu },
     {
       countryProfileId: "in",
