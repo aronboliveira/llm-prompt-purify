@@ -355,6 +355,7 @@ export const RULE_TAG_MAP: Readonly<Record<string, string>> = Object.freeze({
   "bearer-token": "BEARER_TOKEN",
   "jwt-token": "JWT_TOKEN",
   "keyed-secret-assignment": "SECRET",
+  "numeric-secret-assignment": "PASSWORD",
   "secret-assignment": "PASSWORD",
   "aws-access-key": "AWS_KEY",
   "aws-secret-key": "AWS_SECRET",

@@ -47,6 +47,20 @@ ES_SECRET_ASSIGNMENT_FLAGS = (
     "token de actualizacion",
 )
 
+NUMERIC_SECRET_ASSIGNMENT_FLAGS = (
+    "cert password", "contrasena", "contrasena de base de datos",
+    "contrasena maestra", "contraseña", "contraseña de base de datos",
+    "contraseña maestra", "database password", "db password",
+    "डेटाबेस पासवर्ड", "keystore password", "mail password",
+    "master password", "pass", "passphrase", "पासफ्रेज़", "पासवर्ड",
+    "palavra passe", "palavra-passe", "password", "redis password",
+    "senha", "senha admin", "senha api", "senha do banco de dados",
+    "senha mestra", "senha mongo", "senha mysql", "senha postgres",
+    "senha redis", "senha root", "senha do servidor", "senha_master",
+    "senha_mestre", "smtp password", "пароль", "пароль базы данных",
+    "парольная фраза", "密码", "密码短语", "数据库密码",
+)
+
 SECRET_ASSIGNMENT_FLAGS = (
     *SHARED_SECRET_ASSIGNMENT_FLAGS,
     *PT_BR_SECRET_ASSIGNMENT_FLAGS,
@@ -304,6 +318,17 @@ RULES: list[DetectionRuleDef] = [
             re.U,
         ),
         "value_group": None,
+    },
+    {
+        "id": "numeric-secret-assignment",
+        "label": "Numeric credential assignment",
+        "regex": create_delimited_label_value_pattern(
+            NUMERIC_SECRET_ASSIGNMENT_FLAGS,
+            r"\d{3,}",
+            delimiter_pattern=r"[:=]+",
+            quote_wrapped=True,
+        ),
+        "value_group": 1,
     },
     {
         "id": "secret-assignment",

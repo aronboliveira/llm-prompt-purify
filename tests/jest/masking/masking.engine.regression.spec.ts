@@ -1,4 +1,7 @@
-import { DEFAULT_GROUP_PREFERENCES } from "@core/masking/constants/masking.constants";
+import {
+  DEFAULT_ADVANCED_PREFERENCES,
+  DEFAULT_GROUP_PREFERENCES,
+} from "@core/masking/constants/masking.constants";
 import { MaskingEngine } from "@core/masking/masking.engine";
 import { buildScanScopeSelection } from "@core/masking/utils/country-scope.utils";
 import {
@@ -87,6 +90,61 @@ describe("MaskingEngine regression corpus", () => {
     expect(result.matches).toHaveLength(2);
     expect(result.matches[0].mask).toBe(result.matches[1].mask);
     expect(result.maskedText).not.toContain("sk-proj-ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
+  });
+
+  it("masks short numeric password assignments from main textarea labels", () => {
+    const sourceText = [
+        "senha=123",
+        "password : 4567",
+        "contraseÑa=89012",
+        "密码=321",
+        "पासवर्ड=654",
+      ].join("\n"),
+      result = engine.scan(
+        sourceText,
+        DEFAULT_GROUP_PREFERENCES,
+        buildScanScopeSelection(["br"], "selected-plus-global"),
+        "2026-05-09T00:00:00.000Z",
+        { ...DEFAULT_ADVANCED_PREFERENCES, maskingStrategy: "tags" },
+      ),
+      numericPasswordMatches = result.matches.filter(
+        match => match.ruleId === "numeric-secret-assignment",
+      );
+
+    expect(numericPasswordMatches.map(match => match.value)).toEqual([
+      "123",
+      "4567",
+      "89012",
+      "321",
+      "654",
+    ]);
+    expect(result.maskedText).not.toContain("123");
+    expect(result.maskedText).not.toContain("4567");
+    expect(result.maskedText).not.toContain("89012");
+    expect(result.maskedText).not.toContain("321");
+    expect(result.maskedText).not.toContain("654");
+  });
+
+  it("does not treat HTTP bearer scheme words as config-secret values", () => {
+    const sourceText =
+        "Bearer token: Bearer abc123_def456-ghi789.jkl012~mno345+pqr678",
+      result = engine.scan(
+        sourceText,
+        DEFAULT_GROUP_PREFERENCES,
+        buildScanScopeSelection(["us"], "selected-plus-global"),
+        "2026-05-09T00:00:00.000Z",
+        { ...DEFAULT_ADVANCED_PREFERENCES, maskingStrategy: "tags" },
+      );
+
+    expect(
+      result.matches.some(match => match.ruleId === "config-secret-assignment"),
+    ).toBe(false);
+    expect(result.matches.map(match => match.ruleId)).toContain(
+      "bearer-token",
+    );
+    expect(result.maskedText).not.toContain(
+      "abc123_def456-ghi789.jkl012~mno345+pqr678",
+    );
   });
 
   it("preserves untouched prose around masked values instead of collapsing formatting", () => {

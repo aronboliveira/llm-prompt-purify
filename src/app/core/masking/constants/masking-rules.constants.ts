@@ -34,6 +34,7 @@ import {
   LATAM_DNI_LABEL_FLAGS,
   LATAM_RUC_LABEL_FLAGS,
   NEXT_FIELD_BOUNDARY,
+  NUMERIC_SECRET_ASSIGNMENT_FLAGS,
   PT_NIF_LABEL_FLAGS,
   PT_NISS_LABEL_FLAGS,
   RU_INN_LABEL_FLAGS,
@@ -379,6 +380,22 @@ export const MASKING_RULES: readonly DetectionRule[] = deepFreeze([
     patternFactory: () =>
       /https:\/\/hooks\.slack\.com\/services\/T[A-Z0-9]{8,}\/B[A-Z0-9]{8,}\/[A-Za-z0-9]{20,}/gu,
     priority: 126,
+  },
+  {
+    category: "credential",
+    coverage: "global",
+    confidence: "high",
+    id: "numeric-secret-assignment",
+    label: "Numeric credential assignment",
+    locale: "shared",
+    patternFactory: () =>
+      createDelimitedLabelValuePattern(
+        NUMERIC_SECRET_ASSIGNMENT_FLAGS,
+        String.raw`\d{3,}`,
+        { delimiterPattern: String.raw`[:=]+`, quoteWrapped: true },
+      ),
+    priority: 120,
+    valueGroup: 1,
   },
   {
     category: "credential",

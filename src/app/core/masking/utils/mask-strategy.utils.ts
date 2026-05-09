@@ -98,6 +98,7 @@ const FAKER_CATEGORY_LABELS: Readonly<Record<string, string>> = Object.freeze({
   "github-pat": "GITHUB_PAT",
   "slack-webhook": "SLACK_WEBHOOK",
   "secret-assignment": "SECRET",
+  "numeric-secret-assignment": "SECRET",
   "bearer-token": "BEARER",
 
   // United States (US)

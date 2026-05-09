@@ -617,6 +617,7 @@ export function looksSecretLike(value: string): boolean {
 export function looksLikeConfigSecret(value: string): boolean {
   const normalized = sanitizeCapturedValue(value);
   if (normalized.length === 0) return true;
+  if (/^(?:basic|bearer|digest|negotiate)$/i.test(normalized)) return false;
   if (
     /^(?:null|nil|dummy|empty|undefined|none|na|n\/a|false|true|yes|no|1|0|off|on|local|localhost|127\.0\.0\.1)$/i.test(
       normalized,
