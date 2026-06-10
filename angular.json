@@ -34,6 +34,9 @@
             "scripts": [],
             "server": "src/main.server.ts",
             "prerender": true,
+            "security": {
+              "allowedHosts": ["localhost", "ng-localhost"]
+            },
             "ssr": {
               "entry": "server.ts"
             }
